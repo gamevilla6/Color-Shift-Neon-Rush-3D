@@ -1,6 +1,6 @@
 # Store name and listing readiness review
 
-**Reviewed:** 2026-10-22  
+**Policy sources checked:** 2026-10-22
 **Scope:** Preliminary public search and review of the project’s existing store-facing metadata for a planned Google Play release. The initial review did not have a confirmed title or territory list; the user later confirmed a working title and nine planned markets, documented below.
 
 ## Findings
@@ -83,3 +83,55 @@ Google Play’s official [Metadata policy](https://support.google.com/googleplay
 5. Capture actual gameplay screenshots after the game preview/build can run. The screenshot review could not be completed in the initial pass because the configured game workflow failed to start: `scripts/embed-three.mjs` could not resolve the declared `esbuild` package.
 
 **Status:** Screening documented; **not cleared for store submission**. The selected working title is recorded, but no app branding was changed. No approval or legal availability is implied.
+
+## Google Play listing draft and current policy check
+
+**Reviewed:** 2026-10-22
+**Status:** English copy is drafted for review only. The title remains uncleared, and the required graphics and real Android screenshots are not ready. Do not paste this draft into Play Console or treat it as an approved listing.
+
+### Proposed English metadata (working title only)
+
+- **App title:** `Color Shift: Neon Rush 3D` — 25 characters, within the current 30-character limit. This is the un-cleared working title, not a final title.
+- **Short description:** `Match colors, dodge neon gates, and chase a new high score in a 3D runner.` — 74 characters, within the 80-character limit.
+- **Full description (draft, 570 characters):**
+
+> Shift lanes and match your orb to each gate in a fast-paced 3D arcade runner. Choose Endless for a longer run or Time Attack to score before time runs out.
+>
+> Swipe or use the on-screen controls to change lanes and switch colors. Pass matching gates, build a streak, collect crystals, and pick up power-ups as the pace increases.
+>
+> Earn crystals and use them to unlock orb skins. Track your best score, complete in-game achievements and daily challenges, and explore changing neon environments.
+>
+> Each run puts your timing and color matching to the test. How far can you go?
+
+The copy is limited to features visible in the current game code. It makes no claims about online play, leaderboards, purchases, ads, or offline Android operation. The Android release still needs a device/build check before any gameplay claim is treated as verified for publication.
+
+### Asset readiness
+
+| Play asset | Current requirement / guidance | Readiness |
+| --- | --- | --- |
+| App icon | Required; 512 × 512 PNG with alpha, 32-bit, maximum 1,024 KB | Not prepared. The separate Android icon/launch-screen task is pending. |
+| Feature graphic | Required; 1,024 × 500 JPEG or 24-bit PNG without alpha | Not prepared. Hold final branded artwork until the title is cleared; compose it around actual game visuals and keep important content in the safe center. |
+| Screenshots | At least two screenshots across different device types; JPEG or 24-bit PNG, each dimension 320–3,840 px, with the long dimension no more than twice the short dimension | None prepared. Capture from the Android release on supported device types; do not substitute mockups or web-only imagery. |
+| Game screenshot set for recommendation eligibility | Highly recommended: at least three portrait 1,080 × 1,920 or landscape 1,920 × 1,080 screenshots showing in-game experience | Not prepared. Use real gameplay, keep overlays/taglines minimal, and supply alt text (140 characters or less) for each asset. |
+| Preview video | Optional, recommended for games | None prepared. If added later, show actual gameplay early, disable ads, and use a public or unlisted embeddable video. |
+
+No image assets were created because the name is not cleared and an Android build/device capture could not be verified in this environment. The project currently has no confirmed store icon, feature graphic, or store screenshots.
+
+### Policy review against current official guidance
+
+Checked on 2026-10-22 against Google Play’s [preview asset requirements](https://support.google.com/googleplay/android-developer/answer/9866151?hl=en), [Metadata policy](https://support.google.com/googleplay/android-developer/answer/9898842?hl=en), and [store listing best practices](https://support.google.com/googleplay/android-developer/answer/13393723?hl=en).
+
+- Titles must be 30 characters or fewer; short descriptions 80 characters or fewer; full descriptions 4,000 characters or fewer.
+- Metadata must be accurate, clear, non-repetitive, and suitable for a general audience. Avoid ranking, awards, price or promotion claims, irrelevant keywords, and unlicensed third-party marks or imagery.
+- The required icon and feature graphic must meet the formats and dimensions above. Feature graphics should keep key content near the center and avoid misleading promotional badges or store branding.
+- Screenshots must show the actual in-app/game experience. The policy recommends at least three high-resolution gameplay screenshots in a supported orientation for games; added screenshot text should be minimal, truthful, and localized. Alt text is recommended for uploaded assets.
+- Do not claim name clearance, online features, an offline mode, or other functionality that has not been verified for the Android release.
+
+### Remaining release blockers
+
+1. **Name clearance:** this review records the title as **NOT CLEARED**. The seven unverified market searches and legal review remain open. Until resolved, do not change the Android label, HTML/game branding, artifact title, or create final title-bearing listing assets.
+2. **Consistent naming:** after clearance, align the exact approved title across `capacitor.config.json`, Android strings, the HTML/game branding, artifact metadata, and Play listing. Today these surfaces still differ (`Color Shift`, `Color Shift: Neon Rush 3D`, and `Color Swipe Runner`).
+3. **Android validation and captures:** this environment has no Java or Android build tools, so the Android package and on-device behavior could not be checked. Capture real gameplay on the supported phone/tablet form factors before preparing the final screenshot set.
+4. **Graphics:** prepare the final 512 × 512 icon and 1,024 × 500 feature graphic only after title clearance, then inspect each export against the dimensions, format, content, and trademark rules above.
+
+**Disposition:** The listing text is a measured draft, not a completed Play listing. The task is partially complete because name clearance and release-accurate store graphics/screenshots remain blocked.
