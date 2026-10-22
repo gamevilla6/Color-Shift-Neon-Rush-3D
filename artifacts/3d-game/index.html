@@ -37,6 +37,8 @@
     .highscore { text-align: right; }
     .micro-label { color: #818995; font-size: 9px; text-transform: uppercase; letter-spacing: .18em; }
     .record-value { margin-top: 4px; color: #f5f2e9; font-size: 16px; letter-spacing: .04em; }
+    .coin-total { margin-top: 4px; color: #ffd36a; font-size: 8px; letter-spacing: .12em; text-shadow: 0 0 12px rgba(255,211,106,.42); }
+    .coin-total::before { content: "◆ "; }
     .sound-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; padding: 6px 8px; border: 1px solid rgba(224,235,240,.2); background: rgba(8,13,20,.5); color: rgba(220,228,236,.78); cursor: pointer; font: inherit; font-size: 8px; letter-spacing: .12em; pointer-events: auto; }
     .sound-toggle:hover:not(:disabled) { border-color: rgba(157,255,208,.55); color: #f5f2e9; }
     .sound-toggle[aria-pressed="false"] { color: #858b98; }
@@ -51,15 +53,16 @@
     .stat-value { transition: color .2s, text-shadow .2s, transform .2s; }
     .run-status { position: absolute; z-index: 6; top: 50%; left: 50%; transform: translate(-50%, 105px); color: rgba(240,244,247,.66); font-size: 9px; letter-spacing: .19em; text-transform: uppercase; opacity: 0; transition: opacity .3s; pointer-events: none; }
     .run-status.visible { opacity: 1; }
-    .power-status { position: absolute; z-index: 5; top: 151px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; gap: 8px; pointer-events: none; }
+    .power-status { position: absolute; z-index: 5; top: 151px; left: 50%; width: min(94vw, 560px); transform: translateX(-50%); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; pointer-events: none; }
     .power-status[hidden], .power-chip[hidden], .boost-banner[hidden] { display: none !important; }
     .power-chip { padding: 6px 9px; border: 1px solid rgba(255,255,255,.18); background: rgba(8,12,19,.72); color: #e9f5fa; font-size: 8px; letter-spacing: .14em; text-transform: uppercase; box-shadow: 0 0 14px rgba(56,230,211,.12); }
     .power-chip.shield { color: var(--cyan); border-color: rgba(56,230,211,.48); }
-    .power-chip.rainbow { color: var(--magenta); border-color: rgba(255,79,184,.48); }
+    .power-chip.time-warp { color: #67aaff; border-color: rgba(80,158,255,.56); box-shadow: 0 0 14px rgba(80,158,255,.18); }
+    .power-chip.score-boost { color: #ffd46a; border-color: rgba(255,205,74,.58); box-shadow: 0 0 14px rgba(255,205,74,.18); }
     .boost-banner { position: absolute; z-index: 6; top: 184px; left: 50%; transform: translateX(-50%); color: var(--lime); font-family: system-ui, sans-serif; font-size: 19px; font-weight: 900; letter-spacing: .2em; text-shadow: 0 0 18px rgba(197,255,74,.8); pointer-events: none; animation: boostPulse .5s ease-in-out infinite alternate; white-space: nowrap; }
     .boost-banner span { font: 9px ui-monospace, monospace; letter-spacing: .12em; }
     @keyframes boostPulse { from { opacity: .68; filter: brightness(.9); } to { opacity: 1; filter: brightness(1.4); } }
-    .environment-banner { position: absolute; z-index: 7; top: clamp(166px, 24vh, 226px); left: 50%; width: min(calc(100vw - 32px), 350px); padding: 10px 16px 12px; border: 1px solid color-mix(in srgb, var(--zone-color) 65%, transparent); background: rgba(7, 11, 19, .82); color: var(--zone-color); text-align: center; pointer-events: none; opacity: 0; transform: translate(-50%, 10px) scale(.96); box-shadow: 0 0 0 rgba(0,0,0,0); backdrop-filter: blur(10px); transition: opacity .28s ease, transform .32s cubic-bezier(.2,.8,.2,1), box-shadow .32s ease; }
+    .environment-banner { position: absolute; z-index: 7; top: clamp(210px, 31vh, 260px); left: 50%; width: min(calc(100vw - 32px), 350px); padding: 10px 16px 12px; border: 1px solid color-mix(in srgb, var(--zone-color) 65%, transparent); background: rgba(7, 11, 19, .82); color: var(--zone-color); text-align: center; pointer-events: none; opacity: 0; transform: translate(-50%, 10px) scale(.96); box-shadow: 0 0 0 rgba(0,0,0,0); backdrop-filter: blur(10px); transition: opacity .28s ease, transform .32s cubic-bezier(.2,.8,.2,1), box-shadow .32s ease; }
     .environment-banner[hidden] { display: none !important; }
     .environment-banner.visible { opacity: 1; transform: translate(-50%, 0) scale(1); box-shadow: 0 0 28px color-mix(in srgb, var(--zone-color) 22%, transparent); }
     .environment-kicker { display: block; margin-bottom: 4px; color: rgba(238,244,250,.6); font-size: 8px; letter-spacing: .2em; text-transform: uppercase; }
@@ -109,6 +112,14 @@
     .tap-control:active { background: rgba(56,230,211,.25); transform: scale(.94); }
     .flash { position: absolute; z-index: 4; inset: 0; pointer-events: none; background: rgba(255,79,184,.1); opacity: 0; transition: opacity .08s; }
     .flash.on { opacity: 1; }
+    #game.impact-shake { animation: impactShake .32s linear; }
+    @keyframes impactShake {
+      0%, 100% { transform: translate3d(0,0,0); }
+      18% { transform: translate3d(-5px,2px,0); }
+      38% { transform: translate3d(4px,-2px,0); }
+      58% { transform: translate3d(-3px,1px,0); }
+      78% { transform: translate3d(2px,-1px,0); }
+    }
     @media (max-width: 650px) {
       .topbar { top: max(18px, env(safe-area-inset-top)); left: 18px; right: 18px; }
       .brand-mark { width: 24px; height: 24px; }
@@ -146,7 +157,7 @@
       .hud { top: max(52px, calc(env(safe-area-inset-top) + 38px)); }
       .power-status { top: max(94px, calc(env(safe-area-inset-top) + 78px)); }
       .boost-banner { top: max(122px, calc(env(safe-area-inset-top) + 106px)); }
-      .environment-banner { top: max(158px, calc(env(safe-area-inset-top) + 143px)); }
+      .environment-banner { top: max(190px, calc(env(safe-area-inset-top) + 175px)); }
       .overlay { padding: 10px max(14px, env(safe-area-inset-right)) 10px max(14px, env(safe-area-inset-left)); }
       .card { width: min(100%, 520px); }
       .eyebrow { margin-bottom: 7px; }
@@ -175,7 +186,7 @@
       .color-key { margin: 15px 0; }
       .color-panel, .controls-hint { bottom: 22px; }
     }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
   </style>
 </head>
 <body>
@@ -190,6 +201,7 @@
       </div>
       <div class="highscore">
         <div class="micro-label">Best score</div><div class="record-value"><span id="bestTop">00000</span></div>
+        <div class="coin-total" aria-label="Total crystals collected">CRYSTALS <span id="coinTotal">00000</span></div>
         <button class="sound-toggle" id="soundToggle" type="button" aria-label="Mute sound" aria-pressed="true" title="Mute sound">
           <svg class="sound-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6v4h3l4 3V3L5 6H2Z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5"/></svg>
           <span id="soundLabel">SOUND ON</span>
@@ -205,8 +217,9 @@
     </section>
     <div class="run-status" id="runStatus">Next gate ahead</div>
     <div class="power-status" id="powerStatus" hidden>
-      <span class="power-chip shield" id="shieldStatus" hidden>Shield ready</span>
-      <span class="power-chip rainbow" id="rainbowStatus" hidden>Rainbow <b id="rainbowTime">0</b>s</span>
+      <span class="power-chip shield" id="shieldStatus" hidden>Prism shield active</span>
+      <span class="power-chip time-warp" id="timeWarpStatus" hidden>Slow-mo · 0s</span>
+      <span class="power-chip score-boost" id="scoreBoostStatus" hidden>2X · 0s</span>
     </div>
     <div class="boost-banner" id="speedBanner" hidden>SPEED UP! <span><b id="speedTime">5</b>s</span></div>
     <div class="environment-banner" id="environmentBanner" role="status" aria-live="polite" hidden>
@@ -231,7 +244,7 @@
       <div class="card" id="card">
         <div class="eyebrow" id="eyebrow">A color reaction test</div>
         <h1 aria-label="Color Shift: Neon Rush 3D"><span class="title-light" id="titleTop">Color Shift:</span><span class="title-accent" id="titleBottom">Neon Rush 3D</span></h1>
-    <p class="intro" id="intro">Chain matching gates for bigger combo scores. Grab Shield and Rainbow power-ups, then ride the speed burst every fifth gate.</p>
+    <p class="intro" id="intro">Chain matching gates, scoop up neon crystals, and collect Prism Shields, Time Warps, and 2X score boosts across ten evolving worlds.</p>
         <div class="color-key" id="colorKey">
           <span class="key-chip"><i style="color:var(--cyan);background:var(--cyan)"></i>Cyan</span>
           <span class="key-chip"><i style="color:var(--magenta);background:var(--magenta)"></i>Magenta</span>
@@ -3977,6 +3990,7 @@ void main() {
       const GATE_HALF_DEPTH = 0.045;
       const GATE_HALF_WIDTH = 3.65;
       const SEGMENT_WIDTH = (GATE_HALF_WIDTH * 2) / COLORS.length;
+      const LASER_HALF_WIDTH = 0.56;
       const FIRST_GATE_SPAWN_Z = -50;
       const START_GRACE_SECONDS = 1;
       const ENVIRONMENTS = [
@@ -4005,6 +4019,11 @@ void main() {
       // Keep the camera below the tunnel roof while aiming down the path at incoming gates.
       camera.position.set(0, 1.45, 7.5);
       camera.lookAt(0, 0.5, -18);
+      const CAMERA_BASE_Y = camera.position.y;
+      const CAMERA_BASE_Z = camera.position.z;
+      let cameraShakeTimer = 0;
+      let cameraShakeIntensity = 0;
+      let impactShakeTimer = 0;
       let renderer = null;
       let fallbackCanvas = null;
       let fallbackContext = null;
@@ -4327,7 +4346,7 @@ void main() {
       function updateGateMechanics(gate) {
         const mechanics = gate.userData;
         if (mechanics.colorChanging) {
-          const step = Math.floor(elapsed * mechanics.flashRate + mechanics.flashPhase);
+          const step = Math.floor(obstacleElapsed * mechanics.flashRate + mechanics.flashPhase);
           if (step !== mechanics.flashStep) {
             mechanics.flashStep = step;
             mechanics.colorIndex = (mechanics.baseColorIndex + step) % COLORS.length;
@@ -4338,14 +4357,14 @@ void main() {
               material.opacity = lane === mechanics.requiredLane ? 1 : 0.38;
             });
           }
-          const flash = 0.5 + 0.5 * Math.sin(elapsed * 11 + mechanics.flashPhase);
+          const flash = 0.5 + 0.5 * Math.sin(obstacleElapsed * 11 + mechanics.flashPhase);
           mechanics.frameMaterial.opacity = 0.62 + flash * 0.34;
           mechanics.segmentMaterials.forEach((material, lane) => {
             material.opacity = lane === mechanics.requiredLane ? 0.08 + flash * 0.12 : 0.38 + flash * 0.08;
           });
         }
         if (mechanics.phantom) {
-          mechanics.phantomActive = Math.sin(elapsed * mechanics.phantomSpeed + mechanics.phantomPhase) > 0.12;
+          mechanics.phantomActive = Math.sin(obstacleElapsed * mechanics.phantomSpeed + mechanics.phantomPhase) > 0.12;
           gate.visible = mechanics.phantomActive;
         }
       }
@@ -4360,7 +4379,12 @@ void main() {
           collected: false,
           phase: Math.random() * Math.PI * 2
         };
-        const color = type === "shield" ? 0x38e6d3 : 0xff4fb8;
+        const colors = {
+          prism: 0xff58d6,
+          warp: 0x4d9dff,
+          booster: 0xffc83d
+        };
+        const color = colors[type] ?? colors.prism;
         const coreMaterial = new THREE.MeshStandardMaterial({
           color,
           emissive: color,
@@ -4368,18 +4392,21 @@ void main() {
           metalness: 0.15,
           roughness: 0.25
         });
-        const coreGeometry = type === "shield"
-          ? new THREE.OctahedronGeometry(0.34, 1)
-          : new THREE.IcosahedronGeometry(0.34, 1);
+        const coreGeometry = type === "prism"
+          ? new THREE.OctahedronGeometry(0.34, 0)
+          : type === "warp"
+            ? new THREE.CylinderGeometry(0.3, 0.3, 0.1, 20)
+            : new THREE.DodecahedronGeometry(0.34, 0);
         const core = new THREE.Mesh(coreGeometry, coreMaterial);
+        if (type === "warp") core.rotation.x = Math.PI / 2;
         group.add(core);
         const halo = new THREE.Mesh(
-          new THREE.TorusGeometry(0.52, 0.035, 8, 36),
+          new THREE.TorusGeometry(type === "booster" ? 0.48 : 0.52, 0.035, 8, 36),
           new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.88 })
         );
         halo.rotation.x = Math.PI / 2;
         group.add(halo);
-        if (type === "rainbow") {
+        if (type === "prism") {
           COLORS.forEach((entry, index) => {
             const bead = new THREE.Mesh(
               new THREE.SphereGeometry(0.075, 8, 8),
@@ -4389,10 +4416,186 @@ void main() {
             bead.position.set(Math.cos(angle) * 0.56, Math.sin(angle) * 0.56, 0);
             group.add(bead);
           });
+          [0x38e6d3, 0xff58d6, 0xc5ff4a].forEach((ringColor, index) => {
+            const ring = new THREE.Mesh(
+              new THREE.TorusGeometry(0.39 + index * 0.035, 0.018, 6, 32),
+              new THREE.MeshBasicMaterial({ color: ringColor, transparent: true, opacity: 0.82 })
+            );
+            ring.rotation.set(index * 0.82, index * 0.66, index * 0.48);
+            group.add(ring);
+          });
+        } else if (type === "warp") {
+          const handMaterial = new THREE.MeshBasicMaterial({ color: 0xd8edff });
+          const minuteHand = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.2, 0.035), handMaterial);
+          minuteHand.position.set(0, 0.045, 0.11);
+          group.add(minuteHand);
+          const hourHand = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.035, 0.035), handMaterial);
+          hourHand.position.set(0.045, -0.055, 0.12);
+          group.add(hourHand);
+        } else if (type === "booster") {
+          const symbolMaterial = new THREE.MeshBasicMaterial({ color: 0xfff2c2 });
+          const addSymbolBar = (width, height, x, y, rotation = 0) => {
+            const bar = new THREE.Mesh(new THREE.BoxGeometry(width, height, 0.045), symbolMaterial);
+            bar.position.set(x, y, 0.16);
+            bar.rotation.z = rotation;
+            group.add(bar);
+          };
+          addSymbolBar(0.22, 0.045, -0.12, 0.16);
+          addSymbolBar(0.045, 0.1, -0.015, 0.1);
+          addSymbolBar(0.22, 0.045, -0.12, 0.02);
+          addSymbolBar(0.045, 0.1, -0.225, -0.07);
+          addSymbolBar(0.22, 0.045, -0.12, -0.16);
+          addSymbolBar(0.28, 0.045, 0.15, 0, Math.PI / 4);
+          addSymbolBar(0.28, 0.045, 0.15, 0, -Math.PI / 4);
         }
         group.userData.core = core;
         gameScene.add(group);
         return group;
+      }
+
+      function makeCrystalCoin(lane, z) {
+        const group = new THREE.Group();
+        group.position.set(LANE_X[lane], 0.12, z);
+        group.visible = state === "running";
+        group.userData = { lane, phase: Math.random() * Math.PI * 2, collected: false };
+        const gold = new THREE.MeshStandardMaterial({
+          color: 0xffd25e,
+          emissive: 0xffa91f,
+          emissiveIntensity: 2.8,
+          metalness: 0.65,
+          roughness: 0.2
+        });
+        const crystal = new THREE.Mesh(new THREE.OctahedronGeometry(0.3, 0), gold);
+        group.add(crystal);
+        const ring = new THREE.Mesh(
+          new THREE.TorusGeometry(0.47, 0.035, 7, 32),
+          new THREE.MeshBasicMaterial({ color: 0xffdf83, transparent: true, opacity: 0.9 })
+        );
+        ring.rotation.x = Math.PI / 2;
+        group.add(ring);
+        const innerRing = new THREE.Mesh(
+          new THREE.TorusGeometry(0.34, 0.018, 6, 28),
+          new THREE.MeshBasicMaterial({ color: 0xff9f2e, transparent: true, opacity: 0.8 })
+        );
+        innerRing.rotation.set(Math.PI / 2, Math.PI / 3, 0);
+        group.add(innerRing);
+        const glint = new THREE.Mesh(
+          new THREE.SphereGeometry(0.065, 8, 8),
+          new THREE.MeshBasicMaterial({ color: 0xffffff })
+        );
+        glint.position.set(-0.11, 0.14, 0.24);
+        group.add(glint);
+        group.userData.crystal = crystal;
+        gameScene.add(group);
+        return group;
+      }
+
+      function makeLaser(z) {
+        const group = new THREE.Group();
+        group.position.set(0, 0, z);
+        group.userData = {
+          phase: Math.random() * Math.PI * 2,
+          checked: false,
+          active: true,
+          beam: null,
+          glow: null
+        };
+        const glow = new THREE.Mesh(
+          new THREE.BoxGeometry(1.75, 0.24, 0.14),
+          new THREE.MeshBasicMaterial({ color: 0xff397e, transparent: true, opacity: 0.22, depthWrite: false })
+        );
+        glow.position.y = 0.52;
+        group.add(glow);
+        const beam = new THREE.Mesh(
+          new THREE.BoxGeometry(LASER_HALF_WIDTH * 2, 0.075, 0.09),
+          new THREE.MeshBasicMaterial({ color: 0xff8ec0, transparent: true, opacity: 1, depthWrite: false })
+        );
+        beam.position.y = 0.52;
+        group.add(beam);
+        const emitter = new THREE.PointLight(0xff397e, 3.5, 4.5, 2);
+        emitter.position.set(0, 0.58, 0.4);
+        group.add(emitter);
+        group.userData.beam = beam;
+        group.userData.glow = glow;
+        gameScene.add(group);
+        return group;
+      }
+
+      function updateLaserVisual(laser) {
+        const phase = obstacleElapsed + laser.userData.phase;
+        const sweep = Math.sin(phase * 0.72);
+        const blink = 0.5 + 0.5 * Math.sin(phase * 3.3);
+        laser.userData.beam.position.x = sweep * LANE_X[2];
+        laser.userData.active = blink > 0.28;
+        laser.userData.beam.visible = laser.userData.active;
+        laser.userData.glow.position.x = laser.userData.beam.position.x;
+        laser.userData.glow.visible = laser.userData.active;
+        laser.userData.beam.material.opacity = 0.65 + blink * 0.35;
+        laser.userData.glow.material.opacity = 0.12 + blink * 0.15;
+      }
+
+      const impactParticleGeometry = new THREE.SphereGeometry(0.055, 6, 6);
+      function clearImpactBursts() {
+        impactBursts.forEach(burst => {
+          burst.particles.forEach(particle => gameScene.remove(particle.mesh));
+          burst.material.dispose();
+        });
+        impactBursts = [];
+      }
+      function createImpactBurst(color, strength = 1) {
+        if (impactBursts.length >= 4) {
+          const oldest = impactBursts.shift();
+          oldest.particles.forEach(particle => gameScene.remove(particle.mesh));
+          oldest.material.dispose();
+        }
+        const count = strength > 1 ? 22 : 15;
+        const material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 1, depthWrite: false });
+        const particles = [];
+        for (let i = 0; i < count; i++) {
+          const mesh = new THREE.Mesh(impactParticleGeometry, material);
+          const size = 0.65 + Math.random() * 1.25;
+          mesh.scale.setScalar(size);
+          mesh.position.set(player.position.x, player.position.y, 0);
+          gameScene.add(mesh);
+          const angle = Math.random() * Math.PI * 2;
+          const velocity = 1.2 + Math.random() * (strength > 1 ? 4.6 : 3.2);
+          particles.push({
+            mesh,
+            vx: Math.cos(angle) * velocity,
+            vy: 0.5 + Math.random() * velocity,
+            vz: (Math.random() - 0.5) * velocity
+          });
+        }
+        impactBursts.push({ particles, material, life: 0.62, duration: 0.62 });
+      }
+      function updateImpactBursts(dt) {
+        impactBursts = impactBursts.filter(burst => {
+          burst.life -= dt;
+          const fade = Math.max(0, burst.life / burst.duration);
+          burst.material.opacity = fade;
+          burst.particles.forEach(particle => {
+            particle.vy -= 3.2 * dt;
+            particle.mesh.position.x += particle.vx * dt;
+            particle.mesh.position.y += particle.vy * dt;
+            particle.mesh.position.z += particle.vz * dt;
+            particle.mesh.scale.setScalar(Math.max(0.01, fade));
+          });
+          if (burst.life > 0) return true;
+          burst.particles.forEach(particle => gameScene.remove(particle.mesh));
+          burst.material.dispose();
+          return false;
+        });
+      }
+      function triggerImpactEffects(color, strength = 1) {
+        cameraShakeTimer = Math.max(cameraShakeTimer, 0.38);
+        cameraShakeIntensity = Math.max(cameraShakeIntensity, 0.12 * strength);
+        createImpactBurst(color, strength);
+        const gameElement = el("game");
+        gameElement.classList.remove("impact-shake");
+        void gameElement.offsetWidth;
+        gameElement.classList.add("impact-shake");
+        window.clearTimeout(impactShakeTimer);
+        impactShakeTimer = window.setTimeout(() => gameElement.classList.remove("impact-shake"), 340);
       }
 
       function disposeGate(gate) {
@@ -4406,23 +4609,37 @@ void main() {
       function disposePowerUp(powerUp) {
         disposeGate(powerUp);
       }
+      function disposeCrystalCoin(coin) {
+        disposeGate(coin);
+      }
+      function disposeLaser(laser) {
+        disposeGate(laser);
+      }
 
       let gates = [];
       let powerUps = [];
+      let crystalCoins = [];
+      let lasers = [];
+      let impactBursts = [];
       let currentColor = 0;
       let distance = 0;
       let passed = 0;
       let score = 0;
       let combo = 0;
-      let gateBonus = 0;
       let speed = 13.5;
       let lastTime = 0;
       let elapsed = 0;
       let nextGateZ = FIRST_GATE_SPAWN_Z;
       let gateSerial = 0;
       let powerUpSpawnTimer = 7;
+      let crystalSpawnTimer = 3.5;
+      let laserSpawnTimer = 10;
+      let totalCoins = 0;
+      let runCoins = 0;
       let shieldCharges = 0;
-      let rainbowTimer = 0;
+      let timeWarpTimer = 0;
+      let scoreBoosterTimer = 0;
+      let obstacleElapsed = 0;
       let speedBoostTimer = 0;
       let graceTimer = 0;
       let statusTimer = 0;
@@ -4483,12 +4700,19 @@ void main() {
         } else if (cue === "gate") {
           playTone(620, 760, now, 0.09, "sine", 0.04);
           playTone(790, 960, now + 0.075, 0.11, "sine", 0.035);
+        } else if (cue === "power") {
+          playTone(470, 710, now, 0.12, "triangle", 0.045);
+          playTone(710, 1060, now + 0.09, 0.17, "sine", 0.04);
+        } else if (cue === "coin") {
+          playTone(880, 1180, now, 0.075, "sine", 0.035);
+          playTone(1180, 1480, now + 0.055, 0.1, "sine", 0.03);
         } else if (cue === "gameOver") {
           playTone(300, 105, now, 0.32, "triangle", 0.055);
         }
       }
       updateSoundControl();
       const BEST_KEY = "colorSwipeBestScore";
+      const COINS_KEY = "colorShiftTotalCoins";
       let best = 0;
       try {
         best = Math.max(
@@ -4496,10 +4720,16 @@ void main() {
           Number(localStorage.getItem(BEST_KEY)) || 0,
           Number(localStorage.getItem("colorSwipeBest")) || 0
         );
+        totalCoins = Math.max(0, Number(localStorage.getItem(COINS_KEY)) || 0);
       } catch (error) {
         best = 0;
+        totalCoins = 0;
       }
       el("bestTop").textContent = String(best).padStart(5, "0");
+      el("coinTotal").textContent = String(totalCoins).padStart(5, "0");
+      function updateCoinDisplay() {
+        el("coinTotal").textContent = String(totalCoins).padStart(5, "0");
+      }
       const randomColor = () => {
         gateSerial++;
         return (gateSerial + Math.floor(gateSerial / 3)) % COLORS.length;
@@ -4530,6 +4760,10 @@ void main() {
         gates = [];
         powerUps.forEach(disposePowerUp);
         powerUps = [];
+        crystalCoins.forEach(disposeCrystalCoin);
+        crystalCoins = [];
+        lasers.forEach(disposeLaser);
+        lasers = [];
         gateSerial = 0;
         nextGateZ = FIRST_GATE_SPAWN_Z;
         for (let i = 0; i < 5; i++) {
@@ -4542,8 +4776,7 @@ void main() {
       makeInitialGates();
 
       function updateHUD() {
-        score = Math.floor(distance) + gateBonus;
-        el("score").textContent = String(score).padStart(5, "0");
+        el("score").textContent = String(Math.floor(score)).padStart(5, "0");
         el("combo").textContent = "×" + combo;
         el("comboStat").classList.toggle("combo-hot", combo >= 3);
         el("distance").textContent = String(Math.floor(distance)).padStart(3, "0");
@@ -4573,12 +4806,15 @@ void main() {
       }
       function updatePowerHUD() {
         const hasShield = shieldCharges > 0;
-        const hasRainbow = rainbowTimer > 0;
+        const hasTimeWarp = timeWarpTimer > 0;
+        const hasScoreBooster = scoreBoosterTimer > 0;
         el("shieldStatus").hidden = !hasShield;
-        el("rainbowStatus").hidden = !hasRainbow;
-        el("powerStatus").hidden = !hasShield && !hasRainbow;
-        if (hasShield) el("shieldStatus").textContent = "Shield ×" + shieldCharges;
-        if (hasRainbow) el("rainbowTime").textContent = Math.max(1, Math.ceil(rainbowTimer));
+        el("timeWarpStatus").hidden = !hasTimeWarp;
+        el("scoreBoostStatus").hidden = !hasScoreBooster;
+        el("powerStatus").hidden = !hasShield && !hasTimeWarp && !hasScoreBooster;
+        if (hasShield) el("shieldStatus").textContent = "Shield active · ×" + shieldCharges;
+        if (hasTimeWarp) el("timeWarpStatus").textContent = "Slow-mo · " + Math.max(1, Math.ceil(timeWarpTimer)) + "s";
+        if (hasScoreBooster) el("scoreBoostStatus").textContent = "2X · " + Math.max(1, Math.ceil(scoreBoosterTimer)) + "s";
         el("speedBanner").hidden = speedBoostTimer <= 0;
         if (speedBoostTimer > 0) el("speedTime").textContent = Math.max(1, Math.ceil(speedBoostTimer));
       }
@@ -4596,27 +4832,60 @@ void main() {
           .filter(gate => !gate.userData.checked && gate.position.z < 0)
           .sort((a, b) => b.position.z - a.position.z)[0];
         const z = upcoming ? upcoming.position.z - 9 : -42;
-        const type = Math.random() < 0.58 ? "shield" : "rainbow";
+        const roll = Math.random();
+        const type = roll < 0.36 ? "prism" : roll < 0.68 ? "warp" : "booster";
         const lane = Math.floor(Math.random() * LANE_X.length);
         powerUps.push(makePowerUp(type, lane, z));
         powerUpSpawnTimer = 13 + Math.random() * 9;
       }
+      function spawnCrystalCoin() {
+        const upcoming = gates
+          .filter(gate => !gate.userData.checked && gate.position.z < 0)
+          .sort((a, b) => b.position.z - a.position.z)[0];
+        const z = upcoming ? Math.min(-30, upcoming.position.z - (6 + Math.random() * 8)) : -42;
+        const lane = Math.floor(Math.random() * LANE_X.length);
+        crystalCoins.push(makeCrystalCoin(lane, z));
+        crystalSpawnTimer = 5.5 + Math.random() * 4;
+      }
+      function spawnLaser() {
+        const z = -42 - Math.random() * 8;
+        lasers.push(makeLaser(z));
+        laserSpawnTimer = 10 + Math.random() * 5;
+      }
+      function collectCrystalCoin(coin) {
+        coin.userData.collected = true;
+        runCoins++;
+        totalCoins++;
+        score += 250 * (scoreBoosterTimer > 0 ? 2 : 1);
+        try {
+          localStorage.setItem(COINS_KEY, String(totalCoins));
+        } catch (error) {
+          // Keep coin collection and bonus scoring available if storage is blocked.
+        }
+        updateCoinDisplay();
+        playCue("coin");
+        showRunStatus("Crystal +250 · Run " + runCoins, 800);
+      }
       function collectPowerUp(powerUp) {
         powerUp.userData.collected = true;
-        if (powerUp.userData.type === "shield") {
+        if (powerUp.userData.type === "prism") {
           shieldCharges = Math.min(2, shieldCharges + 1);
-          showRunStatus("Shield acquired", 900);
+          showRunStatus("Prism shield acquired", 900);
+        } else if (powerUp.userData.type === "warp") {
+          timeWarpTimer = Math.max(timeWarpTimer, 5);
+          showRunStatus("Time warp · 5 seconds", 900);
         } else {
-          rainbowTimer = Math.max(rainbowTimer, 8);
-          showRunStatus("Rainbow burst · 8 seconds", 900);
+          scoreBoosterTimer = Math.max(scoreBoosterTimer, 10);
+          showRunStatus("Score doubled · 10 seconds", 900);
         }
+        playCue("power");
         updatePowerHUD();
       }
       function resetOverlay() {
         el("eyebrow").textContent = "A color reaction test";
         el("titleTop").textContent = "Color Shift:";
         el("titleBottom").textContent = "Neon Rush 3D";
-        el("intro").textContent = "Chain matching gates for bigger combo scores. Grab Shield and Rainbow power-ups, then ride the speed burst every fifth gate.";
+        el("intro").textContent = "Chain matching gates, scoop up neon crystals, and collect Prism Shields, Time Warps, and 2X score boosts across ten evolving worlds.";
         el("colorKey").hidden = false;
         el("startHint").hidden = false;
         el("results").hidden = true;
@@ -4633,13 +4902,21 @@ void main() {
         el("environmentBanner").hidden = true;
         el("flash").classList.remove("on");
         el("flash").style.background = "";
+        window.clearTimeout(impactShakeTimer);
+        el("game").classList.remove("impact-shake");
+        clearImpactBursts();
+        cameraShakeTimer = 0;
+        cameraShakeIntensity = 0;
         resetOverlay();
         state = "running";
-        distance = 0; passed = 0; score = 0; combo = 0; gateBonus = 0;
-        elapsed = 0; speed = 13.5;
+        distance = 0; passed = 0; score = 0; combo = 0;
+        elapsed = 0; obstacleElapsed = 0; speed = 13.5;
         setEnvironment(0, { announce: false, instant: true });
-        shieldCharges = 0; rainbowTimer = 0; speedBoostTimer = 0;
+        shieldCharges = 0; timeWarpTimer = 0; scoreBoosterTimer = 0; speedBoostTimer = 0;
         powerUpSpawnTimer = 7;
+        crystalSpawnTimer = 3.5 + Math.random() * 1.5;
+        laserSpawnTimer = 10 + Math.random() * 2;
+        runCoins = 0;
         graceTimer = START_GRACE_SECONDS;
         setOrbColor(1);
         player.position.set(LANE_X[1], 0.5, 0);
@@ -4660,7 +4937,8 @@ void main() {
         passed++;
         playCue("gate");
         combo++;
-        gateBonus += combo * 100;
+        const gatePoints = combo * 100;
+        score += gatePoints * (scoreBoosterTimer > 0 ? 2 : 1);
         if (passed % 5 === 0) {
           speedBoostTimer = 5;
           updatePowerHUD();
@@ -4669,6 +4947,34 @@ void main() {
           showRunStatus(message + " · ×" + combo, 460);
         }
         updateHUD();
+      }
+      function handleObstacleImpact(message, color) {
+        combo = 0;
+        updateHUD();
+        triggerImpactEffects(color, 0.9);
+        if (shieldCharges > 0) {
+          shieldCharges--;
+          el("flash").style.background = "rgba(56,230,211,.18)";
+          el("flash").classList.add("on");
+          window.clearTimeout(flashTimer);
+          flashTimer = window.setTimeout(() => {
+            el("flash").classList.remove("on");
+            el("flash").style.background = "";
+          }, 150);
+          updatePowerHUD();
+          showRunStatus(message + " · shield blocked it", 850);
+          return false;
+        }
+        endGame();
+        return true;
+      }
+      function resolveLaserCollision(laser) {
+        laser.userData.checked = true;
+        if (graceTimer > 0 || !laser.userData.active) return;
+        const laserX = laser.position.x + laser.userData.beam.position.x;
+        if (Math.abs(player.position.x - laserX) <= LASER_HALF_WIDTH + PLAYER_RADIUS) {
+          handleObstacleImpact("Laser strike", 0xff397e);
+        }
       }
       function resolveGateCollision(gate) {
         gate.userData.checked = true;
@@ -4710,28 +5016,13 @@ void main() {
         const passedThroughMatchingSection =
           !hitBarrier &&
           hitSegment >= 0 &&
-          (rainbowTimer > 0 || (colorMatchesExactly &&
+          (colorMatchesExactly &&
             hitSegment === gate.userData.requiredLane &&
             gate.userData.colorIndex === orb.userData.colorIndex
-          ));
+          );
 
         if (!passedThroughMatchingSection) {
-          combo = 0;
-          updateHUD();
-          if (shieldCharges > 0) {
-            shieldCharges--;
-            el("flash").style.background = "rgba(56,230,211,.18)";
-            el("flash").classList.add("on");
-            window.clearTimeout(flashTimer);
-            flashTimer = window.setTimeout(() => {
-              el("flash").classList.remove("on");
-              el("flash").style.background = "";
-            }, 150);
-            updatePowerHUD();
-            showRunStatus("Shield blocked the crash", 800);
-            return;
-          }
-          endGame();
+          handleObstacleImpact("Gate impact", COLORS[gate.userData.colorIndex].hex);
           return;
         }
         awardGatePass("Gate cleared");
@@ -4744,12 +5035,13 @@ void main() {
         el("environmentBanner").classList.remove("visible");
         el("environmentBanner").hidden = true;
         state = "over";
+        triggerImpactEffects(COLORS[currentColor].hex, 1.4);
         playCue("gameOver");
         el("flash").classList.add("on");
         window.clearTimeout(flashTimer);
         flashTimer = window.setTimeout(() => el("flash").classList.remove("on"), 120);
         updateHUD();
-        const final = score;
+        const final = Math.floor(score);
         const isBest = final > best;
         if (isBest) {
           best = final;
@@ -4771,7 +5063,8 @@ void main() {
         el("finalBest").textContent = String(best);
         el("finalGates").textContent = String(passed);
         el("bestMessage").textContent = isBest ? "New personal best" : "Personal best · " + best;
-        rainbowTimer = 0;
+        timeWarpTimer = 0;
+        scoreBoosterTimer = 0;
         speedBoostTimer = 0;
         shieldCharges = 0;
         updatePowerHUD();
@@ -4876,13 +5169,38 @@ void main() {
           ctx.shadowBlur = 0;
         });
 
+        lasers.forEach(laser => {
+          const progress = Math.max(0, Math.min(1, Math.exp(laser.position.z / 27)));
+          if (progress <= 0 || progress > 1) return;
+          const y = horizon + (floor - horizon) * progress;
+          const halfWidth = width * (0.035 + 0.37 * progress);
+          const laserX = center + (laser.userData.beam.position.x / 4.5) * nearHalf;
+          const beamWidth = Math.max(8, (LASER_HALF_WIDTH * 2 / 4.5) * halfWidth);
+          ctx.beginPath();
+          ctx.moveTo(laserX - beamWidth * 0.75, y);
+          ctx.lineTo(laserX + beamWidth * 0.75, y);
+          ctx.strokeStyle = "#ff397e";
+          ctx.globalAlpha = laser.userData.active ? 0.95 : 0.2;
+          ctx.lineWidth = Math.max(3, progress * 10);
+          ctx.shadowColor = "#ff397e";
+          ctx.shadowBlur = laser.userData.active ? 18 * progress : 4;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+          ctx.globalAlpha = 1;
+        });
+
         powerUps.filter(powerUp => !powerUp.userData.collected).forEach(powerUp => {
           const progress = Math.max(0, Math.min(1, Math.exp(powerUp.position.z / 27)));
           if (progress <= 0 || progress > 1) return;
           const x = center + (powerUp.position.x / 4.5) * nearHalf;
           const y = horizon + (floor - horizon) * progress;
           const radius = Math.max(7, Math.min(21, progress * 24));
-          const color = powerUp.userData.type === "shield" ? "#38e6d3" : "#ff4fb8";
+          const powerColor = {
+            prism: "#ff58d6",
+            warp: "#4d9dff",
+            booster: "#ffc83d"
+          };
+          const color = powerColor[powerUp.userData.type] ?? "#ff58d6";
           ctx.beginPath();
           ctx.arc(x, y, radius * 1.45, 0, Math.PI * 2);
           ctx.strokeStyle = color;
@@ -4897,7 +5215,50 @@ void main() {
           ctx.shadowBlur = 0;
         });
 
-        const orbColor = rainbowTimer > 0 ? null : COLORS[currentColor].css;
+        crystalCoins.filter(coin => !coin.userData.collected).forEach(coin => {
+          const progress = Math.max(0, Math.min(1, Math.exp(coin.position.z / 27)));
+          if (progress <= 0 || progress > 1) return;
+          const x = center + (coin.position.x / 4.5) * nearHalf;
+          const y = horizon + (floor - horizon) * progress;
+          const radius = Math.max(7, Math.min(23, progress * 24));
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(t * 2.4 + coin.userData.phase);
+          ctx.beginPath();
+          ctx.moveTo(0, -radius);
+          ctx.lineTo(radius * 0.66, 0);
+          ctx.lineTo(0, radius);
+          ctx.lineTo(-radius * 0.66, 0);
+          ctx.closePath();
+          ctx.fillStyle = "#ffd25e";
+          ctx.strokeStyle = "#fff0b2";
+          ctx.lineWidth = Math.max(1.5, progress * 2.5);
+          ctx.shadowColor = "#ffb52d";
+          ctx.shadowBlur = 18 * progress;
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+          ctx.shadowBlur = 0;
+        });
+
+        impactBursts.forEach(burst => {
+          burst.particles.forEach(particle => {
+            const x = center + (particle.mesh.position.x / 4.5) * nearHalf;
+            const y = height * 0.76 - (particle.mesh.position.y - player.position.y) * height * 0.055;
+            const radius = Math.max(1.5, 5 * (burst.life / burst.duration));
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = "#" + particle.mesh.material.color.getHexString();
+            ctx.globalAlpha = Math.max(0, burst.life / burst.duration);
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.shadowBlur = 14;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.globalAlpha = 1;
+          });
+        });
+
+        const orbColor = COLORS[currentColor].css;
         const orbX = center + (player.position.x / 4.5) * nearHalf;
         const orbY = height * 0.76;
         const orbRadius = Math.max(20, Math.min(40, width * 0.045));
@@ -4919,15 +5280,9 @@ void main() {
         ctx.beginPath();
         ctx.arc(orbX, orbY + Math.sin(t * (state === "running" ? 5 : 1.15)) * 4, orbRadius, 0, Math.PI * 2);
         const orbGradient = ctx.createLinearGradient(orbX - orbRadius, orbY, orbX + orbRadius, orbY);
-        if (rainbowTimer > 0) {
-          orbGradient.addColorStop(0, "#38e6d3");
-          orbGradient.addColorStop(.5, "#ff4fb8");
-          orbGradient.addColorStop(1, "#c5ff4a");
-        } else {
-          orbGradient.addColorStop(0, orbColor);
-          orbGradient.addColorStop(1, orbColor);
-        }
-        ctx.shadowColor = rainbowTimer > 0 ? "#ff4fb8" : orbColor;
+        orbGradient.addColorStop(0, orbColor);
+        orbGradient.addColorStop(1, orbColor);
+        ctx.shadowColor = orbColor;
         ctx.shadowBlur = 28;
         ctx.fillStyle = orbGradient;
         ctx.fill();
@@ -4945,20 +5300,28 @@ void main() {
         const t = time * 0.001;
         updateEnvironmentTransition(dt);
         const colorLerp = 1 - Math.exp(-dt * 16);
-        if (rainbowTimer > 0) targetOrbColor.setHSL((t * 0.42) % 1, 0.95, 0.58);
-        else targetOrbColor.copy(selectedOrbColor);
+        targetOrbColor.copy(selectedOrbColor);
         orbMat.color.lerp(targetOrbColor, colorLerp);
         orbMat.emissive.lerp(targetOrbColor, colorLerp);
         orbHalo.material.color.lerp(targetOrbColor, colorLerp);
         orbLight.color.lerp(targetOrbColor, colorLerp);
         const laneResponse = environmentIndex >= 8 ? 3.8 : environmentIndex >= 4 ? 5.2 : 18;
         player.position.x = THREE.MathUtils.damp(player.position.x, LANE_X[currentColor], laneResponse, dt);
-        camera.position.x = player.position.x;
+        camera.position.set(player.position.x, CAMERA_BASE_Y, CAMERA_BASE_Z);
         camera.lookAt(player.position.x, player.position.y, -18);
+        if (cameraShakeTimer > 0) {
+          const shakeFade = cameraShakeTimer / 0.38;
+          camera.position.x += (Math.random() - 0.5) * cameraShakeIntensity * shakeFade;
+          camera.position.y += (Math.random() - 0.5) * cameraShakeIntensity * shakeFade;
+          camera.position.z += (Math.random() - 0.5) * cameraShakeIntensity * shakeFade;
+          cameraShakeTimer = Math.max(0, cameraShakeTimer - dt);
+          if (cameraShakeTimer === 0) cameraShakeIntensity = 0;
+        }
         colorPulse = THREE.MathUtils.damp(colorPulse, 0, 12, dt);
         orb.scale.setScalar(THREE.MathUtils.damp(orb.scale.x, 1 + colorPulse, 18, dt));
         shieldBubble.visible = shieldCharges > 0 || graceTimer > 0;
-        shieldBubble.material.color.setHex(graceTimer > 0 ? 0x68f2df : 0x38e6d3);
+        if (graceTimer > 0) shieldBubble.material.color.setHex(0x68f2df);
+        else shieldBubble.material.color.setHSL((t * 0.18) % 1, 0.9, 0.62);
         shieldBubble.material.opacity = 0.1 + (0.07 * (0.5 + Math.sin(t * 7) * 0.5));
         const boostPulse = speedBoostTimer > 0 ? 0.5 + Math.sin(t * 17) * 0.5 : 0;
           laneLineMat.opacity = 0.5 + boostPulse * 0.42;
@@ -4966,17 +5329,27 @@ void main() {
         boostLight.intensity = speedBoostTimer > 0 ? 9 + boostPulse * 13 : 0;
         if (state === "running") {
           elapsed += dt;
+          const scoreMultiplierActive = scoreBoosterTimer > 0;
+          const obstacleTimeScale = timeWarpTimer > 0 ? 0.5 : 1;
           graceTimer = Math.max(0, graceTimer - dt);
-          rainbowTimer = Math.max(0, rainbowTimer - dt);
+          timeWarpTimer = Math.max(0, timeWarpTimer - dt);
+          scoreBoosterTimer = Math.max(0, scoreBoosterTimer - dt);
           speedBoostTimer = Math.max(0, speedBoostTimer - dt);
+          obstacleElapsed += dt * obstacleTimeScale;
           const runSpeed = 13.5 + Math.min(8, elapsed * 0.11);
           const lateZoneMultiplier = environmentIndex >= 8 ? 1 + (environmentIndex - 7) * 0.12 : 1;
           speed = Math.min(26, runSpeed * lateZoneMultiplier) * (speedBoostTimer > 0 ? 1.25 : 1);
-          distance += speed * dt * 0.72;
+          const distanceDelta = speed * dt * 0.72;
+          distance += distanceDelta;
+          score += distanceDelta * (scoreMultiplierActive ? 2 : 1);
           const nextEnvironment = Math.min(ENVIRONMENTS.length - 1, Math.floor(distance / 500));
           if (nextEnvironment !== environmentIndex) setEnvironment(nextEnvironment);
           powerUpSpawnTimer -= dt;
           if (powerUpSpawnTimer <= 0 && powerUps.length < 2) spawnPowerUp();
+          crystalSpawnTimer -= dt;
+          if (crystalSpawnTimer <= 0 && crystalCoins.length < 3) spawnCrystalCoin();
+          laserSpawnTimer -= dt;
+          if (laserSpawnTimer <= 0 && lasers.length < 2) spawnLaser();
           player.position.y = 0.5 + Math.sin(t * 5) * 0.055;
           orb.rotation.y += dt * 1.2;
           orb.rotation.x += dt * 0.7;
@@ -5012,18 +5385,49 @@ void main() {
             }
             return true;
           });
+          crystalCoins.forEach(coin => {
+            if (coin.userData.collected) return;
+            const previousZ = coin.position.z;
+            coin.position.z += speed * dt;
+            coin.position.y = 0.12 + Math.sin(t * 3 + coin.userData.phase) * 0.13;
+            coin.rotation.y += dt * 2.4;
+            coin.rotation.x += dt * 0.75;
+            coin.userData.crystal.scale.setScalar(1 + Math.sin(t * 6 + coin.userData.phase) * 0.09);
+            const pickupPlane = -(PLAYER_RADIUS + 0.34);
+            if (previousZ < pickupPlane && coin.position.z >= pickupPlane &&
+                Math.abs(player.position.x - coin.position.x) <= PLAYER_RADIUS + 0.34) {
+              collectCrystalCoin(coin);
+            }
+          });
+          crystalCoins = crystalCoins.filter(coin => {
+            if (coin.userData.collected || coin.position.z > 10) {
+              disposeCrystalCoin(coin);
+              return false;
+            }
+            return true;
+          });
+          lasers.forEach(laser => {
+            if (state !== "running") return;
+            updateLaserVisual(laser);
+            const previousZ = laser.position.z;
+            laser.position.z += speed * dt * obstacleTimeScale;
+            const collisionPlane = -(PLAYER_RADIUS + 0.045);
+            if (!laser.userData.checked && previousZ < collisionPlane && laser.position.z >= collisionPlane) {
+              resolveLaserCollision(laser);
+            }
+          });
           updatePowerHUD();
           gates.forEach(gate => {
             if (state !== "running") return;
             updateGateMechanics(gate);
             const previousZ = gate.position.z;
-            gate.position.z += speed * dt;
-            const movement = Math.sin(elapsed * gate.userData.movementSpeed + gate.userData.movementPhase);
+            gate.position.z += speed * dt * obstacleTimeScale;
+            const movement = Math.sin(obstacleElapsed * gate.userData.movementSpeed + gate.userData.movementPhase);
             gate.position.x = gate.userData.moving ? movement * gate.userData.movementAmplitude : 0;
             gate.rotation.y = gate.userData.moving ? movement * 0.12 : 0;
             gate.rotation.z = gate.userData.rotating
-              ? elapsed * gate.userData.rotationSpeed + gate.userData.rotationPhase
-              : gate.userData.moving ? Math.sin(elapsed * 1.2 + gate.userData.movementPhase) * 0.018 : 0;
+              ? obstacleElapsed * gate.userData.rotationSpeed + gate.userData.rotationPhase
+              : gate.userData.moving ? Math.sin(obstacleElapsed * 1.2 + gate.userData.movementPhase) * 0.018 : 0;
             const collisionPlane = -(PLAYER_RADIUS + GATE_HALF_DEPTH);
             if (!gate.userData.checked && previousZ < collisionPlane && gate.position.z >= collisionPlane) {
               resolveGateCollision(gate);
@@ -5032,6 +5436,10 @@ void main() {
           if (state === "running") {
             gates = gates.filter(gate => {
               if (gate.position.z > 10) { disposeGate(gate); return false; }
+              return true;
+            });
+            lasers = lasers.filter(laser => {
+              if (laser.position.z > 10) { disposeLaser(laser); return false; }
               return true;
             });
             if (environmentIndex >= 8 && gates.length <= 3) {
@@ -5053,6 +5461,7 @@ void main() {
             if (rib.position.z > 8) rib.position.z -= 120;
           });
         }
+        updateImpactBursts(dt);
         if (renderer) renderer.render(gameScene, camera);
         else drawFallback(t);
       }
