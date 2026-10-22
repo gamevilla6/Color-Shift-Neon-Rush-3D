@@ -264,7 +264,7 @@
         { name: "Lime", key: "lime", hex: 0xc5ff4a, css: "#c5ff4a" }
       ];
       const LANE_X = [-2.42, 0, 2.42];
-      const PLAYER_RADIUS = 0.48;
+      const PLAYER_RADIUS = 0.56;
       const GATE_HALF_DEPTH = 0.045;
       const GATE_HALF_WIDTH = 3.65;
       const SEGMENT_WIDTH = (GATE_HALF_WIDTH * 2) / COLORS.length;
@@ -278,8 +278,8 @@
       gameScene.fog = new THREE.FogExp2(0x050515, 0.009);
       const camera = new THREE.PerspectiveCamera(window.innerWidth < 650 ? 68 : 62, 1, 0.1, 180);
       // Keep the camera below the tunnel roof while aiming down the path at incoming gates.
-      camera.position.set(0, 1.35, 9.2);
-      camera.lookAt(0, 0, -18);
+      camera.position.set(0, 1.45, 7.5);
+      camera.lookAt(0, 0.5, -18);
       let renderer = null;
       let fallbackCanvas = null;
       let fallbackContext = null;
@@ -435,8 +435,8 @@
 
       const player = new THREE.Group();
       gameScene.add(player);
-      player.position.set(LANE_X[1], 0, 0);
-      const orbMat = new THREE.MeshStandardMaterial({ color: COLORS[1].hex, emissive: COLORS[1].hex, emissiveIntensity: 3.2, metalness: 0.1, roughness: 0.2 });
+      player.position.set(LANE_X[1], 0.5, 0);
+      const orbMat = new THREE.MeshStandardMaterial({ color: COLORS[1].hex, emissive: COLORS[1].hex, emissiveIntensity: 3.8, metalness: 0.1, roughness: 0.2 });
       const orb = new THREE.Mesh(new THREE.SphereGeometry(PLAYER_RADIUS, 20, 16), orbMat);
       player.add(orb);
       const orbHalo = new THREE.Mesh(
@@ -451,13 +451,14 @@
       );
       shieldBubble.visible = false;
       player.add(shieldBubble);
-      const orbLight = new THREE.PointLight(COLORS[1].hex, 9, 9, 2);
+      const orbLight = new THREE.PointLight(COLORS[1].hex, 16, 12, 2);
+      orbLight.position.set(0, 0.65, 0);
       player.add(orbLight);
       const targetOrbColor = new THREE.Color(COLORS[1].hex);
       const selectedOrbColor = new THREE.Color(COLORS[1].hex);
       const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.62, 32), new THREE.MeshBasicMaterial({ color: 0x02050a, transparent: true, opacity: 0.5 }));
       shadow.rotation.x = -Math.PI / 2;
-      shadow.position.set(0, -1.9, 0);
+      shadow.position.set(0, -2.4, 0);
       player.add(shadow);
 
       function makeGate(colorIndex, z) {
@@ -720,7 +721,7 @@
         powerUpSpawnTimer = 7;
         graceTimer = START_GRACE_SECONDS;
         setOrbColor(1);
-        player.position.set(LANE_X[1], 0, 0);
+        player.position.set(LANE_X[1], 0.5, 0);
         player.rotation.set(0, 0, 0);
         orb.rotation.set(0, 0, 0);
         ribs.forEach((rib, index) => { rib.position.z = -index * 8 - 1; });
@@ -957,7 +958,7 @@
         const orbColor = rainbowTimer > 0 ? null : COLORS[currentColor].css;
         const orbX = center + (player.position.x / 4.5) * nearHalf;
         const orbY = height * 0.76;
-        const orbRadius = Math.max(12, Math.min(31, width * 0.025));
+        const orbRadius = Math.max(20, Math.min(40, width * 0.045));
         if (shieldCharges > 0 || graceTimer > 0) {
           const shieldColor = graceTimer > 0 ? "#68f2df" : "#38e6d3";
           ctx.beginPath();
@@ -1008,6 +1009,8 @@
         orbHalo.material.color.lerp(targetOrbColor, colorLerp);
         orbLight.color.lerp(targetOrbColor, colorLerp);
         player.position.x = THREE.MathUtils.damp(player.position.x, LANE_X[currentColor], 18, dt);
+        camera.position.x = player.position.x;
+        camera.lookAt(player.position.x, player.position.y, -18);
         colorPulse = THREE.MathUtils.damp(colorPulse, 0, 12, dt);
         orb.scale.setScalar(THREE.MathUtils.damp(orb.scale.x, 1 + colorPulse, 18, dt));
         shieldBubble.visible = shieldCharges > 0 || graceTimer > 0;
@@ -1026,7 +1029,7 @@
           distance += speed * dt * 0.72;
           powerUpSpawnTimer -= dt;
           if (powerUpSpawnTimer <= 0 && powerUps.length < 2) spawnPowerUp();
-          player.position.y = Math.sin(t * 5) * 0.055;
+          player.position.y = 0.5 + Math.sin(t * 5) * 0.055;
           orb.rotation.y += dt * 1.2;
           orb.rotation.x += dt * 0.7;
           ribs.forEach(rib => {
@@ -1088,7 +1091,7 @@
             updateHUD();
           }
         } else {
-          player.position.y = Math.sin(t * 1.15) * 0.09;
+          player.position.y = 0.5 + Math.sin(t * 1.15) * 0.09;
           orb.rotation.y += dt * 0.35;
           ribs.forEach(rib => {
             rib.position.z += dt * 1.5;
