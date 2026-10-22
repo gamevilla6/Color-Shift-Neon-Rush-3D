@@ -37,6 +37,11 @@ node_modules
 /.sass-cache
 /connect.lock
 /coverage
+/artifacts/3d-game/android/.gradle/
+/artifacts/3d-game/android/build/
+/artifacts/3d-game/android/app/build/
+/artifacts/3d-game/android/app/src/main/assets/public/
+/artifacts/3d-game/android/local.properties
 /libpeerconnection.log
 npm-debug.log
 yarn-error.log
