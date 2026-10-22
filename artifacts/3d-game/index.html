@@ -144,7 +144,7 @@
     .primary-btn { position: relative; min-width: 194px; min-height: 52px; border: 0; padding: 15px 22px; color: #10151a; background: var(--accent); cursor: pointer; touch-action: manipulation; font-family: system-ui, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); transition: transform .18s, background .18s; }
     .primary-btn:hover { transform: translateY(-2px); background: #a6fff3; }
     .primary-btn:active { transform: translateY(1px); }
-    .primary-btn:focus-visible, .tap-control:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+    .primary-btn:focus-visible, .secondary-btn:focus-visible, .tap-control:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
     .button-arrow { margin-left: 9px; font-size: 15px; }
     .small-note { margin-top: 19px; color: #7e8792; font-size: 8px; letter-spacing: .17em; text-transform: uppercase; }
     .small-note b { color: #d6dce1; font-weight: 400; }
@@ -429,6 +429,7 @@
         </div>
         <div class="actions">
           <button class="primary-btn" id="startButton">Start run <span class="button-arrow">↗</span></button>
+          <button class="secondary-btn" id="restartButton" type="button" hidden>Restart run</button>
           <button class="secondary-btn" id="shopButton" type="button">Shop / Skins</button>
         </div>
         <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; color auto-cycles every 2.5s</span><span class="mobile-hint">Tap to start · swipe lanes · color auto-cycles</span></div>
@@ -5794,6 +5795,8 @@ void main() {
       function resetOverlay() {
         closeShop();
         el("card").classList.remove("pause-open");
+        el("restartButton").hidden = true;
+        el("eyebrow").textContent = "A color reaction test";
         el("titleTop").textContent = "Color Shift:";
         el("titleBottom").textContent = "Neon Rush 3D";
         el("colorKey").hidden = false;
@@ -5824,13 +5827,13 @@ void main() {
         saveProgression();
         return "Score Boost";
       }
-      function startGame() {
-        if (state === "paused") {
+      function startGame(restartPaused = false) {
+        if (state === "paused" && !restartPaused) {
           resumeGame();
           return;
         }
         if (state === "running" || !el("dailyModal").hidden) return;
-        if (dailySpinReady()) {
+        if (!restartPaused && dailySpinReady()) {
           maybeShowDailyReward();
           return;
         }
@@ -5895,9 +5898,10 @@ void main() {
             ? "Grace 1s · color auto-cycles · Space / tap flips gravity"
             : "Grace 1s · color auto-cycles · steer to its matching lane", 1600);
       }
-      function pauseGame() {
+      function pauseGame(reason = "manual") {
         if (state !== "running") return;
         state = "paused";
+        lastTime = performance.now();
         window.clearTimeout(statusTimer);
         window.clearTimeout(environmentNoticeTimer);
         environmentNoticeToken++;
@@ -5913,21 +5917,25 @@ void main() {
         el("eyebrow").textContent = "Run paused";
         el("titleTop").textContent = "Take";
         el("titleBottom").textContent = "a breath";
-        el("intro").textContent = "Your run is paused. Resume whenever you're ready.";
+        el("intro").textContent = reason === "background"
+          ? "Your run paused when you left the game. Resume it or restart whenever you're ready."
+          : "Your run is paused. Resume it or restart whenever you're ready.";
         el("colorKey").hidden = true;
         el("modeSelector").hidden = true;
         el("results").hidden = true;
         el("mysteryReward").hidden = true;
         el("shopButton").hidden = true;
         el("card").classList.add("pause-open");
+        el("restartButton").hidden = false;
         el("startHint").hidden = false;
-        el("startHint").textContent = "Tap to resume · Esc / P";
+        el("startHint").textContent = "Resume or restart when you're ready · Esc / P";
         el("startButton").textContent = "Resume run";
         el("overlay").classList.remove("hidden");
       }
       function resumeGame() {
         if (state !== "paused") return;
         state = "running";
+        lastTime = performance.now();
         el("game").classList.remove("is-paused");
         el("card").classList.remove("pause-open");
         el("modeSelector").hidden = false;
@@ -6733,6 +6741,7 @@ void main() {
       el("shopButton").addEventListener("click", openShop);
       el("shopBack").addEventListener("click", closeShop);
       el("pauseButton").addEventListener("click", pauseGame);
+      el("restartButton").addEventListener("click", () => startGame(true));
       el("resetLocalData").addEventListener("click", resetLocalProgress);
       document.querySelectorAll(".skin-action").forEach(button => {
         button.addEventListener("click", () => chooseSkin(button.dataset.skin));
@@ -6832,10 +6841,15 @@ void main() {
       window.addEventListener("contextmenu", event => event.preventDefault());
       setGameMode("endless");
       maybeShowDailyReward();
-      window.addEventListener("focus", maybeShowDailyReward);
+      const pauseForBackground = () => pauseGame("background");
+      window.addEventListener("blur", pauseForBackground);
+      window.addEventListener("pagehide", pauseForBackground);
+      window.addEventListener("focus", () => {
+        if (state !== "paused") maybeShowDailyReward();
+      });
       document.addEventListener("visibilitychange", () => {
-        if (document.hidden) pauseGame();
-        else maybeShowDailyReward();
+        if (document.hidden) pauseForBackground();
+        else if (state !== "paused") maybeShowDailyReward();
       });
     })();
   </script>
