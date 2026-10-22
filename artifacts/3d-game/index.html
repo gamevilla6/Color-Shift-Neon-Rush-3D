@@ -91,6 +91,10 @@
     .power-chip.time-warp { color: #75bfff; border-color: rgba(79,158,255,.58); box-shadow: 0 0 16px rgba(79,158,255,.18); }
     .power-chip.score-boost { color: #ffd76a; border-color: rgba(255,199,64,.62); box-shadow: 0 0 16px rgba(255,199,64,.18); }
     .power-chip.fever { color: #ffeaf9; border-color: rgba(255,79,184,.7); box-shadow: 0 0 16px rgba(255,79,184,.32); }
+    .gravity-indicator { position: absolute; z-index: 6; top: max(64px, calc(env(safe-area-inset-top) + 54px)); left: 50%; transform: translateX(-50%); padding: 7px 11px; border: 1px solid rgba(168,130,255,.52); background: rgba(12,8,30,.76); color: #e6dcff; font-size: 8px; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; text-shadow: 0 0 12px rgba(150,108,255,.72); white-space: nowrap; pointer-events: none; }
+    .gravity-indicator[hidden] { display: none !important; }
+    .gravity-indicator .gravity-arrow { display: inline-block; margin-right: 6px; color: #78e8ff; font-size: 12px; }
+    #game.quantum-mode .pause-button { border-color: rgba(176,139,255,.4); }
     .boost-banner { position: absolute; z-index: 6; top: 184px; left: 50%; transform: translateX(-50%); color: var(--lime); font-family: system-ui, sans-serif; font-size: 19px; font-weight: 900; letter-spacing: .2em; text-shadow: 0 0 18px rgba(197,255,74,.8); pointer-events: none; animation: boostPulse .5s ease-in-out infinite alternate; white-space: nowrap; }
     .boost-banner span { font: 9px ui-monospace, monospace; letter-spacing: .12em; }
     @keyframes boostPulse { from { opacity: .68; filter: brightness(.9); } to { opacity: 1; filter: brightness(1.4); } }
@@ -198,6 +202,8 @@
     .mode-selector { display: flex; justify-content: center; gap: 8px; margin: 0 auto 19px; }
     .mode-btn { min-height: 38px; padding: 9px 13px; border: 1px solid rgba(233,241,246,.16); background: rgba(8,13,20,.66); color: #9da6b0; cursor: pointer; font: 750 8px system-ui, sans-serif; letter-spacing: .13em; text-transform: uppercase; touch-action: manipulation; }
     .mode-btn[aria-pressed="true"] { border-color: rgba(56,230,211,.72); background: rgba(56,230,211,.12); color: #c8fff7; box-shadow: 0 0 16px rgba(56,230,211,.12); }
+    #game.quantum-mode .mode-btn[aria-pressed="true"] { border-color: rgba(185,138,255,.78); background: rgba(143,92,255,.18); color: #eee4ff; box-shadow: 0 0 18px rgba(143,92,255,.22); }
+    #game.quantum-mode .gravity-indicator { border-color: rgba(185,138,255,.72); background: rgba(17,9,42,.84); }
     .daily-modal { position: absolute; z-index: 20; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: max(20px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom)); background: rgba(4,7,13,.82); backdrop-filter: blur(10px); }
     .daily-modal[hidden] { display: none !important; }
     .daily-card { width: min(100%, 360px); padding: 22px 20px 18px; border: 1px solid rgba(255,205,74,.42); background: radial-gradient(circle at 50% 0, rgba(255,205,74,.12), transparent 55%), rgba(8,12,19,.96); text-align: center; box-shadow: 0 0 38px rgba(255,205,74,.14); }
@@ -287,8 +293,8 @@
       .result-line { margin: 10px 0 2px; }
       .result-grid { margin: 9px 0 10px; }
       .result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .mode-selector { gap: 6px; margin-bottom: 14px; }
-      .mode-btn { flex: 1; padding-inline: 7px; font-size: 7px; }
+      .mode-selector { gap: 4px; margin-bottom: 14px; }
+      .mode-btn { min-width: 0; flex: 1; padding-inline: 4px; font-size: 6.5px; letter-spacing: .06em; }
       .best-callout { margin: 8px 0 10px; }
       .color-panel { bottom: max(10px, env(safe-area-inset-bottom)); }
       .mobile-controls { bottom: max(8px, env(safe-area-inset-bottom)); }
@@ -333,6 +339,7 @@
     <button class="pause-button" id="pauseButton" type="button" aria-label="Pause run" title="Pause run" hidden>
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h3v12H3zM10 2h3v12h-3z"/></svg>
     </button>
+    <div class="gravity-indicator" id="gravityIndicator" role="status" aria-live="polite" hidden><span class="gravity-arrow" id="gravityArrow">↓</span><span id="gravityLabel">Floor gravity</span></div>
     <section class="hud" id="hud" aria-live="polite">
       <div class="stat"><div class="stat-value" id="score">00000</div><div class="stat-label">Current score</div></div>
       <div class="stat" id="comboStat"><div class="stat-value" id="combo">×0</div><div class="stat-label">Streak</div></div>
@@ -386,8 +393,9 @@
           <span class="key-chip"><i style="color:var(--yellow);background:var(--yellow)"></i>Yellow</span>
         </div>
         <div class="mode-selector" id="modeSelector" role="group" aria-label="Choose game mode">
-          <button class="mode-btn" id="endlessModeButton" type="button" aria-pressed="true">Endless Mode</button>
+          <button class="mode-btn" id="endlessModeButton" type="button" aria-pressed="true" aria-label="Endless Runner Mode">Endless Runner</button>
           <button class="mode-btn" id="timeAttackModeButton" type="button" aria-pressed="false">Time Attack · 60s</button>
+          <button class="mode-btn" id="antiGravityModeButton" type="button" aria-pressed="false" aria-label="Quantum Singularity: Anti-Gravity Mode" title="Quantum Singularity: Anti-Gravity Mode">Anti-Gravity</button>
         </div>
         <div id="results" hidden>
           <div class="game-over-brand">Color Shift:<span>Neon Rush 3D</span></div>
@@ -4207,6 +4215,9 @@ void main() {
       const FIRST_GATE_SPAWN_Z = -50;
       const START_GRACE_SECONDS = 1;
       const PLAYER_INPUT_COOLDOWN_MS = 120;
+      const RUNNER_Y = 0.5;
+      const GRAVITY_FLOOR_Y = -1.15;
+      const GRAVITY_CEILING_Y = 1.15;
       const SLIDING_GATE_UNLOCK_SCORE = 500;
       const ROTATING_GATE_UNLOCK_SCORE = 1500;
       const ENVIRONMENTS = [
@@ -4222,6 +4233,19 @@ void main() {
         { name: "The Singularity", background: 0x03030c, fog: 0x03030c, fogDensity: 0.013, grid: 0xe9f5ff, rail: 0xba75ff, key: 0xba75ff, tunnel: 0x46f8ee, far: 0xff5a94, ground: 0x10101c, groundGlow: 0x090a16 }
       ];
       let environmentIndex = 0;
+      let antiGravityModeActive = false;
+      const QUANTUM_THEME = {
+        background: 0x08051a,
+        fog: 0x160b35,
+        fogDensity: 0.0105,
+        grid: 0x9b6dff,
+        rail: 0x65e6ff,
+        key: 0xb58aff,
+        tunnel: 0x7453ff,
+        far: 0x4bcfff,
+        ground: 0x17112e,
+        groundGlow: 0x3c1d78
+      };
       let environmentTargets = null;
       let environmentNoticeTimer = 0;
       let environmentNoticeToken = 0;
@@ -4365,7 +4389,9 @@ void main() {
         const nextIndex = Math.max(0, Math.min(ENVIRONMENTS.length - 1, index));
         const changed = nextIndex !== environmentIndex;
         environmentIndex = nextIndex;
-        const theme = ENVIRONMENTS[environmentIndex];
+        const theme = antiGravityModeActive
+          ? { ...ENVIRONMENTS[environmentIndex], ...QUANTUM_THEME }
+          : ENVIRONMENTS[environmentIndex];
         environmentTargets = {
           background: new THREE.Color(theme.background),
           fog: new THREE.Color(theme.fog),
@@ -4435,7 +4461,24 @@ void main() {
       const positionAttribute = new THREE.BufferAttribute(particlePositions, 3);
       positionAttribute.setUsage(THREE.DynamicDrawUsage);
       particleGeometry.setAttribute("position", positionAttribute);
-      particleGeometry.setAttribute("color", new THREE.BufferAttribute(particleColors, 3));
+      const particleColorAttribute = new THREE.BufferAttribute(particleColors, 3);
+      particleGeometry.setAttribute("color", particleColorAttribute);
+      const baseParticleColors = particleColors.slice();
+      const quantumDustPalette = [new THREE.Color(0x9a6cff), new THREE.Color(0x55dfff), new THREE.Color(0xd4bcff)];
+      function setParticleTheme(isQuantum) {
+        if (!isQuantum) {
+          particleColors.set(baseParticleColors);
+        } else {
+          for (let i = 0; i < PARTICLE_COUNT; i++) {
+            const tint = quantumDustPalette[i % quantumDustPalette.length];
+            const offset = i * 3;
+            particleColors[offset] = tint.r;
+            particleColors[offset + 1] = tint.g;
+            particleColors[offset + 2] = tint.b;
+          }
+        }
+        particleColorAttribute.needsUpdate = true;
+      }
       const particleField = new THREE.Points(
         particleGeometry,
         new THREE.PointsMaterial({
@@ -4452,7 +4495,8 @@ void main() {
 
       const player = new THREE.Group();
       gameScene.add(player);
-      player.position.set(LANE_X[1], 0.5, 0);
+      player.position.set(LANE_X[1], RUNNER_Y, 0);
+      player.userData.gravityTargetY = RUNNER_Y;
       const orbMat = new THREE.MeshStandardMaterial({ color: COLORS[1].hex, emissive: COLORS[1].hex, emissiveIntensity: 3.8, metalness: 0.1, roughness: 0.2 });
       const orb = new THREE.Mesh(new THREE.SphereGeometry(PLAYER_RADIUS, 20, 16), orbMat);
       player.add(orb);
@@ -4540,6 +4584,7 @@ void main() {
         group.position.set(0, 0, z);
         group.visible = state !== "ready";
         const level = environmentIndex + 1;
+        const gateGravitySide = antiGravityModeActive ? nextGravityHazardSide() : null;
         const narrowing = level < 7 ? 0 : level === 7 ? 0.18 : level === 8 ? 0.28 : level === 9 ? 0.4 : 0.5;
         group.userData = {
           colorIndex,
@@ -4568,6 +4613,8 @@ void main() {
           phantomPhase: Math.random() * Math.PI * 2,
           phantomSpeed: level >= 7 ? 3.4 + (level - 7) * 0.35 : 0,
           narrowing,
+          gravitySide: gateGravitySide,
+          gravityBand: null,
           stacked: level >= 9,
           stackIndex,
           checked: false
@@ -4611,13 +4658,23 @@ void main() {
           const markerMat = new THREE.MeshBasicMaterial({ color: COLORS[lane].hex, transparent: true, opacity: lane === colorIndex ? 1 : 0.45 });
           const marker = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.08, 0.08), markerMat);
           group.userData.markerMaterials.push(markerMat);
-          marker.position.set(LANE_X[lane], -1.48, 0.04);
+          marker.position.set(LANE_X[lane], antiGravityModeActive ? -1.32 : -1.48, 0.04);
           group.add(marker);
         }
         const postGlow = new THREE.PointLight(color, 7, 8, 2);
         postGlow.position.set(0, 0, 0.7);
         group.userData.postGlow = postGlow;
         group.add(postGlow);
+        if (gateGravitySide) {
+          const bandColor = gateGravitySide === "ceiling" ? 0xb992ff : 0x69e8ff;
+          const gravityBand = new THREE.Mesh(
+            new THREE.BoxGeometry(7.8, 0.065, 0.11),
+            new THREE.MeshBasicMaterial({ color: bandColor, transparent: true, opacity: 0.94 })
+          );
+          gravityBand.position.set(0, gateGravitySide === "ceiling" ? 1.62 : -1.62, 0.12);
+          group.userData.gravityBand = gravityBand;
+          group.add(gravityBand);
+        }
         gameScene.add(group);
         return group;
       }
@@ -4756,9 +4813,11 @@ void main() {
         group.position.set(LANE_X[lane], 0.12, z);
         group.visible = state === "running";
         group.userData = { lane, phase: Math.random() * Math.PI * 2, collected: false };
+        const crystalBase = antiGravityModeActive ? 0xb98aff : 0xffd25e;
+        const crystalGlow = antiGravityModeActive ? 0x7d5bff : 0xffa91f;
         const gold = new THREE.MeshStandardMaterial({
-          color: 0xffd25e,
-          emissive: 0xffa91f,
+          color: crystalBase,
+          emissive: crystalGlow,
           emissiveIntensity: 2.8,
           metalness: 0.65,
           roughness: 0.2
@@ -4767,13 +4826,13 @@ void main() {
         group.add(crystal);
         const ring = new THREE.Mesh(
           new THREE.TorusGeometry(0.47, 0.035, 7, 32),
-          new THREE.MeshBasicMaterial({ color: 0xffdf83, transparent: true, opacity: 0.9 })
+          new THREE.MeshBasicMaterial({ color: antiGravityModeActive ? 0xe2d4ff : 0xffdf83, transparent: true, opacity: 0.9 })
         );
         ring.rotation.x = Math.PI / 2;
         group.add(ring);
         const innerRing = new THREE.Mesh(
           new THREE.TorusGeometry(0.34, 0.018, 6, 28),
-          new THREE.MeshBasicMaterial({ color: 0xff9f2e, transparent: true, opacity: 0.8 })
+          new THREE.MeshBasicMaterial({ color: antiGravityModeActive ? 0x7e5cff : 0xff9f2e, transparent: true, opacity: 0.8 })
         );
         innerRing.rotation.set(Math.PI / 2, Math.PI / 3, 0);
         group.add(innerRing);
@@ -4791,27 +4850,34 @@ void main() {
       function makeLaser(z) {
         const group = new THREE.Group();
         group.position.set(0, 0, z);
+        const gravitySide = antiGravityModeActive ? nextGravityHazardSide() : null;
+        const surfaceY = gravitySide
+          ? gravitySide === "ceiling" ? 1.68 : -1.68
+          : 0.52;
+        const beamColor = antiGravityModeActive ? gravitySide === "ceiling" ? 0xc4a0ff : 0x63e6ff : 0xff8ec0;
+        const glowColor = antiGravityModeActive ? gravitySide === "ceiling" ? 0x9c68ff : 0x45cfff : 0xff397e;
         group.userData = {
           phase: Math.random() * Math.PI * 2,
           checked: false,
           active: true,
+          gravitySide,
           beam: null,
           glow: null
         };
         const glow = new THREE.Mesh(
           new THREE.BoxGeometry(1.75, 0.24, 0.14),
-          new THREE.MeshBasicMaterial({ color: 0xff397e, transparent: true, opacity: 0.22, depthWrite: false })
+          new THREE.MeshBasicMaterial({ color: glowColor, transparent: true, opacity: 0.22, depthWrite: false })
         );
-        glow.position.y = 0.52;
+        glow.position.y = surfaceY;
         group.add(glow);
         const beam = new THREE.Mesh(
           new THREE.BoxGeometry(LASER_HALF_WIDTH * 2, 0.075, 0.09),
-          new THREE.MeshBasicMaterial({ color: 0xff8ec0, transparent: true, opacity: 1, depthWrite: false })
+          new THREE.MeshBasicMaterial({ color: beamColor, transparent: true, opacity: 1, depthWrite: false })
         );
-        beam.position.y = 0.52;
+        beam.position.y = surfaceY;
         group.add(beam);
-        const emitter = new THREE.PointLight(0xff397e, 3.5, 4.5, 2);
-        emitter.position.set(0, 0.58, 0.4);
+        const emitter = new THREE.PointLight(glowColor, 3.5, 4.5, 2);
+        emitter.position.set(0, surfaceY + (gravitySide === "ceiling" ? -0.12 : 0.12), 0.4);
         group.add(emitter);
         group.userData.beam = beam;
         group.userData.glow = glow;
@@ -4924,6 +4990,8 @@ void main() {
       let lastSpawnedGateColorIndex = -1;
       let gateColorBag = [];
       let currentLane = 1;
+      let gravitySide = "floor";
+      let gravityHazardSerial = 0;
       let lastPlayerInputAt = -Infinity;
       let distance = 0;
       let passed = 0;
@@ -4940,6 +5008,11 @@ void main() {
       let powerUpSpawnTimer = 7;
       let crystalSpawnTimer = 3.5;
       let laserSpawnTimer = 10;
+      function nextGravityHazardSide() {
+        const side = gravityHazardSerial % 2 === 0 ? "floor" : "ceiling";
+        gravityHazardSerial++;
+        return side;
+      }
       function createFreshProgression() {
         return {
           crystals: 0,
@@ -5324,14 +5397,48 @@ void main() {
         if (achievementQueue.length && !achievementNoticeTimer) displayNextAchievement();
       }
       function setGameMode(mode) {
-        if (state === "running" || !["endless", "timeAttack"].includes(mode)) return;
+        if (state === "running" || !["endless", "timeAttack", "antiGravity"].includes(mode)) return;
         selectedMode = mode;
+        antiGravityModeActive = mode === "antiGravity";
+        gravityHazardSerial = 0;
+        gravitySide = "floor";
+        player.userData.gravityTargetY = antiGravityModeActive ? GRAVITY_FLOOR_Y : RUNNER_Y;
+        player.position.y = player.userData.gravityTargetY;
+        shadow.position.y = antiGravityModeActive ? -0.82 : -2.4;
+        shadow.rotation.x = -Math.PI / 2;
+        colorBeacon.position.y = 0.9;
+        player.rotation.z = 0;
+        el("game").classList.toggle("quantum-mode", antiGravityModeActive);
+        setParticleTheme(antiGravityModeActive);
+        setEnvironment(environmentIndex, { announce: false, instant: true });
         el("endlessModeButton").setAttribute("aria-pressed", String(mode === "endless"));
         el("timeAttackModeButton").setAttribute("aria-pressed", String(mode === "timeAttack"));
-        el("startButton").innerHTML = mode === "timeAttack"
-          ? 'Start Time Attack <span class="button-arrow">↗</span>'
-          : 'Start Endless <span class="button-arrow">↗</span>';
+        el("antiGravityModeButton").setAttribute("aria-pressed", String(mode === "antiGravity"));
+        updateModeCopy();
+        updateGravityIndicator();
         updateHUD();
+      }
+      function updateModeCopy() {
+        const quantum = selectedMode === "antiGravity";
+        if (el("results").hidden) {
+          el("eyebrow").textContent = quantum ? "QUANTUM SINGULARITY" : "A color reaction test";
+          el("intro").textContent = quantum
+            ? "Flip between the tunnel floor and ceiling to clear alternating plasma gates. Match each gate’s color too: use C or the COLOR button to cycle, and Space or a tap to flip gravity."
+            : "Shift lanes with arrows or swipes, tap or press Space to cycle red, cyan, and yellow, then match glowing gate sections. Collect Prism Shield, Time Warp, and 2X score boosts across ten evolving worlds.";
+          el("startHint").innerHTML = quantum
+            ? '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space</b> flip &nbsp;·&nbsp; <b>C</b> color</span><span class="mobile-hint">Swipe lanes · tap to flip · COLOR button to switch color</span>'
+            : '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space</b> color</span><span class="mobile-hint">Tap to start · swipe lanes, tap to change color</span>';
+        }
+        if (selectedMode === "antiGravity") {
+          el("startButton").innerHTML = 'Enter Anti-Gravity <span class="button-arrow">↗</span>';
+          if (!el("results").hidden) el("resultLine").textContent = "Quantum Singularity · Anti-Gravity";
+        } else if (selectedMode === "timeAttack") {
+          el("startButton").innerHTML = 'Start Time Attack <span class="button-arrow">↗</span>';
+          if (!el("results").hidden) el("resultLine").textContent = "Time Attack · Run summary";
+        } else {
+          el("startButton").innerHTML = 'Start Endless Runner <span class="button-arrow">↗</span>';
+          if (!el("results").hidden) el("resultLine").textContent = "Endless · Run summary";
+        }
       }
       function openShop() {
         if (state === "running") return;
@@ -5477,6 +5584,42 @@ void main() {
         playCue("lane");
         return true;
       }
+      function updateGravityIndicator() {
+        const visible = antiGravityModeActive && state === "running";
+        el("gravityIndicator").hidden = !visible;
+        el("gravityLabel").textContent = gravitySide === "ceiling" ? "Ceiling gravity" : "Floor gravity";
+        el("gravityArrow").textContent = gravitySide === "ceiling" ? "↑" : "↓";
+      }
+      function setGravitySide(side, instant = false) {
+        gravitySide = side === "ceiling" ? "ceiling" : "floor";
+        const targetY = antiGravityModeActive
+          ? gravitySide === "ceiling" ? GRAVITY_CEILING_Y : GRAVITY_FLOOR_Y
+          : RUNNER_Y;
+        player.userData.gravityTargetY = targetY;
+        if (instant) player.position.y = targetY;
+        shadow.position.y = antiGravityModeActive
+          ? gravitySide === "ceiling" ? 0.82 : -0.82
+          : -2.4;
+        shadow.rotation.x = gravitySide === "ceiling" ? Math.PI / 2 : -Math.PI / 2;
+        colorBeacon.position.y = antiGravityModeActive && gravitySide === "ceiling" ? -0.9 : 0.9;
+        updateGravityIndicator();
+      }
+      function isPlayerOnGravitySide(side) {
+        if (!antiGravityModeActive) return true;
+        const targetY = side === "ceiling" ? GRAVITY_CEILING_Y : GRAVITY_FLOOR_Y;
+        return gravitySide === side && Math.abs(player.position.y - targetY) <= 0.42;
+      }
+      function flipGravity() {
+        if (state !== "running" || !antiGravityModeActive || !acceptPlayerInput()) return false;
+        const nextSide = gravitySide === "floor" ? "ceiling" : "floor";
+        setGravitySide(nextSide);
+        colorPulse = 0.12;
+        createImpactBurst(nextSide === "ceiling" ? 0xb992ff : 0x69e8ff, 0.65, 9);
+        unlockAudio();
+        playCue("power");
+        showRunStatus("GRAVITY FLIP · " + nextSide.toUpperCase(), 650);
+        return true;
+      }
       let colorPulse = 0;
       setOrbColor(1);
       updateLaneIndicator();
@@ -5492,6 +5635,7 @@ void main() {
         lasers = [];
         gateColorBag = [];
         lastSpawnedGateColorIndex = currentColor;
+        gravityHazardSerial = 0;
         nextGateZ = FIRST_GATE_SPAWN_Z;
         for (let i = 0; i < 5; i++) {
           gates.push(makeGate(randomColor(), nextGateZ));
@@ -5523,7 +5667,9 @@ void main() {
       }
       function showEnvironmentBanner(index) {
         const banner = el("environmentBanner");
-        const theme = ENVIRONMENTS[index];
+        const theme = antiGravityModeActive
+          ? { ...ENVIRONMENTS[index], ...QUANTUM_THEME }
+          : ENVIRONMENTS[index];
         const token = ++environmentNoticeToken;
         window.clearTimeout(environmentNoticeTimer);
         banner.style.setProperty("--zone-color", new THREE.Color(theme.grid).getStyle());
@@ -5633,20 +5779,16 @@ void main() {
       function resetOverlay() {
         closeShop();
         el("card").classList.remove("pause-open");
-        el("eyebrow").textContent = "A color reaction test";
         el("titleTop").textContent = "Color Shift:";
         el("titleBottom").textContent = "Neon Rush 3D";
-        el("intro").textContent = "Shift lanes with arrows or swipes, tap or press Space to cycle red, cyan, and yellow, then match glowing gate sections. Collect Prism Shield, Time Warp, and 2X score boosts across ten evolving worlds.";
         el("colorKey").hidden = false;
         el("startHint").hidden = false;
-        el("startHint").innerHTML = '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space</b> color</span><span class="mobile-hint">Tap to start · swipe lanes, tap to change color</span>';
         el("modeSelector").hidden = false;
         el("results").hidden = true;
         el("mysteryReward").hidden = true;
         el("shopButton").hidden = false;
-        el("startButton").innerHTML = selectedMode === "timeAttack"
-          ? 'Start Time Attack <span class="button-arrow">↗</span>'
-          : 'Start Endless <span class="button-arrow">↗</span>';
+        updateModeCopy();
+        updateGravityIndicator();
       }
       function consumeStoredPowerUp() {
         const available = Object.entries(progression.powerTokens).filter(([, count]) => count > 0);
@@ -5701,6 +5843,7 @@ void main() {
         timeRemaining = 60;
         feverTimer = 0;
         elapsed = 0; obstacleElapsed = 0; speed = 13.5;
+        lastPlayerInputAt = -Infinity;
         setEnvironment(0, { announce: false, instant: true });
         shieldCharges = 0; timeWarpTimer = 0; scoreBoosterTimer = 0; speedBoostTimer = 0;
         const dailyPowerName = consumeStoredPowerUp();
@@ -5710,12 +5853,14 @@ void main() {
         laserSpawnTimer = 10 + Math.random() * 2;
         runCoins = 0;
         graceTimer = START_GRACE_SECONDS;
+        gravityHazardSerial = 0;
+        setGravitySide("floor", true);
         applyPlayerSkin(progression.activeSkin);
         currentLane = 1;
         setOrbColor(1);
         player.userData.targetX = LANE_X[currentLane];
         updateLaneIndicator();
-        player.position.set(LANE_X[currentLane], 0.5, 0);
+        player.position.set(LANE_X[currentLane], antiGravityModeActive ? GRAVITY_FLOOR_Y : RUNNER_Y, 0);
         player.rotation.set(0, 0, 0);
         orb.rotation.set(0, 0, 0);
         ribs.forEach((rib, index) => { rib.position.z = -index * 8 - 1; });
@@ -5724,10 +5869,13 @@ void main() {
         makeInitialGates();
         updatePowerHUD();
         updateHUD();
+        updateGravityIndicator();
         el("overlay").classList.add("hidden");
         el("hud").classList.add("visible");
         el("runStatus").classList.add("visible");
-        showRunStatus(dailyPowerName ? "Grace 1s · " + dailyPowerName + " ready" : "Grace 1s · swipe lanes · tap color", 1600);
+        showRunStatus(dailyPowerName
+          ? "Grace 1s · " + dailyPowerName + " ready"
+          : antiGravityModeActive ? "Grace 1s · C / Color button switches color · tap flips gravity" : "Grace 1s · swipe lanes · tap color", 1600);
       }
       function pauseGame() {
         if (state !== "running") return;
@@ -5738,6 +5886,7 @@ void main() {
         el("environmentBanner").classList.remove("visible");
         el("environmentBanner").hidden = true;
         el("runStatus").classList.remove("visible");
+        updateGravityIndicator();
         el("pauseButton").hidden = true;
         el("game").classList.add("is-paused");
         el("feverWash").classList.remove("active");
@@ -5767,6 +5916,7 @@ void main() {
         el("overlay").classList.add("hidden");
         el("hud").classList.add("visible");
         el("runStatus").classList.add("visible");
+        updateGravityIndicator();
         updatePowerHUD();
       }
       function awardGatePass(message) {
@@ -5817,6 +5967,7 @@ void main() {
       function resolveLaserCollision(laser) {
         laser.userData.checked = true;
         if (graceTimer > 0 || !laser.userData.active) return;
+        if (antiGravityModeActive && !isPlayerOnGravitySide(laser.userData.gravitySide)) return;
         const laserX = laser.position.x + laser.userData.beam.position.x;
         if (Math.abs(player.position.x - laserX) <= LASER_HALF_WIDTH + PLAYER_RADIUS) {
           handleObstacleImpact("Laser strike", 0xff397e);
@@ -5830,6 +5981,10 @@ void main() {
         }
         if (player.currentColorIndex !== gate.colorIndex) {
           triggerGameOver("color mismatch");
+          return;
+        }
+        if (antiGravityModeActive && !isPlayerOnGravitySide(gate.userData.gravitySide)) {
+          handleObstacleImpact("Wrong gravity surface", 0x9b6dff);
           return;
         }
         if (gate.userData.phantom && !gate.userData.phantomActive) {
@@ -5907,6 +6062,7 @@ void main() {
         state = "over";
         el("game").classList.remove("is-running", "is-paused");
         el("pauseButton").hidden = true;
+        updateGravityIndicator();
         feverTimer = 0;
         triggerImpactEffects(COLORS[currentColor].hex, 1.4);
         playCue("gameOver");
@@ -5928,12 +6084,16 @@ void main() {
           el("bestTop").textContent = String(best).padStart(5, "0");
           crateReward = grantMysteryCrate();
         }
-        el("eyebrow").textContent = reason === "time" ? "Time attack complete" : "Run complete";
+        el("eyebrow").textContent = reason === "time"
+          ? "Time attack complete"
+          : selectedMode === "antiGravity" ? "Quantum run complete" : "Run complete";
         el("titleTop").textContent = reason === "time" ? "Time" : "Gate";
         el("titleBottom").textContent = reason === "time" ? "is up" : "missed";
         el("intro").textContent = reason === "time"
           ? "The clock is out. Your score is locked in—take another run and push your rank higher."
-          : "The tunnel keeps moving. Find your rhythm and take another run.";
+          : selectedMode === "antiGravity"
+            ? "The quantum tunnel keeps moving. Recalibrate your gravity flips and try again."
+            : "The tunnel keeps moving. Find your rhythm and take another run.";
         el("colorKey").hidden = true;
         el("startHint").hidden = true;
         el("results").hidden = false;
@@ -5944,7 +6104,9 @@ void main() {
         el("finalMaxStreak").textContent = "×" + maxCombo;
         el("finalRunCrystals").textContent = String(runCoins);
         el("finalRank").textContent = playerRankForScore(final);
-        el("resultLine").textContent = (selectedMode === "timeAttack" ? "Time Attack" : "Endless") + " · Run summary";
+        el("resultLine").textContent = selectedMode === "antiGravity"
+          ? "Quantum Singularity · Anti-Gravity"
+          : (selectedMode === "timeAttack" ? "Time Attack" : "Endless") + " · Run summary";
         el("bestMessage").textContent = isBest ? "New personal best" : "Personal best · " + best;
         el("mysteryReward").hidden = !isBest;
         if (isBest) el("crateReward").textContent = "+" + crateReward + " crystals";
@@ -5985,6 +6147,20 @@ void main() {
 
         const leftAt = progress => center - (farHalf + (nearHalf - farHalf) * progress);
         const rightAt = progress => center + (farHalf + (nearHalf - farHalf) * progress);
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const offset = i * 3;
+          const depth = Math.max(0, Math.min(1, Math.exp(particlePositions[offset + 2] / 27)));
+          const spread = farHalf + (nearHalf - farHalf) * depth;
+          const dustX = center + (particlePositions[offset] / 4.5) * spread;
+          const dustY = horizon + (floor - horizon) * depth - particlePositions[offset + 1] * height * 0.045 * depth;
+          const red = Math.round(particleColors[offset] * 255);
+          const green = Math.round(particleColors[offset + 1] * 255);
+          const blue = Math.round(particleColors[offset + 2] * 255);
+          ctx.beginPath();
+          ctx.arc(dustX, dustY, Math.max(0.8, depth * 2.2), 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${red},${green},${blue},${0.35 + depth * 0.4})`;
+          ctx.fill();
+        }
         ctx.beginPath();
         ctx.moveTo(leftAt(0), horizon);
         ctx.lineTo(rightAt(0), horizon);
@@ -6054,22 +6230,41 @@ void main() {
           ctx.lineWidth = Math.max(1.5, progress * 4);
           ctx.strokeRect(x, y - halfHeight, halfWidth * 2, halfHeight * 2);
           ctx.shadowBlur = 0;
+          if (antiGravityModeActive) {
+            const gravityY = y + (gate.userData.gravitySide === "ceiling" ? -halfHeight * 0.78 : halfHeight * 0.78);
+            const gravityColor = gate.userData.gravitySide === "ceiling" ? "#b992ff" : "#69e8ff";
+            ctx.beginPath();
+            ctx.moveTo(x, gravityY);
+            ctx.lineTo(x + halfWidth * 2, gravityY);
+            ctx.strokeStyle = gravityColor;
+            ctx.lineWidth = Math.max(2, progress * 4);
+            ctx.shadowColor = gravityColor;
+            ctx.shadowBlur = 14 * progress;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+          }
         });
 
         lasers.forEach(laser => {
           const progress = Math.max(0, Math.min(1, Math.exp(laser.position.z / 27)));
           if (progress <= 0 || progress > 1) return;
-          const y = horizon + (floor - horizon) * progress;
+          const gateY = horizon + (floor - horizon) * progress;
           const halfWidth = width * (0.035 + 0.37 * progress);
+          const y = antiGravityModeActive
+            ? gateY + (laser.userData.gravitySide === "ceiling" ? -height * 0.035 : height * 0.035)
+            : gateY;
           const laserX = center + (laser.userData.beam.position.x / 4.5) * nearHalf;
           const beamWidth = Math.max(8, (LASER_HALF_WIDTH * 2 / 4.5) * halfWidth);
+          const laserTint = antiGravityModeActive
+            ? laser.userData.gravitySide === "ceiling" ? "#c4a0ff" : "#63e6ff"
+            : "#ff397e";
           ctx.beginPath();
           ctx.moveTo(laserX - beamWidth * 0.75, y);
           ctx.lineTo(laserX + beamWidth * 0.75, y);
-          ctx.strokeStyle = "#ff397e";
+          ctx.strokeStyle = laserTint;
           ctx.globalAlpha = laser.userData.active ? 0.95 : 0.2;
           ctx.lineWidth = Math.max(3, progress * 10);
-          ctx.shadowColor = "#ff397e";
+          ctx.shadowColor = laserTint;
           ctx.shadowBlur = laser.userData.active ? 18 * progress : 4;
           ctx.stroke();
           ctx.shadowBlur = 0;
@@ -6150,10 +6345,10 @@ void main() {
           ctx.lineTo(0, radius);
           ctx.lineTo(-radius * 0.66, 0);
           ctx.closePath();
-          ctx.fillStyle = "#ffd25e";
-          ctx.strokeStyle = "#fff0b2";
+          ctx.fillStyle = antiGravityModeActive ? "#b98aff" : "#ffd25e";
+          ctx.strokeStyle = antiGravityModeActive ? "#dfd0ff" : "#fff0b2";
           ctx.lineWidth = Math.max(1.5, progress * 2.5);
-          ctx.shadowColor = "#ffb52d";
+          ctx.shadowColor = antiGravityModeActive ? "#7d5bff" : "#ffb52d";
           ctx.shadowBlur = 18 * progress;
           ctx.fill();
           ctx.stroke();
@@ -6180,7 +6375,7 @@ void main() {
 
         const orbColor = scoreBoosterTimer > 0 ? "#ffd34d" : COLORS[currentColor].css;
         const orbX = center + (player.position.x / 4.5) * nearHalf;
-        const orbY = height * 0.76;
+        const orbY = height * (0.76 - (player.position.y - RUNNER_Y) * 0.09);
         const orbRadius = Math.max(20, Math.min(40, width * 0.045));
         ctx.beginPath();
         ctx.arc(orbX, orbY, orbRadius * 1.38, 0, Math.PI * 2);
@@ -6212,7 +6407,15 @@ void main() {
           ctx.shadowBlur = 0;
         }
         ctx.beginPath();
-        ctx.ellipse(orbX, height * 0.83, orbRadius * 1.7, orbRadius * 0.36, 0, 0, Math.PI * 2);
+        ctx.ellipse(
+          orbX,
+          height * (0.83 - (player.position.y - RUNNER_Y) * 0.08),
+          orbRadius * 1.7,
+          orbRadius * 0.36,
+          0,
+          0,
+          Math.PI * 2
+        );
         ctx.fillStyle = "rgba(0,0,0,.38)";
         ctx.fill();
         const orbDrawY = orbY + Math.sin(t * (state === "running" ? 5 : 1.15)) * 4;
@@ -6285,11 +6488,21 @@ void main() {
         orbHalo.material.color.lerp(targetOrbColor, colorLerp);
         orbLight.color.lerp(targetOrbColor, colorLerp);
         skinAccent.rotation.z += dt * 0.38;
-        colorBeacon.position.y = 0.9 + Math.sin(t * 3.2) * 0.045;
+        const beaconDirection = antiGravityModeActive && gravitySide === "ceiling" ? -1 : 1;
+        colorBeacon.position.y = beaconDirection * (0.9 + Math.sin(t * 3.2) * 0.045);
         colorBeacon.rotation.y += dt * 1.5;
         const laneResponse = environmentIndex >= 8 ? 3.8 : environmentIndex >= 4 ? 5.2 : 18;
         player.position.x = THREE.MathUtils.damp(player.position.x, LANE_X[currentLane], laneResponse, dt);
-        camera.position.set(player.position.x, CAMERA_BASE_Y, CAMERA_BASE_Z);
+        if (antiGravityModeActive) {
+          player.position.y = THREE.MathUtils.damp(player.position.y, player.userData.gravityTargetY, 14, dt);
+        } else {
+          player.position.y = RUNNER_Y + Math.sin(t * 5) * 0.055;
+        }
+        camera.position.set(
+          player.position.x,
+          CAMERA_BASE_Y + (antiGravityModeActive ? (player.position.y - RUNNER_Y) * 0.32 : 0),
+          CAMERA_BASE_Z
+        );
         camera.lookAt(player.position.x, player.position.y, -18);
         if (cameraShakeTimer > 0) {
           const shakeFade = cameraShakeTimer / 0.38;
@@ -6339,7 +6552,6 @@ void main() {
           if (crystalSpawnTimer <= 0 && crystalCoins.length < 3) spawnCrystalCoin();
           laserSpawnTimer -= dt;
           if (laserSpawnTimer <= 0 && lasers.length < 2) spawnLaser();
-          player.position.y = 0.5 + Math.sin(t * 5) * 0.055;
           orb.rotation.y += dt * 1.2;
           orb.rotation.x += dt * 0.7;
           ribs.forEach(rib => {
@@ -6384,7 +6596,8 @@ void main() {
             coin.userData.crystal.scale.setScalar(1 + Math.sin(t * 6 + coin.userData.phase) * 0.09);
             const pickupPlane = -(PLAYER_RADIUS + 0.34);
             if (previousZ < pickupPlane && coin.position.z >= pickupPlane &&
-                Math.abs(player.position.x - coin.position.x) <= PLAYER_RADIUS + 0.34) {
+                Math.abs(player.position.x - coin.position.x) <= PLAYER_RADIUS + 0.34 &&
+                (!antiGravityModeActive || Math.abs(player.position.y - coin.position.y) <= 1.45)) {
               collectCrystalCoin(coin);
             }
           });
@@ -6447,7 +6660,11 @@ void main() {
             updateHUD();
           }
         } else {
-          player.position.y = 0.5 + Math.sin(t * 1.15) * 0.09;
+          if (antiGravityModeActive) {
+            player.position.y = THREE.MathUtils.damp(player.position.y, player.userData.gravityTargetY, 10, dt);
+          } else {
+            player.position.y = RUNNER_Y + Math.sin(t * 1.15) * 0.09;
+          }
           orb.rotation.y += dt * 0.35;
           ribs.forEach(rib => {
             rib.position.z += dt * 1.5;
@@ -6485,6 +6702,7 @@ void main() {
       el("startButton").addEventListener("click", startGame);
       el("endlessModeButton").addEventListener("click", () => setGameMode("endless"));
       el("timeAttackModeButton").addEventListener("click", () => setGameMode("timeAttack"));
+      el("antiGravityModeButton").addEventListener("click", () => setGameMode("antiGravity"));
       el("dailySpinButton").addEventListener("click", spinDailyReward);
       el("dailyContinueButton").addEventListener("click", closeDailyReward);
       el("shopButton").addEventListener("click", openShop);
@@ -6503,7 +6721,7 @@ void main() {
       el("laneRight").addEventListener("click", () => shiftLane(1));
       el("switchColor").addEventListener("click", () => cycleColor(1));
       window.addEventListener("keydown", event => {
-        if (event.repeat && ["ArrowLeft", "ArrowRight", "KeyA", "KeyD", "Space", "Escape", "KeyP"].includes(event.code)) return;
+        if (event.repeat && ["ArrowLeft", "ArrowRight", "KeyA", "KeyD", "KeyC", "Space", "Escape", "KeyP"].includes(event.code)) return;
         if (["ArrowLeft", "ArrowRight", "Space", "Escape"].includes(event.code)) event.preventDefault();
         if (event.code === "Escape" || event.code === "KeyP") {
           if (state === "running") pauseGame();
@@ -6513,7 +6731,11 @@ void main() {
         if (state === "running") {
           if (event.code === "ArrowLeft" || event.code === "KeyA") shiftLane(-1);
           if (event.code === "ArrowRight" || event.code === "KeyD") shiftLane(1);
-          if (event.code === "Space") cycleColor(1);
+          if (event.code === "KeyC") cycleColor(1);
+          if (event.code === "Space") {
+            if (antiGravityModeActive) flipGravity();
+            else cycleColor(1);
+          }
           return;
         }
         if ((event.code === "Space" || event.code === "Enter") && el("dailyModal").hidden && !el("card").classList.contains("shop-open")) startGame();
@@ -6530,7 +6752,8 @@ void main() {
         }
         if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
           if (state === "running") {
-            cycleColor(1);
+            if (antiGravityModeActive) flipGravity();
+            else cycleColor(1);
             return;
           }
         }
