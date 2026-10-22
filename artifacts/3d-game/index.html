@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#090c13" />
   <meta name="description" content="Color Shift: Neon Rush 3D — shift through neon gates, build your combo, and chase your best run." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='24' fill='%2338eaff'/%3E%3C/svg%3E" />
   <title>Color Shift: Neon Rush 3D</title>
   <style>
     :root {
@@ -13,7 +14,9 @@
       --muted: #858b98;
       --line: rgba(211, 222, 231, .13);
       --panel: rgba(12, 16, 24, .82);
-      --cyan: #38e6d3;
+      --cyan: #38eaff;
+      --red: #ff3d5e;
+      --yellow: #ffd84a;
       --magenta: #ff4fb8;
       --lime: #c5ff4a;
       --accent: #68f2df;
@@ -27,7 +30,7 @@
     #scene canvas { position: fixed; top: 0; left: 0; z-index: 1; display: block; width: 100vw; height: 100vh; height: 100dvh; touch-action: none; }
     #game::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2; background: linear-gradient(180deg, rgba(5,8,14,.2), transparent 25%, transparent 67%, rgba(5,8,14,.65)); }
     .grain { position: fixed; inset: 0; z-index: 15; pointer-events: none; opacity: .055; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.3'/%3E%3C/svg%3E"); }
-    .topbar { position: absolute; z-index: 5; top: max(25px, env(safe-area-inset-top)); left: clamp(20px, 5vw, 72px); right: clamp(20px, 5vw, 72px); display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; }
+    .topbar { position: absolute; z-index: 5; top: max(25px, env(safe-area-inset-top)); left: clamp(20px, 5vw, 72px); right: clamp(20px, 5vw, 72px); display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; opacity: 1; visibility: visible; transition: opacity .28s ease, visibility .28s; }
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand-mark { position: relative; width: 28px; height: 28px; border: 1px solid rgba(255,255,255,.44); border-radius: 50%; }
     .brand-mark::before, .brand-mark::after { content: ""; position: absolute; border-radius: 50%; inset: 5px; border: 1px solid rgba(255,255,255,.35); }
@@ -46,11 +49,39 @@
     .sound-icon { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
     .hud { position: absolute; z-index: 5; top: 94px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: clamp(14px, 4vw, 48px); opacity: 0; transition: opacity .35s ease; pointer-events: none; }
     .hud.visible { opacity: 1; }
+    #game.is-running .topbar { opacity: 0; visibility: hidden; }
+    #game.is-running .hud { top: 0; left: 0; right: 0; width: 100%; max-width: none; height: 0; transform: none; display: block; }
+    #game.is-running .hud .stat:not(:first-child):not(:last-child) { display: none; }
+    #game.is-running .hud .stat:first-child,
+    #game.is-running .hud .stat:last-child { position: absolute; top: max(17px, env(safe-area-inset-top)); min-width: 0; text-align: left; }
+    #game.is-running .hud .stat:first-child { left: max(18px, env(safe-area-inset-left)); }
+    #game.is-running .hud .stat:last-child { right: max(18px, env(safe-area-inset-right)); text-align: right; }
+    #game.is-running .hud .stat-value { color: #f4f7fb; font-size: clamp(21px, 5vw, 27px); line-height: 1; text-shadow: 0 0 16px rgba(56,234,255,.18); }
+    #game.is-running .hud .stat-label { margin-top: 5px; color: rgba(220,228,236,.58); font-size: 7px; letter-spacing: .16em; }
+    #game.is-running .run-status,
+    #game.is-running .power-status,
+    #game.is-running .boost-banner,
+    #game.is-running .fever-banner,
+    #game.is-running .achievement-banner,
+    #game.is-running .color-panel,
+    #game.is-running .controls-hint { display: none !important; }
+    #game.is-running .grain { opacity: .018; }
+    #game.is-running.is-paused .mobile-controls { visibility: hidden; opacity: 0; }
+    .pause-button { position: absolute; z-index: 7; top: max(14px, env(safe-area-inset-top)); left: 50%; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid rgba(226,239,247,.2); border-radius: 50%; background: rgba(6,10,17,.48); color: rgba(238,246,251,.84); cursor: pointer; pointer-events: auto; transform: translateX(-50%); backdrop-filter: blur(7px); transition: opacity .2s, border-color .2s, background .2s; }
+    .pause-button:hover { border-color: rgba(56,234,255,.56); background: rgba(6,10,17,.75); }
+    .pause-button[hidden] { display: none !important; }
+    .pause-button svg { width: 15px; height: 15px; fill: currentColor; }
+    #game:not(.is-running) .mobile-controls { visibility: hidden; opacity: 0; }
     .stat { min-width: 74px; text-align: center; }
     .stat-value { font-family: system-ui, sans-serif; font-weight: 800; font-size: clamp(27px, 4vw, 38px); line-height: .9; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
     .stat-label { margin-top: 8px; font-size: 8px; letter-spacing: .2em; color: #89919c; text-transform: uppercase; }
     .stat.combo-hot .stat-value { color: var(--lime); text-shadow: 0 0 18px rgba(197,255,74,.65); transform: scale(1.08); }
     .stat-value { transition: color .2s, text-shadow .2s, transform .2s; }
+    #score.score-pop { animation: scorePop .44s cubic-bezier(.2,.8,.2,1); }
+    @keyframes scorePop {
+      0%, 100% { transform: scale(1); filter: brightness(1); }
+      42% { transform: scale(1.3); color: #fff; filter: brightness(1.6); text-shadow: 0 0 12px var(--cyan), 0 0 30px rgba(56,234,255,.82); }
+    }
     .run-status { position: absolute; z-index: 6; top: 50%; left: 50%; transform: translate(-50%, 105px); color: rgba(240,244,247,.66); font-size: 9px; letter-spacing: .19em; text-transform: uppercase; opacity: 0; transition: opacity .3s; pointer-events: none; }
     .run-status.visible { opacity: 1; }
     .power-status { position: absolute; z-index: 5; top: 151px; left: 50%; width: min(94vw, 560px); transform: translateX(-50%); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; pointer-events: none; }
@@ -69,8 +100,8 @@
     @keyframes feverText { from { opacity: .74; filter: hue-rotate(0deg) brightness(1); } to { opacity: 1; filter: hue-rotate(35deg) brightness(1.45); } }
     .fever-wash { position: absolute; z-index: 4; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(135deg, rgba(255,79,184,.12), rgba(56,230,211,.1), rgba(197,255,74,.1)); mix-blend-mode: screen; }
     .fever-wash.active { opacity: 1; animation: feverWash .72s linear infinite alternate; }
-    @keyframes feverWash { from { filter: hue-rotate(0deg); opacity: .32; } to { filter: hue-rotate(120deg); opacity: .72; } }
-    #game.fever-active #scene { filter: blur(1.35px) saturate(1.6); }
+    @keyframes feverWash { from { filter: hue-rotate(0deg); opacity: .06; } to { filter: hue-rotate(120deg); opacity: .14; } }
+    #game.fever-active #scene { filter: saturate(1.28); }
     .environment-banner { position: absolute; z-index: 7; top: clamp(210px, 31vh, 260px); left: 50%; width: min(calc(100vw - 32px), 350px); padding: 10px 16px 12px; border: 1px solid color-mix(in srgb, var(--zone-color) 65%, transparent); background: rgba(7, 11, 19, .82); color: var(--zone-color); text-align: center; pointer-events: none; opacity: 0; transform: translate(-50%, 10px) scale(.96); box-shadow: 0 0 0 rgba(0,0,0,0); backdrop-filter: blur(10px); transition: opacity .28s ease, transform .32s cubic-bezier(.2,.8,.2,1), box-shadow .32s ease; }
     .environment-banner[hidden] { display: none !important; }
     .environment-banner.visible { opacity: 1; transform: translate(-50%, 0) scale(1); box-shadow: 0 0 28px color-mix(in srgb, var(--zone-color) 22%, transparent); }
@@ -80,14 +111,15 @@
     .color-panel { position: absolute; z-index: 5; left: clamp(20px, 5vw, 72px); bottom: max(32px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 15px; pointer-events: none; }
     .color-copy { min-width: 74px; }
     .color-current { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-family: system-ui, sans-serif; font-size: 18px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .lane-current { margin-top: 4px; color: rgba(220,228,236,.72); font-size: 7px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
     .color-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px currentColor; }
     .swatches { display: flex; gap: 6px; }
     .swatch { width: 18px; height: 4px; border-radius: 6px; opacity: .34; transition: opacity .18s, transform .18s; }
     .swatch.active { opacity: 1; transform: scaleX(1.18); }
-    .controls-hint { position: absolute; z-index: 5; right: clamp(20px, 5vw, 72px); bottom: max(36px, env(safe-area-inset-bottom)); color: rgba(220,228,236,.58); text-align: right; font-size: 9px; line-height: 1.9; letter-spacing: .08em; pointer-events: none; }
+    .controls-hint { position: absolute; z-index: 5; right: clamp(20px, 5vw, 72px); bottom: max(36px, env(safe-area-inset-bottom)); color: rgba(220,228,236,.74); text-align: right; font-size: 9px; line-height: 1.9; letter-spacing: .08em; pointer-events: none; }
     .controls-hint strong { color: rgba(245,242,233,.91); font-weight: 500; }
     .overlay { position: absolute; z-index: 10; inset: 0; display: grid; place-items: center; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 24px; background: radial-gradient(ellipse at 50% 43%, rgba(9,12,19,.07) 0%, rgba(9,12,19,.28) 42%, rgba(9,12,19,.72) 100%); transition: opacity .35s ease, visibility .35s; }
-    .overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; overflow: hidden; }
     .card { width: min(100%, 490px); text-align: center; transform: translateY(0); transition: transform .4s cubic-bezier(.2,.8,.2,1); }
     .overlay.hidden .card { transform: translateY(12px); }
     .eyebrow { display: inline-flex; align-items: center; gap: 9px; margin-bottom: 14px; color: var(--accent); font-size: 9px; letter-spacing: .23em; text-transform: uppercase; }
@@ -113,6 +145,7 @@
     .actions { flex-wrap: wrap; }
     .actions .secondary-btn { min-width: 138px; }
     .card.shop-open > :not(.shop-panel) { display: none !important; }
+    .card.pause-open > #dailyTokenNote { display: none !important; }
     .shop-panel { width: 100%; max-height: min(78vh, 620px); overflow-y: auto; padding: 15px; border: 1px solid rgba(56,230,211,.28); background: rgba(7,11,19,.84); box-shadow: 0 0 36px rgba(56,230,211,.1); text-align: left; }
     .shop-panel[hidden] { display: none !important; }
     .shop-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 12px; }
@@ -138,6 +171,9 @@
     .achievement-row.unlocked .achievement-state { color: var(--lime); }
     .shop-notice { min-height: 16px; margin: 8px 0 5px; color: var(--cyan); font-size: 8px; letter-spacing: .08em; text-align: center; }
     .shop-back { display: block; width: min(100%, 220px); margin: 2px auto 0; }
+    .save-reset { margin-top: 18px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+    .save-reset p { margin: 0 0 8px; color: #8d9aa8; font-size: 8px; line-height: 1.6; letter-spacing: .07em; }
+    .reset-save-btn { width: min(100%, 220px); min-height: 40px; border-color: rgba(255,95,129,.48); color: #ff9aac; }
     .mobile-hint { display: none; }
     .result-line { margin: 24px 0 4px; color: #9ca4ad; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; }
     .game-over-brand { margin: 3px 0 12px; color: var(--accent); font-family: system-ui, sans-serif; font-size: 10px; font-weight: 800; letter-spacing: .16em; line-height: 1.5; text-transform: uppercase; text-shadow: 0 0 14px rgba(56,230,211,.32); }
@@ -174,9 +210,11 @@
     .wheel-pointer { position: absolute; z-index: 3; top: -7px; left: 50%; color: #fff2c5; font-size: 24px; text-shadow: 0 0 10px #ffd25e; transform: translateX(-50%); }
     .daily-result { min-height: 18px; margin: 0 0 10px; color: #ffe29a; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
     .daily-modal .primary-btn, .daily-modal .secondary-btn { width: min(100%, 250px); }
-    .mobile-controls { display: none; position: absolute; z-index: 6; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); gap: 9px; }
-    .tap-control { width: 56px; height: 56px; display: grid; place-items: center; border: 1px solid rgba(224,235,240,.3); border-radius: 12px; background: rgba(8,13,20,.72); color: #f3f1e9; backdrop-filter: blur(8px); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; font-size: 19px; transition: background .15s, transform .15s; }
-    .tap-control:active { background: rgba(56,230,211,.25); transform: scale(.94); }
+    .mobile-controls { display: none; position: absolute; z-index: 6; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); gap: 8px; }
+    .tap-control { width: 54px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; border: 1px solid rgba(224,235,240,.42); border-radius: 12px; background: rgba(8,13,20,.82); color: #f3f1e9; backdrop-filter: blur(8px); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; font-size: 20px; transition: background .15s, transform .15s; }
+    .tap-control small { color: rgba(243,241,233,.8); font-size: 6px; font-weight: 800; letter-spacing: .1em; }
+    .tap-control.color-switch { border-color: rgba(56,234,255,.64); color: var(--cyan); }
+    .tap-control:active { background: rgba(56,234,255,.25); transform: scale(.94); }
     .flash { position: absolute; z-index: 4; inset: 0; pointer-events: none; background: rgba(255,79,184,.1); opacity: 0; transition: opacity .08s; }
     .flash.on { opacity: 1; }
     #game.impact-shake { animation: impactShake .32s linear; }
@@ -193,6 +231,12 @@
       .brand-name { font-size: 15px; }
       .brand-sub { font-size: 8px; }
       .hud { top: max(70px, calc(env(safe-area-inset-top) + 54px)); width: calc(100% - 24px); max-width: 500px; justify-content: space-between; gap: clamp(3px, 1.4vw, 8px); }
+      #game.is-running .hud .stat:first-child,
+      #game.is-running .hud .stat:last-child { top: max(14px, env(safe-area-inset-top)); }
+      #game.is-running .hud .stat:first-child { left: max(14px, env(safe-area-inset-left)); }
+      #game.is-running .hud .stat:last-child { right: max(14px, env(safe-area-inset-right)); }
+      #game.is-running .hud .stat-value { font-size: clamp(20px, 6vw, 25px); }
+      .pause-button { top: max(10px, env(safe-area-inset-top)); width: 44px; height: 44px; }
       .stat { flex: 1 1 0; min-width: 0; }
       .stat-value { font-size: clamp(22px, 7vw, 28px); }
       .stat-label { margin-top: 6px; font-size: 6px; letter-spacing: .1em; }
@@ -286,9 +330,12 @@
         </button>
       </div>
     </header>
+    <button class="pause-button" id="pauseButton" type="button" aria-label="Pause run" title="Pause run" hidden>
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h3v12H3zM10 2h3v12h-3z"/></svg>
+    </button>
     <section class="hud" id="hud" aria-live="polite">
-      <div class="stat"><div class="stat-value" id="score">00000</div><div class="stat-label">Score</div></div>
-      <div class="stat" id="comboStat"><div class="stat-value" id="combo">×0</div><div class="stat-label">Combo</div></div>
+      <div class="stat"><div class="stat-value" id="score">00000</div><div class="stat-label">Current score</div></div>
+      <div class="stat" id="comboStat"><div class="stat-value" id="combo">×0</div><div class="stat-label">Streak</div></div>
       <div class="stat"><div class="stat-value" id="distance">000</div><div class="stat-label">Distance · m</div></div>
       <div class="stat"><div class="stat-value" id="gates">00</div><div class="stat-label">Gates</div></div>
       <div class="stat" id="paceStat"><div class="stat-value" id="pace">1.0<span style="font-size:.48em">×</span></div><div class="stat-label">Pace</div></div>
@@ -315,27 +362,28 @@
       <small id="achievementDescription">Reach 1,000 meters in one run.</small>
     </div>
     <div class="color-panel">
-      <div class="color-copy"><div class="micro-label">Orb color</div><div class="color-current"><span class="color-dot" id="colorDot"></span><span id="colorName">Magenta</span></div></div>
+      <div class="color-copy"><div class="micro-label">Active color</div><div class="color-current"><span class="color-dot" id="colorDot"></span><span id="colorName">Cyan</span></div><div class="lane-current" id="laneCurrent">Lane 2 / 3</div></div>
       <div class="swatches" aria-hidden="true">
+        <span class="swatch" data-color="red" style="background:var(--red)"></span>
         <span class="swatch" data-color="cyan" style="background:var(--cyan)"></span>
-        <span class="swatch" data-color="magenta" style="background:var(--magenta)"></span>
-        <span class="swatch" data-color="lime" style="background:var(--lime)"></span>
+        <span class="swatch" data-color="yellow" style="background:var(--yellow)"></span>
       </div>
     </div>
-    <div class="controls-hint"><strong>← A</strong> previous color&nbsp;&nbsp; <strong>D →</strong> next color<br>Match the gate before it reaches you</div>
-    <div class="mobile-controls" aria-label="Color controls">
-      <button class="tap-control" id="prevColor" aria-label="Previous color">←</button>
-      <button class="tap-control" id="nextColor" aria-label="Next color">→</button>
+    <div class="controls-hint"><strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br><strong>Space / tap</strong> change color · match the glowing gate section</div>
+    <div class="mobile-controls" aria-label="Lane and color controls">
+      <button class="tap-control" id="laneLeft" type="button" aria-label="Shift lane left">←<small>LANE</small></button>
+      <button class="tap-control color-switch" id="switchColor" type="button" aria-label="Change active color">↻<small>COLOR</small></button>
+      <button class="tap-control" id="laneRight" type="button" aria-label="Shift lane right">→<small>LANE</small></button>
     </div>
     <section class="overlay" id="overlay">
       <div class="card" id="card">
         <div class="eyebrow" id="eyebrow">A color reaction test</div>
         <h1 aria-label="Color Shift: Neon Rush 3D"><span class="title-light" id="titleTop">Color Shift:</span><span class="title-accent" id="titleBottom">Neon Rush 3D</span></h1>
-    <p class="intro" id="intro">Chain matching gates, scoop up neon crystals, and collect Prism Shields, Time Warps, and 2X score boosts across ten evolving worlds.</p>
+    <p class="intro" id="intro">Shift lanes with arrows or swipes. Press Space or tap to cycle red, cyan, and yellow, then pass through the brightest matching gate section.</p>
         <div class="color-key" id="colorKey">
+          <span class="key-chip"><i style="color:var(--red);background:var(--red)"></i>Red</span>
           <span class="key-chip"><i style="color:var(--cyan);background:var(--cyan)"></i>Cyan</span>
-          <span class="key-chip"><i style="color:var(--magenta);background:var(--magenta)"></i>Magenta</span>
-          <span class="key-chip"><i style="color:var(--lime);background:var(--lime)"></i>Lime</span>
+          <span class="key-chip"><i style="color:var(--yellow);background:var(--yellow)"></i>Yellow</span>
         </div>
         <div class="mode-selector" id="modeSelector" role="group" aria-label="Choose game mode">
           <button class="mode-btn" id="endlessModeButton" type="button" aria-pressed="true">Endless Mode</button>
@@ -363,7 +411,7 @@
           <button class="primary-btn" id="startButton">Start run <span class="button-arrow">↗</span></button>
           <button class="secondary-btn" id="shopButton" type="button">Shop / Skins</button>
         </div>
-        <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> previous &nbsp;·&nbsp; <b>D / →</b> next color</span><span class="mobile-hint">Tap anywhere to start · swipe or use arrows</span></div>
+        <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space</b> color</span><span class="mobile-hint">Tap to start · swipe lanes, tap to change color</span></div>
         <div class="small-note" id="dailyTokenNote" hidden></div>
         <section class="shop-panel" id="shopPanel" aria-label="Player skins shop" hidden>
           <div class="shop-header">
@@ -392,6 +440,10 @@
           <div class="shop-section-label">Daily Bounties</div>
           <div class="achievement-list" id="dailyBountyList"></div>
           <div class="shop-notice" id="shopNotice" role="status" aria-live="polite"></div>
+          <div class="save-reset">
+            <p>Reset this device’s local save: high score, crystals, skins, achievements, daily rewards, and power-up tokens.</p>
+            <button class="secondary-btn reset-save-btn" id="resetLocalData" type="button">Reset local save</button>
+          </div>
           <button class="secondary-btn shop-back" id="shopBack" type="button">Back to game</button>
         </section>
       </div>
@@ -4128,9 +4180,9 @@ void main() {
     (() => {
       "use strict";
       const COLORS = [
-        { name: "Cyan", key: "cyan", hex: 0x38e6d3, css: "#38e6d3" },
-        { name: "Magenta", key: "magenta", hex: 0xff4fb8, css: "#ff4fb8" },
-        { name: "Lime", key: "lime", hex: 0xc5ff4a, css: "#c5ff4a" }
+        { name: "Red", key: "red", hex: 0xff3d5e, css: "#ff3d5e" },
+        { name: "Cyan", key: "cyan", hex: 0x38eaff, css: "#38eaff" },
+        { name: "Yellow", key: "yellow", hex: 0xffd84a, css: "#ffd84a" }
       ];
       const PLAYER_SKINS = {
         sphere: { name: "Sphere", cost: 0, accent: 0x68f2df, roughness: 0.2, metalness: 0.1, glow: 3.8 },
@@ -4154,6 +4206,9 @@ void main() {
       const LASER_HALF_WIDTH = 0.56;
       const FIRST_GATE_SPAWN_Z = -50;
       const START_GRACE_SECONDS = 1;
+      const PLAYER_INPUT_COOLDOWN_MS = 120;
+      const SLIDING_GATE_UNLOCK_SCORE = 500;
+      const ROTATING_GATE_UNLOCK_SCORE = 1500;
       const ENVIRONMENTS = [
         { name: "Cyber Grid", background: 0x050515, fog: 0x050515, fogDensity: 0.009, grid: 0x38e6d3, rail: 0xc5ff4a, key: 0x38e6d3, tunnel: 0xff4fb8, far: 0xc5ff4a, ground: 0x17212b, groundGlow: 0x061719 },
         { name: "Chromatic Causeway", background: 0x061627, fog: 0x061627, fogDensity: 0.0095, grid: 0x45c6ff, rail: 0xffc857, key: 0x45c6ff, tunnel: 0x966bff, far: 0xff4fb8, ground: 0x101d2b, groundGlow: 0x071523 },
@@ -4402,11 +4457,23 @@ void main() {
       const orb = new THREE.Mesh(new THREE.SphereGeometry(PLAYER_RADIUS, 20, 16), orbMat);
       player.add(orb);
       const orbHalo = new THREE.Mesh(
-        new THREE.TorusGeometry(0.69, 0.035, 8, 64),
-        new THREE.MeshBasicMaterial({ color: COLORS[1].hex, transparent: true, opacity: 0.8 })
+        new THREE.TorusGeometry(0.72, 0.055, 8, 64),
+        new THREE.MeshBasicMaterial({ color: COLORS[1].hex, transparent: true, opacity: 0.96 })
       );
-      orbHalo.rotation.x = Math.PI / 2;
       player.add(orbHalo);
+      const colorBeacon = new THREE.Group();
+      colorBeacon.position.set(0, 0.9, 0);
+      const colorBeaconCore = new THREE.Mesh(
+        new THREE.SphereGeometry(0.12, 12, 10),
+        new THREE.MeshBasicMaterial({ color: COLORS[1].hex })
+      );
+      const colorBeaconRing = new THREE.Mesh(
+        new THREE.TorusGeometry(0.2, 0.018, 6, 28),
+        new THREE.MeshBasicMaterial({ color: COLORS[1].hex, transparent: true, opacity: 0.9 })
+      );
+      colorBeaconRing.rotation.x = Math.PI / 2;
+      colorBeacon.add(colorBeaconCore, colorBeaconRing);
+      player.add(colorBeacon);
       const skinAccent = new THREE.Mesh(
         new THREE.TorusGeometry(0.82, 0.026, 7, 48),
         new THREE.MeshBasicMaterial({ color: PLAYER_SKINS.sphere.accent, transparent: true, opacity: 0.9 })
@@ -4485,13 +4552,13 @@ void main() {
           frameMaterial: null,
           postGlow: null,
           level,
-          moving: level >= 3,
+          moving: score >= SLIDING_GATE_UNLOCK_SCORE,
           movementPhase: Math.random() * Math.PI * 2,
-          movementAmplitude: level >= 3 ? Math.min(0.95, 0.2 + (level - 3) * 0.1) : 0,
+          movementAmplitude: score >= SLIDING_GATE_UNLOCK_SCORE ? Math.min(0.95, 0.2 + Math.max(0, level - 3) * 0.1) : 0,
           movementSpeed: 0.8 + Math.max(0, level - 3) * 0.15,
-          rotating: level >= 5,
+          rotating: score >= ROTATING_GATE_UNLOCK_SCORE && level >= 3,
           rotationPhase: Math.random() * Math.PI * 2,
-          rotationSpeed: level >= 5 ? 0.8 + (level - 5) * 0.18 : 0,
+          rotationSpeed: score >= ROTATING_GATE_UNLOCK_SCORE && level >= 3 ? 0.8 + Math.max(0, level - 5) * 0.18 : 0,
           colorChanging: level >= 3,
           flashPhase: Math.random() * 2,
           flashStep: -1,
@@ -4505,6 +4572,7 @@ void main() {
           stackIndex,
           checked: false
         };
+        group.colorIndex = colorIndex;
         const color = COLORS[colorIndex].hex;
         const glowMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.96 });
         group.userData.frameMaterial = glowMat;
@@ -4515,10 +4583,15 @@ void main() {
         const frame = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(framePoints), glowMat);
         group.add(frame);
         for (let segment = 0; segment < COLORS.length; segment++) {
-          const segmentMat = new THREE.MeshBasicMaterial({
+          const segmentMat = new THREE.MeshStandardMaterial({
             color: COLORS[segment].hex,
+            emissive: COLORS[segment].hex,
+            emissiveIntensity: segment === colorIndex ? 2.2 : 0.6,
+            metalness: 0,
+            roughness: 0.3,
             transparent: true,
-            opacity: segment === colorIndex ? 0.12 : 0.46,
+            opacity: segment === colorIndex ? 0.76 : 0.24,
+            depthWrite: false,
             side: THREE.DoubleSide
           });
           group.userData.segmentMaterials.push(segmentMat);
@@ -4557,6 +4630,7 @@ void main() {
             mechanics.flashStep = step;
             mechanics.colorIndex = (mechanics.baseColorIndex + step) % COLORS.length;
             mechanics.requiredLane = mechanics.colorIndex;
+            gate.colorIndex = mechanics.colorIndex;
             mechanics.frameMaterial.color.setHex(COLORS[mechanics.colorIndex].hex);
             mechanics.postGlow.color.setHex(COLORS[mechanics.colorIndex].hex);
             mechanics.markerMaterials.forEach((material, lane) => {
@@ -4566,7 +4640,9 @@ void main() {
           const flash = 0.5 + 0.5 * Math.sin(obstacleElapsed * 11 + mechanics.flashPhase);
           mechanics.frameMaterial.opacity = 0.62 + flash * 0.34;
           mechanics.segmentMaterials.forEach((material, lane) => {
-            material.opacity = lane === mechanics.requiredLane ? 0.08 + flash * 0.12 : 0.38 + flash * 0.08;
+            const active = lane === mechanics.requiredLane;
+            material.opacity = active ? 0.58 + flash * 0.22 : 0.16 + flash * 0.1;
+            material.emissiveIntensity = active ? 1.8 + flash * 1.2 : 0.52;
           });
         }
         if (mechanics.phantom) {
@@ -4748,13 +4824,13 @@ void main() {
         });
         impactBursts = [];
       }
-      function createImpactBurst(color, strength = 1) {
+      function createImpactBurst(color, strength = 1, particleCount = 0) {
         if (impactBursts.length >= 4) {
           const oldest = impactBursts.shift();
           oldest.particles.forEach(particle => gameScene.remove(particle.mesh));
           oldest.material.dispose();
         }
-        const count = strength > 1 ? 22 : 15;
+        const count = particleCount || (strength > 1 ? 22 : 15);
         const material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 1, depthWrite: false });
         const particles = [];
         for (let i = 0; i < count; i++) {
@@ -4828,6 +4904,10 @@ void main() {
       let lasers = [];
       let impactBursts = [];
       let currentColor = 0;
+      let lastSpawnedGateColorIndex = -1;
+      let gateColorBag = [];
+      let currentLane = 1;
+      let lastPlayerInputAt = -Infinity;
       let distance = 0;
       let passed = 0;
       let score = 0;
@@ -4840,20 +4920,22 @@ void main() {
       let timeRemaining = 60;
       let feverTimer = 0;
       let nextGateZ = FIRST_GATE_SPAWN_Z;
-      let gateSerial = 0;
       let powerUpSpawnTimer = 7;
       let crystalSpawnTimer = 3.5;
       let laserSpawnTimer = 10;
-      let progression = {
-        crystals: 0,
-        lifetimeCrystals: 0,
-        ownedSkins: ["sphere"],
-        activeSkin: "sphere",
-        achievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, false])),
-        daily: createDailyProgress(),
-        dailySpinAt: 0,
-        powerTokens: { prism: 0, warp: 0, booster: 0 }
-      };
+      function createFreshProgression() {
+        return {
+          crystals: 0,
+          lifetimeCrystals: 0,
+          ownedSkins: ["sphere"],
+          activeSkin: "sphere",
+          achievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, false])),
+          daily: createDailyProgress(),
+          dailySpinAt: 0,
+          powerTokens: { prism: 0, warp: 0, booster: 0 }
+        };
+      }
+      let progression = createFreshProgression();
       let runCoins = 0;
       let achievementQueue = [];
       let achievementNoticeTimer = 0;
@@ -4915,7 +4997,10 @@ void main() {
       function playCue(cue) {
         if (!soundEnabled || !audioContext || audioContext.state !== "running") return;
         const now = audioContext.currentTime;
-        if (cue === "color") {
+        if (cue === "lane") {
+          const lanePitch = [390, 470, 560][currentLane] || 470;
+          playTone(lanePitch * 0.9, lanePitch, now, 0.07, "triangle", 0.028);
+        } else if (cue === "color") {
           const colorPitch = [440, 520, 610][currentColor] || 440;
           playTone(colorPitch * 0.78, colorPitch, now, 0.085, "triangle", 0.035);
         } else if (cue === "gate") {
@@ -4934,6 +5019,8 @@ void main() {
       updateSoundControl();
       const BEST_KEY = "colorSwipeBestScore";
       const COINS_KEY = "colorShiftTotalCoins";
+      const HIGH_SCORE_KEY = "highScore";
+      const NEON_CRYSTALS_KEY = "neonCrystals";
       const PROGRESSION_KEY = "colorShiftProgressionV2";
       const LEGACY_PROGRESSION_KEY = "colorShiftProgressionV1";
       const DAILY_COOLDOWN_MS = 24 * 60 * 60 * 1000;
@@ -4941,6 +5028,7 @@ void main() {
       try {
         best = Math.max(
           0,
+          safeStoredCount(localStorage.getItem(HIGH_SCORE_KEY)),
           Number(localStorage.getItem(BEST_KEY)) || 0,
           Number(localStorage.getItem("colorSwipeBest")) || 0
         );
@@ -4958,6 +5046,11 @@ void main() {
           : 0;
       }
       const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+      try {
+        localStorage.setItem(HIGH_SCORE_KEY, String(best));
+      } catch (error) {
+        // The HUD still uses the in-memory best score if storage is unavailable.
+      }
       function localDayKey() {
         const today = new Date();
         return today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
@@ -4976,10 +5069,13 @@ void main() {
         };
       }
       try {
-        const legacyBalance = safeStoredCount(localStorage.getItem(COINS_KEY));
+        const legacyBalance = Math.max(
+          safeStoredCount(localStorage.getItem(NEON_CRYSTALS_KEY)),
+          safeStoredCount(localStorage.getItem(COINS_KEY))
+        );
         const stored = JSON.parse(localStorage.getItem(PROGRESSION_KEY) || localStorage.getItem(LEGACY_PROGRESSION_KEY) || "null");
         if (stored && (stored.version === 1 || stored.version === 2)) {
-          progression.crystals = safeStoredCount(stored.crystals);
+          progression.crystals = safeStoredCount(stored.crystals ?? legacyBalance);
           progression.lifetimeCrystals = Math.max(progression.crystals, safeStoredCount(stored.lifetimeCrystals));
           const validOwned = Array.isArray(stored.ownedSkins)
             ? stored.ownedSkins.filter(id => hasOwn(PLAYER_SKINS, id))
@@ -5003,7 +5099,10 @@ void main() {
         }
       } catch (error) {
         try {
-          progression.crystals = safeStoredCount(localStorage.getItem(COINS_KEY));
+          progression.crystals = Math.max(
+            safeStoredCount(localStorage.getItem(NEON_CRYSTALS_KEY)),
+            safeStoredCount(localStorage.getItem(COINS_KEY))
+          );
           progression.lifetimeCrystals = progression.crystals;
         } catch {
           progression.crystals = 0;
@@ -5033,6 +5132,8 @@ void main() {
         try {
           localStorage.setItem(PROGRESSION_KEY, JSON.stringify(payload));
           localStorage.setItem(COINS_KEY, String(payload.crystals));
+          const totalCrystals = payload.crystals;
+          localStorage.setItem(NEON_CRYSTALS_KEY, String(totalCrystals));
         } catch (error) {
           // Progress remains usable for this visit if browser storage is blocked or full.
         }
@@ -5088,6 +5189,7 @@ void main() {
       }
       applyPlayerSkin(progression.activeSkin);
       renderProgressionUI();
+      saveProgression();
       function displayNextAchievement() {
         const banner = el("achievementBanner");
         if (achievementQueue.length === 0) {
@@ -5225,6 +5327,54 @@ void main() {
         el("card").classList.remove("shop-open");
         el("shopPanel").hidden = true;
       }
+      function resetLocalProgress() {
+        const confirmed = window.confirm(
+          "Reset this device's local game save? This clears the high score, crystals, unlocked skins, achievements, daily rewards, and power-up tokens."
+        );
+        if (!confirmed) return;
+        try {
+          [
+            PROGRESSION_KEY,
+            LEGACY_PROGRESSION_KEY,
+            BEST_KEY,
+            "colorSwipeBest",
+            HIGH_SCORE_KEY,
+            COINS_KEY,
+            NEON_CRYSTALS_KEY
+          ].forEach(key => localStorage.removeItem(key));
+          localStorage.setItem(HIGH_SCORE_KEY, "0");
+          localStorage.setItem(NEON_CRYSTALS_KEY, "0");
+        } catch (error) {
+          // The reset still applies for the current session when storage is unavailable.
+        }
+        progression = createFreshProgression();
+        best = 0;
+        score = 0;
+        distance = 0;
+        passed = 0;
+        combo = 0;
+        maxCombo = 0;
+        runCoins = 0;
+        timeRemaining = 60;
+        currentLane = 1;
+        lastPlayerInputAt = -Infinity;
+        setEnvironment(0, { announce: false, instant: true });
+        applyPlayerSkin("sphere");
+        setOrbColor(1);
+        player.userData.targetX = LANE_X[currentLane];
+        updateLaneIndicator();
+        clearTimeout(achievementNoticeTimer);
+        achievementNoticeTimer = 0;
+        achievementQueue = [];
+        el("achievementBanner").classList.remove("visible");
+        el("achievementBanner").hidden = true;
+        el("bestTop").textContent = "00000";
+        el("finalBest").textContent = "0";
+        saveProgression();
+        renderProgressionUI();
+        updateHUD();
+        el("shopNotice").textContent = "Local save reset. High score, crystals, and unlocked skins were cleared.";
+      }
       function chooseSkin(skinId) {
         const skin = PLAYER_SKINS[skinId];
         if (!skin || state === "running") return;
@@ -5246,30 +5396,73 @@ void main() {
         unlockAudio();
         playCue("power");
       }
-      const randomColor = () => {
-        gateSerial++;
-        return (gateSerial + Math.floor(gateSerial / 3)) % COLORS.length;
-      };
+      function randomColor() {
+        if (!gateColorBag.length) {
+          gateColorBag = COLORS.map((_, index) => index);
+          for (let i = gateColorBag.length - 1; i > 0; i--) {
+            const swapIndex = Math.floor(Math.random() * (i + 1));
+            [gateColorBag[i], gateColorBag[swapIndex]] = [gateColorBag[swapIndex], gateColorBag[i]];
+          }
+          if (gateColorBag[0] === lastSpawnedGateColorIndex) {
+            const swapIndex = 1 + Math.floor(Math.random() * (gateColorBag.length - 1));
+            [gateColorBag[0], gateColorBag[swapIndex]] = [gateColorBag[swapIndex], gateColorBag[0]];
+          }
+        }
+        const nextColor = gateColorBag.shift();
+        lastSpawnedGateColorIndex = nextColor;
+        return nextColor;
+      }
       function setOrbColor(index) {
         currentColor = (index + COLORS.length) % COLORS.length;
         const c = COLORS[currentColor];
         selectedOrbColor.setHex(c.hex);
+        player.currentColorIndex = currentColor;
+        player.userData.currentColorIndex = currentColor;
         orb.userData.colorIndex = currentColor;
-        player.userData.targetX = LANE_X[currentColor];
+        orbMat.color.setHex(c.hex);
+        orbMat.emissive.setHex(c.hex);
+        orbHalo.material.color.setHex(c.hex);
+        orbLight.color.setHex(c.hex);
+        colorBeaconCore.material.color.setHex(c.hex);
+        colorBeaconRing.material.color.setHex(c.hex);
         el("colorName").textContent = c.name;
         el("colorName").style.color = c.css;
         el("colorDot").style.background = c.css;
         el("colorDot").style.color = c.css;
         document.querySelectorAll(".swatch").forEach(s => s.classList.toggle("active", s.dataset.color === c.key));
       }
+      function updateLaneIndicator() {
+        el("laneCurrent").textContent = "Lane " + (currentLane + 1) + " / " + LANE_X.length;
+      }
       function cycleColor(step) {
+        if (state !== "running" || !acceptPlayerInput()) return false;
         setOrbColor(currentColor + step);
         colorPulse = 0.15;
         unlockAudio();
-        if (state === "running") playCue("color");
+        playCue("color");
+        return true;
+      }
+      function acceptPlayerInput() {
+        const now = performance.now();
+        if (now - lastPlayerInputAt < PLAYER_INPUT_COOLDOWN_MS) return false;
+        lastPlayerInputAt = now;
+        return true;
+      }
+      function shiftLane(step) {
+        if (state !== "running") return false;
+        const nextLane = THREE.MathUtils.clamp(currentLane + step, 0, LANE_X.length - 1);
+        if (nextLane === currentLane || !acceptPlayerInput()) return false;
+        currentLane = nextLane;
+        player.userData.targetX = LANE_X[currentLane];
+        updateLaneIndicator();
+        colorPulse = 0.08;
+        unlockAudio();
+        playCue("lane");
+        return true;
       }
       let colorPulse = 0;
       setOrbColor(1);
+      updateLaneIndicator();
 
       function makeInitialGates() {
         gates.forEach(disposeGate);
@@ -5280,12 +5473,11 @@ void main() {
         crystalCoins = [];
         lasers.forEach(disposeLaser);
         lasers = [];
-        gateSerial = 0;
+        gateColorBag = [];
+        lastSpawnedGateColorIndex = currentColor;
         nextGateZ = FIRST_GATE_SPAWN_Z;
         for (let i = 0; i < 5; i++) {
-          const generatedColor = randomColor();
-          const color = i === 0 ? currentColor : generatedColor;
-          gates.push(makeGate(color, nextGateZ));
+          gates.push(makeGate(randomColor(), nextGateZ));
           nextGateZ -= 18;
         }
       }
@@ -5302,6 +5494,11 @@ void main() {
         el("paceStat").hidden = selectedMode === "timeAttack";
         el("timeAttackStat").hidden = selectedMode !== "timeAttack";
         el("timeAttackTime").textContent = String(Math.max(0, Math.ceil(timeRemaining)));
+      }
+      function popScore() {
+        const scoreDisplay = el("score");
+        scoreDisplay.classList.remove("score-pop");
+        requestAnimationFrame(() => scoreDisplay.classList.add("score-pop"));
       }
       function getScoreMultiplier() {
         if (feverTimer > 0) return 3;
@@ -5418,12 +5615,15 @@ void main() {
       }
       function resetOverlay() {
         closeShop();
+        el("card").classList.remove("pause-open");
         el("eyebrow").textContent = "A color reaction test";
         el("titleTop").textContent = "Color Shift:";
         el("titleBottom").textContent = "Neon Rush 3D";
-        el("intro").textContent = "Chain matching gates, scoop up neon crystals, and collect Prism Shields, Time Warps, and 2X score boosts across ten evolving worlds.";
+        el("intro").textContent = "Shift lanes with arrows or swipes. Press Space or tap to cycle red, cyan, and yellow, then pass through the brightest matching gate section.";
         el("colorKey").hidden = false;
         el("startHint").hidden = false;
+        el("startHint").innerHTML = '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space</b> color</span><span class="mobile-hint">Tap to start · swipe lanes, tap to change color</span>';
+        el("modeSelector").hidden = false;
         el("results").hidden = true;
         el("mysteryReward").hidden = true;
         el("shopButton").hidden = false;
@@ -5451,6 +5651,10 @@ void main() {
         return "Score Boost";
       }
       function startGame() {
+        if (state === "paused") {
+          resumeGame();
+          return;
+        }
         if (state === "running" || !el("dailyModal").hidden) return;
         if (dailySpinReady()) {
           maybeShowDailyReward();
@@ -5473,6 +5677,9 @@ void main() {
         cameraShakeIntensity = 0;
         resetOverlay();
         state = "running";
+        el("game").classList.add("is-running");
+        el("game").classList.remove("is-paused");
+        el("pauseButton").hidden = false;
         distance = 0; passed = 0; score = 0; combo = 0; maxCombo = 0;
         timeRemaining = 60;
         feverTimer = 0;
@@ -5487,8 +5694,11 @@ void main() {
         runCoins = 0;
         graceTimer = START_GRACE_SECONDS;
         applyPlayerSkin(progression.activeSkin);
+        currentLane = 1;
         setOrbColor(1);
-        player.position.set(LANE_X[1], 0.5, 0);
+        player.userData.targetX = LANE_X[currentLane];
+        updateLaneIndicator();
+        player.position.set(LANE_X[currentLane], 0.5, 0);
         player.rotation.set(0, 0, 0);
         orb.rotation.set(0, 0, 0);
         ribs.forEach((rib, index) => { rib.position.z = -index * 8 - 1; });
@@ -5500,12 +5710,53 @@ void main() {
         el("overlay").classList.add("hidden");
         el("hud").classList.add("visible");
         el("runStatus").classList.add("visible");
-        showRunStatus(dailyPowerName ? "1 second grace · " + dailyPowerName + " ready" : "1 second start shield", 1100);
+        showRunStatus(dailyPowerName ? "Grace 1s · " + dailyPowerName + " ready" : "Grace 1s · swipe lanes · tap color", 1600);
+      }
+      function pauseGame() {
+        if (state !== "running") return;
+        state = "paused";
+        window.clearTimeout(statusTimer);
+        window.clearTimeout(environmentNoticeTimer);
+        environmentNoticeToken++;
+        el("environmentBanner").classList.remove("visible");
+        el("environmentBanner").hidden = true;
+        el("runStatus").classList.remove("visible");
+        el("pauseButton").hidden = true;
+        el("game").classList.add("is-paused");
+        el("feverWash").classList.remove("active");
+        el("game").classList.remove("fever-active");
+        el("eyebrow").textContent = "Run paused";
+        el("titleTop").textContent = "Take";
+        el("titleBottom").textContent = "a breath";
+        el("intro").textContent = "Your run is paused. Resume whenever you're ready.";
+        el("colorKey").hidden = true;
+        el("modeSelector").hidden = true;
+        el("results").hidden = true;
+        el("mysteryReward").hidden = true;
+        el("shopButton").hidden = true;
+        el("card").classList.add("pause-open");
+        el("startHint").hidden = false;
+        el("startHint").textContent = "Tap to resume · Esc / P";
+        el("startButton").textContent = "Resume run";
+        el("overlay").classList.remove("hidden");
+      }
+      function resumeGame() {
+        if (state !== "paused") return;
+        state = "running";
+        el("game").classList.remove("is-paused");
+        el("card").classList.remove("pause-open");
+        el("modeSelector").hidden = false;
+        el("pauseButton").hidden = false;
+        el("overlay").classList.add("hidden");
+        el("hud").classList.add("visible");
+        el("runStatus").classList.add("visible");
+        updatePowerHUD();
       }
       function awardGatePass(message) {
         passed++;
         checkRunAchievements();
         playCue("gate");
+        createImpactBurst(COLORS[currentColor].hex, 0.7, 12);
         combo++;
         maxCombo = Math.max(maxCombo, combo);
         if (combo === 10) {
@@ -5524,6 +5775,7 @@ void main() {
           showRunStatus(message + " · ×" + combo, 460);
         }
         updateHUD();
+        popScore();
       }
       function handleObstacleImpact(message, color) {
         combo = 0;
@@ -5559,6 +5811,10 @@ void main() {
           showRunStatus("Start shield", 500);
           return;
         }
+        if (player.currentColorIndex !== gate.colorIndex) {
+          triggerGameOver("color mismatch");
+          return;
+        }
         if (gate.userData.phantom && !gate.userData.phantomActive) {
           awardGatePass("Phantom gate phased");
           return;
@@ -5585,17 +5841,16 @@ void main() {
         }
 
         const passingSegmentHex = gate.userData.segmentMaterials[hitSegment]?.color.getHex();
-        const playerColorHex = selectedOrbColor.getHex();
         const colorMatchesExactly =
           hitSegment >= 0 &&
-          orb.userData.colorIndex === gate.userData.segmentColors[hitSegment] &&
-          playerColorHex === passingSegmentHex;
+          player.currentColorIndex === gate.userData.segmentColors[hitSegment] &&
+          selectedOrbColor.getHex() === passingSegmentHex;
         const passedThroughMatchingSection =
           !hitBarrier &&
           hitSegment >= 0 &&
           (colorMatchesExactly &&
             hitSegment === gate.userData.requiredLane &&
-            gate.userData.colorIndex === orb.userData.colorIndex
+            player.currentColorIndex === gate.colorIndex
           );
 
         if (!passedThroughMatchingSection) {
@@ -5622,6 +5877,9 @@ void main() {
         if (value >= 1500) return "Spark Runner";
         return "Rookie";
       }
+      function triggerGameOver(reason = "collision") {
+        endGame(reason);
+      }
       function endGame(reason = "collision") {
         if (state !== "running") return;
         window.clearTimeout(statusTimer);
@@ -5630,6 +5888,8 @@ void main() {
         el("environmentBanner").classList.remove("visible");
         el("environmentBanner").hidden = true;
         state = "over";
+        el("game").classList.remove("is-running", "is-paused");
+        el("pauseButton").hidden = true;
         feverTimer = 0;
         triggerImpactEffects(COLORS[currentColor].hex, 1.4);
         playCue("gameOver");
@@ -5643,6 +5903,7 @@ void main() {
         if (isBest) {
           best = final;
           try {
+            localStorage.setItem(HIGH_SCORE_KEY, String(best));
             localStorage.setItem(BEST_KEY, String(best));
           } catch (error) {
             // Keep the current run playable if browser storage is unavailable.
@@ -5675,6 +5936,7 @@ void main() {
         speedBoostTimer = 0;
         shieldCharges = 0;
         updatePowerHUD();
+        saveProgression();
         el("startButton").innerHTML = 'Run again <span class="button-arrow">↗</span>';
         el("shopButton").hidden = true;
         el("hud").classList.remove("visible");
@@ -5870,6 +6132,14 @@ void main() {
         const orbX = center + (player.position.x / 4.5) * nearHalf;
         const orbY = height * 0.76;
         const orbRadius = Math.max(20, Math.min(40, width * 0.045));
+        ctx.beginPath();
+        ctx.arc(orbX, orbY, orbRadius * 1.38, 0, Math.PI * 2);
+        ctx.strokeStyle = orbColor;
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = orbColor;
+        ctx.shadowBlur = 19;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
         if (shieldCharges > 0 || graceTimer > 0) {
           const shieldColor = graceTimer > 0 ? "#68f2df" : "#38e6d3";
           ctx.beginPath();
@@ -5931,6 +6201,7 @@ void main() {
         const dt = Math.min((time - (lastTime || time)) / 1000, 0.045);
         lastTime = time;
         const t = time * 0.001;
+        if (state === "paused") return;
         updateEnvironmentTransition(dt);
         if (feverTimer > 0) {
           const hue = (t * 0.52) % 1;
@@ -5953,8 +6224,10 @@ void main() {
         orbHalo.material.color.lerp(targetOrbColor, colorLerp);
         orbLight.color.lerp(targetOrbColor, colorLerp);
         skinAccent.rotation.z += dt * 0.38;
+        colorBeacon.position.y = 0.9 + Math.sin(t * 3.2) * 0.045;
+        colorBeacon.rotation.y += dt * 1.5;
         const laneResponse = environmentIndex >= 8 ? 3.8 : environmentIndex >= 4 ? 5.2 : 18;
-        player.position.x = THREE.MathUtils.damp(player.position.x, LANE_X[currentColor], laneResponse, dt);
+        player.position.x = THREE.MathUtils.damp(player.position.x, LANE_X[currentLane], laneResponse, dt);
         camera.position.set(player.position.x, CAMERA_BASE_Y, CAMERA_BASE_Z);
         camera.lookAt(player.position.x, player.position.y, -18);
         if (cameraShakeTimer > 0) {
@@ -6151,6 +6424,8 @@ void main() {
       el("dailyContinueButton").addEventListener("click", closeDailyReward);
       el("shopButton").addEventListener("click", openShop);
       el("shopBack").addEventListener("click", closeShop);
+      el("pauseButton").addEventListener("click", pauseGame);
+      el("resetLocalData").addEventListener("click", resetLocalProgress);
       document.querySelectorAll(".skin-action").forEach(button => {
         button.addEventListener("click", () => chooseSkin(button.dataset.skin));
       });
@@ -6159,14 +6434,24 @@ void main() {
         if (soundEnabled) unlockAudio();
         updateSoundControl();
       });
-      el("prevColor").addEventListener("click", () => cycleColor(-1));
-      el("nextColor").addEventListener("click", () => cycleColor(1));
+      el("laneLeft").addEventListener("click", () => shiftLane(-1));
+      el("laneRight").addEventListener("click", () => shiftLane(1));
+      el("switchColor").addEventListener("click", () => cycleColor(1));
       window.addEventListener("keydown", event => {
-        if (event.repeat && ["ArrowLeft", "ArrowRight", "KeyA", "KeyD"].includes(event.code)) return;
-        if (["ArrowLeft", "ArrowRight", "Space"].includes(event.code)) event.preventDefault();
-        if (event.code === "ArrowLeft" || event.code === "KeyA") cycleColor(-1);
-        if (event.code === "ArrowRight" || event.code === "KeyD") cycleColor(1);
-        if ((event.code === "Space" || event.code === "Enter") && state !== "running" && el("dailyModal").hidden && !el("card").classList.contains("shop-open")) startGame();
+        if (event.repeat && ["ArrowLeft", "ArrowRight", "KeyA", "KeyD", "Space", "Escape", "KeyP"].includes(event.code)) return;
+        if (["ArrowLeft", "ArrowRight", "Space", "Escape"].includes(event.code)) event.preventDefault();
+        if (event.code === "Escape" || event.code === "KeyP") {
+          if (state === "running") pauseGame();
+          else if (state === "paused") resumeGame();
+          return;
+        }
+        if (state === "running") {
+          if (event.code === "ArrowLeft" || event.code === "KeyA") shiftLane(-1);
+          if (event.code === "ArrowRight" || event.code === "KeyD") shiftLane(1);
+          if (event.code === "Space") cycleColor(1);
+          return;
+        }
+        if ((event.code === "Space" || event.code === "Enter") && el("dailyModal").hidden && !el("card").classList.contains("shop-open")) startGame();
       }, { passive: false });
       let gestureStart = null;
       const game = el("game");
@@ -6175,8 +6460,14 @@ void main() {
         const dx = x - start.x;
         const dy = y - start.y;
         if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.15) {
-          if (state === "running") cycleColor(dx < 0 ? -1 : 1);
+          if (state === "running") shiftLane(dx < 0 ? -1 : 1);
           return;
+        }
+        if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
+          if (state === "running") {
+            cycleColor(1);
+            return;
+          }
         }
         if (state !== "running" && el("dailyModal").hidden && !el("card").classList.contains("shop-open")) startGame();
       };
@@ -6214,7 +6505,7 @@ void main() {
         const dy = touch.clientY - gestureStart.y;
         if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.15) {
           gestureStart.swiped = true;
-          if (state === "running") cycleColor(dx < 0 ? -1 : 1);
+          if (state === "running") shiftLane(dx < 0 ? -1 : 1);
         }
       }, { passive: false });
       game.addEventListener("touchend", event => {
@@ -6233,7 +6524,8 @@ void main() {
       maybeShowDailyReward();
       window.addEventListener("focus", maybeShowDailyReward);
       document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) maybeShowDailyReward();
+        if (document.hidden) pauseGame();
+        else maybeShowDailyReward();
       });
     })();
   </script>
