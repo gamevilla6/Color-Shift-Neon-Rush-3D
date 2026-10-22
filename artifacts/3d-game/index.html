@@ -94,6 +94,11 @@
     .gravity-indicator { position: absolute; z-index: 6; top: max(64px, calc(env(safe-area-inset-top) + 54px)); left: 50%; transform: translateX(-50%); padding: 7px 11px; border: 1px solid rgba(168,130,255,.52); background: rgba(12,8,30,.76); color: #e6dcff; font-size: 8px; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; text-shadow: 0 0 12px rgba(150,108,255,.72); white-space: nowrap; pointer-events: none; }
     .gravity-indicator[hidden] { display: none !important; }
     .gravity-indicator .gravity-arrow { display: inline-block; margin-right: 6px; color: #78e8ff; font-size: 12px; }
+    .auto-color-indicator { --auto-color: var(--cyan); position: absolute; z-index: 6; top: max(64px, calc(env(safe-area-inset-top) + 54px)); left: 50%; display: flex; align-items: center; gap: 7px; transform: translateX(-50%); padding: 6px 10px; border: 1px solid color-mix(in srgb, var(--auto-color) 52%, transparent); background: rgba(5,10,17,.82); color: #f4f7fb; font: 800 8px/1 ui-monospace, monospace; letter-spacing: .13em; text-transform: uppercase; white-space: nowrap; pointer-events: none; box-shadow: 0 0 16px color-mix(in srgb, var(--auto-color) 20%, transparent); }
+    .auto-color-indicator[hidden] { display: none !important; }
+    .auto-color-dot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: var(--auto-color); box-shadow: 0 0 10px var(--auto-color); }
+    .auto-color-indicator strong { color: rgba(225,232,240,.58); font-size: 6px; }
+    #game.quantum-mode .auto-color-indicator { top: max(96px, calc(env(safe-area-inset-top) + 86px)); }
     #game.quantum-mode .pause-button { border-color: rgba(176,139,255,.4); }
     .boost-banner { position: absolute; z-index: 6; top: 184px; left: 50%; transform: translateX(-50%); color: var(--lime); font-family: system-ui, sans-serif; font-size: 19px; font-weight: 900; letter-spacing: .2em; text-shadow: 0 0 18px rgba(197,255,74,.8); pointer-events: none; animation: boostPulse .5s ease-in-out infinite alternate; white-space: nowrap; }
     .boost-banner span { font: 9px ui-monospace, monospace; letter-spacing: .12em; }
@@ -220,6 +225,8 @@
     .tap-control { width: 54px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; border: 1px solid rgba(224,235,240,.42); border-radius: 12px; background: rgba(8,13,20,.82); color: #f3f1e9; backdrop-filter: blur(8px); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; font-size: 20px; transition: background .15s, transform .15s; }
     .tap-control small { color: rgba(243,241,233,.8); font-size: 6px; font-weight: 800; letter-spacing: .1em; }
     .tap-control.color-switch { border-color: rgba(56,234,255,.64); color: var(--cyan); }
+    .tap-control:disabled { opacity: .68; cursor: default; }
+    .tap-control:disabled:active { background: rgba(8,13,20,.82); transform: none; }
     .tap-control:active { background: rgba(56,234,255,.25); transform: scale(.94); }
     .flash { position: absolute; z-index: 4; inset: 0; pointer-events: none; background: rgba(255,79,184,.1); opacity: 0; transition: opacity .08s; }
     .flash.on { opacity: 1; }
@@ -247,6 +254,8 @@
       .stat-value { font-size: clamp(22px, 7vw, 28px); }
       .stat-label { margin-top: 6px; font-size: 6px; letter-spacing: .1em; }
       .power-status { top: 117px; gap: 4px; }
+      .auto-color-indicator { top: max(62px, calc(env(safe-area-inset-top) + 50px)); }
+      #game.quantum-mode .auto-color-indicator { top: max(94px, calc(env(safe-area-inset-top) + 82px)); }
       .power-chip { padding: 5px 6px; font-size: 6.5px; letter-spacing: .09em; }
       .boost-banner { top: 154px; font-size: 16px; }
       .fever-banner { top: 188px; }
@@ -356,6 +365,9 @@
       <span class="power-chip score-boost" id="scoreBoostStatus" hidden>2X · <b id="scoreBoostTime">10</b>s</span>
       <span class="power-chip fever" id="feverStatus" hidden>Fever · 5s</span>
     </div>
+    <div class="auto-color-indicator" id="autoColorIndicator" role="status" aria-live="polite" hidden>
+      <span class="auto-color-dot" id="autoColorDot"></span><strong>AUTO</strong><span id="autoColorName">CYAN</span>
+    </div>
     <div class="boost-banner" id="speedBanner" hidden>SPEED UP! <span><b id="speedTime">5</b>s</span></div>
     <div class="fever-banner" id="feverBanner" hidden>RAINBOW RUSH<span>FEVER · <b id="feverTime">5</b>s · 3X SCORE</span></div>
     <div class="environment-banner" id="environmentBanner" role="status" aria-live="polite" hidden>
@@ -376,17 +388,17 @@
         <span class="swatch" data-color="yellow" style="background:var(--yellow)"></span>
       </div>
     </div>
-    <div class="controls-hint"><strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br><strong>Space / tap</strong> change color · match the glowing gate section</div>
-    <div class="mobile-controls" aria-label="Lane and color controls">
+    <div class="controls-hint"><strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Color cycles every 2.5s · steer to match</div>
+    <div class="mobile-controls" aria-label="Lane controls and optional gravity flip">
       <button class="tap-control" id="laneLeft" type="button" aria-label="Shift lane left">←<small>LANE</small></button>
-      <button class="tap-control color-switch" id="switchColor" type="button" aria-label="Change active color">↻<small>COLOR</small></button>
+      <button class="tap-control color-switch" id="switchColor" type="button" aria-label="Player color cycles automatically" disabled>✦<small>AUTO</small></button>
       <button class="tap-control" id="laneRight" type="button" aria-label="Shift lane right">→<small>LANE</small></button>
     </div>
     <section class="overlay" id="overlay">
       <div class="card" id="card">
         <div class="eyebrow" id="eyebrow">A color reaction test</div>
         <h1 aria-label="Color Shift: Neon Rush 3D"><span class="title-light" id="titleTop">Color Shift:</span><span class="title-accent" id="titleBottom">Neon Rush 3D</span></h1>
-        <p class="intro" id="intro">Shift lanes with arrows or swipes, tap or press Space to cycle red, cyan, and yellow, then match glowing gate sections. Collect Prism Shield, Time Warp, and 2X score boosts across ten evolving worlds.</p>
+        <p class="intro" id="intro">The ball cycles Red, Cyan, and Yellow automatically every 2.5 seconds. Steer into the lane glowing with its current color. Collect Prism Shield, Time Warp, and 2X score boosts across ten evolving worlds.</p>
         <div class="color-key" id="colorKey">
           <span class="key-chip"><i style="color:var(--red);background:var(--red)"></i>Red</span>
           <span class="key-chip"><i style="color:var(--cyan);background:var(--cyan)"></i>Cyan</span>
@@ -419,7 +431,7 @@
           <button class="primary-btn" id="startButton">Start run <span class="button-arrow">↗</span></button>
           <button class="secondary-btn" id="shopButton" type="button">Shop / Skins</button>
         </div>
-        <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space</b> color</span><span class="mobile-hint">Tap to start · swipe lanes, tap to change color</span></div>
+        <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; color auto-cycles every 2.5s</span><span class="mobile-hint">Tap to start · swipe lanes · color auto-cycles</span></div>
         <div class="small-note" id="dailyTokenNote" hidden></div>
         <section class="shop-panel" id="shopPanel" aria-label="Player skins shop" hidden>
           <div class="shop-header">
@@ -4214,6 +4226,7 @@ void main() {
       const LASER_HALF_WIDTH = 0.56;
       const FIRST_GATE_SPAWN_Z = -50;
       const START_GRACE_SECONDS = 1;
+      const AUTO_COLOR_INTERVAL_SECONDS = 2.5;
       const PLAYER_INPUT_COOLDOWN_MS = 120;
       const RUNNER_Y = 0.5;
       const GRAVITY_FLOOR_Y = -1.15;
@@ -4588,7 +4601,6 @@ void main() {
         const narrowing = level < 7 ? 0 : level === 7 ? 0.18 : level === 8 ? 0.28 : level === 9 ? 0.4 : 0.5;
         group.userData = {
           colorIndex,
-          baseColorIndex: colorIndex,
           requiredLane: colorIndex,
           segmentColors: COLORS.map((_, index) => index),
           segmentMaterials: [],
@@ -4606,8 +4618,6 @@ void main() {
           rotationSpeed: score >= ROTATING_GATE_UNLOCK_SCORE && level >= 3 ? 0.8 + Math.max(0, level - 5) * 0.18 : 0,
           colorChanging: level >= 3,
           flashPhase: Math.random() * 2,
-          flashStep: -1,
-          flashRate: level >= 3 ? 1.15 + Math.max(0, level - 3) * 0.11 : 0,
           phantom: level >= 7,
           phantomActive: true,
           phantomPhase: Math.random() * Math.PI * 2,
@@ -4681,27 +4691,28 @@ void main() {
 
       function updateGateMechanics(gate) {
         const mechanics = gate.userData;
-        if (mechanics.colorChanging) {
-          const step = Math.floor(obstacleElapsed * mechanics.flashRate + mechanics.flashPhase);
-          if (step !== mechanics.flashStep) {
-            mechanics.flashStep = step;
-            mechanics.colorIndex = (mechanics.baseColorIndex + step) % COLORS.length;
-            mechanics.requiredLane = mechanics.colorIndex;
-            gate.colorIndex = mechanics.colorIndex;
-            mechanics.frameMaterial.color.setHex(COLORS[mechanics.colorIndex].hex);
-            mechanics.postGlow.color.setHex(COLORS[mechanics.colorIndex].hex);
-            mechanics.markerMaterials.forEach((material, lane) => {
-              material.opacity = lane === mechanics.requiredLane ? 1 : 0.38;
-            });
-          }
-          const flash = 0.5 + 0.5 * Math.sin(obstacleElapsed * 11 + mechanics.flashPhase);
-          mechanics.frameMaterial.opacity = 0.62 + flash * 0.34;
-          mechanics.segmentMaterials.forEach((material, lane) => {
-            const active = lane === mechanics.requiredLane;
-            material.opacity = active ? 0.58 + flash * 0.22 : 0.16 + flash * 0.1;
-            material.emissiveIntensity = active ? 1.8 + flash * 1.2 : 0.52;
+        const activeColorIndex = player.currentColorIndex;
+        if (mechanics.colorIndex !== activeColorIndex) {
+          mechanics.colorIndex = activeColorIndex;
+          mechanics.requiredLane = activeColorIndex;
+          gate.colorIndex = activeColorIndex;
+          mechanics.frameMaterial.color.setHex(COLORS[activeColorIndex].hex);
+          mechanics.postGlow.color.setHex(COLORS[activeColorIndex].hex);
+          mechanics.markerMaterials.forEach((material, lane) => {
+            material.opacity = lane === activeColorIndex ? 1 : 0.38;
           });
         }
+        const pulse = 0.5 + 0.5 * Math.sin(obstacleElapsed * (mechanics.colorChanging ? 11 : 4) + mechanics.flashPhase);
+        mechanics.frameMaterial.opacity = mechanics.colorChanging ? 0.62 + pulse * 0.34 : 0.76;
+        mechanics.segmentMaterials.forEach((material, lane) => {
+          const active = lane === activeColorIndex;
+          material.opacity = active
+            ? mechanics.colorChanging ? 0.68 + pulse * 0.18 : 0.78
+            : mechanics.colorChanging ? 0.18 + pulse * 0.08 : 0.26;
+          material.emissiveIntensity = active
+            ? mechanics.colorChanging ? 2.0 + pulse * 0.65 : 2.35
+            : 0.72;
+        });
         if (mechanics.phantom) {
           mechanics.phantomActive = Math.sin(obstacleElapsed * mechanics.phantomSpeed + mechanics.phantomPhase) > 0.12;
           gate.visible = mechanics.phantomActive;
@@ -4987,8 +4998,7 @@ void main() {
       let lasers = [];
       let impactBursts = [];
       let currentColor = 0;
-      let lastSpawnedGateColorIndex = -1;
-      let gateColorBag = [];
+      let autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
       let currentLane = 1;
       let gravitySide = "floor";
       let gravityHazardSerial = 0;
@@ -5415,7 +5425,9 @@ void main() {
         el("timeAttackModeButton").setAttribute("aria-pressed", String(mode === "timeAttack"));
         el("antiGravityModeButton").setAttribute("aria-pressed", String(mode === "antiGravity"));
         updateModeCopy();
+        updateAutoColorControl();
         updateGravityIndicator();
+        updateAutoColorIndicator();
         updateHUD();
       }
       function updateModeCopy() {
@@ -5423,11 +5435,11 @@ void main() {
         if (el("results").hidden) {
           el("eyebrow").textContent = quantum ? "QUANTUM SINGULARITY" : "A color reaction test";
           el("intro").textContent = quantum
-            ? "Flip between the tunnel floor and ceiling to clear alternating plasma gates. Match each gate’s color too: use C or the COLOR button to cycle, and Space or a tap to flip gravity."
-            : "Shift lanes with arrows or swipes, tap or press Space to cycle red, cyan, and yellow, then match glowing gate sections. Collect Prism Shield, Time Warp, and 2X score boosts across ten evolving worlds.";
+            ? "The ball cycles Red, Cyan, and Yellow automatically every 2.5 seconds. Steer into the matching gate lane, then use Space or a tap to flip between the tunnel floor and ceiling."
+            : "The ball cycles Red, Cyan, and Yellow automatically every 2.5 seconds. Steer into the lane glowing with its current color. Collect Prism Shield, Time Warp, and 2X score boosts across ten evolving worlds.";
           el("startHint").innerHTML = quantum
-            ? '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space</b> flip &nbsp;·&nbsp; <b>C</b> color</span><span class="mobile-hint">Swipe lanes · tap to flip · COLOR button to switch color</span>'
-            : '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space</b> color</span><span class="mobile-hint">Tap to start · swipe lanes, tap to change color</span>';
+            ? '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / tap</b> flip gravity</span><span class="mobile-hint">Swipe to steer · tap or FLIP button for gravity · color auto-cycles</span>'
+            : '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; color auto-cycles every 2.5s</span><span class="mobile-hint">Tap to start · swipe lanes · color auto-cycles</span>';
         }
         if (selectedMode === "antiGravity") {
           el("startButton").innerHTML = 'Enter Anti-Gravity <span class="button-arrow">↗</span>';
@@ -5438,6 +5450,18 @@ void main() {
         } else {
           el("startButton").innerHTML = 'Start Endless Runner <span class="button-arrow">↗</span>';
           if (!el("results").hidden) el("resultLine").textContent = "Endless · Run summary";
+        }
+      }
+      function updateAutoColorControl() {
+        const control = el("switchColor");
+        if (antiGravityModeActive) {
+          control.disabled = false;
+          control.innerHTML = '↕<small>FLIP</small>';
+          control.setAttribute("aria-label", "Flip gravity between tunnel floor and ceiling");
+        } else {
+          control.disabled = true;
+          control.innerHTML = '✦<small>AUTO</small>';
+          control.setAttribute("aria-label", "Player color cycles automatically");
         }
       }
       function openShop() {
@@ -5520,22 +5544,6 @@ void main() {
         unlockAudio();
         playCue("power");
       }
-      function randomColor() {
-        if (!gateColorBag.length) {
-          gateColorBag = COLORS.map((_, index) => index);
-          for (let i = gateColorBag.length - 1; i > 0; i--) {
-            const swapIndex = Math.floor(Math.random() * (i + 1));
-            [gateColorBag[i], gateColorBag[swapIndex]] = [gateColorBag[swapIndex], gateColorBag[i]];
-          }
-          if (gateColorBag[0] === lastSpawnedGateColorIndex) {
-            const swapIndex = 1 + Math.floor(Math.random() * (gateColorBag.length - 1));
-            [gateColorBag[0], gateColorBag[swapIndex]] = [gateColorBag[swapIndex], gateColorBag[0]];
-          }
-        }
-        const nextColor = gateColorBag.shift();
-        lastSpawnedGateColorIndex = nextColor;
-        return nextColor;
-      }
       function setOrbColor(index) {
         currentColor = (index + COLORS.length) % COLORS.length;
         const c = COLORS[currentColor];
@@ -5553,18 +5561,17 @@ void main() {
         el("colorName").style.color = c.css;
         el("colorDot").style.background = c.css;
         el("colorDot").style.color = c.css;
+        updateAutoColorIndicator();
         document.querySelectorAll(".swatch").forEach(s => s.classList.toggle("active", s.dataset.color === c.key));
       }
-      function updateLaneIndicator() {
-        el("laneCurrent").textContent = "Lane " + (currentLane + 1) + " / " + LANE_X.length;
-      }
-      function cycleColor(step) {
-        if (state !== "running" || !acceptPlayerInput()) return false;
-        setOrbColor(currentColor + step);
+      function advanceAutomaticColor() {
+        setOrbColor(currentColor + 1);
         colorPulse = 0.15;
         unlockAudio();
         playCue("color");
-        return true;
+      }
+      function updateLaneIndicator() {
+        el("laneCurrent").textContent = "Lane " + (currentLane + 1) + " / " + LANE_X.length;
       }
       function acceptPlayerInput() {
         const now = performance.now();
@@ -5589,6 +5596,16 @@ void main() {
         el("gravityIndicator").hidden = !visible;
         el("gravityLabel").textContent = gravitySide === "ceiling" ? "Ceiling gravity" : "Floor gravity";
         el("gravityArrow").textContent = gravitySide === "ceiling" ? "↑" : "↓";
+      }
+      function updateAutoColorIndicator() {
+        const visible = state === "running";
+        const color = COLORS[currentColor];
+        const indicator = el("autoColorIndicator");
+        indicator.hidden = !visible;
+        indicator.style.setProperty("--auto-color", color.css);
+        el("autoColorDot").style.backgroundColor = color.css;
+        el("autoColorDot").style.boxShadow = "0 0 10px " + color.css;
+        el("autoColorName").textContent = color.name;
       }
       function setGravitySide(side, instant = false) {
         gravitySide = side === "ceiling" ? "ceiling" : "floor";
@@ -5633,12 +5650,10 @@ void main() {
         crystalCoins = [];
         lasers.forEach(disposeLaser);
         lasers = [];
-        gateColorBag = [];
-        lastSpawnedGateColorIndex = currentColor;
         gravityHazardSerial = 0;
         nextGateZ = FIRST_GATE_SPAWN_Z;
         for (let i = 0; i < 5; i++) {
-          gates.push(makeGate(randomColor(), nextGateZ));
+          gates.push(makeGate(currentColor, nextGateZ));
           nextGateZ -= 18;
         }
       }
@@ -5843,6 +5858,7 @@ void main() {
         timeRemaining = 60;
         feverTimer = 0;
         elapsed = 0; obstacleElapsed = 0; speed = 13.5;
+        autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
         lastPlayerInputAt = -Infinity;
         setEnvironment(0, { announce: false, instant: true });
         shieldCharges = 0; timeWarpTimer = 0; scoreBoosterTimer = 0; speedBoostTimer = 0;
@@ -5875,7 +5891,9 @@ void main() {
         el("runStatus").classList.add("visible");
         showRunStatus(dailyPowerName
           ? "Grace 1s · " + dailyPowerName + " ready"
-          : antiGravityModeActive ? "Grace 1s · C / Color button switches color · tap flips gravity" : "Grace 1s · swipe lanes · tap color", 1600);
+          : antiGravityModeActive
+            ? "Grace 1s · color auto-cycles · Space / tap flips gravity"
+            : "Grace 1s · color auto-cycles · steer to its matching lane", 1600);
       }
       function pauseGame() {
         if (state !== "running") return;
@@ -5887,6 +5905,7 @@ void main() {
         el("environmentBanner").hidden = true;
         el("runStatus").classList.remove("visible");
         updateGravityIndicator();
+        updateAutoColorIndicator();
         el("pauseButton").hidden = true;
         el("game").classList.add("is-paused");
         el("feverWash").classList.remove("active");
@@ -5917,6 +5936,7 @@ void main() {
         el("hud").classList.add("visible");
         el("runStatus").classList.add("visible");
         updateGravityIndicator();
+        updateAutoColorIndicator();
         updatePowerHUD();
       }
       function awardGatePass(message) {
@@ -5979,18 +5999,6 @@ void main() {
           showRunStatus("Start shield", 500);
           return;
         }
-        if (player.currentColorIndex !== gate.colorIndex) {
-          triggerGameOver("color mismatch");
-          return;
-        }
-        if (antiGravityModeActive && !isPlayerOnGravitySide(gate.userData.gravitySide)) {
-          handleObstacleImpact("Wrong gravity surface", 0x9b6dff);
-          return;
-        }
-        if (gate.userData.phantom && !gate.userData.phantomActive) {
-          awardGatePass("Phantom gate phased");
-          return;
-        }
         gate.updateMatrixWorld(true);
         const localPlayer = gate.worldToLocal(new THREE.Vector3(player.position.x, player.position.y, 0));
         const playerLeft = localPlayer.x - PLAYER_RADIUS;
@@ -6017,13 +6025,22 @@ void main() {
           hitSegment >= 0 &&
           player.currentColorIndex === gate.userData.segmentColors[hitSegment] &&
           selectedOrbColor.getHex() === passingSegmentHex;
-        const passedThroughMatchingSection =
-          !hitBarrier &&
-          hitSegment >= 0 &&
-          (colorMatchesExactly &&
-            hitSegment === gate.userData.requiredLane &&
-            player.currentColorIndex === gate.colorIndex
-          );
+        if (!colorMatchesExactly) {
+          triggerGameOver("color mismatch");
+          return;
+        }
+        if (antiGravityModeActive && !isPlayerOnGravitySide(gate.userData.gravitySide)) {
+          handleObstacleImpact("Wrong gravity surface", 0x9b6dff);
+          return;
+        }
+        if (gate.userData.phantom && !gate.userData.phantomActive) {
+          if (!hitBarrier && hitSegment === gate.userData.requiredLane) awardGatePass("Phantom gate phased");
+          else handleObstacleImpact("Gate impact", COLORS[gate.userData.colorIndex].hex);
+          return;
+        }
+        const passedThroughMatchingSection = !hitBarrier &&
+          hitSegment === gate.userData.requiredLane &&
+          player.currentColorIndex === gate.colorIndex;
 
         if (!passedThroughMatchingSection) {
           handleObstacleImpact("Gate impact", COLORS[gate.userData.colorIndex].hex);
@@ -6063,6 +6080,7 @@ void main() {
         el("game").classList.remove("is-running", "is-paused");
         el("pauseButton").hidden = true;
         updateGravityIndicator();
+        updateAutoColorIndicator();
         feverTimer = 0;
         triggerImpactEffects(COLORS[currentColor].hex, 1.4);
         playCue("gameOver");
@@ -6373,7 +6391,7 @@ void main() {
           });
         });
 
-        const orbColor = scoreBoosterTimer > 0 ? "#ffd34d" : COLORS[currentColor].css;
+        const orbColor = COLORS[currentColor].css;
         const orbX = center + (player.position.x / 4.5) * nearHalf;
         const orbY = height * (0.76 - (player.position.y - RUNNER_Y) * 0.09);
         const orbRadius = Math.max(20, Math.min(40, width * 0.045));
@@ -6481,18 +6499,21 @@ void main() {
           gameScene.fog.color.setHSL((hue + 0.14) % 1, 0.72, 0.12);
         }
         const colorLerp = 1 - Math.exp(-dt * 16);
-        if (scoreBoosterTimer > 0) targetOrbColor.setHex(0xffd34d);
-        else targetOrbColor.copy(selectedOrbColor);
+        targetOrbColor.copy(selectedOrbColor);
         orbMat.color.lerp(targetOrbColor, colorLerp);
         orbMat.emissive.lerp(targetOrbColor, colorLerp);
-        orbHalo.material.color.lerp(targetOrbColor, colorLerp);
-        orbLight.color.lerp(targetOrbColor, colorLerp);
+        orbHalo.material.color.lerp(selectedOrbColor, colorLerp);
+        orbLight.color.lerp(selectedOrbColor, colorLerp);
         skinAccent.rotation.z += dt * 0.38;
         const beaconDirection = antiGravityModeActive && gravitySide === "ceiling" ? -1 : 1;
         colorBeacon.position.y = beaconDirection * (0.9 + Math.sin(t * 3.2) * 0.045);
         colorBeacon.rotation.y += dt * 1.5;
         const laneResponse = environmentIndex >= 8 ? 3.8 : environmentIndex >= 4 ? 5.2 : 18;
-        player.position.x = THREE.MathUtils.damp(player.position.x, LANE_X[currentLane], laneResponse, dt);
+        player.position.x = THREE.MathUtils.lerp(
+          player.position.x,
+          LANE_X[currentLane],
+          1 - Math.exp(-laneResponse * dt)
+        );
         if (antiGravityModeActive) {
           player.position.y = THREE.MathUtils.damp(player.position.y, player.userData.gravityTargetY, 14, dt);
         } else {
@@ -6525,6 +6546,11 @@ void main() {
           ribMat.opacity = 0.28 + boostPulse * 0.35;
         boostLight.intensity = speedBoostTimer > 0 ? 9 + boostPulse * 13 : 0;
         if (state === "running") {
+          autoColorTimer -= dt;
+          while (autoColorTimer <= 0) {
+            advanceAutomaticColor();
+            autoColorTimer += AUTO_COLOR_INTERVAL_SECONDS;
+          }
           elapsed += dt;
           const runScoreMultiplier = getScoreMultiplier();
           const obstacleTimeScale = timeWarpTimer > 0 ? 0.5 : 1;
@@ -6645,12 +6671,11 @@ void main() {
               return true;
             });
             if (environmentIndex >= 8 && gates.length <= 3) {
-              gates.push(makeGate(randomColor(), nextGateZ, 0));
-              gates.push(makeGate(randomColor(), nextGateZ - 10, 1));
+              gates.push(makeGate(currentColor, nextGateZ, 0));
+              gates.push(makeGate(currentColor, nextGateZ - 10, 1));
               nextGateZ -= 28;
             } else if (environmentIndex < 8 && gates.length < 5) {
-              const col = randomColor();
-              gates.push(makeGate(col, nextGateZ));
+              gates.push(makeGate(currentColor, nextGateZ));
               nextGateZ -= 18;
             }
             if (state === "running" && selectedMode === "timeAttack") {
@@ -6719,9 +6744,11 @@ void main() {
       });
       el("laneLeft").addEventListener("click", () => shiftLane(-1));
       el("laneRight").addEventListener("click", () => shiftLane(1));
-      el("switchColor").addEventListener("click", () => cycleColor(1));
+      el("switchColor").addEventListener("click", () => {
+        if (antiGravityModeActive) flipGravity();
+      });
       window.addEventListener("keydown", event => {
-        if (event.repeat && ["ArrowLeft", "ArrowRight", "KeyA", "KeyD", "KeyC", "Space", "Escape", "KeyP"].includes(event.code)) return;
+        if (event.repeat && ["ArrowLeft", "ArrowRight", "KeyA", "KeyD", "Space", "Escape", "KeyP"].includes(event.code)) return;
         if (["ArrowLeft", "ArrowRight", "Space", "Escape"].includes(event.code)) event.preventDefault();
         if (event.code === "Escape" || event.code === "KeyP") {
           if (state === "running") pauseGame();
@@ -6731,11 +6758,7 @@ void main() {
         if (state === "running") {
           if (event.code === "ArrowLeft" || event.code === "KeyA") shiftLane(-1);
           if (event.code === "ArrowRight" || event.code === "KeyD") shiftLane(1);
-          if (event.code === "KeyC") cycleColor(1);
-          if (event.code === "Space") {
-            if (antiGravityModeActive) flipGravity();
-            else cycleColor(1);
-          }
+          if (event.code === "Space" && antiGravityModeActive) flipGravity();
           return;
         }
         if ((event.code === "Space" || event.code === "Enter") && el("dailyModal").hidden && !el("card").classList.contains("shop-open")) startGame();
@@ -6753,7 +6776,6 @@ void main() {
         if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
           if (state === "running") {
             if (antiGravityModeActive) flipGravity();
-            else cycleColor(1);
             return;
           }
         }
