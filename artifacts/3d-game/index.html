@@ -37,6 +37,11 @@
     .highscore { text-align: right; }
     .micro-label { color: #818995; font-size: 9px; text-transform: uppercase; letter-spacing: .18em; }
     .record-value { margin-top: 4px; color: #f5f2e9; font-size: 16px; letter-spacing: .04em; }
+    .sound-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; padding: 6px 8px; border: 1px solid rgba(224,235,240,.2); background: rgba(8,13,20,.5); color: rgba(220,228,236,.78); cursor: pointer; font: inherit; font-size: 8px; letter-spacing: .12em; pointer-events: auto; }
+    .sound-toggle:hover:not(:disabled) { border-color: rgba(157,255,208,.55); color: #f5f2e9; }
+    .sound-toggle[aria-pressed="false"] { color: #858b98; }
+    .sound-toggle:disabled { cursor: not-allowed; opacity: .55; }
+    .sound-icon { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
     .hud { position: absolute; z-index: 5; top: 94px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: clamp(14px, 4vw, 48px); opacity: 0; transition: opacity .35s ease; pointer-events: none; }
     .hud.visible { opacity: 1; }
     .stat { min-width: 74px; text-align: center; }
@@ -176,7 +181,13 @@
         <div class="brand-mark" aria-hidden="true"></div>
         <div><div class="brand-name">Color Shift</div><div class="brand-sub">Neon Rush 3D</div></div>
       </div>
-      <div class="highscore"><div class="micro-label">Best score</div><div class="record-value"><span id="bestTop">00000</span></div></div>
+      <div class="highscore">
+        <div class="micro-label">Best score</div><div class="record-value"><span id="bestTop">00000</span></div>
+        <button class="sound-toggle" id="soundToggle" type="button" aria-label="Mute sound" aria-pressed="true" title="Mute sound">
+          <svg class="sound-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6v4h3l4 3V3L5 6H2Z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5"/></svg>
+          <span id="soundLabel">SOUND ON</span>
+        </button>
+      </div>
     </header>
     <section class="hud" id="hud" aria-live="polite">
       <div class="stat"><div class="stat-value" id="score">00000</div><div class="stat-label">Score</div></div>
@@ -596,6 +607,67 @@
       let graceTimer = 0;
       let statusTimer = 0;
       let flashTimer = 0;
+      let soundEnabled = true;
+      let audioContext = null;
+      let audioUnavailable = false;
+      const soundToggle = el("soundToggle");
+      const soundLabel = el("soundLabel");
+      function updateSoundControl() {
+        soundToggle.disabled = audioUnavailable;
+        soundToggle.setAttribute("aria-pressed", String(soundEnabled && !audioUnavailable));
+        soundToggle.setAttribute("aria-label", audioUnavailable ? "Sound unavailable" : soundEnabled ? "Mute sound" : "Enable sound");
+        soundToggle.title = audioUnavailable ? "Sound unavailable in this browser" : soundEnabled ? "Mute sound" : "Enable sound";
+        soundLabel.textContent = audioUnavailable ? "SOUND N/A" : soundEnabled ? "SOUND ON" : "SOUND OFF";
+      }
+      function unlockAudio() {
+        if (audioUnavailable || !soundEnabled) return;
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) {
+          audioUnavailable = true;
+          updateSoundControl();
+          return;
+        }
+        try {
+          if (!audioContext) audioContext = new AudioContextClass();
+          if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+        } catch (error) {
+          audioUnavailable = true;
+          updateSoundControl();
+        }
+      }
+      function playTone(startFrequency, endFrequency, startTime, duration, type, volume) {
+        if (!soundEnabled || !audioContext || audioContext.state !== "running") return;
+        try {
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          oscillator.type = type;
+          oscillator.frequency.setValueAtTime(startFrequency, startTime);
+          oscillator.frequency.exponentialRampToValueAtTime(endFrequency, startTime + duration);
+          gain.gain.setValueAtTime(0.0001, startTime);
+          gain.gain.exponentialRampToValueAtTime(volume, startTime + Math.min(0.015, duration * 0.25));
+          gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+          oscillator.start(startTime);
+          oscillator.stop(startTime + duration + 0.01);
+        } catch (error) {
+          // Audio failures must never interrupt a run.
+        }
+      }
+      function playCue(cue) {
+        if (!soundEnabled || !audioContext || audioContext.state !== "running") return;
+        const now = audioContext.currentTime;
+        if (cue === "color") {
+          const colorPitch = [440, 520, 610][currentColor] || 440;
+          playTone(colorPitch * 0.78, colorPitch, now, 0.085, "triangle", 0.035);
+        } else if (cue === "gate") {
+          playTone(620, 760, now, 0.09, "sine", 0.04);
+          playTone(790, 960, now + 0.075, 0.11, "sine", 0.035);
+        } else if (cue === "gameOver") {
+          playTone(300, 105, now, 0.32, "triangle", 0.055);
+        }
+      }
+      updateSoundControl();
       const BEST_KEY = "colorSwipeBestScore";
       let best = 0;
       try {
@@ -627,6 +699,8 @@
       function cycleColor(step) {
         setOrbColor(currentColor + step);
         colorPulse = 0.15;
+        unlockAudio();
+        if (state === "running") playCue("color");
       }
       let colorPulse = 0;
       setOrbColor(1);
@@ -709,6 +783,7 @@
       }
       function startGame() {
         if (state === "running") return;
+        unlockAudio();
         window.clearTimeout(statusTimer);
         window.clearTimeout(flashTimer);
         el("flash").classList.remove("on");
@@ -796,6 +871,7 @@
           return;
         }
         passed++;
+        playCue("gate");
         combo++;
         gateBonus += combo * 100;
         if (passed % 5 === 0) {
@@ -811,6 +887,7 @@
         if (state !== "running") return;
         window.clearTimeout(statusTimer);
         state = "over";
+        playCue("gameOver");
         el("flash").classList.add("on");
         window.clearTimeout(flashTimer);
         flashTimer = window.setTimeout(() => el("flash").classList.remove("on"), 120);
@@ -1126,6 +1203,11 @@
         sceneResizeObserver.observe(sceneRoot);
       }
       el("startButton").addEventListener("click", startGame);
+      soundToggle.addEventListener("click", () => {
+        soundEnabled = !soundEnabled;
+        if (soundEnabled) unlockAudio();
+        updateSoundControl();
+      });
       el("prevColor").addEventListener("click", () => cycleColor(-1));
       el("nextColor").addEventListener("click", () => cycleColor(1));
       window.addEventListener("keydown", event => {
