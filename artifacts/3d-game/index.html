@@ -98,6 +98,37 @@
     .button-arrow { margin-left: 9px; font-size: 15px; }
     .small-note { margin-top: 19px; color: #7e8792; font-size: 8px; letter-spacing: .17em; text-transform: uppercase; }
     .small-note b { color: #d6dce1; font-weight: 400; }
+    .secondary-btn { min-height: 52px; padding: 12px 16px; border: 1px solid rgba(224,235,240,.25); background: rgba(8,13,20,.72); color: #e9f5fa; cursor: pointer; touch-action: manipulation; font: 700 10px system-ui, sans-serif; letter-spacing: .13em; text-transform: uppercase; transition: border-color .15s, color .15s, transform .15s; }
+    .secondary-btn:hover { border-color: var(--cyan); color: #fff; transform: translateY(-1px); }
+    .secondary-btn:disabled { opacity: .46; cursor: not-allowed; transform: none; }
+    .actions { flex-wrap: wrap; }
+    .actions .secondary-btn { min-width: 138px; }
+    .card.shop-open > :not(.shop-panel) { display: none !important; }
+    .shop-panel { width: 100%; max-height: min(78vh, 620px); overflow-y: auto; padding: 15px; border: 1px solid rgba(56,230,211,.28); background: rgba(7,11,19,.84); box-shadow: 0 0 36px rgba(56,230,211,.1); text-align: left; }
+    .shop-panel[hidden] { display: none !important; }
+    .shop-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 12px; }
+    .shop-title { margin: 3px 0 0; color: #f5f2e9; font: 850 22px/1 system-ui, sans-serif; letter-spacing: .02em; }
+    .shop-balance { color: #ffd36a; font-size: 9px; letter-spacing: .1em; text-align: right; white-space: nowrap; }
+    .skin-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .skin-card { min-width: 0; padding: 10px 8px 8px; border: 1px solid rgba(233,241,246,.13); background: rgba(14,19,29,.82); text-align: center; transition: border-color .2s, background .2s; }
+    .skin-card.active { border-color: rgba(56,230,211,.75); background: rgba(22,39,43,.74); }
+    .skin-preview { position: relative; display: grid; place-items: center; width: 45px; height: 45px; margin: 0 auto 8px; border: 1px solid rgba(255,255,255,.1); border-radius: 50%; }
+    .skin-preview::before { content: ""; width: 24px; height: 24px; background: var(--skin-color); box-shadow: 0 0 15px var(--skin-color); }
+    .skin-preview.sphere::before { border-radius: 50%; }
+    .skin-preview.diamond::before { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+    .skin-preview.star::before { clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 94%,50% 73%,21% 94%,32% 57%,2% 35%,39% 35%); }
+    .skin-card h3 { margin: 0; color: #f5f2e9; font: 800 11px system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+    .skin-card p { min-height: 26px; margin: 5px 0 8px; color: #929ba8; font-size: 7px; line-height: 1.5; letter-spacing: .04em; }
+    .skin-action { width: 100%; min-height: 38px; padding: 7px 4px; font-size: 8px; }
+    .shop-section-label { margin: 17px 0 8px; color: #a9b5c1; font-size: 8px; letter-spacing: .18em; text-transform: uppercase; }
+    .achievement-list { display: grid; gap: 6px; }
+    .achievement-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 9px; border: 1px solid rgba(233,241,246,.1); background: rgba(11,15,23,.78); }
+    .achievement-row strong { display: block; color: #e9edf0; font-size: 8px; letter-spacing: .09em; text-transform: uppercase; }
+    .achievement-row small { display: block; margin-top: 3px; color: #818995; font-size: 7px; line-height: 1.4; }
+    .achievement-state { color: #87909b; font-size: 7px; letter-spacing: .13em; white-space: nowrap; }
+    .achievement-row.unlocked .achievement-state { color: var(--lime); }
+    .shop-notice { min-height: 16px; margin: 8px 0 5px; color: var(--cyan); font-size: 8px; letter-spacing: .08em; text-align: center; }
+    .shop-back { display: block; width: min(100%, 220px); margin: 2px auto 0; }
     .mobile-hint { display: none; }
     .result-line { margin: 24px 0 4px; color: #9ca4ad; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; }
     .game-over-brand { margin: 3px 0 12px; color: var(--accent); font-family: system-ui, sans-serif; font-size: 10px; font-weight: 800; letter-spacing: .16em; line-height: 1.5; text-transform: uppercase; text-shadow: 0 0 14px rgba(56,230,211,.32); }
@@ -107,6 +138,17 @@
     .result-cell strong { display: block; color: #f5f2e9; font-family: system-ui, sans-serif; font-size: clamp(22px, 7vw, 34px); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
     .result-cell span { display: block; margin-top: 7px; color: #858d98; font-size: 7px; letter-spacing: .12em; line-height: 1.4; text-transform: uppercase; }
     .best-callout { margin: 13px 0 23px; color: var(--lime); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+    .mystery-reward { display: flex; align-items: center; justify-content: center; gap: 10px; width: fit-content; margin: 12px auto 16px; padding: 9px 13px; border: 1px solid rgba(255,205,74,.52); background: linear-gradient(110deg, rgba(255,190,58,.16), rgba(255,79,184,.12)); color: #ffe29a; font-size: 8px; letter-spacing: .1em; text-align: left; text-transform: uppercase; box-shadow: 0 0 20px rgba(255,190,58,.16); animation: crateGlow .8s ease-in-out infinite alternate; }
+    .mystery-reward[hidden] { display: none !important; }
+    .crate-icon { display: grid; place-items: center; width: 25px; height: 25px; border: 1px solid #ffe29a; background: linear-gradient(135deg, #ffd25e 0 42%, #bb64ff 43% 57%, #ff8b40 58%); color: #281a08; font: 900 13px system-ui, sans-serif; box-shadow: 0 0 12px rgba(255,210,94,.6); }
+    .mystery-reward strong { display: block; margin-bottom: 3px; font: 850 9px system-ui, sans-serif; }
+    @keyframes crateGlow { from { filter: brightness(.88); transform: scale(.99); } to { filter: brightness(1.3); transform: scale(1.015); } }
+    .achievement-banner { position: absolute; z-index: 12; top: max(190px, calc(env(safe-area-inset-top) + 170px)); left: 50%; width: min(calc(100% - 30px), 360px); padding: 10px 14px; border: 1px solid rgba(197,255,74,.56); background: rgba(8,13,20,.94); color: #eaf4d0; text-align: center; pointer-events: none; opacity: 0; transform: translate(-50%, -10px) scale(.96); transition: opacity .24s ease, transform .24s ease; box-shadow: 0 0 24px rgba(197,255,74,.18); }
+    .achievement-banner[hidden] { display: none !important; }
+    .achievement-banner.visible { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    .achievement-banner span { display: block; color: var(--lime); font-size: 7px; letter-spacing: .2em; }
+    .achievement-banner strong { display: block; margin-top: 4px; color: #fff; font: 850 14px system-ui, sans-serif; letter-spacing: .05em; }
+    .achievement-banner small { display: block; margin-top: 3px; color: #b3bdc6; font-size: 8px; }
     .mobile-controls { display: none; position: absolute; z-index: 6; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); gap: 9px; }
     .tap-control { width: 56px; height: 56px; display: grid; place-items: center; border: 1px solid rgba(224,235,240,.3); border-radius: 12px; background: rgba(8,13,20,.72); color: #f3f1e9; backdrop-filter: blur(8px); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; font-size: 19px; transition: background .15s, transform .15s; }
     .tap-control:active { background: rgba(56,230,211,.25); transform: scale(.94); }
@@ -142,6 +184,12 @@
       .intro { margin-top: 19px; }
       .color-key { margin: 20px 0 22px; }
       .primary-btn { width: min(100%, 250px); min-height: 56px; font-size: 18px; }
+      .actions { flex-direction: column; gap: 8px; }
+      .actions .primary-btn, .actions .secondary-btn { width: min(100%, 250px); }
+      .shop-panel { padding: 11px; }
+      .skin-grid { gap: 5px; }
+      .skin-card { padding: 8px 5px 6px; }
+      .skin-action { font-size: 7px; }
       .small-note { font-size: 7px; line-height: 1.8; }
       .mobile-hint { display: inline; }
       .desktop-hint { display: none; }
@@ -214,6 +262,7 @@
       <div class="stat"><div class="stat-value" id="distance">000</div><div class="stat-label">Distance · m</div></div>
       <div class="stat"><div class="stat-value" id="gates">00</div><div class="stat-label">Gates</div></div>
       <div class="stat"><div class="stat-value" id="pace">1.0<span style="font-size:.48em">×</span></div><div class="stat-label">Pace</div></div>
+      <div class="stat"><div class="stat-value" id="crystalHud">00000</div><div class="stat-label">Crystals</div></div>
     </section>
     <div class="run-status" id="runStatus">Next gate ahead</div>
     <div class="power-status" id="powerStatus" hidden>
@@ -226,6 +275,11 @@
       <span class="environment-kicker" id="environmentKicker">ZONE 01 / 10</span>
       <strong>ENTERING</strong>
       <span class="environment-name" id="environmentName">Cyber Grid</span>
+    </div>
+    <div class="achievement-banner" id="achievementBanner" role="status" aria-live="polite" hidden>
+      <span id="achievementKicker">ACHIEVEMENT UNLOCKED</span>
+      <strong id="achievementTitle">Distance Master</strong>
+      <small id="achievementDescription">Reach 1,000 meters in one run.</small>
     </div>
     <div class="color-panel">
       <div class="color-copy"><div class="micro-label">Orb color</div><div class="color-current"><span class="color-dot" id="colorDot"></span><span id="colorName">Magenta</span></div></div>
@@ -259,9 +313,45 @@
             <div class="result-cell"><strong id="finalGates">0</strong><span>Gates cleared</span></div>
           </div>
           <div class="best-callout" id="bestMessage">New personal best</div>
+          <div class="mystery-reward" id="mysteryReward" hidden>
+            <span class="crate-icon" aria-hidden="true">?</span>
+            <span><strong>Mystery crate opened</strong><span id="crateReward">+0 crystals</span></span>
+          </div>
         </div>
-        <div class="actions"><button class="primary-btn" id="startButton">Start run <span class="button-arrow">↗</span></button></div>
+        <div class="actions">
+          <button class="primary-btn" id="startButton">Start run <span class="button-arrow">↗</span></button>
+          <button class="secondary-btn" id="shopButton" type="button">Shop / Skins</button>
+        </div>
         <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> previous &nbsp;·&nbsp; <b>D / →</b> next color</span><span class="mobile-hint">Tap anywhere to start · swipe or use arrows</span></div>
+        <section class="shop-panel" id="shopPanel" aria-label="Player skins shop" hidden>
+          <div class="shop-header">
+            <div><div class="eyebrow">PLAYER LAB</div><h2 class="shop-title">Choose your form</h2></div>
+            <div class="shop-balance">CRYSTAL BALANCE<br><strong id="shopBalance">00000</strong></div>
+          </div>
+          <div class="skin-grid">
+            <article class="skin-card" data-skin-card="sphere">
+              <div class="skin-preview sphere" style="--skin-color:#38e6d3"></div>
+              <h3>Sphere</h3><p>Classic neon orb · Free</p>
+              <button class="secondary-btn skin-action" type="button" data-skin="sphere">Equipped</button>
+            </article>
+            <article class="skin-card" data-skin-card="diamond">
+              <div class="skin-preview diamond" style="--skin-color:#ffd25e"></div>
+              <h3>Diamond</h3><p>Cut-glass prism · 30 crystals</p>
+              <button class="secondary-btn skin-action" type="button" data-skin="diamond">Unlock · 30</button>
+            </article>
+            <article class="skin-card" data-skin-card="star">
+              <div class="skin-preview star" style="--skin-color:#ff58d6"></div>
+              <h3>Star</h3><p>Radiant 3D star · 60 crystals</p>
+              <button class="secondary-btn skin-action" type="button" data-skin="star">Unlock · 60</button>
+            </article>
+          </div>
+          <div class="shop-section-label">Achievements</div>
+          <div class="achievement-list" id="achievementList"></div>
+          <div class="shop-section-label">Daily Bounties</div>
+          <div class="achievement-list" id="dailyBountyList"></div>
+          <div class="shop-notice" id="shopNotice" role="status" aria-live="polite"></div>
+          <button class="secondary-btn shop-back" id="shopBack" type="button">Back to game</button>
+        </section>
       </div>
     </section>
   </main>
@@ -3985,6 +4075,20 @@ void main() {
         { name: "Magenta", key: "magenta", hex: 0xff4fb8, css: "#ff4fb8" },
         { name: "Lime", key: "lime", hex: 0xc5ff4a, css: "#c5ff4a" }
       ];
+      const PLAYER_SKINS = {
+        sphere: { name: "Sphere", cost: 0, accent: 0x68f2df, roughness: 0.2, metalness: 0.1, glow: 3.8 },
+        diamond: { name: "Diamond", cost: 30, accent: 0xffd25e, roughness: 0.13, metalness: 0.45, glow: 4.6 },
+        star: { name: "Star", cost: 60, accent: 0xff58d6, roughness: 0.16, metalness: 0.25, glow: 4.3 }
+      };
+      const ACHIEVEMENTS = [
+        { id: "distanceMaster", title: "Distance Master", description: "Reach 1,000 meters in one run." },
+        { id: "crystalCollector", title: "Crystal Collector", description: "Collect 50 crystals across your runs." },
+        { id: "gateRunner", title: "Gate Runner", description: "Clear 20 gates in one run." }
+      ];
+      const DAILY_BOUNTIES = [
+        { id: "distance", title: "Daily Dash", description: "Reach 300m in one run.", target: 300, reward: 12 },
+        { id: "crystals", title: "Crystal Run", description: "Collect 5 crystals today.", target: 5, reward: 12 }
+      ];
       const LANE_X = [-2.42, 0, 2.42];
       const PLAYER_RADIUS = 0.56;
       const GATE_HALF_DEPTH = 0.045;
@@ -4246,6 +4350,12 @@ void main() {
       );
       orbHalo.rotation.x = Math.PI / 2;
       player.add(orbHalo);
+      const skinAccent = new THREE.Mesh(
+        new THREE.TorusGeometry(0.82, 0.026, 7, 48),
+        new THREE.MeshBasicMaterial({ color: PLAYER_SKINS.sphere.accent, transparent: true, opacity: 0.9 })
+      );
+      skinAccent.rotation.y = Math.PI / 2;
+      player.add(skinAccent);
       const shieldBubble = new THREE.Mesh(
         new THREE.SphereGeometry(0.79, 18, 14),
         new THREE.MeshBasicMaterial({ color: 0x38e6d3, transparent: true, opacity: 0.13, wireframe: true, depthWrite: false })
@@ -4261,6 +4371,45 @@ void main() {
       shadow.rotation.x = -Math.PI / 2;
       shadow.position.set(0, -2.4, 0);
       player.add(shadow);
+
+      function createPlayerSkinGeometry(skinId) {
+        if (skinId === "diamond") return new THREE.OctahedronGeometry(PLAYER_RADIUS * 1.18, 0);
+        if (skinId === "star") {
+          const shape = new THREE.Shape();
+          for (let point = 0; point < 10; point++) {
+            const angle = Math.PI / 2 + point * Math.PI / 5;
+            const radius = PLAYER_RADIUS * (point % 2 === 0 ? 1.28 : 0.58);
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            if (point === 0) shape.moveTo(x, y);
+            else shape.lineTo(x, y);
+          }
+          shape.closePath();
+          const geometry = new THREE.ExtrudeGeometry(shape, {
+            depth: 0.24,
+            bevelEnabled: true,
+            bevelThickness: 0.045,
+            bevelSize: 0.035,
+            bevelSegments: 2,
+            steps: 1
+          });
+          geometry.center();
+          return geometry;
+        }
+        return new THREE.SphereGeometry(PLAYER_RADIUS, 20, 16);
+      }
+      function applyPlayerSkin(skinId) {
+        const safeSkinId = PLAYER_SKINS[skinId] ? skinId : "sphere";
+        const skin = PLAYER_SKINS[safeSkinId];
+        const oldGeometry = orb.geometry;
+        orb.geometry = createPlayerSkinGeometry(safeSkinId);
+        oldGeometry.dispose();
+        orbMat.roughness = skin.roughness;
+        orbMat.metalness = skin.metalness;
+        orbMat.emissiveIntensity = skin.glow;
+        skinAccent.material.color.setHex(skin.accent);
+        player.userData.skin = safeSkinId;
+      }
 
       function makeGate(colorIndex, z, stackIndex = 0) {
         const group = new THREE.Group();
@@ -4634,8 +4783,17 @@ void main() {
       let powerUpSpawnTimer = 7;
       let crystalSpawnTimer = 3.5;
       let laserSpawnTimer = 10;
-      let totalCoins = 0;
+      let progression = {
+        crystals: 0,
+        lifetimeCrystals: 0,
+        ownedSkins: ["sphere"],
+        activeSkin: "sphere",
+        achievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, false])),
+        daily: createDailyProgress()
+      };
       let runCoins = 0;
+      let achievementQueue = [];
+      let achievementNoticeTimer = 0;
       let shieldCharges = 0;
       let timeWarpTimer = 0;
       let scoreBoosterTimer = 0;
@@ -4713,6 +4871,7 @@ void main() {
       updateSoundControl();
       const BEST_KEY = "colorSwipeBestScore";
       const COINS_KEY = "colorShiftTotalCoins";
+      const PROGRESSION_KEY = "colorShiftProgressionV1";
       let best = 0;
       try {
         best = Math.max(
@@ -4720,15 +4879,223 @@ void main() {
           Number(localStorage.getItem(BEST_KEY)) || 0,
           Number(localStorage.getItem("colorSwipeBest")) || 0
         );
-        totalCoins = Math.max(0, Number(localStorage.getItem(COINS_KEY)) || 0);
       } catch (error) {
         best = 0;
-        totalCoins = 0;
+      }
+      function safeStoredCount(value) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) && parsed >= 0 ? Math.min(1000000000, Math.floor(parsed)) : 0;
+      }
+      const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+      function localDayKey() {
+        const today = new Date();
+        return today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+      }
+      function createDailyProgress() {
+        return { date: localDayKey(), crystalsCollected: 0, distanceClaimed: false, crystalsClaimed: false };
+      }
+      function normalizeDailyProgress(saved) {
+        const today = localDayKey();
+        if (!saved || saved.date !== today) return createDailyProgress();
+        return {
+          date: today,
+          crystalsCollected: safeStoredCount(saved.crystalsCollected),
+          distanceClaimed: saved.distanceClaimed === true,
+          crystalsClaimed: saved.crystalsClaimed === true
+        };
+      }
+      try {
+        const legacyBalance = safeStoredCount(localStorage.getItem(COINS_KEY));
+        const stored = JSON.parse(localStorage.getItem(PROGRESSION_KEY) || "null");
+        if (stored && stored.version === 1) {
+          progression.crystals = safeStoredCount(stored.crystals);
+          progression.lifetimeCrystals = Math.max(progression.crystals, safeStoredCount(stored.lifetimeCrystals));
+          const validOwned = Array.isArray(stored.ownedSkins)
+            ? stored.ownedSkins.filter(id => hasOwn(PLAYER_SKINS, id))
+            : [];
+          progression.ownedSkins = Array.from(new Set(["sphere", ...validOwned]));
+          progression.activeSkin =
+            progression.ownedSkins.includes(stored.activeSkin) && hasOwn(PLAYER_SKINS, stored.activeSkin)
+              ? stored.activeSkin
+              : "sphere";
+          progression.achievements = Object.fromEntries(
+            ACHIEVEMENTS.map(item => [item.id, stored.achievements?.[item.id] === true])
+          );
+          progression.daily = normalizeDailyProgress(stored.daily);
+        } else {
+          progression.crystals = legacyBalance;
+          progression.lifetimeCrystals = legacyBalance;
+        }
+      } catch (error) {
+        try {
+          progression.crystals = safeStoredCount(localStorage.getItem(COINS_KEY));
+          progression.lifetimeCrystals = progression.crystals;
+        } catch {
+          progression.crystals = 0;
+          progression.lifetimeCrystals = 0;
+        }
+      }
+      function saveProgression() {
+        progression.daily = normalizeDailyProgress(progression.daily);
+        const payload = {
+          version: 1,
+          crystals: safeStoredCount(progression.crystals),
+          lifetimeCrystals: safeStoredCount(progression.lifetimeCrystals),
+          ownedSkins: progression.ownedSkins.filter(id => hasOwn(PLAYER_SKINS, id)),
+          activeSkin: hasOwn(PLAYER_SKINS, progression.activeSkin) ? progression.activeSkin : "sphere",
+          achievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, progression.achievements[item.id] === true])),
+          daily: {
+            date: progression.daily.date,
+            crystalsCollected: safeStoredCount(progression.daily.crystalsCollected),
+            distanceClaimed: progression.daily.distanceClaimed === true,
+            crystalsClaimed: progression.daily.crystalsClaimed === true
+          }
+        };
+        try {
+          localStorage.setItem(PROGRESSION_KEY, JSON.stringify(payload));
+          localStorage.setItem(COINS_KEY, String(payload.crystals));
+        } catch (error) {
+          // Progress remains usable for this visit if browser storage is blocked or full.
+        }
       }
       el("bestTop").textContent = String(best).padStart(5, "0");
-      el("coinTotal").textContent = String(totalCoins).padStart(5, "0");
       function updateCoinDisplay() {
-        el("coinTotal").textContent = String(totalCoins).padStart(5, "0");
+        const displayValue = String(progression.crystals).padStart(5, "0");
+        el("coinTotal").textContent = displayValue;
+        el("crystalHud").textContent = displayValue;
+        el("shopBalance").textContent = displayValue;
+      }
+      function renderProgressionUI() {
+        progression.daily = normalizeDailyProgress(progression.daily);
+        updateCoinDisplay();
+        document.querySelectorAll(".skin-action").forEach(button => {
+          const skinId = button.dataset.skin;
+          const skin = PLAYER_SKINS[skinId];
+          if (!skin) return;
+          const owned = progression.ownedSkins.includes(skinId);
+          const active = progression.activeSkin === skinId;
+          const affordable = progression.crystals >= skin.cost;
+          button.textContent = active ? "Equipped" : owned ? "Equip" : "Unlock · " + skin.cost;
+          button.disabled = active || (!owned && !affordable);
+          button.closest(".skin-card")?.classList.toggle("active", active);
+        });
+        el("achievementList").innerHTML = ACHIEVEMENTS.map(item => {
+          const unlocked = progression.achievements[item.id] === true;
+          const progressText = item.id === "distanceMaster"
+            ? Math.min(1000, Math.floor(distance)) + " / 1,000 M THIS RUN"
+            : item.id === "crystalCollector"
+              ? Math.min(50, progression.lifetimeCrystals) + " / 50 TOTAL"
+              : Math.min(20, passed) + " / 20 THIS RUN";
+          return '<div class="achievement-row' + (unlocked ? " unlocked" : "") + '">' +
+            '<div><strong>' + item.title + '</strong><small>' + item.description + ' · ' + progressText + '</small></div>' +
+            '<span class="achievement-state">' + (unlocked ? "UNLOCKED" : "IN PROGRESS") + '</span></div>';
+        }).join("");
+        el("dailyBountyList").innerHTML = DAILY_BOUNTIES.map(item => {
+          const claimed = item.id === "distance" ? progression.daily.distanceClaimed : progression.daily.crystalsClaimed;
+          const progress = item.id === "distance"
+            ? Math.min(item.target, Math.floor(distance))
+            : Math.min(item.target, progression.daily.crystalsCollected);
+          const unit = item.id === "distance" ? "M" : "CRYSTALS";
+          return '<div class="achievement-row' + (claimed ? " unlocked" : "") + '">' +
+            '<div><strong>' + item.title + '</strong><small>' + item.description + ' · ' + progress + ' / ' + item.target + ' ' + unit + '</small></div>' +
+            '<span class="achievement-state">' + (claimed ? "CLAIMED" : "+" + item.reward + " ◆") + '</span></div>';
+        }).join("");
+      }
+      applyPlayerSkin(progression.activeSkin);
+      renderProgressionUI();
+      function displayNextAchievement() {
+        const banner = el("achievementBanner");
+        if (achievementQueue.length === 0) {
+          banner.classList.remove("visible");
+          banner.hidden = true;
+          achievementNoticeTimer = 0;
+          return;
+        }
+        const item = achievementQueue.shift();
+        el("achievementTitle").textContent = item.title;
+        el("achievementDescription").textContent = item.description;
+        el("achievementKicker").textContent = item.kicker || "ACHIEVEMENT UNLOCKED";
+        banner.hidden = false;
+        banner.classList.remove("visible");
+        requestAnimationFrame(() => banner.classList.add("visible"));
+        achievementNoticeTimer = window.setTimeout(() => {
+          banner.classList.remove("visible");
+          achievementNoticeTimer = window.setTimeout(displayNextAchievement, 280);
+        }, 2500);
+      }
+      function queueProgressionNotice(item, kicker) {
+        achievementQueue.push({ ...item, kicker });
+        if (!achievementNoticeTimer) displayNextAchievement();
+      }
+      function unlockAchievement(id) {
+        const item = ACHIEVEMENTS.find(candidate => candidate.id === id);
+        if (!item || progression.achievements[id]) return;
+        progression.achievements[id] = true;
+        saveProgression();
+        renderProgressionUI();
+        queueProgressionNotice(item, "ACHIEVEMENT UNLOCKED");
+      }
+      function checkRunAchievements() {
+        if (distance >= 1000) unlockAchievement("distanceMaster");
+        if (passed >= 20) unlockAchievement("gateRunner");
+        if (progression.lifetimeCrystals >= 50) unlockAchievement("crystalCollector");
+      }
+      function completeDailyBounty(id) {
+        const item = DAILY_BOUNTIES.find(candidate => candidate.id === id);
+        if (!item) return;
+        const claimedKey = id === "distance" ? "distanceClaimed" : "crystalsClaimed";
+        if (progression.daily[claimedKey]) return;
+        progression.daily[claimedKey] = true;
+        progression.crystals = safeStoredCount(progression.crystals + item.reward);
+        progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + item.reward);
+        saveProgression();
+        renderProgressionUI();
+        queueProgressionNotice(
+          { title: item.title + " complete", description: "Daily reward · +" + item.reward + " crystals." },
+          "DAILY BOUNTY COMPLETE"
+        );
+        checkRunAchievements();
+      }
+      function checkDailyBounties() {
+        if (!progression.daily || progression.daily.date !== localDayKey()) {
+          progression.daily = createDailyProgress();
+          saveProgression();
+          renderProgressionUI();
+        }
+        if (distance >= DAILY_BOUNTIES[0].target) completeDailyBounty("distance");
+        if (progression.daily.crystalsCollected >= DAILY_BOUNTIES[1].target) completeDailyBounty("crystals");
+      }
+      function openShop() {
+        if (state === "running") return;
+        el("card").classList.add("shop-open");
+        el("shopPanel").hidden = false;
+        el("shopNotice").textContent = "";
+        renderProgressionUI();
+      }
+      function closeShop() {
+        el("card").classList.remove("shop-open");
+        el("shopPanel").hidden = true;
+      }
+      function chooseSkin(skinId) {
+        const skin = PLAYER_SKINS[skinId];
+        if (!skin || state === "running") return;
+        if (!progression.ownedSkins.includes(skinId)) {
+          if (progression.crystals < skin.cost) {
+            el("shopNotice").textContent = "Collect " + (skin.cost - progression.crystals) + " more crystals to unlock " + skin.name + ".";
+            return;
+          }
+          progression.crystals -= skin.cost;
+          progression.ownedSkins.push(skinId);
+          el("shopNotice").textContent = skin.name + " unlocked and equipped.";
+        } else {
+          el("shopNotice").textContent = skin.name + " equipped.";
+        }
+        progression.activeSkin = skinId;
+        applyPlayerSkin(skinId);
+        saveProgression();
+        renderProgressionUI();
+        unlockAudio();
+        playCue("power");
       }
       const randomColor = () => {
         gateSerial++;
@@ -4782,6 +5149,7 @@ void main() {
         el("distance").textContent = String(Math.floor(distance)).padStart(3, "0");
         el("gates").textContent = String(passed).padStart(2, "0");
         el("pace").innerHTML = (speed / 13.5).toFixed(1) + '<span style="font-size:.48em">×</span>';
+        el("crystalHud").textContent = String(progression.crystals).padStart(5, "0");
       }
       function showEnvironmentBanner(index) {
         const banner = el("environmentBanner");
@@ -4855,14 +5223,15 @@ void main() {
       function collectCrystalCoin(coin) {
         coin.userData.collected = true;
         runCoins++;
-        totalCoins++;
+        progression.crystals = safeStoredCount(progression.crystals + 1);
+        progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + 1);
+        progression.daily = normalizeDailyProgress(progression.daily);
+        progression.daily.crystalsCollected = safeStoredCount(progression.daily.crystalsCollected + 1);
         score += 250 * (scoreBoosterTimer > 0 ? 2 : 1);
-        try {
-          localStorage.setItem(COINS_KEY, String(totalCoins));
-        } catch (error) {
-          // Keep coin collection and bonus scoring available if storage is blocked.
-        }
-        updateCoinDisplay();
+        saveProgression();
+        renderProgressionUI();
+        checkRunAchievements();
+        checkDailyBounties();
         playCue("coin");
         showRunStatus("Crystal +250 · Run " + runCoins, 800);
       }
@@ -4882,6 +5251,7 @@ void main() {
         updatePowerHUD();
       }
       function resetOverlay() {
+        closeShop();
         el("eyebrow").textContent = "A color reaction test";
         el("titleTop").textContent = "Color Shift:";
         el("titleBottom").textContent = "Neon Rush 3D";
@@ -4889,10 +5259,13 @@ void main() {
         el("colorKey").hidden = false;
         el("startHint").hidden = false;
         el("results").hidden = true;
+        el("mysteryReward").hidden = true;
+        el("shopButton").hidden = false;
         el("startButton").innerHTML = 'Start run <span class="button-arrow">↗</span>';
       }
       function startGame() {
         if (state === "running") return;
+        closeShop();
         unlockAudio();
         window.clearTimeout(statusTimer);
         window.clearTimeout(flashTimer);
@@ -4918,6 +5291,7 @@ void main() {
         laserSpawnTimer = 10 + Math.random() * 2;
         runCoins = 0;
         graceTimer = START_GRACE_SECONDS;
+        applyPlayerSkin(progression.activeSkin);
         setOrbColor(1);
         player.position.set(LANE_X[1], 0.5, 0);
         player.rotation.set(0, 0, 0);
@@ -4935,6 +5309,7 @@ void main() {
       }
       function awardGatePass(message) {
         passed++;
+        checkRunAchievements();
         playCue("gate");
         combo++;
         const gatePoints = combo * 100;
@@ -5027,6 +5402,17 @@ void main() {
         }
         awardGatePass("Gate cleared");
       }
+      function grantMysteryCrate() {
+        const rewards = [20, 30, 45, 60];
+        const reward = rewards[Math.floor(Math.random() * rewards.length)];
+        progression.crystals = safeStoredCount(progression.crystals + reward);
+        progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + reward);
+        saveProgression();
+        renderProgressionUI();
+        checkRunAchievements();
+        playCue("power");
+        return reward;
+      }
       function endGame() {
         if (state !== "running") return;
         window.clearTimeout(statusTimer);
@@ -5043,6 +5429,7 @@ void main() {
         updateHUD();
         const final = Math.floor(score);
         const isBest = final > best;
+        let crateReward = 0;
         if (isBest) {
           best = final;
           try {
@@ -5051,6 +5438,7 @@ void main() {
             // Keep the current run playable if browser storage is unavailable.
           }
           el("bestTop").textContent = String(best).padStart(5, "0");
+          crateReward = grantMysteryCrate();
         }
         el("eyebrow").textContent = "Run complete";
         el("titleTop").textContent = "Gate";
@@ -5063,12 +5451,15 @@ void main() {
         el("finalBest").textContent = String(best);
         el("finalGates").textContent = String(passed);
         el("bestMessage").textContent = isBest ? "New personal best" : "Personal best · " + best;
+        el("mysteryReward").hidden = !isBest;
+        if (isBest) el("crateReward").textContent = "+" + crateReward + " crystals";
         timeWarpTimer = 0;
         scoreBoosterTimer = 0;
         speedBoostTimer = 0;
         shieldCharges = 0;
         updatePowerHUD();
         el("startButton").innerHTML = 'Run again <span class="button-arrow">↗</span>';
+        el("shopButton").hidden = true;
         el("hud").classList.remove("visible");
         el("runStatus").classList.remove("visible");
         el("overlay").classList.remove("hidden");
@@ -5277,8 +5668,28 @@ void main() {
         ctx.ellipse(orbX, height * 0.83, orbRadius * 1.7, orbRadius * 0.36, 0, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(0,0,0,.38)";
         ctx.fill();
+        const orbDrawY = orbY + Math.sin(t * (state === "running" ? 5 : 1.15)) * 4;
+        const skinAccentColor = "#" + PLAYER_SKINS[progression.activeSkin].accent.toString(16).padStart(6, "0");
         ctx.beginPath();
-        ctx.arc(orbX, orbY + Math.sin(t * (state === "running" ? 5 : 1.15)) * 4, orbRadius, 0, Math.PI * 2);
+        if (progression.activeSkin === "diamond") {
+          ctx.moveTo(orbX, orbDrawY - orbRadius * 1.18);
+          ctx.lineTo(orbX + orbRadius * 0.88, orbDrawY);
+          ctx.lineTo(orbX, orbDrawY + orbRadius * 1.18);
+          ctx.lineTo(orbX - orbRadius * 0.88, orbDrawY);
+          ctx.closePath();
+        } else if (progression.activeSkin === "star") {
+          for (let point = 0; point < 10; point++) {
+            const angle = -Math.PI / 2 + point * Math.PI / 5;
+            const radius = orbRadius * (point % 2 === 0 ? 1.16 : 0.52);
+            const x = orbX + Math.cos(angle) * radius;
+            const y = orbDrawY + Math.sin(angle) * radius;
+            if (point === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+        } else {
+          ctx.arc(orbX, orbDrawY, orbRadius, 0, Math.PI * 2);
+        }
         const orbGradient = ctx.createLinearGradient(orbX - orbRadius, orbY, orbX + orbRadius, orbY);
         orbGradient.addColorStop(0, orbColor);
         orbGradient.addColorStop(1, orbColor);
@@ -5286,6 +5697,11 @@ void main() {
         ctx.shadowBlur = 28;
         ctx.fillStyle = orbGradient;
         ctx.fill();
+        ctx.strokeStyle = skinAccentColor;
+        ctx.lineWidth = 2;
+        ctx.shadowColor = skinAccentColor;
+        ctx.shadowBlur = 12;
+        ctx.stroke();
         ctx.shadowBlur = 0;
         ctx.beginPath();
         ctx.arc(orbX - orbRadius * 0.28, orbY - orbRadius * 0.3, orbRadius * 0.24, 0, Math.PI * 2);
@@ -5305,6 +5721,7 @@ void main() {
         orbMat.emissive.lerp(targetOrbColor, colorLerp);
         orbHalo.material.color.lerp(targetOrbColor, colorLerp);
         orbLight.color.lerp(targetOrbColor, colorLerp);
+        skinAccent.rotation.z += dt * 0.38;
         const laneResponse = environmentIndex >= 8 ? 3.8 : environmentIndex >= 4 ? 5.2 : 18;
         player.position.x = THREE.MathUtils.damp(player.position.x, LANE_X[currentColor], laneResponse, dt);
         camera.position.set(player.position.x, CAMERA_BASE_Y, CAMERA_BASE_Z);
@@ -5341,6 +5758,8 @@ void main() {
           speed = Math.min(26, runSpeed * lateZoneMultiplier) * (speedBoostTimer > 0 ? 1.25 : 1);
           const distanceDelta = speed * dt * 0.72;
           distance += distanceDelta;
+          checkRunAchievements();
+          checkDailyBounties();
           score += distanceDelta * (scoreMultiplierActive ? 2 : 1);
           const nextEnvironment = Math.min(ENVIRONMENTS.length - 1, Math.floor(distance / 500));
           if (nextEnvironment !== environmentIndex) setEnvironment(nextEnvironment);
@@ -5490,6 +5909,11 @@ void main() {
         sceneResizeObserver.observe(sceneRoot);
       }
       el("startButton").addEventListener("click", startGame);
+      el("shopButton").addEventListener("click", openShop);
+      el("shopBack").addEventListener("click", closeShop);
+      document.querySelectorAll(".skin-action").forEach(button => {
+        button.addEventListener("click", () => chooseSkin(button.dataset.skin));
+      });
       soundToggle.addEventListener("click", () => {
         soundEnabled = !soundEnabled;
         if (soundEnabled) unlockAudio();
@@ -5502,7 +5926,7 @@ void main() {
         if (["ArrowLeft", "ArrowRight", "Space"].includes(event.code)) event.preventDefault();
         if (event.code === "ArrowLeft" || event.code === "KeyA") cycleColor(-1);
         if (event.code === "ArrowRight" || event.code === "KeyD") cycleColor(1);
-        if ((event.code === "Space" || event.code === "Enter") && state !== "running") startGame();
+        if ((event.code === "Space" || event.code === "Enter") && state !== "running" && !el("card").classList.contains("shop-open")) startGame();
       }, { passive: false });
       let gestureStart = null;
       const game = el("game");
@@ -5514,7 +5938,7 @@ void main() {
           if (state === "running") cycleColor(dx < 0 ? -1 : 1);
           return;
         }
-        if (state !== "running") startGame();
+        if (state !== "running" && !el("card").classList.contains("shop-open")) startGame();
       };
       game.addEventListener("pointerdown", event => {
         if (event.pointerType === "touch" || event.button !== 0 || (event.target instanceof Element && event.target.closest("button"))) return;
