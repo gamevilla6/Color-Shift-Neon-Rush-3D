@@ -84,12 +84,12 @@
     }
     .run-status { position: absolute; z-index: 6; top: 50%; left: 50%; transform: translate(-50%, 105px); color: rgba(240,244,247,.66); font-size: 9px; letter-spacing: .19em; text-transform: uppercase; opacity: 0; transition: opacity .3s; pointer-events: none; }
     .run-status.visible { opacity: 1; }
-    .power-status { position: absolute; z-index: 5; top: 151px; left: 50%; width: min(94vw, 560px); transform: translateX(-50%); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; pointer-events: none; }
+    .power-status { position: absolute; z-index: 5; top: 143px; left: 50%; width: min(94vw, 560px); transform: translateX(-50%); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; pointer-events: none; }
     .power-status[hidden], .power-chip[hidden], .boost-banner[hidden] { display: none !important; }
-    .power-chip { padding: 6px 9px; border: 1px solid rgba(255,255,255,.18); background: rgba(8,12,19,.72); color: #e9f5fa; font-size: 8px; letter-spacing: .14em; text-transform: uppercase; box-shadow: 0 0 14px rgba(56,230,211,.12); }
-    .power-chip.shield { color: var(--cyan); border-color: rgba(56,230,211,.48); }
-    .power-chip.time-warp { color: #67aaff; border-color: rgba(80,158,255,.56); box-shadow: 0 0 14px rgba(80,158,255,.18); }
-    .power-chip.score-boost { color: #ffd46a; border-color: rgba(255,205,74,.58); box-shadow: 0 0 14px rgba(255,205,74,.18); }
+    .power-chip { padding: 6px 9px; border: 1px solid rgba(255,255,255,.18); background: rgba(8,12,19,.78); color: #e9f5fa; font-size: 8px; letter-spacing: .12em; text-transform: uppercase; box-shadow: 0 0 14px rgba(56,230,211,.12); white-space: nowrap; }
+    .power-chip.shield { color: #a8fff5; border-color: rgba(56,230,211,.58); box-shadow: 0 0 16px rgba(56,230,211,.18); }
+    .power-chip.time-warp { color: #75bfff; border-color: rgba(79,158,255,.58); box-shadow: 0 0 16px rgba(79,158,255,.18); }
+    .power-chip.score-boost { color: #ffd76a; border-color: rgba(255,199,64,.62); box-shadow: 0 0 16px rgba(255,199,64,.18); }
     .power-chip.fever { color: #ffeaf9; border-color: rgba(255,79,184,.7); box-shadow: 0 0 16px rgba(255,79,184,.32); }
     .boost-banner { position: absolute; z-index: 6; top: 184px; left: 50%; transform: translateX(-50%); color: var(--lime); font-family: system-ui, sans-serif; font-size: 19px; font-weight: 900; letter-spacing: .2em; text-shadow: 0 0 18px rgba(197,255,74,.8); pointer-events: none; animation: boostPulse .5s ease-in-out infinite alternate; white-space: nowrap; }
     .boost-banner span { font: 9px ui-monospace, monospace; letter-spacing: .12em; }
@@ -240,8 +240,8 @@
       .stat { flex: 1 1 0; min-width: 0; }
       .stat-value { font-size: clamp(22px, 7vw, 28px); }
       .stat-label { margin-top: 6px; font-size: 6px; letter-spacing: .1em; }
-      .power-status { top: 125px; gap: 5px; }
-      .power-chip { padding: 5px 7px; font-size: 7px; }
+      .power-status { top: 117px; gap: 4px; }
+      .power-chip { padding: 5px 6px; font-size: 6.5px; letter-spacing: .09em; }
       .boost-banner { top: 154px; font-size: 16px; }
       .fever-banner { top: 188px; }
       .color-panel { left: max(16px, env(safe-area-inset-left)); bottom: max(20px, env(safe-area-inset-bottom)); gap: 9px; }
@@ -344,9 +344,9 @@
     </section>
     <div class="run-status" id="runStatus">Next gate ahead</div>
     <div class="power-status" id="powerStatus" hidden>
-      <span class="power-chip shield" id="shieldStatus" hidden>Prism shield active</span>
-      <span class="power-chip time-warp" id="timeWarpStatus" hidden>Slow-mo · 0s</span>
-      <span class="power-chip score-boost" id="scoreBoostStatus" hidden>2X · 0s</span>
+      <span class="power-chip shield" id="shieldStatus" hidden>Prism Shield Active!</span>
+      <span class="power-chip time-warp" id="timeWarpStatus" hidden>Slow-Mo: <b id="timeWarpTime">5</b>s remaining</span>
+      <span class="power-chip score-boost" id="scoreBoostStatus" hidden>2X · <b id="scoreBoostTime">10</b>s</span>
       <span class="power-chip fever" id="feverStatus" hidden>Fever · 5s</span>
     </div>
     <div class="boost-banner" id="speedBanner" hidden>SPEED UP! <span><b id="speedTime">5</b>s</span></div>
@@ -379,7 +379,7 @@
       <div class="card" id="card">
         <div class="eyebrow" id="eyebrow">A color reaction test</div>
         <h1 aria-label="Color Shift: Neon Rush 3D"><span class="title-light" id="titleTop">Color Shift:</span><span class="title-accent" id="titleBottom">Neon Rush 3D</span></h1>
-    <p class="intro" id="intro">Shift lanes with arrows or swipes. Press Space or tap to cycle red, cyan, and yellow, then pass through the brightest matching gate section.</p>
+        <p class="intro" id="intro">Shift lanes with arrows or swipes, tap or press Space to cycle red, cyan, and yellow, then match glowing gate sections. Collect Prism Shield, Time Warp, and 2X score boosts across ten evolving worlds.</p>
         <div class="color-key" id="colorKey">
           <span class="key-chip"><i style="color:var(--red);background:var(--red)"></i>Red</span>
           <span class="key-chip"><i style="color:var(--cyan);background:var(--cyan)"></i>Cyan</span>
@@ -4670,7 +4670,7 @@ void main() {
         const coreMaterial = new THREE.MeshStandardMaterial({
           color,
           emissive: color,
-          emissiveIntensity: 2.4,
+          emissiveIntensity: 2.8,
           metalness: 0.15,
           roughness: 0.25
         });
@@ -4689,13 +4689,13 @@ void main() {
         halo.rotation.x = Math.PI / 2;
         group.add(halo);
         if (type === "prism") {
-          COLORS.forEach((entry, index) => {
+          [0xff4b9b, 0xffc84d, 0xc5ff4a, 0x38e6d3, 0x548cff, 0xb46aff].forEach((beadColor, index) => {
             const bead = new THREE.Mesh(
-              new THREE.SphereGeometry(0.075, 8, 8),
-              new THREE.MeshBasicMaterial({ color: entry.hex })
+              new THREE.SphereGeometry(0.067, 8, 8),
+              new THREE.MeshBasicMaterial({ color: beadColor })
             );
-            const angle = (index / COLORS.length) * Math.PI * 2;
-            bead.position.set(Math.cos(angle) * 0.56, Math.sin(angle) * 0.56, 0);
+            const angle = (index / 6) * Math.PI * 2;
+            bead.position.set(Math.cos(angle) * 0.55, Math.sin(angle) * 0.55, 0.06 * Math.sin(angle * 2));
             group.add(bead);
           });
           [0x38e6d3, 0xff58d6, 0xc5ff4a].forEach((ringColor, index) => {
@@ -4707,6 +4707,12 @@ void main() {
             group.add(ring);
           });
         } else if (type === "warp") {
+          const face = new THREE.Mesh(
+            new THREE.CircleGeometry(0.255, 28),
+            new THREE.MeshBasicMaterial({ color: 0x0c2444, transparent: true, opacity: 0.92, side: THREE.DoubleSide })
+          );
+          face.position.z = 0.075;
+          group.add(face);
           const handMaterial = new THREE.MeshBasicMaterial({ color: 0xd8edff });
           const minuteHand = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.2, 0.035), handMaterial);
           minuteHand.position.set(0, 0.045, 0.11);
@@ -4714,6 +4720,16 @@ void main() {
           const hourHand = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.035, 0.035), handMaterial);
           hourHand.position.set(0.045, -0.055, 0.12);
           group.add(hourHand);
+          for (let tick = 0; tick < 12; tick++) {
+            const angle = (tick / 12) * Math.PI * 2;
+            const marker = new THREE.Mesh(
+              new THREE.BoxGeometry(0.025, 0.055, 0.025),
+              new THREE.MeshBasicMaterial({ color: 0x91cfff })
+            );
+            marker.position.set(Math.sin(angle) * 0.205, Math.cos(angle) * 0.205, 0.11);
+            marker.rotation.z = -angle;
+            group.add(marker);
+          }
         } else if (type === "booster") {
           const symbolMaterial = new THREE.MeshBasicMaterial({ color: 0xfff2c2 });
           const addSymbolBar = (width, height, x, y, rotation = 0) => {
@@ -4889,6 +4905,7 @@ void main() {
         });
       }
       function disposePowerUp(powerUp) {
+        powerUp.userData.labelTexture?.dispose();
         disposeGate(powerUp);
       }
       function disposeCrystalCoin(coin) {
@@ -5535,9 +5552,9 @@ void main() {
         el("scoreBoostStatus").hidden = !hasScoreBooster;
         el("feverStatus").hidden = !hasFever;
         el("powerStatus").hidden = !hasShield && !hasTimeWarp && !hasScoreBooster && !hasFever;
-        if (hasShield) el("shieldStatus").textContent = "Shield active · ×" + shieldCharges;
-        if (hasTimeWarp) el("timeWarpStatus").textContent = "Slow-mo · " + Math.max(1, Math.ceil(timeWarpTimer)) + "s";
-        if (hasScoreBooster) el("scoreBoostStatus").textContent = "2X · " + Math.max(1, Math.ceil(scoreBoosterTimer)) + "s";
+        if (hasShield) el("shieldStatus").textContent = "Prism Shield Active!" + (shieldCharges > 1 ? " ×" + shieldCharges : "");
+        if (hasTimeWarp) el("timeWarpTime").textContent = Math.max(1, Math.ceil(timeWarpTimer));
+        if (hasScoreBooster) el("scoreBoostTime").textContent = Math.max(1, Math.ceil(scoreBoosterTimer));
         if (hasFever) {
           const seconds = Math.max(1, Math.ceil(feverTimer));
           el("feverStatus").textContent = "Fever · " + seconds + "s · 3X";
@@ -5602,13 +5619,13 @@ void main() {
         powerUp.userData.collected = true;
         if (powerUp.userData.type === "prism") {
           shieldCharges = Math.min(2, shieldCharges + 1);
-          showRunStatus("Prism shield acquired", 900);
+          showRunStatus("Prism Shield acquired", 900);
         } else if (powerUp.userData.type === "warp") {
           timeWarpTimer = Math.max(timeWarpTimer, 5);
-          showRunStatus("Time warp · 5 seconds", 900);
+          showRunStatus("Time Warp · 5 seconds", 900);
         } else {
           scoreBoosterTimer = Math.max(scoreBoosterTimer, 10);
-          showRunStatus("Score doubled · 10 seconds", 900);
+          showRunStatus("Score Booster · 2X", 900);
         }
         playCue("power");
         updatePowerHUD();
@@ -5619,7 +5636,7 @@ void main() {
         el("eyebrow").textContent = "A color reaction test";
         el("titleTop").textContent = "Color Shift:";
         el("titleBottom").textContent = "Neon Rush 3D";
-        el("intro").textContent = "Shift lanes with arrows or swipes. Press Space or tap to cycle red, cyan, and yellow, then pass through the brightest matching gate section.";
+        el("intro").textContent = "Shift lanes with arrows or swipes, tap or press Space to cycle red, cyan, and yellow, then match glowing gate sections. Collect Prism Shield, Time Warp, and 2X score boosts across ten evolving worlds.";
         el("colorKey").hidden = false;
         el("startHint").hidden = false;
         el("startHint").innerHTML = '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space</b> color</span><span class="mobile-hint">Tap to start · swipe lanes, tap to change color</span>';
@@ -6065,24 +6082,57 @@ void main() {
           const x = center + (powerUp.position.x / 4.5) * nearHalf;
           const y = horizon + (floor - horizon) * progress;
           const radius = Math.max(7, Math.min(21, progress * 24));
+          const type = powerUp.userData.type;
           const powerColor = {
             prism: "#ff58d6",
             warp: "#4d9dff",
             booster: "#ffc83d"
           };
           const color = powerColor[powerUp.userData.type] ?? "#ff58d6";
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(t * 1.1 + powerUp.userData.phase);
           ctx.beginPath();
-          ctx.arc(x, y, radius * 1.45, 0, Math.PI * 2);
+          ctx.arc(0, 0, radius * 1.45, 0, Math.PI * 2);
           ctx.strokeStyle = color;
           ctx.lineWidth = Math.max(1.5, progress * 3);
           ctx.shadowColor = color;
           ctx.shadowBlur = 16 * progress;
           ctx.stroke();
-          ctx.beginPath();
-          ctx.arc(x, y, radius * 0.58, 0, Math.PI * 2);
           ctx.fillStyle = color;
-          ctx.fill();
+          if (type === "prism") {
+            ctx.beginPath();
+            ctx.moveTo(0, -radius * 0.72);
+            ctx.lineTo(radius * 0.62, -radius * 0.25);
+            ctx.lineTo(radius * 0.48, radius * 0.42);
+            ctx.lineTo(0, radius * 0.82);
+            ctx.lineTo(-radius * 0.48, radius * 0.42);
+            ctx.lineTo(-radius * 0.62, -radius * 0.25);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = Math.max(1, progress * 1.5);
+            ctx.stroke();
+          } else if (type === "warp") {
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * 0.68, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = "#eaf6ff";
+            ctx.lineWidth = Math.max(1.3, progress * 2);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -radius * 0.4);
+            ctx.moveTo(0, 0);
+            ctx.lineTo(radius * 0.32, radius * 0.1);
+            ctx.stroke();
+          } else {
+            ctx.font = "900 " + Math.max(9, radius * 0.75) + "px system-ui, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("2X", 0, 0);
+          }
           ctx.shadowBlur = 0;
+          ctx.restore();
         });
 
         crystalCoins.filter(coin => !coin.userData.collected).forEach(coin => {
@@ -6128,7 +6178,7 @@ void main() {
           });
         });
 
-        const orbColor = COLORS[currentColor].css;
+        const orbColor = scoreBoosterTimer > 0 ? "#ffd34d" : COLORS[currentColor].css;
         const orbX = center + (player.position.x / 4.5) * nearHalf;
         const orbY = height * 0.76;
         const orbRadius = Math.max(20, Math.min(40, width * 0.045));
@@ -6141,14 +6191,24 @@ void main() {
         ctx.stroke();
         ctx.shadowBlur = 0;
         if (shieldCharges > 0 || graceTimer > 0) {
-          const shieldColor = graceTimer > 0 ? "#68f2df" : "#38e6d3";
-          ctx.beginPath();
-          ctx.arc(orbX, orbY, orbRadius * 1.55, 0, Math.PI * 2);
-          ctx.strokeStyle = shieldColor;
-          ctx.lineWidth = 2;
-          ctx.shadowColor = shieldColor;
-          ctx.shadowBlur = 18;
-          ctx.stroke();
+          const shieldColors = shieldCharges > 0
+            ? ["#ff4b9b", "#ffc84d", "#c5ff4a", "#38e6d3", "#548cff", "#b46aff"]
+            : ["#68f2df"];
+          shieldColors.forEach((shieldColor, index) => {
+            ctx.beginPath();
+            ctx.arc(
+              orbX,
+              orbY,
+              orbRadius * 1.55,
+              (index / shieldColors.length) * Math.PI * 2,
+              ((index + 0.82) / shieldColors.length) * Math.PI * 2
+            );
+            ctx.strokeStyle = shieldColor;
+            ctx.lineWidth = 2.5;
+            ctx.shadowColor = shieldColor;
+            ctx.shadowBlur = 18;
+            ctx.stroke();
+          });
           ctx.shadowBlur = 0;
         }
         ctx.beginPath();
@@ -6218,7 +6278,8 @@ void main() {
           gameScene.fog.color.setHSL((hue + 0.14) % 1, 0.72, 0.12);
         }
         const colorLerp = 1 - Math.exp(-dt * 16);
-        targetOrbColor.copy(selectedOrbColor);
+        if (scoreBoosterTimer > 0) targetOrbColor.setHex(0xffd34d);
+        else targetOrbColor.copy(selectedOrbColor);
         orbMat.color.lerp(targetOrbColor, colorLerp);
         orbMat.emissive.lerp(targetOrbColor, colorLerp);
         orbHalo.material.color.lerp(targetOrbColor, colorLerp);
@@ -6243,7 +6304,9 @@ void main() {
         shieldBubble.visible = shieldCharges > 0 || graceTimer > 0;
         if (graceTimer > 0) shieldBubble.material.color.setHex(0x68f2df);
         else shieldBubble.material.color.setHSL((t * 0.18) % 1, 0.9, 0.62);
-        shieldBubble.material.opacity = 0.1 + (0.07 * (0.5 + Math.sin(t * 7) * 0.5));
+        shieldBubble.material.opacity = shieldCharges > 0
+          ? 0.16 + (0.1 * (0.5 + Math.sin(t * 7) * 0.5))
+          : 0.1 + (0.07 * (0.5 + Math.sin(t * 7) * 0.5));
         const boostPulse = speedBoostTimer > 0 ? 0.5 + Math.sin(t * 17) * 0.5 : 0;
           laneLineMat.opacity = 0.5 + boostPulse * 0.42;
           ribMat.opacity = 0.28 + boostPulse * 0.35;
@@ -6261,6 +6324,8 @@ void main() {
           const runSpeed = 13.5 + Math.min(8, elapsed * 0.11);
           const lateZoneMultiplier = environmentIndex >= 8 ? 1 + (environmentIndex - 7) * 0.12 : 1;
           speed = Math.min(26, runSpeed * lateZoneMultiplier) * (speedBoostTimer > 0 ? 1.25 : 1);
+          const obstacleDt = dt * obstacleTimeScale;
+          const obstacleSpeed = speed * obstacleTimeScale;
           const distanceDelta = speed * dt * 0.72;
           distance += distanceDelta;
           checkRunAchievements();
@@ -6288,12 +6353,12 @@ void main() {
           positionAttribute.needsUpdate = true;
           powerUps.forEach(powerUp => {
             const previousZ = powerUp.position.z;
-            powerUp.position.z += speed * dt;
-            powerUp.position.y = 0.12 + Math.sin(t * 2.7 + powerUp.userData.phase) * 0.12;
-            powerUp.rotation.y += dt * 1.8;
-            powerUp.rotation.x += dt * 0.9;
+            powerUp.position.z += obstacleSpeed * dt;
+            powerUp.position.y = 0.12 + Math.sin(obstacleElapsed * 2.7 + powerUp.userData.phase) * 0.12;
+            powerUp.rotation.y += obstacleDt * 1.8;
+            powerUp.rotation.x += obstacleDt * 0.9;
             if (powerUp.userData.core) {
-              powerUp.userData.core.scale.setScalar(1 + Math.sin(t * 5 + powerUp.userData.phase) * 0.08);
+              powerUp.userData.core.scale.setScalar(1 + Math.sin(obstacleElapsed * 5 + powerUp.userData.phase) * 0.08);
             }
             const pickupPlane = -(PLAYER_RADIUS + 0.34);
             const crossedPlayer = previousZ < pickupPlane && powerUp.position.z >= pickupPlane;
@@ -6334,7 +6399,7 @@ void main() {
             if (state !== "running") return;
             updateLaserVisual(laser);
             const previousZ = laser.position.z;
-            laser.position.z += speed * dt * obstacleTimeScale;
+            laser.position.z += obstacleSpeed * dt;
             const collisionPlane = -(PLAYER_RADIUS + 0.045);
             if (!laser.userData.checked && previousZ < collisionPlane && laser.position.z >= collisionPlane) {
               resolveLaserCollision(laser);
@@ -6345,7 +6410,7 @@ void main() {
             if (state !== "running") return;
             updateGateMechanics(gate);
             const previousZ = gate.position.z;
-            gate.position.z += speed * dt * obstacleTimeScale;
+            gate.position.z += obstacleSpeed * dt;
             const movement = Math.sin(obstacleElapsed * gate.userData.movementSpeed + gate.userData.movementPhase);
             gate.position.x = gate.userData.moving ? movement * gate.userData.movementAmplitude : 0;
             gate.rotation.y = gate.userData.moving ? movement * 0.12 : 0;
