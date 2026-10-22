@@ -1,0 +1,1 @@
+- [Artifact workflow restarts](artifact-workflow-restarts.md) — a Vite child can remain bound after a failed restart; verify the listener before retrying.

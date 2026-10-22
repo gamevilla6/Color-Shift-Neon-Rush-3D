@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#090c13" />
   <meta name="description" content="Color Shift: Neon Rush 3D — shift through neon gates, build your combo, and chase your best run." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='24' fill='%2338eaff'/%3E%3C/svg%3E" />
   <title>Color Shift: Neon Rush 3D</title>
   <style>
@@ -99,6 +102,9 @@
     .auto-color-dot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: var(--auto-color); box-shadow: 0 0 10px var(--auto-color); }
     .auto-color-indicator strong { color: rgba(225,232,240,.58); font-size: 6px; }
     #game.quantum-mode .auto-color-indicator { top: max(96px, calc(env(safe-area-inset-top) + 86px)); }
+    .ghost-status { position: absolute; z-index: 6; top: max(108px, calc(env(safe-area-inset-top) + 96px)); left: 50%; transform: translate(-50%, -5px); padding: 6px 10px; border: 1px solid rgba(191, 229, 255, .28); border-radius: 999px; background: rgba(9, 13, 24, .64); color: rgba(227, 243, 255, .8); font: 700 7px/1 ui-monospace, monospace; letter-spacing: .14em; text-shadow: 0 0 10px rgba(151, 213, 255, .4); white-space: nowrap; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .24s ease, transform .24s ease, visibility .24s ease; backdrop-filter: blur(6px); }
+    .ghost-status.visible { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
+    #game.quantum-mode .ghost-status { top: max(137px, calc(env(safe-area-inset-top) + 124px)); }
     #game.quantum-mode .pause-button { border-color: rgba(176,139,255,.4); }
     .boost-banner { position: absolute; z-index: 6; top: 184px; left: 50%; transform: translateX(-50%); color: var(--lime); font-family: system-ui, sans-serif; font-size: 19px; font-weight: 900; letter-spacing: .2em; text-shadow: 0 0 18px rgba(197,255,74,.8); pointer-events: none; animation: boostPulse .5s ease-in-out infinite alternate; white-space: nowrap; }
     .boost-banner span { font: 9px ui-monospace, monospace; letter-spacing: .12em; }
@@ -256,6 +262,8 @@
       .power-status { top: 117px; gap: 4px; }
       .auto-color-indicator { top: max(62px, calc(env(safe-area-inset-top) + 50px)); }
       #game.quantum-mode .auto-color-indicator { top: max(94px, calc(env(safe-area-inset-top) + 82px)); }
+      .ghost-status { top: max(104px, calc(env(safe-area-inset-top) + 92px)); }
+      #game.quantum-mode .ghost-status { top: max(133px, calc(env(safe-area-inset-top) + 120px)); }
       .power-chip { padding: 5px 6px; font-size: 6.5px; letter-spacing: .09em; }
       .boost-banner { top: 154px; font-size: 16px; }
       .fever-banner { top: 188px; }
@@ -323,6 +331,445 @@
       .color-panel, .controls-hint { bottom: 22px; }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+
+    /* Premium home-screen presentation */
+    #overlay {
+      transition: opacity .5s cubic-bezier(.2,.7,.2,1), visibility .5s ease, filter .5s ease;
+    }
+    #overlay.hidden { filter: blur(7px); }
+    #overlay.home-screen {
+      isolation: isolate;
+      overflow-y: auto;
+      background:
+        radial-gradient(ellipse at 50% 43%, rgba(8, 17, 27, .42) 0%, rgba(6, 10, 18, .7) 73%),
+        radial-gradient(ellipse at 50% 30%, rgba(22, 57, 67, .16), transparent 64%);
+    }
+    .menu-atmosphere {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .menu-atmosphere::before {
+      position: absolute;
+      inset: -8%;
+      background-image:
+        linear-gradient(rgba(67, 226, 237, .13) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(67, 226, 237, .13) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: radial-gradient(ellipse at 50% 58%, #000 4%, transparent 76%);
+      opacity: .38;
+      animation: menuGridDrift 24s linear infinite;
+      content: "";
+    }
+    .menu-atmosphere::after {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 16% 22%, rgba(56, 234, 255, .1) 0 1px, transparent 2px),
+        radial-gradient(circle at 84% 31%, rgba(255, 79, 184, .12) 0 1px, transparent 2px),
+        radial-gradient(circle at 11% 71%, rgba(56, 234, 255, .1) 0 1px, transparent 2px),
+        radial-gradient(circle at 92% 79%, rgba(255, 79, 184, .1) 0 1px, transparent 2px);
+      background-size: 170px 170px, 210px 210px, 190px 190px, 240px 240px;
+      opacity: .7;
+      animation: menuDustDrift 14s ease-in-out infinite alternate;
+      content: "";
+    }
+    .menu-dust {
+      position: absolute;
+      z-index: 1;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #8cfaff;
+      box-shadow: 0 0 10px 2px rgba(56, 234, 255, .55);
+      opacity: .45;
+      animation: menuDustFloat 7s ease-in-out infinite alternate;
+    }
+    .dust-one { top: 20%; left: 12%; }
+    .dust-two { top: 34%; left: 88%; animation-delay: -2s; background: #ff83cc; box-shadow: 0 0 10px 2px rgba(255, 79, 184, .55); }
+    .dust-three { top: 67%; left: 8%; animation-delay: -4s; }
+    .dust-four { top: 75%; left: 93%; animation-delay: -1s; background: #ff83cc; box-shadow: 0 0 10px 2px rgba(255, 79, 184, .55); }
+    .dust-five { top: 12%; left: 65%; animation-delay: -3s; }
+    .dust-six { top: 57%; left: 18%; animation-delay: -5s; background: #ff83cc; box-shadow: 0 0 10px 2px rgba(255, 79, 184, .55); }
+    .dust-seven { top: 45%; left: 96%; animation-delay: -2.5s; }
+    .dust-eight { top: 89%; left: 69%; animation-delay: -4.5s; }
+    #overlay:not(.home-screen) .menu-atmosphere { display: none; }
+    #overlay.home-screen .card.home-card {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 560px);
+      max-height: min(86dvh, 830px);
+      overflow-y: auto;
+      padding: clamp(23px, 4vw, 38px) clamp(18px, 4vw, 34px);
+      border: 1px solid rgba(103, 221, 233, .2);
+      border-radius: 22px;
+      background:
+        linear-gradient(145deg, rgba(15, 26, 39, .84), rgba(7, 12, 21, .72) 54%, rgba(20, 13, 29, .78));
+      box-shadow: 0 22px 90px rgba(0, 0, 0, .34), 0 0 42px rgba(45, 213, 228, .08), inset 0 1px rgba(255, 255, 255, .07);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      animation: homeCardReveal .68s cubic-bezier(.18,.76,.2,1) both;
+    }
+    #overlay.home-screen .card.home-card::before {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(115deg, rgba(56, 234, 255, .075), transparent 38%, rgba(255, 79, 184, .065));
+      pointer-events: none;
+      content: "";
+    }
+    #overlay.home-screen .card.settings-open > :not(.settings-panel) { display: none !important; }
+    #overlay.home-screen .settings-panel[hidden] { display: none !important; }
+    #overlay.home-screen .eyebrow {
+      color: #7ef5f4;
+      font: 600 9px/1.4 "Orbitron", sans-serif;
+      letter-spacing: .21em;
+      text-shadow: 0 0 14px rgba(56, 234, 255, .45);
+    }
+    #overlay.home-screen h1 {
+      margin: 13px 0 15px;
+      font: 900 clamp(37px, 8.8vw, 58px)/.98 "Orbitron", sans-serif;
+      letter-spacing: -.055em;
+      text-transform: uppercase;
+    }
+    #overlay.home-screen .title-light {
+      color: #f7f4fb;
+      text-shadow: 0 0 9px rgba(56, 234, 255, .52), 0 0 28px rgba(255, 79, 184, .42), 3px 2px 0 rgba(255, 79, 184, .24);
+      animation: titleGlow 3.4s ease-in-out infinite;
+    }
+    #overlay.home-screen .title-accent {
+      color: #5beff1;
+      text-shadow: 0 0 8px rgba(56, 234, 255, .9), 0 0 25px rgba(56, 234, 255, .52), -2px 0 rgba(255, 79, 184, .38);
+      animation: titleGlow 3.4s ease-in-out -1.4s infinite;
+    }
+    #overlay.home-screen .intro {
+      max-width: 430px;
+      margin: 0 auto 17px;
+      color: #b3c1ca;
+      font: 500 16px/1.38 "Rajdhani", sans-serif;
+      letter-spacing: .025em;
+    }
+    #overlay.home-screen .color-key {
+      gap: 8px;
+      margin: 0 auto 20px;
+    }
+    #overlay.home-screen .color-chip {
+      min-height: 29px;
+      padding: 6px 10px;
+      border: 1px solid rgba(164, 205, 216, .15);
+      border-radius: 5px;
+      background: rgba(5, 13, 22, .56);
+      color: #d5e1e5;
+      font: 600 9px "Orbitron", sans-serif;
+      letter-spacing: .08em;
+    }
+    #overlay.home-screen .mode-selector {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+      width: 100%;
+      margin: 0 auto 15px;
+    }
+    #overlay.home-screen .mode-btn {
+      display: grid;
+      min-width: 0;
+      min-height: 47px;
+      place-items: center;
+      padding: 7px 5px;
+      border: 1px solid rgba(162, 193, 204, .17);
+      border-radius: 6px;
+      background: rgba(7, 15, 24, .76);
+      color: #9aabb3;
+      font: 700 9px/1.2 "Rajdhani", sans-serif;
+      letter-spacing: .055em;
+      text-align: center;
+      transition: transform .18s ease, border-color .18s ease, color .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+    #overlay.home-screen .mode-btn:hover { transform: scale(1.025); border-color: rgba(56, 234, 255, .52); color: #f2ffff; }
+    #overlay.home-screen .mode-btn.active,
+    #overlay.home-screen .mode-btn[aria-pressed="true"] {
+      border-color: rgba(56, 234, 255, .72);
+      background: linear-gradient(145deg, rgba(56, 234, 255, .14), rgba(255, 79, 184, .06));
+      color: #eaffff;
+      box-shadow: inset 0 0 16px rgba(56, 234, 255, .075), 0 0 16px rgba(56, 234, 255, .08);
+    }
+    #overlay.home-screen .actions.home-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 9px;
+      width: 100%;
+      margin-top: 0;
+    }
+    #overlay.home-screen .home-actions .primary-btn {
+      width: min(100%, 350px);
+      min-height: 62px;
+      padding: 14px 20px;
+      border: 1px solid rgba(106, 255, 250, .85);
+      border-radius: 7px;
+      background: linear-gradient(105deg, rgba(34, 205, 218, .95), rgba(20, 116, 140, .94) 56%, rgba(100, 40, 115, .94));
+      color: #f4ffff;
+      font: 800 15px/1 "Orbitron", sans-serif;
+      letter-spacing: .16em;
+      box-shadow: 0 0 22px rgba(56, 234, 255, .2), inset 0 0 20px rgba(255, 255, 255, .1);
+      animation: playPulse 2.5s ease-in-out infinite;
+      transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+    }
+    #overlay.home-screen .home-actions .primary-btn:hover {
+      transform: scale(1.05);
+      filter: brightness(1.12);
+      box-shadow: 0 0 30px rgba(56, 234, 255, .32), 0 0 46px rgba(255, 79, 184, .15);
+    }
+    #overlay.home-screen .home-actions .primary-btn:active { transform: scale(.97); }
+    #overlay.home-screen .button-arrow { margin-left: 8px; color: #fff; }
+    #overlay.home-screen .secondary-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+      width: min(100%, 350px);
+    }
+    #overlay.home-screen .secondary-actions .secondary-btn {
+      width: 100%;
+      min-height: 45px;
+      padding: 10px 9px;
+      border: 1px solid rgba(160, 195, 207, .2);
+      border-radius: 6px;
+      background: rgba(9, 17, 27, .72);
+      color: #d0dde2;
+      font: 700 10px "Orbitron", sans-serif;
+      letter-spacing: .075em;
+      transition: transform .18s ease, border-color .18s ease, color .18s ease, background .18s ease;
+    }
+    #overlay.home-screen .secondary-actions .secondary-btn:hover {
+      transform: scale(1.05);
+      border-color: rgba(255, 79, 184, .54);
+      background: rgba(255, 79, 184, .07);
+      color: #fff;
+    }
+    #overlay.home-screen .secondary-actions .secondary-btn:active { transform: scale(.97); }
+    #overlay.home-screen .startHint,
+    #overlay.home-screen .dailyTokenNote {
+      color: #8297a1;
+      font: 500 12px/1.4 "Rajdhani", sans-serif;
+      letter-spacing: .06em;
+    }
+    #game .topbar .highscore.home-stats {
+      display: grid;
+      min-width: 230px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 5px;
+      padding: 8px;
+      border: 1px solid rgba(158, 218, 228, .19);
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(184, 231, 237, .09), rgba(24, 38, 53, .4));
+      box-shadow: inset 0 1px rgba(255, 255, 255, .055), 0 8px 32px rgba(0, 0, 0, .16);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      text-align: left;
+    }
+    #game .topbar .brand-name {
+      font-family: "Orbitron", sans-serif;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+    #game .topbar .brand-sub {
+      font-family: "Rajdhani", sans-serif;
+      font-weight: 600;
+      letter-spacing: .16em;
+    }
+    #game .topbar { z-index: 11; }
+    #game:not(.is-running) .auto-color-indicator,
+    #game:not(.is-running) .run-status,
+    #game:not(.is-running) .power-status,
+    #game:not(.is-running) .boost-banner,
+    #game:not(.is-running) .fever-banner,
+    #game:not(.is-running) .gravity-indicator,
+    #game:not(.is-running) .ghost-status,
+    #game:not(.is-running) .color-panel,
+    #game:not(.is-running) .controls-hint,
+    #game:not(.is-running) .mobile-controls { display: none !important; }
+    #game .topbar .home-stat-cell {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 6px;
+    }
+    #game .topbar .home-stat-icon {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: #68f1f2;
+      stroke-width: 1.35;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 5px rgba(56, 234, 255, .42));
+    }
+    #game .topbar .crystal-icon { stroke: #ffd479; filter: drop-shadow(0 0 5px rgba(255, 212, 121, .4)); }
+    #game .topbar .home-stat-copy { min-width: 0; }
+    #game .topbar .home-stats .micro-label {
+      margin: 0;
+      color: #91a5ae;
+      font: 600 7px/1.2 "Orbitron", sans-serif;
+      letter-spacing: .1em;
+      white-space: nowrap;
+    }
+    #game .topbar .home-stats .record-value,
+    #game .topbar .home-stats .coin-total {
+      margin-top: 4px;
+      color: #f0fbfb;
+      font: 700 12px/1 "Orbitron", sans-serif;
+      letter-spacing: .09em;
+    }
+    #game .topbar .home-stats .coin-total::before { content: none; }
+    #game .topbar .home-stats .sound-toggle {
+      display: inline-flex;
+      min-height: 25px;
+      grid-column: 1 / -1;
+      justify-self: end;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 3px 7px;
+      border: 1px solid rgba(156, 193, 203, .17);
+      border-radius: 5px;
+      background: rgba(4, 12, 20, .35);
+      color: #a8c4c8;
+      font: 600 7px "Orbitron", sans-serif;
+      letter-spacing: .1em;
+    }
+    #game .topbar .home-stats .sound-icon,
+    #overlay.home-screen .settings-sound-toggle .sound-icon { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.35; }
+    #overlay.home-screen .settings-panel {
+      width: 100%;
+      max-width: 410px;
+      margin: 0 auto;
+      padding: 4px 2px 0;
+      text-align: left;
+      animation: settingsReveal .32s ease both;
+    }
+    #overlay.home-screen .settings-header { margin-bottom: 22px; text-align: center; }
+    #overlay.home-screen .settings-title {
+      margin: 9px 0 0;
+      color: #f2f6fa;
+      font: 800 clamp(29px, 7vw, 42px)/1.05 "Orbitron", sans-serif;
+      letter-spacing: -.03em;
+      text-shadow: 0 0 18px rgba(56, 234, 255, .24), 0 0 30px rgba(255, 79, 184, .18);
+    }
+    #overlay.home-screen .settings-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 0;
+      border-top: 1px solid rgba(173, 205, 212, .14);
+      border-bottom: 1px solid rgba(173, 205, 212, .14);
+    }
+    #overlay.home-screen .settings-option-copy strong,
+    #overlay.home-screen .settings-option-copy small { display: block; }
+    #overlay.home-screen .settings-option-copy strong { color: #e6f1f2; font: 700 13px "Orbitron", sans-serif; }
+    #overlay.home-screen .settings-option-copy small { margin-top: 5px; color: #8fa1aa; font: 500 13px "Rajdhani", sans-serif; }
+    #overlay.home-screen .settings-sound-toggle {
+      display: inline-flex;
+      min-width: 95px;
+      min-height: 42px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 10px;
+      border: 1px solid rgba(56, 234, 255, .42);
+      border-radius: 6px;
+      background: rgba(56, 234, 255, .08);
+      color: #b7f7f6;
+      cursor: pointer;
+      font: 700 8px "Orbitron", sans-serif;
+      letter-spacing: .08em;
+    }
+    #overlay.home-screen .settings-sound-toggle strong { color: #fff; }
+    #overlay.home-screen .settings-controls { margin: 16px 0 18px; }
+    #overlay.home-screen .settings-controls > div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(173, 205, 212, .09);
+      color: #91a4ad;
+      font: 600 12px "Rajdhani", sans-serif;
+    }
+    #overlay.home-screen .settings-controls strong {
+      color: #d6e3e6;
+      font: 600 9px "Orbitron", sans-serif;
+      letter-spacing: .03em;
+      text-align: right;
+    }
+    #overlay.home-screen .settings-back {
+      display: block;
+      width: min(100%, 220px);
+      min-height: 44px;
+      margin: 20px auto 0;
+      border: 1px solid rgba(255, 79, 184, .38);
+      border-radius: 6px;
+      background: rgba(255, 79, 184, .06);
+      color: #f3c8e1;
+      cursor: pointer;
+      font: 700 9px "Orbitron", sans-serif;
+      letter-spacing: .1em;
+      transition: transform .18s ease, border-color .18s ease;
+    }
+    #overlay.home-screen .settings-back:hover { transform: scale(1.05); border-color: #ff4fb8; }
+    #overlay.home-screen .settings-back:active { transform: scale(.97); }
+    #overlay.home-screen button:focus-visible {
+      outline: 2px solid #8cfaff;
+      outline-offset: 3px;
+    }
+    @keyframes menuGridDrift { to { background-position: 46px 46px; } }
+    @keyframes menuDustDrift { from { transform: translate3d(0, 0, 0); opacity: .35; } to { transform: translate3d(10px, -12px, 0); opacity: .78; } }
+    @keyframes menuDustFloat { from { transform: translate3d(0, 0, 0); opacity: .18; } to { transform: translate3d(6px, -14px, 0); opacity: .8; } }
+    @keyframes homeCardReveal { from { opacity: 0; transform: translateY(13px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes settingsReveal { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes titleGlow { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.16); } }
+    @keyframes playPulse { 0%, 100% { box-shadow: 0 0 19px rgba(56, 234, 255, .16), inset 0 0 20px rgba(255, 255, 255, .08); } 50% { box-shadow: 0 0 29px rgba(56, 234, 255, .29), 0 0 38px rgba(255, 79, 184, .11), inset 0 0 22px rgba(255, 255, 255, .13); } }
+    @media (max-width: 520px) {
+      #overlay.home-screen { padding: 92px 15px 62px; }
+      #overlay.home-screen .card.home-card { width: min(100%, 460px); max-height: min(84dvh, 790px); padding: 23px 17px; border-radius: 17px; }
+      #game .topbar { top: max(14px, env(safe-area-inset-top)); right: 12px; left: 12px; gap: 7px; }
+      #game .topbar .highscore.home-stats { min-width: 208px; gap: 3px; padding: 6px; }
+      #game .topbar .home-stat-cell { gap: 5px; padding: 4px; }
+      #game .topbar .home-stat-icon { width: 15px; height: 15px; }
+      #game .topbar .home-stats .micro-label { font-size: 6px; letter-spacing: .06em; }
+      #game .topbar .home-stats .record-value,
+      #game .topbar .home-stats .coin-total { font-size: 10px; }
+      #overlay.home-screen h1 { margin: 10px 0 13px; font-size: clamp(34px, 9vw, 46px); }
+      #overlay.home-screen .intro { font-size: 15px; }
+      #overlay.home-screen .mode-btn { min-height: 44px; font-size: 8px; }
+      #overlay.home-screen .home-actions .primary-btn { min-height: 58px; font-size: 13px; }
+      #overlay.home-screen .secondary-actions .secondary-btn { min-height: 44px; font-size: 8px; }
+    }
+    @media (max-width: 370px) {
+      #game .topbar { right: 9px; left: 9px; }
+      #game .topbar .highscore.home-stats { min-width: 185px; }
+      #game .topbar .home-stat-icon { display: none; }
+      #overlay.home-screen .home-card { padding-right: 13px; padding-left: 13px; }
+      #overlay.home-screen h1 { font-size: 33px; }
+      #overlay.home-screen .mode-btn { padding-right: 3px; padding-left: 3px; font-size: 7px; }
+    }
+    @media (max-height: 730px) {
+      #overlay.home-screen { padding-top: 82px; padding-bottom: 52px; }
+      #overlay.home-screen .card.home-card { max-height: 82dvh; padding-top: 18px; padding-bottom: 18px; }
+      #overlay.home-screen h1 { margin-top: 8px; margin-bottom: 10px; }
+      #overlay.home-screen .color-key { margin-bottom: 13px; }
+      #overlay.home-screen .mode-selector { margin-bottom: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #overlay.home-screen *,
+      #overlay.home-screen *::before,
+      #overlay.home-screen *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
   </style>
 </head>
 <body>
@@ -336,9 +783,21 @@
         <div class="brand-mark" aria-hidden="true"></div>
         <div><div class="brand-name">Color Shift</div><div class="brand-sub">Neon Rush 3D</div></div>
       </div>
-      <div class="highscore">
-        <div class="micro-label">Best score</div><div class="record-value"><span id="bestTop">00000</span></div>
-        <div class="coin-total" aria-label="Total crystals collected">CRYSTALS <span id="coinTotal">00000</span></div>
+      <div class="highscore home-stats" aria-label="Player stats">
+        <div class="home-stat-cell">
+          <svg class="home-stat-icon score-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v3a4 4 0 0 1-8 0V4Zm0 2H5v1a4 4 0 0 0 4 4m7-5h3v1a4 4 0 0 1-4 4m-3 1v4m-4 4h8m-7-4h6l1 4H8l1-4Z"/></svg>
+          <div class="home-stat-copy">
+            <div class="micro-label">Best score</div>
+            <div class="record-value" id="bestTop">00000</div>
+          </div>
+        </div>
+        <div class="home-stat-cell">
+          <svg class="home-stat-icon crystal-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 8 7-8 13L4 9l8-7Zm-8 7h16M8 9l4 13 4-13-4-7-4 7Z"/></svg>
+          <div class="home-stat-copy">
+            <div class="micro-label">Neon crystals</div>
+            <div class="coin-total" aria-label="Total crystals collected"><span id="coinTotal">00000</span></div>
+          </div>
+        </div>
         <button class="sound-toggle" id="soundToggle" type="button" aria-label="Mute sound" aria-pressed="true" title="Mute sound">
           <svg class="sound-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6v4h3l4 3V3L5 6H2Z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5"/></svg>
           <span id="soundLabel">SOUND ON</span>
@@ -368,6 +827,7 @@
     <div class="auto-color-indicator" id="autoColorIndicator" role="status" aria-live="polite" hidden>
       <span class="auto-color-dot" id="autoColorDot"></span><strong>AUTO</strong><span id="autoColorName">CYAN</span>
     </div>
+    <div class="ghost-status" id="ghostStatus" role="status" aria-live="polite" aria-atomic="true">RACING GHOST RECORD</div>
     <div class="boost-banner" id="speedBanner" hidden>SPEED UP! <span><b id="speedTime">5</b>s</span></div>
     <div class="fever-banner" id="feverBanner" hidden>RAINBOW RUSH<span>FEVER · <b id="feverTime">5</b>s · 3X SCORE</span></div>
     <div class="environment-banner" id="environmentBanner" role="status" aria-live="polite" hidden>
@@ -388,17 +848,23 @@
         <span class="swatch" data-color="yellow" style="background:var(--yellow)"></span>
       </div>
     </div>
-    <div class="controls-hint"><strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Color cycles every 2.5s · steer to match</div>
+    <div class="controls-hint"><strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Color cycles every 4.5s · steer to match</div>
     <div class="mobile-controls" aria-label="Lane controls and optional gravity flip">
       <button class="tap-control" id="laneLeft" type="button" aria-label="Shift lane left">←<small>LANE</small></button>
       <button class="tap-control color-switch" id="switchColor" type="button" aria-label="Player color cycles automatically" disabled>✦<small>AUTO</small></button>
       <button class="tap-control" id="laneRight" type="button" aria-label="Shift lane right">→<small>LANE</small></button>
     </div>
-    <section class="overlay" id="overlay">
-      <div class="card" id="card">
+    <section class="overlay home-screen" id="overlay">
+      <div class="menu-atmosphere" aria-hidden="true">
+        <span class="menu-dust dust-one"></span><span class="menu-dust dust-two"></span>
+        <span class="menu-dust dust-three"></span><span class="menu-dust dust-four"></span>
+        <span class="menu-dust dust-five"></span><span class="menu-dust dust-six"></span>
+        <span class="menu-dust dust-seven"></span><span class="menu-dust dust-eight"></span>
+      </div>
+      <div class="card home-card" id="card">
         <div class="eyebrow" id="eyebrow">A color reaction test</div>
-        <h1 aria-label="Color Shift: Neon Rush 3D"><span class="title-light" id="titleTop">Color Shift:</span><span class="title-accent" id="titleBottom">Neon Rush 3D</span></h1>
-        <p class="intro" id="intro">The ball cycles Red, Cyan, and Yellow automatically every 2.5 seconds. Steer into the lane glowing with its current color. Collect Prism Shield, Time Warp, and 2X score boosts across ten evolving worlds.</p>
+        <h1 aria-label="Color Shift: Neon Rush 3D"><span class="title-light" id="titleTop">COLOR SHIFT:</span><span class="title-accent" id="titleBottom">NEON RUSH 3D</span></h1>
+        <p class="intro" id="intro">The ball cycles Red, Cyan, and Yellow automatically every 4.5 seconds. Steer into the lane glowing with its current color. Collect Prism Shield, Time Warp, and 2X score boosts across ten evolving worlds.</p>
         <div class="color-key" id="colorKey">
           <span class="key-chip"><i style="color:var(--red);background:var(--red)"></i>Red</span>
           <span class="key-chip"><i style="color:var(--cyan);background:var(--cyan)"></i>Cyan</span>
@@ -427,12 +893,15 @@
             <span><strong>Mystery crate opened</strong><span id="crateReward">+0 crystals</span></span>
           </div>
         </div>
-        <div class="actions">
-          <button class="primary-btn" id="startButton">Start run <span class="button-arrow">↗</span></button>
+        <div class="actions home-actions">
+          <button class="primary-btn" id="startButton">Tap to Play <span class="button-arrow">↗</span></button>
           <button class="secondary-btn" id="restartButton" type="button" hidden>Restart run</button>
-          <button class="secondary-btn" id="shopButton" type="button">Shop / Skins</button>
+          <div class="secondary-actions">
+            <button class="secondary-btn" id="shopButton" type="button">Shop / Skins</button>
+          <button class="secondary-btn" id="settingsButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="settingsPanel">Settings</button>
+          </div>
         </div>
-        <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; color auto-cycles every 2.5s</span><span class="mobile-hint">Tap to start · swipe lanes · color auto-cycles</span></div>
+        <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; color auto-cycles every 4.5s</span><span class="mobile-hint">Tap to start · swipe lanes · color auto-cycles</span></div>
         <div class="small-note" id="dailyTokenNote" hidden></div>
         <section class="shop-panel" id="shopPanel" aria-label="Player skins shop" hidden>
           <div class="shop-header">
@@ -466,6 +935,28 @@
             <button class="secondary-btn reset-save-btn" id="resetLocalData" type="button">Reset local save</button>
           </div>
           <button class="secondary-btn shop-back" id="shopBack" type="button">Back to game</button>
+        </section>
+        <section class="settings-panel" id="settingsPanel" aria-label="Settings" hidden>
+          <div class="settings-header">
+            <div class="eyebrow">RUN CONFIGURATION</div>
+            <h2 class="settings-title">Settings</h2>
+          </div>
+          <div class="settings-option">
+            <div class="settings-option-copy">
+              <strong>Procedural sound</strong>
+              <small>Original effects generated in your browser</small>
+            </div>
+            <button class="settings-sound-toggle" id="settingsSoundButton" type="button" aria-label="Toggle sound" aria-pressed="true">
+              <svg class="sound-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6v4h3l4 3V3L5 6H2Z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5"/></svg>
+              <span>SOUND <strong id="settingsSoundLabel">ON</strong></span>
+            </button>
+          </div>
+          <div class="settings-controls">
+            <div><span>Steer</span><strong>A / D · ← / → · swipe</strong></div>
+            <div><span>Color</span><strong>Auto-cycle · 4.5 sec</strong></div>
+            <div><span>Anti-Gravity</span><strong>Space · tap · flip</strong></div>
+          </div>
+          <button class="secondary-btn settings-back" id="settingsBack" type="button">Back to game</button>
         </section>
       </div>
     </section>
@@ -4227,8 +4718,14 @@ void main() {
       const LASER_HALF_WIDTH = 0.56;
       const FIRST_GATE_SPAWN_Z = -50;
       const START_GRACE_SECONDS = 1;
-      const AUTO_COLOR_INTERVAL_SECONDS = 2.5;
+      const BASE_FORWARD_SPEED = 11.8;
+      const AUTO_COLOR_INTERVAL_SECONDS = 4.5;
+      const MIN_GATE_REACTION_SECONDS = 2.15;
+      const ITEM_LEAD_SECONDS = 2.15;
+      const MIN_ITEM_NOTICE_SECONDS = 2.1;
       const PLAYER_INPUT_COOLDOWN_MS = 120;
+      const GHOST_SAMPLE_INTERVAL_SECONDS = 0.2;
+      const GHOST_MAX_SAMPLES = 6000;
       const RUNNER_Y = 0.5;
       const GRAVITY_FLOOR_Y = -1.15;
       const GRAVITY_CEILING_Y = 1.15;
@@ -4511,6 +5008,30 @@ void main() {
       gameScene.add(player);
       player.position.set(LANE_X[1], RUNNER_Y, 0);
       player.userData.gravityTargetY = RUNNER_Y;
+      const ghostBall = new THREE.Mesh(
+        new THREE.SphereGeometry(PLAYER_RADIUS * 0.86, 16, 12),
+        new THREE.MeshStandardMaterial({
+          color: 0xf4fbff,
+          emissive: 0x65cfff,
+          emissiveIntensity: 0.42,
+          roughness: 0.24,
+          metalness: 0.04,
+          transparent: true,
+          opacity: 0.3,
+          depthWrite: false
+        })
+      );
+      ghostBall.name = "Ghost Runner";
+      ghostBall.visible = false;
+      ghostBall.position.set(LANE_X[1] + 0.38, RUNNER_Y, -2.4);
+      ghostBall.renderOrder = 4;
+      const ghostHalo = new THREE.Mesh(
+        new THREE.TorusGeometry(0.68, 0.024, 6, 36),
+        new THREE.MeshBasicMaterial({ color: 0x9beaff, transparent: true, opacity: 0.3, depthWrite: false })
+      );
+      ghostHalo.rotation.x = Math.PI / 2;
+      ghostBall.add(ghostHalo);
+      gameScene.add(ghostBall);
       const orbMat = new THREE.MeshStandardMaterial({ color: COLORS[1].hex, emissive: COLORS[1].hex, emissiveIntensity: 3.8, metalness: 0.1, roughness: 0.2 });
       const orb = new THREE.Mesh(new THREE.SphereGeometry(PLAYER_RADIUS, 20, 16), orbMat);
       player.add(orb);
@@ -5009,9 +5530,16 @@ void main() {
       let score = 0;
       let combo = 0;
       let maxCombo = 0;
-      let speed = 13.5;
+      let speed = BASE_FORWARD_SPEED;
       let lastTime = 0;
       let elapsed = 0;
+      let ghostRunData = [];
+      let activeGhostData = null;
+      let runGhostSamples = [];
+      let ghostSampleAccumulator = 0;
+      let ghostReplayCursor = 0;
+      let ghostBestAtRunStart = 0;
+      let ghostRecordCandidate = false;
       let selectedMode = "endless";
       let timeRemaining = 60;
       let feverTimer = 0;
@@ -5023,6 +5551,18 @@ void main() {
         const side = gravityHazardSerial % 2 === 0 ? "floor" : "ceiling";
         gravityHazardSerial++;
         return side;
+      }
+      function getGateSpawnSpacing() {
+        return Math.max(22, speed * MIN_GATE_REACTION_SECONDS);
+      }
+      function getSafeItemSpawnZ() {
+        const leadDistance = speed * ITEM_LEAD_SECONDS;
+        const minimumNoticeDistance = speed * MIN_ITEM_NOTICE_SECONDS;
+        const candidate = gates
+          .filter(gate => !gate.userData.checked && gate.position.z < 0)
+          .sort((a, b) => b.position.z - a.position.z)
+          .find(gate => gate.position.z + leadDistance <= -minimumNoticeDistance);
+        return candidate ? candidate.position.z + leadDistance : null;
       }
       function createFreshProgression() {
         return {
@@ -5059,6 +5599,14 @@ void main() {
         soundToggle.setAttribute("aria-label", audioUnavailable ? "Sound unavailable" : soundEnabled ? "Mute sound" : "Enable sound");
         soundToggle.title = audioUnavailable ? "Sound unavailable in this browser" : soundEnabled ? "Mute sound" : "Enable sound";
         soundLabel.textContent = audioUnavailable ? "SOUND N/A" : soundEnabled ? "SOUND ON" : "SOUND OFF";
+        const settingsSoundLabel = el("settingsSoundLabel");
+        const settingsSoundButton = el("settingsSoundButton");
+        if (settingsSoundLabel) settingsSoundLabel.textContent = audioUnavailable ? "N/A" : soundEnabled ? "ON" : "OFF";
+        if (settingsSoundButton) {
+          settingsSoundButton.disabled = audioUnavailable;
+          settingsSoundButton.setAttribute("aria-pressed", String(soundEnabled && !audioUnavailable));
+          settingsSoundButton.setAttribute("aria-label", audioUnavailable ? "Sound unavailable" : soundEnabled ? "Mute sound" : "Enable sound");
+        }
       }
       function unlockAudio() {
         if (audioUnavailable || !soundEnabled) return;
@@ -5121,6 +5669,7 @@ void main() {
       const BEST_KEY = "colorSwipeBestScore";
       const COINS_KEY = "colorShiftTotalCoins";
       const HIGH_SCORE_KEY = "highScore";
+      const GHOST_RUN_KEY = "ghostRunData";
       const NEON_CRYSTALS_KEY = "neonCrystals";
       const PROGRESSION_KEY = "colorShiftProgressionV2";
       const LEGACY_PROGRESSION_KEY = "colorShiftProgressionV1";
@@ -5139,6 +5688,129 @@ void main() {
       function safeStoredCount(value) {
         const parsed = Number(value);
         return Number.isFinite(parsed) && parsed >= 0 ? Math.min(1000000000, Math.floor(parsed)) : 0;
+      }
+      function normalizeGhostSamples(value) {
+        if (!Array.isArray(value) || value.length < 2) return [];
+        const stride = Math.max(1, Math.ceil(value.length / GHOST_MAX_SAMPLES));
+        const normalized = [];
+        let lastTime = -1;
+        let lastDistance = -1;
+        for (let index = 0; index < value.length; index++) {
+          if (index !== 0 && index !== value.length - 1 && index % stride !== 0) continue;
+          const point = value[index];
+          const time = Number(point?.t);
+          const traveled = Number(point?.distance);
+          const lane = Number(point?.lane);
+          const yValue = Number(point?.y);
+          if (!Number.isFinite(time) || time < 0 || time > 86400 ||
+              !Number.isFinite(traveled) || traveled < 0 || traveled > 10000000 ||
+              !Number.isInteger(lane) || lane < 0 || lane >= LANE_X.length ||
+              time < lastTime || traveled < lastDistance) continue;
+          normalized.push({
+            t: Number(time.toFixed(2)),
+            distance: Number(traveled.toFixed(2)),
+            lane,
+            y: Number((Number.isFinite(yValue) ? THREE.MathUtils.clamp(yValue, -2.5, 2.5) : RUNNER_Y).toFixed(2))
+          });
+          lastTime = time;
+          lastDistance = traveled;
+        }
+        return normalized.length >= 2 ? normalized : [];
+      }
+      function loadGhostRunData() {
+        try {
+          return normalizeGhostSamples(JSON.parse(localStorage.getItem(GHOST_RUN_KEY) || "null"));
+        } catch (error) {
+          return [];
+        }
+      }
+      function persistGhostRunData(samples) {
+        const normalized = normalizeGhostSamples(samples);
+        if (normalized.length < 2) return false;
+        ghostRunData = normalized;
+        try {
+          localStorage.setItem(GHOST_RUN_KEY, JSON.stringify(normalized));
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+      ghostRunData = loadGhostRunData();
+      function captureGhostSample(force = false) {
+        if (!force && state !== "running") return;
+        const sample = {
+          t: Number(elapsed.toFixed(2)),
+          distance: Number(distance.toFixed(2)),
+          lane: currentLane,
+          y: Number(player.position.y.toFixed(2))
+        };
+        const lastIndex = runGhostSamples.length - 1;
+        const previous = runGhostSamples[lastIndex];
+        if (previous && sample.t <= previous.t + 0.001) {
+          if (force) runGhostSamples[lastIndex] = sample;
+          return;
+        }
+        if (previous && !force && sample.t - previous.t < GHOST_SAMPLE_INTERVAL_SECONDS * 0.8) return;
+        runGhostSamples.push(sample);
+        if (runGhostSamples.length > GHOST_MAX_SAMPLES) {
+          const finalIndex = runGhostSamples.length - 1;
+          runGhostSamples = runGhostSamples.filter((point, index) => index === 0 || index === finalIndex || index % 2 === 0);
+        }
+      }
+      function recordGhostProgress(dt) {
+        ghostSampleAccumulator += dt;
+        if (ghostSampleAccumulator >= GHOST_SAMPLE_INTERVAL_SECONDS) {
+          ghostSampleAccumulator %= GHOST_SAMPLE_INTERVAL_SECONDS;
+          captureGhostSample();
+        }
+        if (Math.floor(score) > ghostBestAtRunStart) ghostRecordCandidate = true;
+      }
+      function getGhostPoseAtTime(time) {
+        if (!activeGhostData || activeGhostData.length < 2) return null;
+        while (ghostReplayCursor < activeGhostData.length - 2 && activeGhostData[ghostReplayCursor + 1].t < time) {
+          ghostReplayCursor++;
+        }
+        const from = activeGhostData[ghostReplayCursor];
+        const to = activeGhostData[Math.min(ghostReplayCursor + 1, activeGhostData.length - 1)];
+        if (time <= from.t || from === to) {
+          return { x: LANE_X[from.lane], distance: from.distance, y: from.y };
+        }
+        const alpha = THREE.MathUtils.clamp((time - from.t) / Math.max(0.001, to.t - from.t), 0, 1);
+        return {
+          x: THREE.MathUtils.lerp(LANE_X[from.lane], LANE_X[to.lane], alpha),
+          distance: THREE.MathUtils.lerp(from.distance, to.distance, alpha),
+          y: THREE.MathUtils.lerp(from.y, to.y, alpha)
+        };
+      }
+      function updateGhostRunner(dt) {
+        const status = el("ghostStatus");
+        if (state !== "running" || !activeGhostData || activeGhostData.length < 2) {
+          ghostBall.visible = false;
+          status.classList.remove("visible");
+          return;
+        }
+        const pose = getGhostPoseAtTime(elapsed);
+        if (!pose) {
+          ghostBall.visible = false;
+          status.classList.remove("visible");
+          return;
+        }
+        const distanceGap = pose.distance - distance;
+        const relativeZ = -distanceGap - 2.4;
+        ghostBall.visible = relativeZ > -110 && relativeZ < 6;
+        if (ghostBall.visible) {
+          const nearbyLaneOffset = Math.abs(distanceGap) <= 8 && Math.abs(pose.x - player.position.x) < 1 ? 0.38 : 0;
+          ghostBall.position.x = THREE.MathUtils.damp(ghostBall.position.x, pose.x + nearbyLaneOffset, 12, dt);
+          ghostBall.position.y = THREE.MathUtils.damp(ghostBall.position.y, pose.y, 10, dt);
+          ghostBall.position.z = relativeZ;
+          ghostBall.rotation.y += dt * 0.8;
+          ghostHalo.rotation.z += dt * 0.55;
+          ghostBall.material.opacity = 0.25 + (0.055 * (0.5 + Math.sin(elapsed * 4) * 0.5));
+        }
+        const closeToRecord = elapsed > 0.35 && Math.abs(distanceGap) <= 18;
+        status.classList.toggle("visible", closeToRecord);
+        const text = distanceGap < -1 ? "RACING GHOST RECORD · AHEAD" : "RACING GHOST RECORD";
+        if (closeToRecord && status.textContent !== text) status.textContent = text;
       }
       function safeStoredTimestamp(value) {
         const parsed = Number(value);
@@ -5436,22 +6108,22 @@ void main() {
         if (el("results").hidden) {
           el("eyebrow").textContent = quantum ? "QUANTUM SINGULARITY" : "A color reaction test";
           el("intro").textContent = quantum
-            ? "The ball cycles Red, Cyan, and Yellow automatically every 2.5 seconds. Steer into the matching gate lane, then use Space or a tap to flip between the tunnel floor and ceiling."
-            : "The ball cycles Red, Cyan, and Yellow automatically every 2.5 seconds. Steer into the lane glowing with its current color. Collect Prism Shield, Time Warp, and 2X score boosts across ten evolving worlds.";
+            ? "Match each plasma gate, then flip gravity between the tunnel floor and ceiling."
+            : selectedMode === "timeAttack"
+              ? "Match neon gates, collect crystals, and score as much as you can in 60 seconds."
+              : "Match each neon gate, collect crystals, and build your best streak.";
           el("startHint").innerHTML = quantum
-            ? '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / tap</b> flip gravity</span><span class="mobile-hint">Swipe to steer · tap or FLIP button for gravity · color auto-cycles</span>'
-            : '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; color auto-cycles every 2.5s</span><span class="mobile-hint">Tap to start · swipe lanes · color auto-cycles</span>';
+            ? '<span class="desktop-hint"><b>A / ←</b> steer &nbsp;·&nbsp; <b>Space / tap</b> flip gravity</span><span class="mobile-hint">Swipe to steer · tap to flip gravity</span>'
+            : '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right</span><span class="mobile-hint">Swipe to shift lanes · color auto-cycles</span>';
         }
         if (selectedMode === "antiGravity") {
-          el("startButton").innerHTML = 'Enter Anti-Gravity <span class="button-arrow">↗</span>';
           if (!el("results").hidden) el("resultLine").textContent = "Quantum Singularity · Anti-Gravity";
         } else if (selectedMode === "timeAttack") {
-          el("startButton").innerHTML = 'Start Time Attack <span class="button-arrow">↗</span>';
           if (!el("results").hidden) el("resultLine").textContent = "Time Attack · Run summary";
         } else {
-          el("startButton").innerHTML = 'Start Endless Runner <span class="button-arrow">↗</span>';
           if (!el("results").hidden) el("resultLine").textContent = "Endless · Run summary";
         }
+        if (el("results").hidden) el("startButton").innerHTML = 'TAP TO PLAY <span class="button-arrow">↗</span>';
       }
       function updateAutoColorControl() {
         const control = el("switchColor");
@@ -5467,6 +6139,7 @@ void main() {
       }
       function openShop() {
         if (state === "running") return;
+        closeSettings();
         el("card").classList.add("shop-open");
         el("shopPanel").hidden = false;
         el("shopNotice").textContent = "";
@@ -5475,6 +6148,19 @@ void main() {
       function closeShop() {
         el("card").classList.remove("shop-open");
         el("shopPanel").hidden = true;
+      }
+      function openSettings() {
+        if (state === "running") return;
+        closeShop();
+        el("card").classList.add("settings-open");
+        el("settingsPanel").hidden = false;
+        el("settingsButton").setAttribute("aria-expanded", "true");
+        el("settingsSoundButton").focus();
+      }
+      function closeSettings() {
+        el("card").classList.remove("settings-open");
+        el("settingsPanel").hidden = true;
+        el("settingsButton").setAttribute("aria-expanded", "false");
       }
       function resetLocalProgress() {
         const confirmed = window.confirm(
@@ -5489,7 +6175,8 @@ void main() {
             "colorSwipeBest",
             HIGH_SCORE_KEY,
             COINS_KEY,
-            NEON_CRYSTALS_KEY
+            NEON_CRYSTALS_KEY,
+            GHOST_RUN_KEY
           ].forEach(key => localStorage.removeItem(key));
           localStorage.setItem(HIGH_SCORE_KEY, "0");
           localStorage.setItem(NEON_CRYSTALS_KEY, "0");
@@ -5504,6 +6191,13 @@ void main() {
         combo = 0;
         maxCombo = 0;
         runCoins = 0;
+        ghostRunData = [];
+        activeGhostData = null;
+        runGhostSamples = [];
+        ghostSampleAccumulator = 0;
+        ghostRecordCandidate = false;
+        ghostBall.visible = false;
+        el("ghostStatus").classList.remove("visible");
         timeRemaining = 60;
         currentLane = 1;
         lastPlayerInputAt = -Infinity;
@@ -5655,7 +6349,7 @@ void main() {
         nextGateZ = FIRST_GATE_SPAWN_Z;
         for (let i = 0; i < 5; i++) {
           gates.push(makeGate(currentColor, nextGateZ));
-          nextGateZ -= 18;
+          nextGateZ -= getGateSpawnSpacing();
         }
       }
       makeInitialGates();
@@ -5666,7 +6360,7 @@ void main() {
         el("comboStat").classList.toggle("combo-hot", combo >= 3);
         el("distance").textContent = String(Math.floor(distance)).padStart(3, "0");
         el("gates").textContent = String(passed).padStart(2, "0");
-        el("pace").innerHTML = (speed / 13.5).toFixed(1) + '<span style="font-size:.48em">×</span>';
+        el("pace").innerHTML = (speed / BASE_FORWARD_SPEED).toFixed(1) + '<span style="font-size:.48em">×</span>';
         el("crystalHud").textContent = String(progression.crystals).padStart(5, "0");
         el("paceStat").hidden = selectedMode === "timeAttack";
         el("timeAttackStat").hidden = selectedMode !== "timeAttack";
@@ -5738,10 +6432,11 @@ void main() {
         }
       }
       function spawnPowerUp() {
-        const upcoming = gates
-          .filter(gate => !gate.userData.checked && gate.position.z < 0)
-          .sort((a, b) => b.position.z - a.position.z)[0];
-        const z = upcoming ? upcoming.position.z - 9 : -42;
+        const z = getSafeItemSpawnZ();
+        if (z === null) {
+          powerUpSpawnTimer = 1.5;
+          return;
+        }
         const roll = Math.random();
         const type = roll < 0.36 ? "prism" : roll < 0.68 ? "warp" : "booster";
         const lane = Math.floor(Math.random() * LANE_X.length);
@@ -5749,13 +6444,14 @@ void main() {
         powerUpSpawnTimer = 13 + Math.random() * 9;
       }
       function spawnCrystalCoin() {
-        const upcoming = gates
-          .filter(gate => !gate.userData.checked && gate.position.z < 0)
-          .sort((a, b) => b.position.z - a.position.z)[0];
-        const z = upcoming ? Math.min(-30, upcoming.position.z - (6 + Math.random() * 8)) : -42;
+        const z = getSafeItemSpawnZ();
+        if (z === null) {
+          crystalSpawnTimer = 1.5;
+          return;
+        }
         const lane = Math.floor(Math.random() * LANE_X.length);
         crystalCoins.push(makeCrystalCoin(lane, z));
-        crystalSpawnTimer = 5.5 + Math.random() * 4;
+        crystalSpawnTimer = 6.5 + Math.random() * 3.5;
       }
       function spawnLaser() {
         const z = -42 - Math.random() * 8;
@@ -5832,11 +6528,12 @@ void main() {
           resumeGame();
           return;
         }
-        if (state === "running" || !el("dailyModal").hidden) return;
+        if (state === "running" || !el("dailyModal").hidden || el("card").classList.contains("settings-open")) return;
         if (!restartPaused && dailySpinReady()) {
           maybeShowDailyReward();
           return;
         }
+        closeSettings();
         closeShop();
         unlockAudio();
         window.clearTimeout(statusTimer);
@@ -5852,6 +6549,7 @@ void main() {
         clearImpactBursts();
         cameraShakeTimer = 0;
         cameraShakeIntensity = 0;
+        el("overlay").classList.remove("home-screen");
         resetOverlay();
         state = "running";
         el("game").classList.add("is-running");
@@ -5860,7 +6558,17 @@ void main() {
         distance = 0; passed = 0; score = 0; combo = 0; maxCombo = 0;
         timeRemaining = 60;
         feverTimer = 0;
-        elapsed = 0; obstacleElapsed = 0; speed = 13.5;
+        elapsed = 0; obstacleElapsed = 0; speed = BASE_FORWARD_SPEED;
+        ghostBestAtRunStart = best;
+        runGhostSamples = [];
+        ghostSampleAccumulator = 0;
+        ghostRecordCandidate = false;
+        activeGhostData = ghostRunData.length >= 2 ? ghostRunData : null;
+        ghostReplayCursor = 0;
+        ghostBall.visible = Boolean(activeGhostData);
+        ghostBall.material.opacity = 0.3;
+        el("ghostStatus").classList.remove("visible");
+        el("ghostStatus").textContent = "RACING GHOST RECORD";
         autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
         lastPlayerInputAt = -Infinity;
         setEnvironment(0, { announce: false, instant: true });
@@ -5882,9 +6590,12 @@ void main() {
         player.position.set(LANE_X[currentLane], antiGravityModeActive ? GRAVITY_FLOOR_Y : RUNNER_Y, 0);
         player.rotation.set(0, 0, 0);
         orb.rotation.set(0, 0, 0);
+        ghostBall.position.set(LANE_X[currentLane] + 0.38, player.position.y, -2.4);
+        ghostBall.rotation.set(0, 0, 0);
         ribs.forEach((rib, index) => { rib.position.z = -index * 8 - 1; });
         orb.scale.setScalar(1);
         colorPulse = 0;
+        captureGhostSample(true);
         makeInitialGates();
         updatePowerHUD();
         updateHUD();
@@ -5908,6 +6619,7 @@ void main() {
         el("environmentBanner").classList.remove("visible");
         el("environmentBanner").hidden = true;
         el("runStatus").classList.remove("visible");
+        el("ghostStatus").classList.remove("visible");
         updateGravityIndicator();
         updateAutoColorIndicator();
         el("pauseButton").hidden = true;
@@ -5925,6 +6637,7 @@ void main() {
         el("results").hidden = true;
         el("mysteryReward").hidden = true;
         el("shopButton").hidden = true;
+        el("settingsButton").hidden = true;
         el("card").classList.add("pause-open");
         el("restartButton").hidden = false;
         el("startHint").hidden = false;
@@ -6079,6 +6792,8 @@ void main() {
       }
       function endGame(reason = "collision") {
         if (state !== "running") return;
+        captureGhostSample(true);
+        if (Math.floor(score) > ghostBestAtRunStart) ghostRecordCandidate = true;
         window.clearTimeout(statusTimer);
         window.clearTimeout(environmentNoticeTimer);
         environmentNoticeToken++;
@@ -6100,6 +6815,7 @@ void main() {
         const isBest = final > best;
         let crateReward = 0;
         if (isBest) {
+          if (ghostRecordCandidate) persistGhostRunData(runGhostSamples);
           best = final;
           try {
             localStorage.setItem(HIGH_SCORE_KEY, String(best));
@@ -6140,10 +6856,13 @@ void main() {
         scoreBoosterTimer = 0;
         speedBoostTimer = 0;
         shieldCharges = 0;
+        ghostBall.visible = false;
+        el("ghostStatus").classList.remove("visible");
         updatePowerHUD();
         saveProgression();
         el("startButton").innerHTML = 'Run again <span class="button-arrow">↗</span>';
         el("shopButton").hidden = true;
+        el("settingsButton").hidden = true;
         el("hud").classList.remove("visible");
         el("runStatus").classList.remove("visible");
         el("overlay").classList.remove("hidden");
@@ -6568,9 +7287,9 @@ void main() {
           feverTimer = Math.max(0, feverTimer - dt);
           speedBoostTimer = Math.max(0, speedBoostTimer - dt);
           obstacleElapsed += dt * obstacleTimeScale;
-          const runSpeed = 13.5 + Math.min(8, elapsed * 0.11);
+          const runSpeed = BASE_FORWARD_SPEED + Math.min(4.5, elapsed * 0.045);
           const lateZoneMultiplier = environmentIndex >= 8 ? 1 + (environmentIndex - 7) * 0.12 : 1;
-          speed = Math.min(26, runSpeed * lateZoneMultiplier) * (speedBoostTimer > 0 ? 1.25 : 1);
+          speed = Math.min(22, runSpeed * lateZoneMultiplier) * (speedBoostTimer > 0 ? 1.25 : 1);
           const obstacleDt = dt * obstacleTimeScale;
           const obstacleSpeed = speed * obstacleTimeScale;
           const distanceDelta = speed * dt * 0.72;
@@ -6578,6 +7297,8 @@ void main() {
           checkRunAchievements();
           checkDailyBounties();
           score += distanceDelta * runScoreMultiplier;
+          recordGhostProgress(dt);
+          updateGhostRunner(dt);
           const nextEnvironment = Math.min(ENVIRONMENTS.length - 1, Math.floor(distance / 500));
           if (nextEnvironment !== environmentIndex) setEnvironment(nextEnvironment);
           powerUpSpawnTimer -= dt;
@@ -6679,12 +7400,13 @@ void main() {
               return true;
             });
             if (environmentIndex >= 8 && gates.length <= 3) {
+              const pairSpacing = getGateSpawnSpacing();
               gates.push(makeGate(currentColor, nextGateZ, 0));
-              gates.push(makeGate(currentColor, nextGateZ - 10, 1));
-              nextGateZ -= 28;
+              gates.push(makeGate(currentColor, nextGateZ - pairSpacing, 1));
+              nextGateZ -= pairSpacing * 2;
             } else if (environmentIndex < 8 && gates.length < 5) {
               gates.push(makeGate(currentColor, nextGateZ));
-              nextGateZ -= 18;
+              nextGateZ -= getGateSpawnSpacing();
             }
             if (state === "running" && selectedMode === "timeAttack") {
               timeRemaining = Math.max(0, timeRemaining - dt);
@@ -6740,17 +7462,21 @@ void main() {
       el("dailyContinueButton").addEventListener("click", closeDailyReward);
       el("shopButton").addEventListener("click", openShop);
       el("shopBack").addEventListener("click", closeShop);
+      el("settingsButton").addEventListener("click", openSettings);
+      el("settingsBack").addEventListener("click", closeSettings);
       el("pauseButton").addEventListener("click", pauseGame);
       el("restartButton").addEventListener("click", () => startGame(true));
       el("resetLocalData").addEventListener("click", resetLocalProgress);
       document.querySelectorAll(".skin-action").forEach(button => {
         button.addEventListener("click", () => chooseSkin(button.dataset.skin));
       });
-      soundToggle.addEventListener("click", () => {
+      const toggleSound = () => {
         soundEnabled = !soundEnabled;
         if (soundEnabled) unlockAudio();
         updateSoundControl();
-      });
+      };
+      soundToggle.addEventListener("click", toggleSound);
+      el("settingsSoundButton").addEventListener("click", toggleSound);
       el("laneLeft").addEventListener("click", () => shiftLane(-1));
       el("laneRight").addEventListener("click", () => shiftLane(1));
       el("switchColor").addEventListener("click", () => {
@@ -6759,6 +7485,11 @@ void main() {
       window.addEventListener("keydown", event => {
         if (event.repeat && ["ArrowLeft", "ArrowRight", "KeyA", "KeyD", "Space", "Escape", "KeyP"].includes(event.code)) return;
         if (["ArrowLeft", "ArrowRight", "Space", "Escape"].includes(event.code)) event.preventDefault();
+        if (event.code === "Escape" && el("card").classList.contains("settings-open")) {
+          closeSettings();
+          el("settingsButton").focus();
+          return;
+        }
         if (event.code === "Escape" || event.code === "KeyP") {
           if (state === "running") pauseGame();
           else if (state === "paused") resumeGame();
@@ -6770,7 +7501,7 @@ void main() {
           if (event.code === "Space" && antiGravityModeActive) flipGravity();
           return;
         }
-        if ((event.code === "Space" || event.code === "Enter") && el("dailyModal").hidden && !el("card").classList.contains("shop-open")) startGame();
+        if ((event.code === "Space" || event.code === "Enter") && el("dailyModal").hidden && !el("card").classList.contains("shop-open") && !el("card").classList.contains("settings-open")) startGame();
       }, { passive: false });
       let gestureStart = null;
       const game = el("game");
@@ -6788,7 +7519,7 @@ void main() {
             return;
           }
         }
-        if (state !== "running" && el("dailyModal").hidden && !el("card").classList.contains("shop-open")) startGame();
+        if (state !== "running" && el("dailyModal").hidden && !el("card").classList.contains("shop-open") && !el("card").classList.contains("settings-open")) startGame();
       };
       game.addEventListener("pointerdown", event => {
         if (event.pointerType === "touch" || event.button !== 0 || (event.target instanceof Element && event.target.closest("button"))) return;

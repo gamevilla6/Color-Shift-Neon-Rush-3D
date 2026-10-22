@@ -1,0 +1,112 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap");
+
+.arcade-home,
+.arcade-home * { box-sizing: border-box; }
+.arcade-home {
+  --ah-cyan: #50f4ed;
+  --ah-pink: #ff4aa7;
+  --ah-gold: #ffd477;
+  --ah-ink: #edf7f7;
+  --ah-muted: #81919a;
+  position: relative; isolation: isolate; display: flex; min-height: 100svh; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
+  padding: 106px 30px 60px; color: var(--ah-ink);
+  background: radial-gradient(ellipse at 50% 40%, rgba(16, 49, 61, .62) 0%, rgba(9, 21, 31, .55) 36%, transparent 66%), radial-gradient(ellipse at 50% 100%, #111821 0%, #080d14 58%, #070b11 100%);
+  font-family: "Rajdhani", sans-serif; -webkit-font-smoothing: antialiased;
+}
+.arcade-home::before { position: absolute; z-index: -1; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(3,8,14,.68), transparent 24%, transparent 76%, rgba(3,8,14,.65)), linear-gradient(0deg, rgba(5,10,16,.75), transparent 35%, transparent 75%, rgba(5,10,16,.48)); content: ""; }
+.arcade-grid { position: absolute; z-index: -2; inset: 28% -30% -55%; transform: perspective(370px) rotateX(61deg) scale(1.4); transform-origin: center top; opacity: .19; background-image: linear-gradient(rgba(57, 209, 220, .32) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 209, 220, .32) 1px, transparent 1px); background-size: 52px 52px; mask-image: linear-gradient(to bottom, transparent, black 17%, black 75%, transparent); animation: ah-grid-flow 18s linear infinite; }
+.arcade-orbit { position: absolute; z-index: -1; width: 470px; height: 470px; border: 1px solid rgba(58, 232, 231, .08); border-radius: 50%; pointer-events: none; }
+.arcade-orbit-a { top: 18%; left: 50%; transform: translateX(-50%); box-shadow: 0 0 80px rgba(39, 196, 211, .045), inset 0 0 55px rgba(39, 196, 211, .035); }
+.arcade-orbit-b { top: 23%; left: 50%; width: 360px; height: 360px; transform: translateX(-50%); border-color: rgba(255, 74, 167, .075); }
+.arcade-dust { position: absolute; z-index: -1; inset: 0; overflow: hidden; pointer-events: none; }
+.arcade-dust i { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #9bffff; box-shadow: 0 0 8px 2px rgba(80,244,237,.42); opacity: .5; animation: ah-dust 7s ease-in-out infinite alternate; }
+.arcade-dust i:nth-child(1) { top: 22%; left: 13%; }.arcade-dust i:nth-child(2) { top: 31%; left: 82%; animation-delay: -2s; }.arcade-dust i:nth-child(3) { top: 55%; left: 9%; animation-delay: -4s; }.arcade-dust i:nth-child(4) { top: 67%; left: 91%; animation-delay: -1s; }.arcade-dust i:nth-child(5) { top: 79%; left: 21%; animation-delay: -3s; }.arcade-dust i:nth-child(6) { top: 14%; left: 68%; animation-delay: -5s; }.arcade-dust i:nth-child(7) { top: 43%; left: 94%; animation-delay: -2s; }.arcade-dust i:nth-child(8) { top: 86%; left: 74%; animation-delay: -4s; }.arcade-dust i:nth-child(9) { top: 38%; left: 5%; animation-delay: -6s; }
+.arcade-topbar { position: absolute; top: max(24px, env(safe-area-inset-top)); left: clamp(20px, 5vw, 72px); right: clamp(20px, 5vw, 72px); display: flex; align-items: flex-start; justify-content: space-between; }
+.arcade-brand { display: flex; align-items: center; gap: 11px; font-family: "Orbitron", sans-serif; }
+.arcade-brand > span:last-child { display: block; }
+.arcade-brand strong { display: block; font-size: 11px; font-weight: 700; letter-spacing: .13em; }
+.arcade-brand small { display: block; margin-top: 4px; color: #7f939c; font-size: 8px; letter-spacing: .23em; }
+.arcade-brand-mark { position: relative; display: grid; width: 29px; height: 29px; place-items: center; border: 1px solid rgba(80,244,237,.48); border-radius: 50%; box-shadow: 0 0 18px rgba(80,244,237,.14), inset 0 0 12px rgba(80,244,237,.13); }
+.arcade-brand-mark::before { width: 14px; height: 14px; border: 1px solid var(--ah-cyan); border-radius: 50%; content: ""; }
+.arcade-brand-mark i { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: var(--ah-pink); box-shadow: 0 0 8px var(--ah-pink); }
+.arcade-records { display: flex; gap: 8px; }
+.arcade-stat { display: flex; min-width: 102px; align-items: center; gap: 9px; padding: 9px 12px; border: 1px solid rgba(165,221,230,.15); background: linear-gradient(135deg, rgba(174,231,239,.075), rgba(54,85,103,.05)); box-shadow: inset 0 1px rgba(255,255,255,.045); backdrop-filter: blur(12px); }
+.arcade-stat-icon { display: grid; width: 22px; height: 22px; place-items: center; color: var(--ah-cyan); }
+.arcade-stat-icon svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.45; stroke-linecap: round; stroke-linejoin: round; }
+.arcade-crystals .arcade-stat-icon { color: var(--ah-gold); }
+.arcade-stat-copy small { display: block; color: #94a3ab; font: 600 7px/1.1 "Orbitron", sans-serif; letter-spacing: .12em; white-space: nowrap; }
+.arcade-stat-copy strong { display: block; margin-top: 5px; color: #f3fcfc; font: 700 13px/1 "Orbitron", sans-serif; letter-spacing: .1em; }
+.arcade-stage { width: min(100%, 470px); text-align: center; animation: ah-enter .46s cubic-bezier(.2,.7,.2,1) both; }
+.arcade-kicker { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 18px; color: var(--ah-cyan); font: 600 9px "Orbitron", sans-serif; letter-spacing: .24em; }
+.arcade-kicker span { display: block; width: 25px; height: 1px; background: linear-gradient(90deg, transparent, currentColor); opacity: .8; }
+.arcade-kicker span:last-child { transform: rotate(180deg); }
+.arcade-title { margin: 0; font-family: "Orbitron", sans-serif; font-weight: 900; text-transform: uppercase; }
+.arcade-title-main { display: block; color: #f6f2f4; font-size: clamp(37px, 8vw, 55px); line-height: .98; letter-spacing: -.055em; text-shadow: 0 0 13px rgba(255,74,167,.49), 0 0 37px rgba(255,74,167,.24), 3px 2px 0 rgba(255,74,167,.42); }
+.arcade-colon { color: var(--ah-pink); text-shadow: 0 0 17px var(--ah-pink); }
+.arcade-title-sub { display: block; margin-top: 6px; color: var(--ah-cyan); font-size: clamp(24px, 5.3vw, 35px); letter-spacing: .08em; text-shadow: 0 0 9px rgba(80,244,237,.84), 0 0 25px rgba(80,244,237,.42), -2px 0 rgba(255,74,167,.35); }
+.arcade-subline { display: flex; align-items: center; justify-content: center; gap: 11px; margin-top: 17px; color: #8297a0; font: 600 8px "Orbitron", sans-serif; letter-spacing: .25em; }
+.arcade-subline-dash { width: 24px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,74,167,.65)); }
+.arcade-subline-dash:last-child { transform: rotate(180deg); }
+.arcade-crystal-ribbon { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 23px 0 26px; }
+.arcade-crystal-ribbon > span { display: inline-flex; align-items: center; gap: 7px; color: #c0cbd0; font: 600 8px "Orbitron", sans-serif; letter-spacing: .12em; }
+.arcade-crystal-ribbon > b { width: 2px; height: 2px; border-radius: 50%; background: #596d76; }
+.arcade-crystal-ribbon i { width: 7px; height: 7px; border-radius: 50%; box-shadow: 0 0 9px currentColor; }
+.dot-red { color: #ff4d68; background: #ff4d68; }.dot-cyan { color: #50f4ed; background: #50f4ed; }.dot-yellow { color: #ffd477; background: #ffd477; }
+.arcade-mode-heading,.arcade-help-title { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; color: #d2e0e3; text-align: left; }
+.arcade-mode-heading > span,.arcade-help-title > span { color: var(--ah-pink); font: 700 9px "Orbitron", sans-serif; }
+.arcade-mode-heading strong,.arcade-help-title strong { font: 700 9px "Orbitron", sans-serif; letter-spacing: .16em; }
+.arcade-mode-heading i { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(80,244,237,.32), transparent); }
+.arcade-modes { display: grid; grid-template-columns: 1fr; gap: 6px; }
+.arcade-mode { display: flex; min-height: 40px; align-items: center; gap: 12px; padding: 0 13px; border: 1px solid rgba(162,193,204,.14); background: rgba(9,17,26,.72); color: #899ca5; cursor: pointer; text-align: left; font: 600 11px "Rajdhani", sans-serif; letter-spacing: .12em; transition: transform .18s ease, border-color .18s ease, background .18s ease, color .18s ease; }
+.arcade-mode:hover { transform: scale(1.015); border-color: rgba(80,244,237,.5); color: #e9ffff; }
+.arcade-mode:active { transform: scale(.98); }
+.arcade-mode.is-selected { border-color: rgba(80,244,237,.55); background: linear-gradient(90deg, rgba(80,244,237,.13), rgba(8,20,27,.73) 50%); color: #eaffff; box-shadow: inset 2px 0 var(--ah-cyan); }
+.arcade-mode-index { width: 22px; color: var(--ah-cyan); font: 600 8px "Orbitron", sans-serif; }
+.arcade-mode-check { margin-left: auto; color: var(--ah-pink); font: 500 16px "Rajdhani", sans-serif; }
+.arcade-play { position: relative; display: flex; width: 100%; min-height: 74px; align-items: center; justify-content: center; gap: 16px; margin-top: 18px; overflow: hidden; border: 1px solid rgba(111,255,250,.9); background: linear-gradient(105deg, rgba(40,214,214,.22), rgba(19,52,64,.96) 48%, rgba(39,27,50,.94)); color: #efffff; cursor: pointer; box-shadow: 0 0 25px rgba(42,231,229,.17), inset 0 0 24px rgba(64,241,240,.08); animation: ah-pulse 2.7s ease-in-out infinite; transition: transform .18s ease, background .2s ease; }
+.arcade-play::before { position: absolute; inset: 0; background: linear-gradient(100deg, transparent 15%, rgba(255,255,255,.09) 48%, transparent 70%); transform: translateX(-120%); animation: ah-sweep 4s ease-in-out infinite; content: ""; }
+.arcade-play:hover { transform: scale(1.025); background-color: rgba(60,233,229,.18); }
+.arcade-play:active { transform: scale(.975); }
+.arcade-play-ring { position: relative; display: grid; width: 29px; height: 29px; place-items: center; border: 1px solid rgba(80,244,237,.75); border-radius: 50%; box-shadow: 0 0 13px rgba(80,244,237,.2); }
+.arcade-play-ring::before { border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 9px solid var(--ah-cyan); filter: drop-shadow(0 0 5px var(--ah-cyan)); content: ""; }
+.arcade-play-ring i { position: absolute; inset: -5px; border: 1px solid rgba(80,244,237,.15); border-radius: 50%; }
+.arcade-play-copy { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.arcade-play-copy strong { font: 800 19px "Orbitron", sans-serif; letter-spacing: .17em; text-shadow: 0 0 13px rgba(80,244,237,.27); }
+.arcade-play-copy small { color: #9ac1c3; font: 600 8px "Orbitron", sans-serif; letter-spacing: .17em; }
+.arcade-play-arrow { position: absolute; right: 19px; top: 50%; color: var(--ah-cyan); font-size: 19px; transform: translateY(-50%); }
+.arcade-secondary-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 9px; }
+.arcade-secondary-actions button { display: flex; min-height: 44px; align-items: center; justify-content: flex-start; gap: 8px; padding: 0 12px; border: 1px solid rgba(170,201,210,.17); background: rgba(11,18,27,.73); color: #c8d3d7; cursor: pointer; font: 700 9px "Orbitron", sans-serif; letter-spacing: .1em; transition: transform .18s ease, color .18s ease, border-color .18s ease; }
+.arcade-secondary-actions button:hover { transform: scale(1.025); border-color: rgba(255,74,167,.58); color: #fff; }.arcade-secondary-actions button:active { transform: scale(.97); }
+.arcade-action-icon { width: 13px; height: 13px; flex: 0 0 auto; fill: none; stroke: var(--ah-pink); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }.arcade-action-arrow { margin-left: auto; color: #69828a; font-size: 13px; }
+.arcade-controls { margin-top: 21px; color: #8b9aa0; font: 600 8px "Orbitron", sans-serif; letter-spacing: .1em; }
+.arcade-controls-key { color: #dce7e8; }.arcade-controls i { display: inline-block; width: 3px; height: 3px; margin: 0 8px 2px; border-radius: 50%; background: var(--ah-pink); }
+.arcade-cycle-note { margin-top: 7px; color: #677982; font: 600 7px "Orbitron", sans-serif; letter-spacing: .14em; }.arcade-cycle-note b { color: #a8b7bc; }
+.arcade-footer { position: absolute; right: clamp(20px,5vw,72px); bottom: max(18px, env(safe-area-inset-bottom)); left: clamp(20px,5vw,72px); display: flex; align-items: center; justify-content: space-between; color: #64747d; font: 600 7px "Orbitron", sans-serif; letter-spacing: .13em; }
+.arcade-footer > span:first-child { color: #98a7ad; font-size: 9px; }.arcade-footer-dot { padding: 0 4px; color: var(--ah-pink); }.arcade-footer > span:nth-child(2) i { display: inline-block; width: 3px; height: 3px; margin: 0 4px 1px; border-radius: 50%; background: var(--ah-cyan); }
+.arcade-footer button { display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid rgba(169,201,210,.19); background: rgba(12,21,30,.58); color: var(--ah-cyan); cursor: pointer; transition: transform .16s ease; }.arcade-footer button:hover { transform: scale(1.08); }.arcade-footer button:active { transform: scale(.94); }.arcade-footer svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.arcade-panel { width: min(100%, 405px); margin: auto; padding: 30px 25px 26px; border: 1px solid rgba(105,226,229,.2); background: linear-gradient(150deg, rgba(18,34,45,.9), rgba(9,15,24,.9)); box-shadow: 0 20px 70px rgba(0,0,0,.32), inset 0 1px rgba(255,255,255,.04); text-align: left; }
+.arcade-panel-kicker { color: var(--ah-cyan); font: 600 8px "Orbitron", sans-serif; letter-spacing: .17em; }
+.arcade-panel h2 { margin: 12px 0 0; color: #f5f1f4; font: 800 clamp(32px,7vw,43px)/1 "Orbitron", sans-serif; letter-spacing: -.04em; text-shadow: 0 0 20px rgba(255,74,167,.2); }.arcade-panel h2 span { color: var(--ah-pink); }
+.arcade-panel-intro { margin: 10px 0 23px; color: #92a3ab; font-size: 15px; letter-spacing: .03em; }
+.arcade-setting-row { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-top: 1px solid rgba(173,205,212,.13); border-bottom: 1px solid rgba(173,205,212,.13); }.arcade-setting-row small,.arcade-skin-preview small { display: block; color: #82959e; font: 600 8px "Orbitron", sans-serif; letter-spacing: .15em; }.arcade-setting-row strong,.arcade-skin-preview strong { display: block; margin-top: 6px; color: #e5f0f1; font: 700 12px "Orbitron", sans-serif; letter-spacing: .04em; }
+.arcade-switch { display: flex; width: 76px; height: 30px; align-items: center; gap: 7px; padding: 3px 8px 3px 4px; border: 1px solid rgba(153,180,191,.3); background: #111c26; color: #81939b; cursor: pointer; font: 700 8px "Orbitron", sans-serif; }.arcade-switch span { width: 20px; height: 20px; background: #63717a; transition: transform .2s ease, background .2s ease; }.arcade-switch.on { border-color: rgba(80,244,237,.6); color: var(--ah-cyan); }.arcade-switch.on span { background: var(--ah-cyan); box-shadow: 0 0 12px rgba(80,244,237,.4); transform: translateX(0); }.arcade-switch:not(.on) span { transform: translateX(40px); }
+.arcade-help { margin-top: 23px; }.arcade-help-title { margin-bottom: 14px; }.arcade-help-row { display: flex; align-items: center; gap: 7px; margin: 8px 0; }.arcade-keycap { display: grid; min-width: 28px; height: 27px; place-items: center; border: 1px solid rgba(156,197,206,.25); background: rgba(80,244,237,.05); color: #bfeeed; font: 700 10px "Orbitron", sans-serif; }.arcade-help-row b { margin-left: 5px; color: #d3dfe1; font: 600 9px "Orbitron", sans-serif; letter-spacing: .1em; }.arcade-help p { margin: 15px 0 0; color: #84969f; font-size: 13px; line-height: 1.5; }
+.arcade-back { display: inline-flex; align-items: center; gap: 10px; min-height: 40px; margin-top: 25px; padding: 0 13px; border: 1px solid rgba(255,74,167,.34); background: rgba(255,74,167,.06); color: var(--ah-pink); cursor: pointer; font: 700 15px "Rajdhani", sans-serif; transition: transform .18s ease, border-color .18s ease; }.arcade-back span { font: 700 8px "Orbitron", sans-serif; letter-spacing: .12em; }.arcade-back:hover { transform: scale(1.03); border-color: var(--ah-pink); }.arcade-back:active { transform: scale(.96); }
+.arcade-skin-preview { display: flex; align-items: center; gap: 13px; padding: 14px; border: 1px solid rgba(150,194,204,.16); background: rgba(7,14,22,.6); }.arcade-skin-orb { display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid var(--ah-cyan); border-radius: 50%; box-shadow: 0 0 18px rgba(80,244,237,.3), inset 0 0 13px rgba(80,244,237,.4); }.arcade-skin-orb i { width: 12px; height: 12px; border-radius: 50%; background: var(--ah-cyan); box-shadow: 0 0 12px var(--ah-cyan); }.skin-volt { border-color: #ffd477; box-shadow: 0 0 18px rgba(255,212,119,.3), inset 0 0 13px rgba(255,212,119,.4); }.skin-volt i { background: #ffd477; box-shadow: 0 0 12px #ffd477; }.skin-pulse { border-color: #ff4aa7; box-shadow: 0 0 18px rgba(255,74,167,.3), inset 0 0 13px rgba(255,74,167,.4); }.skin-pulse i { background: #ff4aa7; box-shadow: 0 0 12px #ff4aa7; }.arcade-skin-count { margin-left: auto; color: #80929b; font: 600 8px "Orbitron", sans-serif; }
+.arcade-skin-list { margin-top: 10px; border-top: 1px solid rgba(160,195,203,.14); }.arcade-swatch { display: grid; width: 100%; grid-template-columns: 15px 1fr auto; align-items: center; gap: 8px; min-height: 41px; border: 0; border-bottom: 1px solid rgba(160,195,203,.12); background: transparent; color: #9fb0b5; cursor: pointer; text-align: left; font: 700 9px "Orbitron", sans-serif; letter-spacing: .1em; }.arcade-swatch.active { color: #f0ffff; }.arcade-swatch small { color: #7f9098; font: 600 7px "Orbitron", sans-serif; }.arcade-swatch.active small { color: var(--ah-cyan); }.skin-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ah-cyan); box-shadow: 0 0 8px var(--ah-cyan); }.skin-dot-1 { background: var(--ah-gold); box-shadow: 0 0 8px var(--ah-gold); }.skin-dot-2 { background: var(--ah-pink); box-shadow: 0 0 8px var(--ah-pink); }
+.arcade-run-panel { text-align: center; }.arcade-run-visual { position: relative; width: 120px; height: 145px; margin: 26px auto 18px; perspective: 240px; }.arcade-run-visual::before { position: absolute; top: 0; left: 50%; width: 74px; height: 125px; border: 1px solid rgba(80,244,237,.35); border-bottom: 0; transform: translateX(-50%) rotateX(18deg); content: ""; }.arcade-run-visual span { position: absolute; bottom: 14px; left: 50%; width: 14px; height: 14px; border-radius: 50%; background: var(--ah-cyan); box-shadow: 0 0 15px 5px rgba(80,244,237,.44); transform: translateX(-50%); }.arcade-run-visual i,.arcade-run-visual b { position: absolute; bottom: 14px; width: 1px; height: 115px; background: linear-gradient(transparent, rgba(255,74,167,.7)); }.arcade-run-visual i { left: 25%; transform: rotate(12deg); }.arcade-run-visual b { right: 25%; transform: rotate(-12deg); }.arcade-run-status { display: inline-flex; align-items: center; gap: 9px; margin: 8px 0; color: var(--ah-cyan); font: 700 9px "Orbitron", sans-serif; letter-spacing: .17em; }.arcade-run-status i { width: 6px; height: 6px; border-radius: 50%; background: var(--ah-cyan); box-shadow: 0 0 9px var(--ah-cyan); }
+@keyframes ah-grid-flow { from { background-position: 0 0; } to { background-position: 0 52px; } }
+@keyframes ah-dust { from { opacity: .18; transform: translate3d(0,0,0); } to { opacity: .8; transform: translate3d(7px,-13px,0); } }
+@keyframes ah-pulse { 0%,100% { box-shadow: 0 0 18px rgba(42,231,229,.12), inset 0 0 24px rgba(64,241,240,.06); } 50% { box-shadow: 0 0 31px rgba(42,231,229,.25), inset 0 0 29px rgba(64,241,240,.12); } }
+@keyframes ah-sweep { 0%,40% { transform: translateX(-120%); } 65%,100% { transform: translateX(120%); } }
+@keyframes ah-enter { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 520px) {
+  .arcade-home { min-height: 100svh; padding: 116px 22px 68px; justify-content: center; }
+  .arcade-topbar { top: max(18px, env(safe-area-inset-top)); left: 18px; right: 18px; }
+  .arcade-brand { gap: 8px; }.arcade-brand-mark { width: 26px; height: 26px; }.arcade-brand strong { font-size: 9px; }.arcade-brand small { font-size: 7px; }
+  .arcade-records { gap: 5px; }.arcade-stat { min-width: 0; gap: 5px; padding: 7px 7px; }.arcade-stat-icon { width: 16px; height: 18px; }.arcade-stat-icon svg { width: 14px; height: 14px; }.arcade-stat-copy small { font-size: 6px; letter-spacing: .07em; }.arcade-stat-copy strong { font-size: 10px; margin-top: 4px; letter-spacing: .07em; }
+  .arcade-stage { width: 100%; }.arcade-kicker { margin-bottom: 15px; font-size: 8px; }.arcade-title-main { font-size: clamp(35px, 9.4vw, 46px); }.arcade-title-sub { font-size: clamp(23px, 6.2vw, 29px); }.arcade-crystal-ribbon { margin: 19px 0 21px; gap: 11px; }.arcade-crystal-ribbon > span { font-size: 7px; gap: 5px; }.arcade-mode { min-height: 38px; }.arcade-play { min-height: 68px; margin-top: 15px; }.arcade-play-copy strong { font-size: 17px; }.arcade-secondary-actions button { min-height: 42px; font-size: 8px; padding: 0 9px; gap: 6px; }.arcade-controls { margin-top: 17px; font-size: 7px; }.arcade-footer { bottom: max(13px, env(safe-area-inset-bottom)); }
+}
+@media (max-height: 760px) and (min-width: 521px) { .arcade-home { padding-top: 82px; padding-bottom: 48px; }.arcade-crystal-ribbon { margin: 13px 0 16px; }.arcade-controls { margin-top: 13px; } }
+@media (max-width: 360px) { .arcade-home { padding-right: 15px; padding-left: 15px; }.arcade-stat { padding-inline: 5px; }.arcade-stat-icon { display: none; }.arcade-title-main { font-size: 33px; }.arcade-title-sub { font-size: 22px; }.arcade-secondary-actions button { font-size: 7px; } }
+@media (prefers-reduced-motion: reduce) { .arcade-home *, .arcade-home *::before, .arcade-home *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; } }
