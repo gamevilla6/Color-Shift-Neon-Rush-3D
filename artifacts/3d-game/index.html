@@ -18,8 +18,8 @@
       --lime: #c5ff4a;
       --accent: #68f2df;
     }
-    * { box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; background: #090c13; }
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; touch-action: none; background: #090c13; }
     body { color: var(--ink); font-family: ui-monospace, monospace; -webkit-font-smoothing: antialiased; }
     button { font: inherit; }
     #game { position: relative; width: 100%; height: 100vh; height: 100dvh; min-height: 100vh; min-height: 100svh; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; background: radial-gradient(ellipse at 50% 34%, #18202b 0%, #0b1018 55%, #080b11 100%); }
@@ -59,6 +59,12 @@
     .boost-banner { position: absolute; z-index: 6; top: 184px; left: 50%; transform: translateX(-50%); color: var(--lime); font-family: system-ui, sans-serif; font-size: 19px; font-weight: 900; letter-spacing: .2em; text-shadow: 0 0 18px rgba(197,255,74,.8); pointer-events: none; animation: boostPulse .5s ease-in-out infinite alternate; white-space: nowrap; }
     .boost-banner span { font: 9px ui-monospace, monospace; letter-spacing: .12em; }
     @keyframes boostPulse { from { opacity: .68; filter: brightness(.9); } to { opacity: 1; filter: brightness(1.4); } }
+    .environment-banner { position: absolute; z-index: 7; top: clamp(166px, 24vh, 226px); left: 50%; width: min(calc(100vw - 32px), 350px); padding: 10px 16px 12px; border: 1px solid color-mix(in srgb, var(--zone-color) 65%, transparent); background: rgba(7, 11, 19, .82); color: var(--zone-color); text-align: center; pointer-events: none; opacity: 0; transform: translate(-50%, 10px) scale(.96); box-shadow: 0 0 0 rgba(0,0,0,0); backdrop-filter: blur(10px); transition: opacity .28s ease, transform .32s cubic-bezier(.2,.8,.2,1), box-shadow .32s ease; }
+    .environment-banner[hidden] { display: none !important; }
+    .environment-banner.visible { opacity: 1; transform: translate(-50%, 0) scale(1); box-shadow: 0 0 28px color-mix(in srgb, var(--zone-color) 22%, transparent); }
+    .environment-kicker { display: block; margin-bottom: 4px; color: rgba(238,244,250,.6); font-size: 8px; letter-spacing: .2em; text-transform: uppercase; }
+    .environment-banner strong { display: block; color: #f4f4ee; font: 800 10px system-ui, sans-serif; letter-spacing: .17em; }
+    .environment-name { display: block; margin-top: 3px; font: 800 16px system-ui, sans-serif; letter-spacing: .06em; text-shadow: 0 0 14px color-mix(in srgb, var(--zone-color) 72%, transparent); }
     .color-panel { position: absolute; z-index: 5; left: clamp(20px, 5vw, 72px); bottom: max(32px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 15px; pointer-events: none; }
     .color-copy { min-width: 74px; }
     .color-current { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-family: system-ui, sans-serif; font-size: 18px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
@@ -99,7 +105,7 @@
     .result-cell span { display: block; margin-top: 7px; color: #858d98; font-size: 7px; letter-spacing: .12em; line-height: 1.4; text-transform: uppercase; }
     .best-callout { margin: 13px 0 23px; color: var(--lime); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
     .mobile-controls { display: none; position: absolute; z-index: 6; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); gap: 9px; }
-    .tap-control { width: 52px; height: 52px; display: grid; place-items: center; border: 1px solid rgba(224,235,240,.3); border-radius: 12px; background: rgba(8,13,20,.72); color: #f3f1e9; backdrop-filter: blur(8px); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; font-size: 19px; transition: background .15s, transform .15s; }
+    .tap-control { width: 56px; height: 56px; display: grid; place-items: center; border: 1px solid rgba(224,235,240,.3); border-radius: 12px; background: rgba(8,13,20,.72); color: #f3f1e9; backdrop-filter: blur(8px); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; font-size: 19px; transition: background .15s, transform .15s; }
     .tap-control:active { background: rgba(56,230,211,.25); transform: scale(.94); }
     .flash { position: absolute; z-index: 4; inset: 0; pointer-events: none; background: rgba(255,79,184,.1); opacity: 0; transition: opacity .08s; }
     .flash.on { opacity: 1; }
@@ -140,13 +146,14 @@
       .hud { top: max(52px, calc(env(safe-area-inset-top) + 38px)); }
       .power-status { top: max(94px, calc(env(safe-area-inset-top) + 78px)); }
       .boost-banner { top: max(122px, calc(env(safe-area-inset-top) + 106px)); }
+      .environment-banner { top: max(158px, calc(env(safe-area-inset-top) + 143px)); }
       .overlay { padding: 10px max(14px, env(safe-area-inset-right)) 10px max(14px, env(safe-area-inset-left)); }
       .card { width: min(100%, 520px); }
       .eyebrow { margin-bottom: 7px; }
       h1 { font-size: clamp(34px, 9.4vh, 50px); line-height: .88; }
       .intro { margin-top: 10px; font-size: 10px; line-height: 1.45; }
       .color-key { margin: 10px 0; }
-      .primary-btn { min-height: 46px; padding-block: 10px; }
+      .primary-btn { min-height: 52px; padding-block: 10px; }
       .small-note { margin-top: 8px; }
       .result-line { margin: 10px 0 2px; }
       .result-grid { margin: 9px 0 10px; }
@@ -202,6 +209,11 @@
       <span class="power-chip rainbow" id="rainbowStatus" hidden>Rainbow <b id="rainbowTime">0</b>s</span>
     </div>
     <div class="boost-banner" id="speedBanner" hidden>SPEED UP! <span><b id="speedTime">5</b>s</span></div>
+    <div class="environment-banner" id="environmentBanner" role="status" aria-live="polite" hidden>
+      <span class="environment-kicker" id="environmentKicker">ZONE 01 / 10</span>
+      <strong>ENTERING</strong>
+      <span class="environment-name" id="environmentName">Cyber Grid</span>
+    </div>
     <div class="color-panel">
       <div class="color-copy"><div class="micro-label">Orb color</div><div class="color-current"><span class="color-dot" id="colorDot"></span><span id="colorName">Magenta</span></div></div>
       <div class="swatches" aria-hidden="true">
@@ -3967,12 +3979,28 @@ void main() {
       const SEGMENT_WIDTH = (GATE_HALF_WIDTH * 2) / COLORS.length;
       const FIRST_GATE_SPAWN_Z = -50;
       const START_GRACE_SECONDS = 1;
+      const ENVIRONMENTS = [
+        { name: "Cyber Grid", background: 0x050515, fog: 0x050515, fogDensity: 0.009, grid: 0x38e6d3, rail: 0xc5ff4a, key: 0x38e6d3, tunnel: 0xff4fb8, far: 0xc5ff4a, ground: 0x17212b, groundGlow: 0x061719 },
+        { name: "Chromatic Causeway", background: 0x061627, fog: 0x061627, fogDensity: 0.0095, grid: 0x45c6ff, rail: 0xffc857, key: 0x45c6ff, tunnel: 0x966bff, far: 0xff4fb8, ground: 0x101d2b, groundGlow: 0x071523 },
+        { name: "Prism Drift", background: 0x170a25, fog: 0x170a25, fogDensity: 0.0085, grid: 0xff5ade, rail: 0x4dffe1, key: 0xff5ade, tunnel: 0x4dffe1, far: 0xffc857, ground: 0x21142b, groundGlow: 0x170d20 },
+        { name: "Voltage Reef", background: 0x041b20, fog: 0x041b20, fogDensity: 0.010, grid: 0x46f0c1, rail: 0x4ccaff, key: 0x46f0c1, tunnel: 0x4ccaff, far: 0xc5ff4a, ground: 0x0e2525, groundGlow: 0x08201b },
+        { name: "Gyro Lab", background: 0x1b0b16, fog: 0x1b0b16, fogDensity: 0.009, grid: 0xff657a, rail: 0xffd166, key: 0xff657a, tunnel: 0xffd166, far: 0xa0ff54, ground: 0x28141c, groundGlow: 0x220d18 },
+        { name: "Momentum Rift", background: 0x07132b, fog: 0x07132b, fogDensity: 0.0085, grid: 0x58a6ff, rail: 0xb18bff, key: 0x58a6ff, tunnel: 0xb18bff, far: 0x38e6d3, ground: 0x14213b, groundGlow: 0x0b1830 },
+        { name: "Phantom Corridor", background: 0x150d2b, fog: 0x150d2b, fogDensity: 0.011, grid: 0xbd72ff, rail: 0x50f5d2, key: 0xbd72ff, tunnel: 0x50f5d2, far: 0xff4fb8, ground: 0x201432, groundGlow: 0x190c29 },
+        { name: "Narrowing Void", background: 0x081b20, fog: 0x081b20, fogDensity: 0.012, grid: 0x50f5d2, rail: 0xffb84d, key: 0x50f5d2, tunnel: 0xffb84d, far: 0x4c92ff, ground: 0x142822, groundGlow: 0x09231b },
+        { name: "Double Helix", background: 0x200918, fog: 0x200918, fogDensity: 0.0105, grid: 0xff5ca8, rail: 0x50e9ff, key: 0xff5ca8, tunnel: 0x50e9ff, far: 0xffcf57, ground: 0x2a1020, groundGlow: 0x230a1b },
+        { name: "The Singularity", background: 0x03030c, fog: 0x03030c, fogDensity: 0.013, grid: 0xe9f5ff, rail: 0xba75ff, key: 0xba75ff, tunnel: 0x46f8ee, far: 0xff5a94, ground: 0x10101c, groundGlow: 0x090a16 }
+      ];
+      let environmentIndex = 0;
+      let environmentTargets = null;
+      let environmentNoticeTimer = 0;
+      let environmentNoticeToken = 0;
       let state = "ready";
       const el = (id) => document.getElementById(id);
       const sceneRoot = el("scene");
       const gameScene = new THREE.Scene();
-      gameScene.background = new THREE.Color(0x050515);
-      gameScene.fog = new THREE.FogExp2(0x050515, 0.009);
+      gameScene.background = new THREE.Color(ENVIRONMENTS[0].background);
+      gameScene.fog = new THREE.FogExp2(ENVIRONMENTS[0].fog, ENVIRONMENTS[0].fogDensity);
       const camera = new THREE.PerspectiveCamera(window.innerWidth < 650 ? 68 : 62, 1, 0.1, 180);
       // Keep the camera below the tunnel roof while aiming down the path at incoming gates.
       camera.position.set(0, 1.45, 7.5);
@@ -3982,7 +4010,7 @@ void main() {
       let fallbackContext = null;
       const isCoarsePointer = () => window.matchMedia?.("(pointer: coarse)").matches ?? false;
       const isMobileViewport = () => window.innerWidth < 650 || isCoarsePointer();
-      const getPixelRatio = () => Math.min(window.devicePixelRatio || 1, isMobileViewport() ? 1.35 : 1.7);
+      const getPixelRatio = () => Math.min(window.devicePixelRatio || 1, 2);
       const getSceneSize = () => {
         const bounds = sceneRoot.getBoundingClientRect();
         return {
@@ -4007,7 +4035,7 @@ void main() {
           stencil: false,
           premultipliedAlpha: true,
           preserveDrawingBuffer: false,
-          powerPreference: "high-performance"
+          powerPreference: isMobileViewport() ? "low-power" : "high-performance"
         };
         const webglContext =
           rendererCanvas.getContext("webgl2", contextAttributes) ||
@@ -4098,6 +4126,63 @@ void main() {
         ribs.push(rib);
       }
 
+      function setEnvironment(index, { announce = true, instant = false } = {}) {
+        const nextIndex = Math.max(0, Math.min(ENVIRONMENTS.length - 1, index));
+        const changed = nextIndex !== environmentIndex;
+        environmentIndex = nextIndex;
+        const theme = ENVIRONMENTS[environmentIndex];
+        environmentTargets = {
+          background: new THREE.Color(theme.background),
+          fog: new THREE.Color(theme.fog),
+          fogDensity: theme.fogDensity,
+          grid: new THREE.Color(theme.grid),
+          rail: new THREE.Color(theme.rail),
+          key: new THREE.Color(theme.key),
+          tunnel: new THREE.Color(theme.tunnel),
+          far: new THREE.Color(theme.far),
+          ground: new THREE.Color(theme.ground),
+          groundGlow: new THREE.Color(theme.groundGlow)
+        };
+        if (instant) {
+          gameScene.background.copy(environmentTargets.background);
+          gameScene.fog.color.copy(environmentTargets.fog);
+          gameScene.fog.density = environmentTargets.fogDensity;
+          laneLineMat.color.copy(environmentTargets.grid);
+          railMat.color.copy(environmentTargets.rail);
+          ribMat.color.copy(environmentTargets.grid);
+          keyLight.color.copy(environmentTargets.key);
+          directionalLight.color.copy(environmentTargets.key);
+          tunnelLight.color.copy(environmentTargets.tunnel);
+          farLight.color.copy(environmentTargets.far);
+          boostLight.color.copy(environmentTargets.rail);
+          tunnelMat.color.copy(environmentTargets.ground);
+          tunnelMat.emissive.copy(environmentTargets.groundGlow);
+          sideMat.color.copy(environmentTargets.ground);
+        }
+        if (changed && announce) showEnvironmentBanner(environmentIndex);
+      }
+
+      function updateEnvironmentTransition(dt) {
+        if (!environmentTargets) return;
+        const blend = 1 - Math.exp(-dt * 2.1);
+        gameScene.background.lerp(environmentTargets.background, blend);
+        gameScene.fog.color.lerp(environmentTargets.fog, blend);
+        gameScene.fog.density = THREE.MathUtils.lerp(gameScene.fog.density, environmentTargets.fogDensity, blend);
+        laneLineMat.color.lerp(environmentTargets.grid, blend);
+        railMat.color.lerp(environmentTargets.rail, blend);
+        ribMat.color.lerp(environmentTargets.grid, blend);
+        keyLight.color.lerp(environmentTargets.key, blend);
+        directionalLight.color.lerp(environmentTargets.key, blend);
+        tunnelLight.color.lerp(environmentTargets.tunnel, blend);
+        farLight.color.lerp(environmentTargets.far, blend);
+        boostLight.color.lerp(environmentTargets.rail, blend);
+        tunnelMat.color.lerp(environmentTargets.ground, blend);
+        tunnelMat.emissive.lerp(environmentTargets.groundGlow, blend);
+        sideMat.color.lerp(environmentTargets.ground, blend);
+      }
+
+      setEnvironment(0, { announce: false, instant: true });
+
       const PARTICLE_COUNT = 72;
       const particlePositions = new Float32Array(PARTICLE_COUNT * 3);
       const particleColors = new Float32Array(PARTICLE_COUNT * 3);
@@ -4158,25 +4243,46 @@ void main() {
       shadow.position.set(0, -2.4, 0);
       player.add(shadow);
 
-      function makeGate(colorIndex, z) {
+      function makeGate(colorIndex, z, stackIndex = 0) {
         const group = new THREE.Group();
         group.position.set(0, 0, z);
         group.visible = state !== "ready";
-        const difficulty = passed;
-        const movementLevel = Math.floor(difficulty / 5);
+        const level = environmentIndex + 1;
+        const narrowing = level < 7 ? 0 : level === 7 ? 0.18 : level === 8 ? 0.28 : level === 9 ? 0.4 : 0.5;
         group.userData = {
           colorIndex,
+          baseColorIndex: colorIndex,
           requiredLane: colorIndex,
           segmentColors: COLORS.map((_, index) => index),
           segmentMaterials: [],
-          moving: difficulty >= 3,
+          segmentPanels: [],
+          markerMaterials: [],
+          frameMaterial: null,
+          postGlow: null,
+          level,
+          moving: level >= 3,
           movementPhase: Math.random() * Math.PI * 2,
-          movementAmplitude: difficulty >= 3 ? Math.min(0.62, 0.18 + movementLevel * 0.08) : 0,
-          movementSpeed: 0.85 + movementLevel * 0.08,
+          movementAmplitude: level >= 3 ? Math.min(0.95, 0.2 + (level - 3) * 0.1) : 0,
+          movementSpeed: 0.8 + Math.max(0, level - 3) * 0.15,
+          rotating: level >= 5,
+          rotationPhase: Math.random() * Math.PI * 2,
+          rotationSpeed: level >= 5 ? 0.8 + (level - 5) * 0.18 : 0,
+          colorChanging: level >= 3,
+          flashPhase: Math.random() * 2,
+          flashStep: -1,
+          flashRate: level >= 3 ? 1.15 + Math.max(0, level - 3) * 0.11 : 0,
+          phantom: level >= 7,
+          phantomActive: true,
+          phantomPhase: Math.random() * Math.PI * 2,
+          phantomSpeed: level >= 7 ? 3.4 + (level - 7) * 0.35 : 0,
+          narrowing,
+          stacked: level >= 9,
+          stackIndex,
           checked: false
         };
         const color = COLORS[colorIndex].hex;
         const glowMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.96 });
+        group.userData.frameMaterial = glowMat;
         const framePoints = [
           new THREE.Vector3(-GATE_HALF_WIDTH, -1.75, 0), new THREE.Vector3(GATE_HALF_WIDTH, -1.75, 0),
           new THREE.Vector3(GATE_HALF_WIDTH, 1.75, 0), new THREE.Vector3(-GATE_HALF_WIDTH, 1.75, 0)
@@ -4193,7 +4299,9 @@ void main() {
           group.userData.segmentMaterials.push(segmentMat);
           const segmentPanel = new THREE.Mesh(new THREE.PlaneGeometry(2.38, 3.42), segmentMat);
           segmentPanel.position.set(-2.42 + segment * 2.42, 0, -0.025);
+          segmentPanel.scale.x = Math.max(0.55, (2.38 - narrowing * 2) / 2.38);
           group.add(segmentPanel);
+          group.userData.segmentPanels.push(segmentPanel);
         }
         const dividerMat = new THREE.MeshBasicMaterial({ color: 0x91a5b8, transparent: true, opacity: 0.72 });
         [-SEGMENT_WIDTH / 2, SEGMENT_WIDTH / 2].forEach(x => {
@@ -4202,18 +4310,44 @@ void main() {
           group.add(divider);
         });
         for (let lane = 0; lane < 3; lane++) {
-          const marker = new THREE.Mesh(
-            new THREE.BoxGeometry(0.14, 0.08, 0.08),
-            new THREE.MeshBasicMaterial({ color: COLORS[lane].hex, transparent: true, opacity: lane === colorIndex ? 1 : 0.45 })
-          );
+          const markerMat = new THREE.MeshBasicMaterial({ color: COLORS[lane].hex, transparent: true, opacity: lane === colorIndex ? 1 : 0.45 });
+          const marker = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.08, 0.08), markerMat);
+          group.userData.markerMaterials.push(markerMat);
           marker.position.set(LANE_X[lane], -1.48, 0.04);
           group.add(marker);
         }
         const postGlow = new THREE.PointLight(color, 7, 8, 2);
         postGlow.position.set(0, 0, 0.7);
+        group.userData.postGlow = postGlow;
         group.add(postGlow);
         gameScene.add(group);
         return group;
+      }
+
+      function updateGateMechanics(gate) {
+        const mechanics = gate.userData;
+        if (mechanics.colorChanging) {
+          const step = Math.floor(elapsed * mechanics.flashRate + mechanics.flashPhase);
+          if (step !== mechanics.flashStep) {
+            mechanics.flashStep = step;
+            mechanics.colorIndex = (mechanics.baseColorIndex + step) % COLORS.length;
+            mechanics.requiredLane = mechanics.colorIndex;
+            mechanics.frameMaterial.color.setHex(COLORS[mechanics.colorIndex].hex);
+            mechanics.postGlow.color.setHex(COLORS[mechanics.colorIndex].hex);
+            mechanics.markerMaterials.forEach((material, lane) => {
+              material.opacity = lane === mechanics.requiredLane ? 1 : 0.38;
+            });
+          }
+          const flash = 0.5 + 0.5 * Math.sin(elapsed * 11 + mechanics.flashPhase);
+          mechanics.frameMaterial.opacity = 0.62 + flash * 0.34;
+          mechanics.segmentMaterials.forEach((material, lane) => {
+            material.opacity = lane === mechanics.requiredLane ? 0.08 + flash * 0.12 : 0.38 + flash * 0.08;
+          });
+        }
+        if (mechanics.phantom) {
+          mechanics.phantomActive = Math.sin(elapsed * mechanics.phantomSpeed + mechanics.phantomPhase) > 0.12;
+          gate.visible = mechanics.phantomActive;
+        }
       }
 
       function makePowerUp(type, lane, z) {
@@ -4416,6 +4550,27 @@ void main() {
         el("gates").textContent = String(passed).padStart(2, "0");
         el("pace").innerHTML = (speed / 13.5).toFixed(1) + '<span style="font-size:.48em">×</span>';
       }
+      function showEnvironmentBanner(index) {
+        const banner = el("environmentBanner");
+        const theme = ENVIRONMENTS[index];
+        const token = ++environmentNoticeToken;
+        window.clearTimeout(environmentNoticeTimer);
+        banner.style.setProperty("--zone-color", new THREE.Color(theme.grid).getStyle());
+        el("environmentKicker").textContent = "ZONE " + String(index + 1).padStart(2, "0") + " / 10";
+        el("environmentName").textContent = theme.name;
+        banner.hidden = false;
+        banner.classList.remove("visible");
+        requestAnimationFrame(() => {
+          if (token === environmentNoticeToken && state === "running") banner.classList.add("visible");
+        });
+        environmentNoticeTimer = window.setTimeout(() => {
+          if (token !== environmentNoticeToken) return;
+          banner.classList.remove("visible");
+          environmentNoticeTimer = window.setTimeout(() => {
+            if (token === environmentNoticeToken) banner.hidden = true;
+          }, 350);
+        }, 2200);
+      }
       function updatePowerHUD() {
         const hasShield = shieldCharges > 0;
         const hasRainbow = rainbowTimer > 0;
@@ -4472,12 +4627,17 @@ void main() {
         unlockAudio();
         window.clearTimeout(statusTimer);
         window.clearTimeout(flashTimer);
+        window.clearTimeout(environmentNoticeTimer);
+        environmentNoticeToken++;
+        el("environmentBanner").classList.remove("visible");
+        el("environmentBanner").hidden = true;
         el("flash").classList.remove("on");
         el("flash").style.background = "";
         resetOverlay();
         state = "running";
         distance = 0; passed = 0; score = 0; combo = 0; gateBonus = 0;
         elapsed = 0; speed = 13.5;
+        setEnvironment(0, { announce: false, instant: true });
         shieldCharges = 0; rainbowTimer = 0; speedBoostTimer = 0;
         powerUpSpawnTimer = 7;
         graceTimer = START_GRACE_SECONDS;
@@ -4496,10 +4656,28 @@ void main() {
         el("runStatus").classList.add("visible");
         showRunStatus("1 second start shield", 1000);
       }
+      function awardGatePass(message) {
+        passed++;
+        playCue("gate");
+        combo++;
+        gateBonus += combo * 100;
+        if (passed % 5 === 0) {
+          speedBoostTimer = 5;
+          updatePowerHUD();
+          showRunStatus("SPEED UP!", 1400);
+        } else {
+          showRunStatus(message + " · ×" + combo, 460);
+        }
+        updateHUD();
+      }
       function resolveGateCollision(gate) {
         gate.userData.checked = true;
         if (graceTimer > 0) {
           showRunStatus("Start shield", 500);
+          return;
+        }
+        if (gate.userData.phantom && !gate.userData.phantomActive) {
+          awardGatePass("Phantom gate phased");
           return;
         }
         gate.updateMatrixWorld(true);
@@ -4512,8 +4690,8 @@ void main() {
         let hitBarrier = playerTop < -1.75 || playerBottom > 1.75;
 
         for (let segment = 0; segment < COLORS.length; segment++) {
-          const segmentLeft = -GATE_HALF_WIDTH + segment * SEGMENT_WIDTH;
-          const segmentRight = segmentLeft + SEGMENT_WIDTH;
+          const segmentLeft = -GATE_HALF_WIDTH + segment * SEGMENT_WIDTH + gate.userData.narrowing;
+          const segmentRight = -GATE_HALF_WIDTH + (segment + 1) * SEGMENT_WIDTH - gate.userData.narrowing;
           if (playerRight > segmentLeft && playerLeft < segmentRight) {
             if (playerLeft < segmentLeft || playerRight > segmentRight || hitSegment !== -1) {
               hitBarrier = true;
@@ -4556,22 +4734,15 @@ void main() {
           endGame();
           return;
         }
-        passed++;
-        playCue("gate");
-        combo++;
-        gateBonus += combo * 100;
-        if (passed % 5 === 0) {
-          speedBoostTimer = 5;
-          updatePowerHUD();
-          showRunStatus("SPEED UP!", 1400);
-        } else {
-          showRunStatus("Gate cleared · ×" + combo, 460);
-        }
-        updateHUD();
+        awardGatePass("Gate cleared");
       }
       function endGame() {
         if (state !== "running") return;
         window.clearTimeout(statusTimer);
+        window.clearTimeout(environmentNoticeTimer);
+        environmentNoticeToken++;
+        el("environmentBanner").classList.remove("visible");
+        el("environmentBanner").hidden = true;
         state = "over";
         playCue("gameOver");
         el("flash").classList.add("on");
@@ -4619,12 +4790,16 @@ void main() {
         const floor = height * 0.98;
         const farHalf = width * 0.055;
         const nearHalf = width * 0.47;
+        const backgroundColor = gameScene.background.getStyle();
+        const groundColor = tunnelMat.color.getStyle();
+        const gridColor = laneLineMat.color.getStyle();
+        const railColor = railMat.color.getStyle();
         ctx.clearRect(0, 0, width, height);
         const boostPulse = speedBoostTimer > 0 ? 0.5 + Math.sin(t * 17) * 0.5 : 0;
 
         const glow = ctx.createRadialGradient(center, height * 0.46, 0, center, height * 0.46, width * 0.62);
-        glow.addColorStop(0, speedBoostTimer > 0 ? "#30213b" : "#17232e");
-        glow.addColorStop(1, "#090c13");
+        glow.addColorStop(0, speedBoostTimer > 0 ? "#30213b" : groundColor);
+        glow.addColorStop(1, backgroundColor);
         ctx.fillStyle = glow;
         ctx.fillRect(0, 0, width, height);
 
@@ -4637,14 +4812,13 @@ void main() {
         ctx.lineTo(leftAt(1), floor);
         ctx.closePath();
         const road = ctx.createLinearGradient(0, horizon, 0, floor);
-        road.addColorStop(0, "#18232e");
-        road.addColorStop(1, "#101720");
+        road.addColorStop(0, backgroundColor);
+        road.addColorStop(1, groundColor);
         ctx.fillStyle = road;
         ctx.fill();
 
-        ctx.strokeStyle = speedBoostTimer > 0
-          ? `rgba(56, 230, 211, ${0.16 + boostPulse * 0.3})`
-          : "rgba(125, 157, 176, .16)";
+        ctx.strokeStyle = speedBoostTimer > 0 ? railColor : gridColor;
+        ctx.globalAlpha = speedBoostTimer > 0 ? 0.16 + boostPulse * 0.3 : 0.18;
         ctx.lineWidth = 1;
         for (let i = 0; i < 14; i++) {
           const progress = ((i / 14) + ((t * 0.035) % 1)) % 1;
@@ -4655,20 +4829,25 @@ void main() {
           ctx.lineTo(center + half, y);
           ctx.stroke();
         }
+        ctx.globalAlpha = 1;
         for (let lane = -1; lane <= 1; lane += 2) {
           ctx.beginPath();
           ctx.moveTo(center + lane * farHalf / 3, horizon);
           ctx.lineTo(center + lane * nearHalf / 3, floor);
-          ctx.strokeStyle = "rgba(139, 167, 184, .2)";
+          ctx.strokeStyle = gridColor;
+          ctx.globalAlpha = 0.28;
           ctx.stroke();
+          ctx.globalAlpha = 1;
         }
         [-1, 1].forEach(side => {
           ctx.beginPath();
           ctx.moveTo(center + side * farHalf, horizon);
           ctx.lineTo(center + side * nearHalf, floor);
-          ctx.strokeStyle = "rgba(56, 230, 211, .3)";
+          ctx.strokeStyle = railColor;
+          ctx.globalAlpha = 0.42;
           ctx.lineWidth = 2;
           ctx.stroke();
+          ctx.globalAlpha = 1;
         });
 
         [...gates].filter(gate => gate.visible).sort((a, b) => a.position.z - b.position.z).forEach(gate => {
@@ -4764,6 +4943,7 @@ void main() {
         const dt = Math.min((time - (lastTime || time)) / 1000, 0.045);
         lastTime = time;
         const t = time * 0.001;
+        updateEnvironmentTransition(dt);
         const colorLerp = 1 - Math.exp(-dt * 16);
         if (rainbowTimer > 0) targetOrbColor.setHSL((t * 0.42) % 1, 0.95, 0.58);
         else targetOrbColor.copy(selectedOrbColor);
@@ -4771,7 +4951,8 @@ void main() {
         orbMat.emissive.lerp(targetOrbColor, colorLerp);
         orbHalo.material.color.lerp(targetOrbColor, colorLerp);
         orbLight.color.lerp(targetOrbColor, colorLerp);
-        player.position.x = THREE.MathUtils.damp(player.position.x, LANE_X[currentColor], 18, dt);
+        const laneResponse = environmentIndex >= 8 ? 3.8 : environmentIndex >= 4 ? 5.2 : 18;
+        player.position.x = THREE.MathUtils.damp(player.position.x, LANE_X[currentColor], laneResponse, dt);
         camera.position.x = player.position.x;
         camera.lookAt(player.position.x, player.position.y, -18);
         colorPulse = THREE.MathUtils.damp(colorPulse, 0, 12, dt);
@@ -4788,8 +4969,12 @@ void main() {
           graceTimer = Math.max(0, graceTimer - dt);
           rainbowTimer = Math.max(0, rainbowTimer - dt);
           speedBoostTimer = Math.max(0, speedBoostTimer - dt);
-          speed = (13.5 + Math.min(8, elapsed * 0.11)) * (speedBoostTimer > 0 ? 1.25 : 1);
+          const runSpeed = 13.5 + Math.min(8, elapsed * 0.11);
+          const lateZoneMultiplier = environmentIndex >= 8 ? 1 + (environmentIndex - 7) * 0.12 : 1;
+          speed = Math.min(26, runSpeed * lateZoneMultiplier) * (speedBoostTimer > 0 ? 1.25 : 1);
           distance += speed * dt * 0.72;
+          const nextEnvironment = Math.min(ENVIRONMENTS.length - 1, Math.floor(distance / 500));
+          if (nextEnvironment !== environmentIndex) setEnvironment(nextEnvironment);
           powerUpSpawnTimer -= dt;
           if (powerUpSpawnTimer <= 0 && powerUps.length < 2) spawnPowerUp();
           player.position.y = 0.5 + Math.sin(t * 5) * 0.055;
@@ -4830,12 +5015,15 @@ void main() {
           updatePowerHUD();
           gates.forEach(gate => {
             if (state !== "running") return;
+            updateGateMechanics(gate);
             const previousZ = gate.position.z;
             gate.position.z += speed * dt;
             const movement = Math.sin(elapsed * gate.userData.movementSpeed + gate.userData.movementPhase);
             gate.position.x = gate.userData.moving ? movement * gate.userData.movementAmplitude : 0;
             gate.rotation.y = gate.userData.moving ? movement * 0.12 : 0;
-            gate.rotation.z = gate.userData.moving ? Math.sin(elapsed * 1.2 + gate.userData.movementPhase) * 0.018 : 0;
+            gate.rotation.z = gate.userData.rotating
+              ? elapsed * gate.userData.rotationSpeed + gate.userData.rotationPhase
+              : gate.userData.moving ? Math.sin(elapsed * 1.2 + gate.userData.movementPhase) * 0.018 : 0;
             const collisionPlane = -(PLAYER_RADIUS + GATE_HALF_DEPTH);
             if (!gate.userData.checked && previousZ < collisionPlane && gate.position.z >= collisionPlane) {
               resolveGateCollision(gate);
@@ -4846,7 +5034,11 @@ void main() {
               if (gate.position.z > 10) { disposeGate(gate); return false; }
               return true;
             });
-            if (gates.length < 5) {
+            if (environmentIndex >= 8 && gates.length <= 3) {
+              gates.push(makeGate(randomColor(), nextGateZ, 0));
+              gates.push(makeGate(randomColor(), nextGateZ - 10, 1));
+              nextGateZ -= 28;
+            } else if (environmentIndex < 8 && gates.length < 5) {
               const col = randomColor();
               gates.push(makeGate(col, nextGateZ));
               nextGateZ -= 18;
@@ -4905,24 +5097,64 @@ void main() {
       }, { passive: false });
       let gestureStart = null;
       const game = el("game");
-      game.addEventListener("pointerdown", event => {
-        if (event.button !== 0 || (event.target instanceof Element && event.target.closest("button"))) return;
-        gestureStart = { id: event.pointerId, x: event.clientX, y: event.clientY };
-        try { game.setPointerCapture(event.pointerId); } catch {}
-      }, { passive: true });
-      game.addEventListener("pointerup", event => {
-        if (!gestureStart || gestureStart.id !== event.pointerId) return;
-        const start = gestureStart;
-        gestureStart = null;
-        const dx = event.clientX - start.x;
-        const dy = event.clientY - start.y;
+      const finishGesture = (start, x, y) => {
+        if (start.swiped) return;
+        const dx = x - start.x;
+        const dy = y - start.y;
         if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.15) {
           if (state === "running") cycleColor(dx < 0 ? -1 : 1);
           return;
         }
         if (state !== "running") startGame();
+      };
+      game.addEventListener("pointerdown", event => {
+        if (event.pointerType === "touch" || event.button !== 0 || (event.target instanceof Element && event.target.closest("button"))) return;
+        gestureStart = { id: event.pointerId, source: "pointer", x: event.clientX, y: event.clientY, swiped: false };
+        try { game.setPointerCapture(event.pointerId); } catch {}
       }, { passive: true });
-      game.addEventListener("pointercancel", () => { gestureStart = null; }, { passive: true });
+      game.addEventListener("pointerup", event => {
+        if (!gestureStart || gestureStart.source !== "pointer" || gestureStart.id !== event.pointerId) return;
+        const start = gestureStart;
+        gestureStart = null;
+        finishGesture(start, event.clientX, event.clientY);
+      }, { passive: true });
+      game.addEventListener("pointercancel", event => {
+        if (gestureStart?.source === "pointer" && gestureStart.id === event.pointerId) gestureStart = null;
+      }, { passive: true });
+      game.addEventListener("touchstart", event => {
+        if (event.target instanceof Element && event.target.closest("button")) return;
+        if (event.touches.length > 1) {
+          gestureStart = null;
+          return;
+        }
+        const touch = event.changedTouches[0];
+        if (!touch) return;
+        gestureStart = { id: touch.identifier, source: "touch", x: touch.clientX, y: touch.clientY, swiped: false };
+      }, { passive: true });
+      game.addEventListener("touchmove", event => {
+        if (gestureStart?.source !== "touch") return;
+        const touch = Array.from(event.changedTouches).find(item => item.identifier === gestureStart.id);
+        if (!touch) return;
+        if (event.cancelable) event.preventDefault();
+        if (gestureStart.swiped) return;
+        const dx = touch.clientX - gestureStart.x;
+        const dy = touch.clientY - gestureStart.y;
+        if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+          gestureStart.swiped = true;
+          if (state === "running") cycleColor(dx < 0 ? -1 : 1);
+        }
+      }, { passive: false });
+      game.addEventListener("touchend", event => {
+        if (gestureStart?.source !== "touch") return;
+        const touch = Array.from(event.changedTouches).find(item => item.identifier === gestureStart.id);
+        if (!touch) return;
+        const start = gestureStart;
+        gestureStart = null;
+        finishGesture(start, touch.clientX, touch.clientY);
+      }, { passive: true });
+      game.addEventListener("touchcancel", () => {
+        if (gestureStart?.source === "touch") gestureStart = null;
+      }, { passive: true });
       window.addEventListener("contextmenu", event => event.preventDefault());
     })();
   </script>
