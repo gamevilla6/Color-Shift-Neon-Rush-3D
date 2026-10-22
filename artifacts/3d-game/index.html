@@ -4,11 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#090c13" />
-  <meta name="description" content="Shift your color. Thread the gates. How far can you run?" />
-  <title>Color Swipe Runner</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <meta name="description" content="Color Shift: Neon Rush 3D — shift through neon gates, build your combo, and chase your best run." />
+  <title>Color Shift: Neon Rush 3D</title>
   <style>
     :root {
       color-scheme: dark;
@@ -16,93 +13,151 @@
       --muted: #858b98;
       --line: rgba(211, 222, 231, .13);
       --panel: rgba(12, 16, 24, .82);
-      --red: #ff4b54;
-      --blue: #42d9ff;
-      --yellow: #ffe16b;
-      --mint: #9dffd0;
+      --cyan: #38e6d3;
+      --magenta: #ff4fb8;
+      --lime: #c5ff4a;
+      --accent: #68f2df;
     }
     * { box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #090c13; }
-    body { color: var(--ink); font-family: "DM Mono", monospace; -webkit-font-smoothing: antialiased; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; background: #090c13; }
+    body { color: var(--ink); font-family: ui-monospace, monospace; -webkit-font-smoothing: antialiased; }
     button { font: inherit; }
-    #game { position: relative; width: 100%; height: 100%; min-height: 100dvh; overflow: hidden; background: radial-gradient(ellipse at 50% 34%, #18202b 0%, #0b1018 55%, #080b11 100%); }
+    #game { position: relative; width: 100%; height: 100vh; height: 100dvh; min-height: 100vh; min-height: 100svh; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; background: radial-gradient(ellipse at 50% 34%, #18202b 0%, #0b1018 55%, #080b11 100%); }
     #scene { position: absolute; inset: 0; }
-    #scene canvas { display: block; width: 100%; height: 100%; }
+    #scene canvas { position: fixed; top: 0; left: 0; z-index: 1; display: block; width: 100vw; height: 100vh; height: 100dvh; touch-action: none; }
     #game::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2; background: linear-gradient(180deg, rgba(5,8,14,.2), transparent 25%, transparent 67%, rgba(5,8,14,.65)); }
     .grain { position: fixed; inset: 0; z-index: 15; pointer-events: none; opacity: .055; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.3'/%3E%3C/svg%3E"); }
     .topbar { position: absolute; z-index: 5; top: max(25px, env(safe-area-inset-top)); left: clamp(20px, 5vw, 72px); right: clamp(20px, 5vw, 72px); display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; }
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand-mark { position: relative; width: 28px; height: 28px; border: 1px solid rgba(255,255,255,.44); border-radius: 50%; }
     .brand-mark::before, .brand-mark::after { content: ""; position: absolute; border-radius: 50%; inset: 5px; border: 1px solid rgba(255,255,255,.35); }
-    .brand-mark::after { inset: 10px; background: var(--mint); border: 0; box-shadow: 0 0 14px var(--mint); }
-    .brand-name { font-family: "Barlow Condensed", sans-serif; font-weight: 800; font-size: 18px; letter-spacing: .14em; text-transform: uppercase; line-height: 1; }
+    .brand-mark::after { inset: 10px; background: var(--accent); border: 0; box-shadow: 0 0 14px var(--accent); }
+    .brand-name { font-family: system-ui, sans-serif; font-weight: 800; font-size: 18px; letter-spacing: .14em; text-transform: uppercase; line-height: 1; }
     .brand-sub { color: #78808c; font-size: 9px; letter-spacing: .14em; margin-top: 5px; text-transform: uppercase; }
     .highscore { text-align: right; }
     .micro-label { color: #818995; font-size: 9px; text-transform: uppercase; letter-spacing: .18em; }
     .record-value { margin-top: 4px; color: #f5f2e9; font-size: 16px; letter-spacing: .04em; }
-    .hud { position: absolute; z-index: 5; top: 94px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: clamp(24px, 6vw, 68px); opacity: 0; transition: opacity .35s ease; pointer-events: none; }
+    .hud { position: absolute; z-index: 5; top: 94px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: clamp(14px, 4vw, 48px); opacity: 0; transition: opacity .35s ease; pointer-events: none; }
     .hud.visible { opacity: 1; }
     .stat { min-width: 74px; text-align: center; }
-    .stat-value { font-family: "Barlow Condensed", sans-serif; font-weight: 800; font-size: clamp(27px, 4vw, 38px); line-height: .9; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+    .stat-value { font-family: system-ui, sans-serif; font-weight: 800; font-size: clamp(27px, 4vw, 38px); line-height: .9; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
     .stat-label { margin-top: 8px; font-size: 8px; letter-spacing: .2em; color: #89919c; text-transform: uppercase; }
+    .stat.combo-hot .stat-value { color: var(--lime); text-shadow: 0 0 18px rgba(197,255,74,.65); transform: scale(1.08); }
+    .stat-value { transition: color .2s, text-shadow .2s, transform .2s; }
     .run-status { position: absolute; z-index: 6; top: 50%; left: 50%; transform: translate(-50%, 105px); color: rgba(240,244,247,.66); font-size: 9px; letter-spacing: .19em; text-transform: uppercase; opacity: 0; transition: opacity .3s; pointer-events: none; }
     .run-status.visible { opacity: 1; }
+    .power-status { position: absolute; z-index: 5; top: 151px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; gap: 8px; pointer-events: none; }
+    .power-status[hidden], .power-chip[hidden], .boost-banner[hidden] { display: none !important; }
+    .power-chip { padding: 6px 9px; border: 1px solid rgba(255,255,255,.18); background: rgba(8,12,19,.72); color: #e9f5fa; font-size: 8px; letter-spacing: .14em; text-transform: uppercase; box-shadow: 0 0 14px rgba(56,230,211,.12); }
+    .power-chip.shield { color: var(--cyan); border-color: rgba(56,230,211,.48); }
+    .power-chip.rainbow { color: var(--magenta); border-color: rgba(255,79,184,.48); }
+    .boost-banner { position: absolute; z-index: 6; top: 184px; left: 50%; transform: translateX(-50%); color: var(--lime); font-family: system-ui, sans-serif; font-size: 19px; font-weight: 900; letter-spacing: .2em; text-shadow: 0 0 18px rgba(197,255,74,.8); pointer-events: none; animation: boostPulse .5s ease-in-out infinite alternate; white-space: nowrap; }
+    .boost-banner span { font: 9px ui-monospace, monospace; letter-spacing: .12em; }
+    @keyframes boostPulse { from { opacity: .68; filter: brightness(.9); } to { opacity: 1; filter: brightness(1.4); } }
     .color-panel { position: absolute; z-index: 5; left: clamp(20px, 5vw, 72px); bottom: max(32px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 15px; pointer-events: none; }
     .color-copy { min-width: 74px; }
-    .color-current { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-family: "Barlow Condensed", sans-serif; font-size: 18px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-    .color-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 12px currentColor; }
+    .color-current { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-family: system-ui, sans-serif; font-size: 18px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .color-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px currentColor; }
     .swatches { display: flex; gap: 6px; }
     .swatch { width: 18px; height: 4px; border-radius: 6px; opacity: .34; transition: opacity .18s, transform .18s; }
     .swatch.active { opacity: 1; transform: scaleX(1.18); }
     .controls-hint { position: absolute; z-index: 5; right: clamp(20px, 5vw, 72px); bottom: max(36px, env(safe-area-inset-bottom)); color: rgba(220,228,236,.58); text-align: right; font-size: 9px; line-height: 1.9; letter-spacing: .08em; pointer-events: none; }
     .controls-hint strong { color: rgba(245,242,233,.91); font-weight: 500; }
-    .overlay { position: absolute; z-index: 10; inset: 0; display: grid; place-items: center; padding: 24px; background: radial-gradient(ellipse at 50% 43%, rgba(9,12,19,.07) 0%, rgba(9,12,19,.28) 42%, rgba(9,12,19,.72) 100%); transition: opacity .35s ease, visibility .35s; }
+    .overlay { position: absolute; z-index: 10; inset: 0; display: grid; place-items: center; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 24px; background: radial-gradient(ellipse at 50% 43%, rgba(9,12,19,.07) 0%, rgba(9,12,19,.28) 42%, rgba(9,12,19,.72) 100%); transition: opacity .35s ease, visibility .35s; }
     .overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     .card { width: min(100%, 490px); text-align: center; transform: translateY(0); transition: transform .4s cubic-bezier(.2,.8,.2,1); }
     .overlay.hidden .card { transform: translateY(12px); }
-    .eyebrow { display: inline-flex; align-items: center; gap: 9px; margin-bottom: 14px; color: var(--mint); font-size: 9px; letter-spacing: .23em; text-transform: uppercase; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 9px; margin-bottom: 14px; color: var(--accent); font-size: 9px; letter-spacing: .23em; text-transform: uppercase; }
     .eyebrow::before, .eyebrow::after { content: ""; width: 22px; height: 1px; background: currentColor; opacity: .7; }
-    h1 { margin: 0; font-family: "Barlow Condensed", sans-serif; font-size: clamp(67px, 12vw, 104px); font-weight: 900; line-height: .76; letter-spacing: -.035em; text-transform: uppercase; }
-    h1 .title-light { display: block; color: #f1eee6; }
-    h1 .title-accent { display: block; margin-top: 9px; color: transparent; -webkit-text-stroke: 1px rgba(235,244,245,.82); }
+    h1 { margin: 0; font-family: system-ui, sans-serif; font-size: clamp(42px, 5.5vw, 66px); font-weight: 900; line-height: .88; letter-spacing: -.045em; text-transform: uppercase; }
+    h1 .title-light { display: block; color: #f1eee6; text-shadow: 0 0 13px rgba(255,79,184,.28), 0 0 34px rgba(255,79,184,.12); }
+    h1 .title-accent { display: block; margin-top: 4px; color: var(--cyan); font-size: .82em; letter-spacing: .035em; text-shadow: 0 0 8px rgba(56,230,211,.82), 0 0 22px rgba(56,230,211,.55), 0 0 42px rgba(56,230,211,.25); }
     .intro { max-width: 320px; margin: 24px auto 0; color: #a5abb3; font-size: 11px; line-height: 1.8; letter-spacing: .025em; }
     .color-key { display: flex; justify-content: center; gap: 8px; margin: 24px 0 25px; }
     .key-chip { display: flex; align-items: center; gap: 7px; border: 1px solid rgba(233,241,246,.14); background: rgba(10,14,21,.55); padding: 7px 10px; color: #c3c8ce; font-size: 8px; letter-spacing: .13em; text-transform: uppercase; }
     .key-chip i { width: 7px; height: 7px; border-radius: 50%; box-shadow: 0 0 10px currentColor; }
     .actions { display: flex; align-items: center; justify-content: center; gap: 13px; }
-    .primary-btn { position: relative; min-width: 194px; border: 0; padding: 15px 22px; color: #10151a; background: var(--mint); cursor: pointer; font-family: "Barlow Condensed", sans-serif; font-size: 17px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); transition: transform .18s, background .18s; }
-    .primary-btn:hover { transform: translateY(-2px); background: #c0ffdf; }
+    .primary-btn { position: relative; min-width: 194px; min-height: 52px; border: 0; padding: 15px 22px; color: #10151a; background: var(--accent); cursor: pointer; touch-action: manipulation; font-family: system-ui, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); transition: transform .18s, background .18s; }
+    .primary-btn:hover { transform: translateY(-2px); background: #a6fff3; }
     .primary-btn:active { transform: translateY(1px); }
+    .primary-btn:focus-visible, .tap-control:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
     .button-arrow { margin-left: 9px; font-size: 15px; }
     .small-note { margin-top: 19px; color: #7e8792; font-size: 8px; letter-spacing: .17em; text-transform: uppercase; }
     .small-note b { color: #d6dce1; font-weight: 400; }
+    .mobile-hint { display: none; }
     .result-line { margin: 24px 0 4px; color: #9ca4ad; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; }
-    .final-score { color: #f5f2e9; font-family: "Barlow Condensed", sans-serif; font-size: 46px; font-weight: 800; letter-spacing: .02em; line-height: 1; }
-    .best-callout { margin: 13px 0 23px; color: var(--yellow); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
-    .mobile-controls { display: none; }
-    .flash { position: absolute; z-index: 4; inset: 0; pointer-events: none; background: rgba(255,75,84,.1); opacity: 0; transition: opacity .08s; }
+    .game-over-brand { margin: 3px 0 12px; color: var(--accent); font-family: system-ui, sans-serif; font-size: 10px; font-weight: 800; letter-spacing: .16em; line-height: 1.5; text-transform: uppercase; text-shadow: 0 0 14px rgba(56,230,211,.32); }
+    .game-over-brand span { display: block; color: var(--magenta); text-shadow: 0 0 14px rgba(255,79,184,.42); }
+    .result-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin: 18px 0 21px; }
+    .result-cell { min-width: 0; padding: 12px 7px 10px; border: 1px solid rgba(233,241,246,.12); background: rgba(10,14,21,.62); }
+    .result-cell strong { display: block; color: #f5f2e9; font-family: system-ui, sans-serif; font-size: clamp(22px, 7vw, 34px); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+    .result-cell span { display: block; margin-top: 7px; color: #858d98; font-size: 7px; letter-spacing: .12em; line-height: 1.4; text-transform: uppercase; }
+    .best-callout { margin: 13px 0 23px; color: var(--lime); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+    .mobile-controls { display: none; position: absolute; z-index: 6; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); gap: 9px; }
+    .tap-control { width: 52px; height: 52px; display: grid; place-items: center; border: 1px solid rgba(224,235,240,.3); border-radius: 12px; background: rgba(8,13,20,.72); color: #f3f1e9; backdrop-filter: blur(8px); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; font-size: 19px; transition: background .15s, transform .15s; }
+    .tap-control:active { background: rgba(56,230,211,.25); transform: scale(.94); }
+    .flash { position: absolute; z-index: 4; inset: 0; pointer-events: none; background: rgba(255,79,184,.1); opacity: 0; transition: opacity .08s; }
     .flash.on { opacity: 1; }
     @media (max-width: 650px) {
       .topbar { top: max(18px, env(safe-area-inset-top)); left: 18px; right: 18px; }
       .brand-mark { width: 24px; height: 24px; }
       .brand-name { font-size: 15px; }
       .brand-sub { font-size: 8px; }
-      .hud { top: 77px; gap: clamp(16px, 6vw, 32px); }
-      .stat { min-width: 56px; }
-      .stat-value { font-size: 31px; }
-      .stat-label { font-size: 7px; }
-      .color-panel { left: 20px; bottom: max(28px, env(safe-area-inset-bottom)); gap: 9px; }
+      .hud { top: max(70px, calc(env(safe-area-inset-top) + 54px)); width: calc(100% - 24px); max-width: 500px; justify-content: space-between; gap: clamp(3px, 1.4vw, 8px); }
+      .stat { flex: 1 1 0; min-width: 0; }
+      .stat-value { font-size: clamp(22px, 7vw, 28px); }
+      .stat-label { margin-top: 6px; font-size: 6px; letter-spacing: .1em; }
+      .power-status { top: 125px; gap: 5px; }
+      .power-chip { padding: 5px 7px; font-size: 7px; }
+      .boost-banner { top: 154px; font-size: 16px; }
+      .color-panel { left: max(16px, env(safe-area-inset-left)); bottom: max(20px, env(safe-area-inset-bottom)); gap: 9px; }
       .controls-hint { display: none; }
-      .mobile-controls { display: flex; position: absolute; z-index: 6; right: 18px; bottom: max(22px, env(safe-area-inset-bottom)); gap: 8px; }
-      .tap-control { width: 46px; height: 46px; display: grid; place-items: center; border: 1px solid rgba(224,235,240,.25); background: rgba(8,13,20,.54); color: #f3f1e9; backdrop-filter: blur(8px); cursor: pointer; font-family: "Barlow Condensed", sans-serif; font-size: 17px; transition: background .15s, transform .15s; }
-      .tap-control:active { background: rgba(157,255,208,.25); transform: scale(.94); }
+      .mobile-controls { display: flex; }
       .run-status { transform: translate(-50%, 84px); }
-      .overlay { padding: 20px; }
+      .overlay { padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+      .card { width: min(100%, 430px); }
+      h1 { font-size: clamp(36px, 11vw, 46px); line-height: .9; }
       .intro { margin-top: 19px; }
       .color-key { margin: 20px 0 22px; }
+      .primary-btn { width: min(100%, 250px); min-height: 56px; font-size: 18px; }
+      .small-note { font-size: 7px; line-height: 1.8; }
+      .mobile-hint { display: inline; }
+      .desktop-hint { display: none; }
+    }
+    @media (max-width: 900px) and (pointer: coarse) {
+      .mobile-controls { display: flex; }
+      .controls-hint { display: none; }
+      .mobile-hint { display: inline; }
+      .desktop-hint { display: none; }
+    }
+    @media (max-height: 520px) {
+      .topbar { top: max(10px, env(safe-area-inset-top)); }
+      .hud { top: max(52px, calc(env(safe-area-inset-top) + 38px)); }
+      .power-status { top: max(94px, calc(env(safe-area-inset-top) + 78px)); }
+      .boost-banner { top: max(122px, calc(env(safe-area-inset-top) + 106px)); }
+      .overlay { padding: 10px max(14px, env(safe-area-inset-right)) 10px max(14px, env(safe-area-inset-left)); }
+      .card { width: min(100%, 520px); }
+      .eyebrow { margin-bottom: 7px; }
+      h1 { font-size: clamp(34px, 9.4vh, 50px); line-height: .88; }
+      .intro { margin-top: 10px; font-size: 10px; line-height: 1.45; }
+      .color-key { margin: 10px 0; }
+      .primary-btn { min-height: 46px; padding-block: 10px; }
+      .small-note { margin-top: 8px; }
+      .result-line { margin: 10px 0 2px; }
+      .result-grid { margin: 9px 0 10px; }
+      .best-callout { margin: 8px 0 10px; }
+      .color-panel { bottom: max(10px, env(safe-area-inset-bottom)); }
+      .mobile-controls { bottom: max(8px, env(safe-area-inset-bottom)); }
+    }
+    @media (max-width: 900px) and (pointer: coarse) and (orientation: landscape) {
+      .topbar { left: max(14px, env(safe-area-inset-left)); right: max(14px, env(safe-area-inset-right)); }
+      .hud { left: 50%; }
+      .mobile-controls { right: max(14px, env(safe-area-inset-right)); }
     }
     @media (max-height: 660px) and (min-width: 651px) {
       .hud { top: 76px; }
+      .power-status { top: 118px; }
+      .boost-banner { top: 151px; }
       h1 { font-size: 76px; }
       .intro { margin-top: 15px; }
       .color-key { margin: 15px 0; }
@@ -112,29 +167,36 @@
   </style>
 </head>
 <body>
-  <main id="game" aria-label="Color Swipe Runner game">
+  <main id="game" aria-label="Color Shift: Neon Rush 3D game">
     <div id="scene" aria-hidden="true"></div>
     <div class="grain"></div>
     <div class="flash" id="flash"></div>
     <header class="topbar">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true"></div>
-        <div><div class="brand-name">Color Swipe</div><div class="brand-sub">Runner / 001</div></div>
+        <div><div class="brand-name">Color Shift</div><div class="brand-sub">Neon Rush 3D</div></div>
       </div>
-      <div class="highscore"><div class="micro-label">Personal best</div><div class="record-value"><span id="bestTop">0000</span><span class="micro-label"> m</span></div></div>
+      <div class="highscore"><div class="micro-label">Best score</div><div class="record-value"><span id="bestTop">00000</span></div></div>
     </header>
     <section class="hud" id="hud" aria-live="polite">
+      <div class="stat"><div class="stat-value" id="score">00000</div><div class="stat-label">Score</div></div>
+      <div class="stat" id="comboStat"><div class="stat-value" id="combo">×0</div><div class="stat-label">Combo</div></div>
       <div class="stat"><div class="stat-value" id="distance">000</div><div class="stat-label">Distance · m</div></div>
       <div class="stat"><div class="stat-value" id="gates">00</div><div class="stat-label">Gates</div></div>
       <div class="stat"><div class="stat-value" id="pace">1.0<span style="font-size:.48em">×</span></div><div class="stat-label">Pace</div></div>
     </section>
     <div class="run-status" id="runStatus">Next gate ahead</div>
+    <div class="power-status" id="powerStatus" hidden>
+      <span class="power-chip shield" id="shieldStatus" hidden>Shield ready</span>
+      <span class="power-chip rainbow" id="rainbowStatus" hidden>Rainbow <b id="rainbowTime">0</b>s</span>
+    </div>
+    <div class="boost-banner" id="speedBanner" hidden>SPEED UP! <span><b id="speedTime">5</b>s</span></div>
     <div class="color-panel">
-      <div class="color-copy"><div class="micro-label">Orb color</div><div class="color-current"><span class="color-dot" id="colorDot"></span><span id="colorName">Mint</span></div></div>
+      <div class="color-copy"><div class="micro-label">Orb color</div><div class="color-current"><span class="color-dot" id="colorDot"></span><span id="colorName">Magenta</span></div></div>
       <div class="swatches" aria-hidden="true">
-        <span class="swatch" data-color="red" style="background:var(--red)"></span>
-        <span class="swatch" data-color="blue" style="background:var(--blue)"></span>
-        <span class="swatch" data-color="yellow" style="background:var(--yellow)"></span>
+        <span class="swatch" data-color="cyan" style="background:var(--cyan)"></span>
+        <span class="swatch" data-color="magenta" style="background:var(--magenta)"></span>
+        <span class="swatch" data-color="lime" style="background:var(--lime)"></span>
       </div>
     </div>
     <div class="controls-hint"><strong>← A</strong> previous color&nbsp;&nbsp; <strong>D →</strong> next color<br>Match the gate before it reaches you</div>
@@ -145,60 +207,105 @@
     <section class="overlay" id="overlay">
       <div class="card" id="card">
         <div class="eyebrow" id="eyebrow">A color reaction test</div>
-        <h1><span class="title-light" id="titleTop">Color</span><span class="title-accent" id="titleBottom">Runner</span></h1>
-        <p class="intro" id="intro">A tunnel. Three colors. One clean decision at every gate.<br>Shift your orb to match and keep moving.</p>
+        <h1 aria-label="Color Shift: Neon Rush 3D"><span class="title-light" id="titleTop">Color Shift:</span><span class="title-accent" id="titleBottom">Neon Rush 3D</span></h1>
+    <p class="intro" id="intro">Chain matching gates for bigger combo scores. Grab Shield and Rainbow power-ups, then ride the speed burst every fifth gate.</p>
         <div class="color-key" id="colorKey">
-          <span class="key-chip"><i style="color:var(--red);background:var(--red)"></i>Red</span>
-          <span class="key-chip"><i style="color:var(--blue);background:var(--blue)"></i>Blue</span>
-          <span class="key-chip"><i style="color:var(--yellow);background:var(--yellow)"></i>Yellow</span>
+          <span class="key-chip"><i style="color:var(--cyan);background:var(--cyan)"></i>Cyan</span>
+          <span class="key-chip"><i style="color:var(--magenta);background:var(--magenta)"></i>Magenta</span>
+          <span class="key-chip"><i style="color:var(--lime);background:var(--lime)"></i>Lime</span>
         </div>
-        <div class="actions"><button class="primary-btn" id="startButton">Start run <span class="button-arrow">↗</span></button></div>
-        <div class="small-note" id="startHint"><b>A / ←</b> previous &nbsp;·&nbsp; <b>D / →</b> next color</div>
         <div id="results" hidden>
-          <div class="result-line">Run distance</div>
-          <div class="final-score"><span id="finalDistance">0</span><span style="font-size:.42em;color:#9aa4ad"> M</span></div>
+          <div class="game-over-brand">Color Shift:<span>Neon Rush 3D</span></div>
+          <div class="result-line">Run summary</div>
+          <div class="result-grid">
+            <div class="result-cell"><strong id="finalScore">0</strong><span>Current score</span></div>
+            <div class="result-cell"><strong id="finalBest">0</strong><span>Best score</span></div>
+            <div class="result-cell"><strong id="finalGates">0</strong><span>Gates cleared</span></div>
+          </div>
           <div class="best-callout" id="bestMessage">New personal best</div>
         </div>
+        <div class="actions"><button class="primary-btn" id="startButton">Start run <span class="button-arrow">↗</span></button></div>
+        <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> previous &nbsp;·&nbsp; <b>D / →</b> next color</span><span class="mobile-hint">Tap anywhere to start · swipe or use arrows</span></div>
       </div>
     </section>
   </main>
-  <script type="module">
+    <!-- Original game code and visuals. Third-party runtime dependency: Three.js r160. -->
+    <!--
+      The MIT License
+      Copyright © 2010-2023 three.js authors
+
+      Permission is hereby granted, free of charge, to any person obtaining a copy
+      of this software and associated documentation files (the "Software"), to deal
+      in the Software without restriction, including without limitation the rights
+      to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      copies of the Software, and to permit persons to whom the Software is
+      furnished to do so, subject to the following conditions:
+
+      The above copyright notice and this permission notice shall be included in
+      all copies or substantial portions of the Software.
+
+      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+      IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+      FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+      AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+      LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+      THE SOFTWARE.
+
+      Upstream license: https://github.com/mrdoob/three.js/blob/r160/LICENSE
+    -->
+    <script type="module">
     import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
     (() => {
       "use strict";
       const COLORS = [
-        { name: "Red", key: "red", hex: 0xff4b54, css: "#ff4b54" },
-        { name: "Blue", key: "blue", hex: 0x42d9ff, css: "#42d9ff" },
-        { name: "Yellow", key: "yellow", hex: 0xffe16b, css: "#ffe16b" }
+        { name: "Cyan", key: "cyan", hex: 0x38e6d3, css: "#38e6d3" },
+        { name: "Magenta", key: "magenta", hex: 0xff4fb8, css: "#ff4fb8" },
+        { name: "Lime", key: "lime", hex: 0xc5ff4a, css: "#c5ff4a" }
       ];
       const LANE_X = [-2.42, 0, 2.42];
       const PLAYER_RADIUS = 0.48;
       const GATE_HALF_DEPTH = 0.045;
       const GATE_HALF_WIDTH = 3.65;
       const SEGMENT_WIDTH = (GATE_HALF_WIDTH * 2) / COLORS.length;
+      const FIRST_GATE_SPAWN_Z = -50;
+      const START_GRACE_SECONDS = 1;
       let state = "ready";
       const el = (id) => document.getElementById(id);
       const sceneRoot = el("scene");
       const gameScene = new THREE.Scene();
-      gameScene.fog = new THREE.FogExp2(0x090d14, 0.017);
+      gameScene.background = new THREE.Color(0x050515);
+      gameScene.fog = new THREE.FogExp2(0x050515, 0.009);
       const camera = new THREE.PerspectiveCamera(window.innerWidth < 650 ? 68 : 62, 1, 0.1, 180);
-      camera.position.set(0, 2.5, 8.5);
-      camera.lookAt(0, 0, -15);
+      // Keep the camera below the tunnel roof while aiming down the path at incoming gates.
+      camera.position.set(0, 1.35, 9.2);
+      camera.lookAt(0, 0, -18);
       let renderer = null;
       let fallbackCanvas = null;
       let fallbackContext = null;
+      const isCoarsePointer = () => window.matchMedia?.("(pointer: coarse)").matches ?? false;
+      const isMobileViewport = () => window.innerWidth < 650 || isCoarsePointer();
+      const getPixelRatio = () => Math.min(window.devicePixelRatio || 1, isMobileViewport() ? 1.35 : 1.7);
+      const getSceneSize = () => {
+        const bounds = sceneRoot.getBoundingClientRect();
+        return {
+          width: Math.max(1, Math.round(bounds.width || window.innerWidth)),
+          height: Math.max(1, Math.round(bounds.height || window.innerHeight))
+        };
+      };
       function resizeFallback() {
         if (!fallbackCanvas) return;
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-        fallbackCanvas.width = Math.round(window.innerWidth * dpr);
-        fallbackCanvas.height = Math.round(window.innerHeight * dpr);
+        const { width, height } = getSceneSize();
+        const dpr = Math.min(window.devicePixelRatio || 1, isMobileViewport() ? 1.35 : 1.5);
+        fallbackCanvas.width = Math.round(width * dpr);
+        fallbackCanvas.height = Math.round(height * dpr);
         fallbackContext?.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
       try {
         const rendererCanvas = document.createElement("canvas");
         const contextAttributes = {
           alpha: true,
-          antialias: true,
+          antialias: !isMobileViewport(),
           depth: true,
           stencil: false,
           premultipliedAlpha: true,
@@ -214,11 +321,13 @@
           context: webglContext,
           ...contextAttributes
         });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.7));
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.domElement.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;z-index:1;display:block;touch-action:none";
+        renderer.setPixelRatio(getPixelRatio());
+        const { width, height } = getSceneSize();
+        renderer.setSize(width, height, false);
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.2;
+        renderer.toneMappingExposure = 1.35;
         sceneRoot.appendChild(renderer.domElement);
       } catch (error) {
         fallbackCanvas = document.createElement("canvas");
@@ -229,22 +338,28 @@
         resizeFallback();
       }
 
-      gameScene.add(new THREE.AmbientLight(0xc4d9ff, 0.85));
-      gameScene.add(new THREE.HemisphereLight(0x9db7d8, 0x10141c, 1.1));
-      const keyLight = new THREE.PointLight(0x95ffe0, 18, 34, 2);
-      keyLight.position.set(0, 3.8, 2);
+      gameScene.add(new THREE.AmbientLight(0xffffff, 1.2));
+      gameScene.add(new THREE.HemisphereLight(0xbadfff, 0x101428, 0.9));
+      const keyLight = new THREE.PointLight(0x38e6d3, 22, 40, 2);
+      keyLight.position.set(0, 1.8, 2);
       gameScene.add(keyLight);
-      const directionalLight = new THREE.DirectionalLight(0xe8f5ff, 2.1);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 2.4);
       directionalLight.position.set(-3, 6, 5);
       gameScene.add(directionalLight);
-      const farLight = new THREE.PointLight(0x426b8b, 25, 46, 2);
-      farLight.position.set(0, 2, -30);
+      const tunnelLight = new THREE.PointLight(0xff4fb8, 18, 44, 2);
+      tunnelLight.position.set(0, 1.3, -13);
+      gameScene.add(tunnelLight);
+      const farLight = new THREE.PointLight(0xc5ff4a, 22, 52, 2);
+      farLight.position.set(0, 1.3, -32);
       gameScene.add(farLight);
+      const boostLight = new THREE.PointLight(0xff4fb8, 0, 48, 2);
+      boostLight.position.set(0, 1.5, -12);
+      gameScene.add(boostLight);
 
       const tunnel = new THREE.Group();
       gameScene.add(tunnel);
-      const tunnelMat = new THREE.MeshStandardMaterial({ color: 0x17212b, metalness: 0.55, roughness: 0.48, side: THREE.DoubleSide });
-      const sideMat = new THREE.MeshStandardMaterial({ color: 0x121a24, metalness: 0.25, roughness: 0.78, side: THREE.DoubleSide });
+      const tunnelMat = new THREE.MeshStandardMaterial({ color: 0x17212b, emissive: 0x061719, emissiveIntensity: 0.85, metalness: 0.45, roughness: 0.48, side: THREE.DoubleSide });
+      const sideMat = new THREE.MeshStandardMaterial({ color: 0x121a24, emissive: 0x060a18, emissiveIntensity: 0.45, metalness: 0.2, roughness: 0.78, side: THREE.DoubleSide });
       const floor = new THREE.Mesh(new THREE.PlaneGeometry(9, 124), tunnelMat);
       floor.rotation.x = -Math.PI / 2;
       floor.position.set(0, -2.25, -44);
@@ -259,13 +374,13 @@
         wall.position.set(x, 0, -44);
         tunnel.add(wall);
       });
-      const lineMat = new THREE.MeshBasicMaterial({ color: 0x617585, transparent: true, opacity: 0.35 });
+      const laneLineMat = new THREE.MeshBasicMaterial({ color: 0x38e6d3, transparent: true, opacity: 0.5 });
       [-SEGMENT_WIDTH / 2, SEGMENT_WIDTH / 2].forEach(x => {
-        const line = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.018, 124), lineMat);
+        const line = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.018, 124), laneLineMat);
         line.position.set(x, -2.22, -44);
         tunnel.add(line);
       });
-      const railMat = new THREE.MeshBasicMaterial({ color: 0x486071, transparent: true, opacity: 0.42 });
+      const railMat = new THREE.MeshBasicMaterial({ color: 0xc5ff4a, transparent: true, opacity: 0.38 });
       [-4.44, 4.44].forEach(x => {
         const rail = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.045, 124), railMat);
         rail.position.set(x, -2.18, -44);
@@ -273,7 +388,7 @@
       });
 
       const ribs = [];
-      const ribMat = new THREE.MeshBasicMaterial({ color: 0x516272, transparent: true, opacity: 0.21 });
+      const ribMat = new THREE.MeshBasicMaterial({ color: 0x38e6d3, transparent: true, opacity: 0.28 });
       for (let i = 0; i < 15; i++) {
         const rib = new THREE.LineLoop(
           new THREE.BufferGeometry().setFromPoints([
@@ -286,21 +401,60 @@
         ribs.push(rib);
       }
 
+      const PARTICLE_COUNT = 72;
+      const particlePositions = new Float32Array(PARTICLE_COUNT * 3);
+      const particleColors = new Float32Array(PARTICLE_COUNT * 3);
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const offset = i * 3;
+        particlePositions[offset] = (Math.random() - 0.5) * 8.2;
+        particlePositions[offset + 1] = (Math.random() - 0.5) * 3.7;
+        particlePositions[offset + 2] = -2 - Math.random() * 100;
+        const tint = new THREE.Color(COLORS[Math.floor(Math.random() * COLORS.length)].hex);
+        particleColors[offset] = tint.r;
+        particleColors[offset + 1] = tint.g;
+        particleColors[offset + 2] = tint.b;
+      }
+      const particleGeometry = new THREE.BufferGeometry();
+      const positionAttribute = new THREE.BufferAttribute(particlePositions, 3);
+      positionAttribute.setUsage(THREE.DynamicDrawUsage);
+      particleGeometry.setAttribute("position", positionAttribute);
+      particleGeometry.setAttribute("color", new THREE.BufferAttribute(particleColors, 3));
+      const particleField = new THREE.Points(
+        particleGeometry,
+        new THREE.PointsMaterial({
+          size: 0.055,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.58,
+          sizeAttenuation: true,
+          depthWrite: false
+        })
+      );
+      particleField.frustumCulled = false;
+      gameScene.add(particleField);
+
       const player = new THREE.Group();
       gameScene.add(player);
-      player.position.set(LANE_X[0], 0, 0);
-      const orbMat = new THREE.MeshStandardMaterial({ color: COLORS[0].hex, emissive: COLORS[0].hex, emissiveIntensity: 2.8, metalness: 0.1, roughness: 0.2 });
-      const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(PLAYER_RADIUS, 2), orbMat);
+      player.position.set(LANE_X[1], 0, 0);
+      const orbMat = new THREE.MeshStandardMaterial({ color: COLORS[1].hex, emissive: COLORS[1].hex, emissiveIntensity: 3.2, metalness: 0.1, roughness: 0.2 });
+      const orb = new THREE.Mesh(new THREE.SphereGeometry(PLAYER_RADIUS, 20, 16), orbMat);
       player.add(orb);
       const orbHalo = new THREE.Mesh(
         new THREE.TorusGeometry(0.69, 0.035, 8, 64),
-        new THREE.MeshBasicMaterial({ color: COLORS[0].hex, transparent: true, opacity: 0.8 })
+        new THREE.MeshBasicMaterial({ color: COLORS[1].hex, transparent: true, opacity: 0.8 })
       );
       orbHalo.rotation.x = Math.PI / 2;
       player.add(orbHalo);
-      const orbLight = new THREE.PointLight(COLORS[0].hex, 9, 9, 2);
+      const shieldBubble = new THREE.Mesh(
+        new THREE.SphereGeometry(0.79, 18, 14),
+        new THREE.MeshBasicMaterial({ color: 0x38e6d3, transparent: true, opacity: 0.13, wireframe: true, depthWrite: false })
+      );
+      shieldBubble.visible = false;
+      player.add(shieldBubble);
+      const orbLight = new THREE.PointLight(COLORS[1].hex, 9, 9, 2);
       player.add(orbLight);
-      const targetOrbColor = new THREE.Color(COLORS[0].hex);
+      const targetOrbColor = new THREE.Color(COLORS[1].hex);
+      const selectedOrbColor = new THREE.Color(COLORS[1].hex);
       const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.62, 32), new THREE.MeshBasicMaterial({ color: 0x02050a, transparent: true, opacity: 0.5 }));
       shadow.rotation.x = -Math.PI / 2;
       shadow.position.set(0, -1.9, 0);
@@ -310,10 +464,17 @@
         const group = new THREE.Group();
         group.position.set(0, 0, z);
         group.visible = state !== "ready";
+        const difficulty = passed;
+        const movementLevel = Math.floor(difficulty / 5);
         group.userData = {
           colorIndex,
           requiredLane: colorIndex,
           segmentColors: COLORS.map((_, index) => index),
+          segmentMaterials: [],
+          moving: difficulty >= 3,
+          movementPhase: Math.random() * Math.PI * 2,
+          movementAmplitude: difficulty >= 3 ? Math.min(0.62, 0.18 + movementLevel * 0.08) : 0,
+          movementSpeed: 0.85 + movementLevel * 0.08,
           checked: false
         };
         const color = COLORS[colorIndex].hex;
@@ -328,9 +489,10 @@
           const segmentMat = new THREE.MeshBasicMaterial({
             color: COLORS[segment].hex,
             transparent: true,
-            opacity: segment === colorIndex ? 0.035 : 0.34,
+            opacity: segment === colorIndex ? 0.12 : 0.46,
             side: THREE.DoubleSide
           });
+          group.userData.segmentMaterials.push(segmentMat);
           const segmentPanel = new THREE.Mesh(new THREE.PlaneGeometry(2.38, 3.42), segmentMat);
           segmentPanel.position.set(-2.42 + segment * 2.42, 0, -0.025);
           group.add(segmentPanel);
@@ -356,6 +518,51 @@
         return group;
       }
 
+      function makePowerUp(type, lane, z) {
+        const group = new THREE.Group();
+        group.position.set(LANE_X[lane], 0.12, z);
+        group.visible = state === "running";
+        group.userData = {
+          type,
+          lane,
+          collected: false,
+          phase: Math.random() * Math.PI * 2
+        };
+        const color = type === "shield" ? 0x38e6d3 : 0xff4fb8;
+        const coreMaterial = new THREE.MeshStandardMaterial({
+          color,
+          emissive: color,
+          emissiveIntensity: 2.4,
+          metalness: 0.15,
+          roughness: 0.25
+        });
+        const coreGeometry = type === "shield"
+          ? new THREE.OctahedronGeometry(0.34, 1)
+          : new THREE.IcosahedronGeometry(0.34, 1);
+        const core = new THREE.Mesh(coreGeometry, coreMaterial);
+        group.add(core);
+        const halo = new THREE.Mesh(
+          new THREE.TorusGeometry(0.52, 0.035, 8, 36),
+          new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.88 })
+        );
+        halo.rotation.x = Math.PI / 2;
+        group.add(halo);
+        if (type === "rainbow") {
+          COLORS.forEach((entry, index) => {
+            const bead = new THREE.Mesh(
+              new THREE.SphereGeometry(0.075, 8, 8),
+              new THREE.MeshBasicMaterial({ color: entry.hex })
+            );
+            const angle = (index / COLORS.length) * Math.PI * 2;
+            bead.position.set(Math.cos(angle) * 0.56, Math.sin(angle) * 0.56, 0);
+            group.add(bead);
+          });
+        }
+        group.userData.core = core;
+        gameScene.add(group);
+        return group;
+      }
+
       function disposeGate(gate) {
         gameScene.remove(gate);
         gate.traverse(child => {
@@ -364,26 +571,42 @@
           else child.material?.dispose();
         });
       }
+      function disposePowerUp(powerUp) {
+        disposeGate(powerUp);
+      }
 
       let gates = [];
+      let powerUps = [];
       let currentColor = 0;
       let distance = 0;
       let passed = 0;
+      let score = 0;
+      let combo = 0;
+      let gateBonus = 0;
       let speed = 13.5;
       let lastTime = 0;
       let elapsed = 0;
-      let nextGateZ = -30;
+      let nextGateZ = FIRST_GATE_SPAWN_Z;
       let gateSerial = 0;
+      let powerUpSpawnTimer = 7;
+      let shieldCharges = 0;
+      let rainbowTimer = 0;
+      let speedBoostTimer = 0;
+      let graceTimer = 0;
       let statusTimer = 0;
       let flashTimer = 0;
-      const BEST_KEY = "colorSwipeBest";
+      const BEST_KEY = "colorSwipeBestScore";
       let best = 0;
       try {
-        best = Math.max(0, Number(localStorage.getItem(BEST_KEY)) || 0);
+        best = Math.max(
+          0,
+          Number(localStorage.getItem(BEST_KEY)) || 0,
+          Number(localStorage.getItem("colorSwipeBest")) || 0
+        );
       } catch (error) {
         best = 0;
       }
-      el("bestTop").textContent = String(best).padStart(4, "0");
+      el("bestTop").textContent = String(best).padStart(5, "0");
       const randomColor = () => {
         gateSerial++;
         return (gateSerial + Math.floor(gateSerial / 3)) % COLORS.length;
@@ -391,7 +614,8 @@
       function setOrbColor(index) {
         currentColor = (index + COLORS.length) % COLORS.length;
         const c = COLORS[currentColor];
-        targetOrbColor.setHex(c.hex);
+        selectedOrbColor.setHex(c.hex);
+        orb.userData.colorIndex = currentColor;
         player.userData.targetX = LANE_X[currentColor];
         el("colorName").textContent = c.name;
         el("colorName").style.color = c.css;
@@ -404,15 +628,18 @@
         colorPulse = 0.15;
       }
       let colorPulse = 0;
-      setOrbColor(0);
+      setOrbColor(1);
 
       function makeInitialGates() {
         gates.forEach(disposeGate);
         gates = [];
+        powerUps.forEach(disposePowerUp);
+        powerUps = [];
         gateSerial = 0;
-        nextGateZ = -30;
+        nextGateZ = FIRST_GATE_SPAWN_Z;
         for (let i = 0; i < 5; i++) {
-          const color = randomColor();
+          const generatedColor = randomColor();
+          const color = i === 0 ? currentColor : generatedColor;
           gates.push(makeGate(color, nextGateZ));
           nextGateZ -= 18;
         }
@@ -420,15 +647,60 @@
       makeInitialGates();
 
       function updateHUD() {
+        score = Math.floor(distance) + gateBonus;
+        el("score").textContent = String(score).padStart(5, "0");
+        el("combo").textContent = "×" + combo;
+        el("comboStat").classList.toggle("combo-hot", combo >= 3);
         el("distance").textContent = String(Math.floor(distance)).padStart(3, "0");
         el("gates").textContent = String(passed).padStart(2, "0");
         el("pace").innerHTML = (speed / 13.5).toFixed(1) + '<span style="font-size:.48em">×</span>';
       }
+      function updatePowerHUD() {
+        const hasShield = shieldCharges > 0;
+        const hasRainbow = rainbowTimer > 0;
+        el("shieldStatus").hidden = !hasShield;
+        el("rainbowStatus").hidden = !hasRainbow;
+        el("powerStatus").hidden = !hasShield && !hasRainbow;
+        if (hasShield) el("shieldStatus").textContent = "Shield ×" + shieldCharges;
+        if (hasRainbow) el("rainbowTime").textContent = Math.max(1, Math.ceil(rainbowTimer));
+        el("speedBanner").hidden = speedBoostTimer <= 0;
+        if (speedBoostTimer > 0) el("speedTime").textContent = Math.max(1, Math.ceil(speedBoostTimer));
+      }
+      function showRunStatus(message, delay = 0) {
+        window.clearTimeout(statusTimer);
+        el("runStatus").textContent = message;
+        if (delay > 0) {
+          statusTimer = window.setTimeout(() => {
+            if (state === "running") el("runStatus").textContent = "Next gate ahead";
+          }, delay);
+        }
+      }
+      function spawnPowerUp() {
+        const upcoming = gates
+          .filter(gate => !gate.userData.checked && gate.position.z < 0)
+          .sort((a, b) => b.position.z - a.position.z)[0];
+        const z = upcoming ? upcoming.position.z - 9 : -42;
+        const type = Math.random() < 0.58 ? "shield" : "rainbow";
+        const lane = Math.floor(Math.random() * LANE_X.length);
+        powerUps.push(makePowerUp(type, lane, z));
+        powerUpSpawnTimer = 13 + Math.random() * 9;
+      }
+      function collectPowerUp(powerUp) {
+        powerUp.userData.collected = true;
+        if (powerUp.userData.type === "shield") {
+          shieldCharges = Math.min(2, shieldCharges + 1);
+          showRunStatus("Shield acquired", 900);
+        } else {
+          rainbowTimer = Math.max(rainbowTimer, 8);
+          showRunStatus("Rainbow burst · 8 seconds", 900);
+        }
+        updatePowerHUD();
+      }
       function resetOverlay() {
         el("eyebrow").textContent = "A color reaction test";
-        el("titleTop").textContent = "Color";
-        el("titleBottom").textContent = "Runner";
-        el("intro").innerHTML = "A tunnel. Three colors. One clean decision at every gate.<br>Shift your orb to match and keep moving.";
+        el("titleTop").textContent = "Color Shift:";
+        el("titleBottom").textContent = "Neon Rush 3D";
+        el("intro").textContent = "Chain matching gates for bigger combo scores. Grab Shield and Rainbow power-ups, then ride the speed burst every fifth gate.";
         el("colorKey").hidden = false;
         el("startHint").hidden = false;
         el("results").hidden = true;
@@ -439,26 +711,43 @@
         window.clearTimeout(statusTimer);
         window.clearTimeout(flashTimer);
         el("flash").classList.remove("on");
+        el("flash").style.background = "";
         resetOverlay();
         state = "running";
-        distance = 0; passed = 0; elapsed = 0; speed = 13.5;
-        setOrbColor(0);
-        player.position.set(LANE_X[0], 0, 0);
+        distance = 0; passed = 0; score = 0; combo = 0; gateBonus = 0;
+        elapsed = 0; speed = 13.5;
+        shieldCharges = 0; rainbowTimer = 0; speedBoostTimer = 0;
+        powerUpSpawnTimer = 7;
+        graceTimer = START_GRACE_SECONDS;
+        setOrbColor(1);
+        player.position.set(LANE_X[1], 0, 0);
+        player.rotation.set(0, 0, 0);
+        orb.rotation.set(0, 0, 0);
+        ribs.forEach((rib, index) => { rib.position.z = -index * 8 - 1; });
         orb.scale.setScalar(1);
         colorPulse = 0;
         makeInitialGates();
+        updatePowerHUD();
         updateHUD();
         el("overlay").classList.add("hidden");
         el("hud").classList.add("visible");
         el("runStatus").classList.add("visible");
-        el("runStatus").textContent = "Next gate ahead";
+        showRunStatus("1 second start shield", 1000);
       }
       function resolveGateCollision(gate) {
         gate.userData.checked = true;
-        const playerLeft = player.position.x - PLAYER_RADIUS;
-        const playerRight = player.position.x + PLAYER_RADIUS;
+        if (graceTimer > 0) {
+          showRunStatus("Start shield", 500);
+          return;
+        }
+        gate.updateMatrixWorld(true);
+        const localPlayer = gate.worldToLocal(new THREE.Vector3(player.position.x, player.position.y, 0));
+        const playerLeft = localPlayer.x - PLAYER_RADIUS;
+        const playerRight = localPlayer.x + PLAYER_RADIUS;
+        const playerBottom = localPlayer.y - PLAYER_RADIUS;
+        const playerTop = localPlayer.y + PLAYER_RADIUS;
         let hitSegment = -1;
-        let hitBarrier = false;
+        let hitBarrier = playerTop < -1.75 || playerBottom > 1.75;
 
         for (let segment = 0; segment < COLORS.length; segment++) {
           const segmentLeft = -GATE_HALF_WIDTH + segment * SEGMENT_WIDTH;
@@ -472,22 +761,50 @@
           }
         }
 
+        const passingSegmentHex = gate.userData.segmentMaterials[hitSegment]?.color.getHex();
+        const playerColorHex = selectedOrbColor.getHex();
+        const colorMatchesExactly =
+          hitSegment >= 0 &&
+          orb.userData.colorIndex === gate.userData.segmentColors[hitSegment] &&
+          playerColorHex === passingSegmentHex;
         const passedThroughMatchingSection =
           !hitBarrier &&
-          hitSegment === gate.userData.requiredLane &&
-          gate.userData.segmentColors[hitSegment] === currentColor &&
-          gate.userData.colorIndex === currentColor;
+          hitSegment >= 0 &&
+          (rainbowTimer > 0 || (colorMatchesExactly &&
+            hitSegment === gate.userData.requiredLane &&
+            gate.userData.colorIndex === orb.userData.colorIndex
+          ));
 
         if (!passedThroughMatchingSection) {
+          combo = 0;
+          updateHUD();
+          if (shieldCharges > 0) {
+            shieldCharges--;
+            el("flash").style.background = "rgba(56,230,211,.18)";
+            el("flash").classList.add("on");
+            window.clearTimeout(flashTimer);
+            flashTimer = window.setTimeout(() => {
+              el("flash").classList.remove("on");
+              el("flash").style.background = "";
+            }, 150);
+            updatePowerHUD();
+            showRunStatus("Shield blocked the crash", 800);
+            return;
+          }
           endGame();
           return;
         }
         passed++;
-        el("runStatus").textContent = "Gate cleared";
-        window.clearTimeout(statusTimer);
-        statusTimer = window.setTimeout(() => {
-          if (state === "running") el("runStatus").textContent = "Next gate ahead";
-        }, 460);
+        combo++;
+        gateBonus += combo * 100;
+        if (passed % 5 === 0) {
+          speedBoostTimer = 5;
+          updatePowerHUD();
+          showRunStatus("SPEED UP!", 1400);
+        } else {
+          showRunStatus("Gate cleared · ×" + combo, 460);
+        }
+        updateHUD();
       }
       function endGame() {
         if (state !== "running") return;
@@ -496,7 +813,8 @@
         el("flash").classList.add("on");
         window.clearTimeout(flashTimer);
         flashTimer = window.setTimeout(() => el("flash").classList.remove("on"), 120);
-        const final = Math.floor(distance);
+        updateHUD();
+        const final = score;
         const isBest = final > best;
         if (isBest) {
           best = final;
@@ -505,7 +823,7 @@
           } catch (error) {
             // Keep the current run playable if browser storage is unavailable.
           }
-          el("bestTop").textContent = String(best).padStart(4, "0");
+          el("bestTop").textContent = String(best).padStart(5, "0");
         }
         el("eyebrow").textContent = "Run complete";
         el("titleTop").textContent = "Gate";
@@ -514,8 +832,14 @@
         el("colorKey").hidden = true;
         el("startHint").hidden = true;
         el("results").hidden = false;
-        el("finalDistance").textContent = String(final).padStart(3, "0");
-        el("bestMessage").textContent = isBest ? "New personal best" : "Personal best · " + best + " m";
+        el("finalScore").textContent = String(final);
+        el("finalBest").textContent = String(best);
+        el("finalGates").textContent = String(passed);
+        el("bestMessage").textContent = isBest ? "New personal best" : "Personal best · " + best;
+        rainbowTimer = 0;
+        speedBoostTimer = 0;
+        shieldCharges = 0;
+        updatePowerHUD();
         el("startButton").innerHTML = 'Run again <span class="button-arrow">↗</span>';
         el("hud").classList.remove("visible");
         el("runStatus").classList.remove("visible");
@@ -525,17 +849,17 @@
       function drawFallback(t) {
         const ctx = fallbackContext;
         if (!ctx) return;
-        const width = window.innerWidth;
-        const height = window.innerHeight;
+        const { width, height } = getSceneSize();
         const center = width * 0.5;
         const horizon = height * 0.3;
         const floor = height * 0.98;
         const farHalf = width * 0.055;
         const nearHalf = width * 0.47;
         ctx.clearRect(0, 0, width, height);
+        const boostPulse = speedBoostTimer > 0 ? 0.5 + Math.sin(t * 17) * 0.5 : 0;
 
         const glow = ctx.createRadialGradient(center, height * 0.46, 0, center, height * 0.46, width * 0.62);
-        glow.addColorStop(0, "#17232e");
+        glow.addColorStop(0, speedBoostTimer > 0 ? "#30213b" : "#17232e");
         glow.addColorStop(1, "#090c13");
         ctx.fillStyle = glow;
         ctx.fillRect(0, 0, width, height);
@@ -554,7 +878,9 @@
         ctx.fillStyle = road;
         ctx.fill();
 
-        ctx.strokeStyle = "rgba(125, 157, 176, .16)";
+        ctx.strokeStyle = speedBoostTimer > 0
+          ? `rgba(56, 230, 211, ${0.16 + boostPulse * 0.3})`
+          : "rgba(125, 157, 176, .16)";
         ctx.lineWidth = 1;
         for (let i = 0; i < 14; i++) {
           const progress = ((i / 14) + ((t * 0.035) % 1)) % 1;
@@ -576,7 +902,7 @@
           ctx.beginPath();
           ctx.moveTo(center + side * farHalf, horizon);
           ctx.lineTo(center + side * nearHalf, floor);
-          ctx.strokeStyle = "rgba(157, 255, 208, .3)";
+          ctx.strokeStyle = "rgba(56, 230, 211, .3)";
           ctx.lineWidth = 2;
           ctx.stroke();
         });
@@ -587,7 +913,8 @@
           const y = horizon + (floor - horizon) * progress;
           const halfWidth = width * (0.035 + 0.37 * progress);
           const halfHeight = height * (0.012 + 0.13 * progress);
-          const x = center - halfWidth;
+          const gateCenter = center + (gate.position.x / 4.5) * nearHalf;
+          const x = gateCenter - halfWidth;
           const segmentWidth = halfWidth * 2 / COLORS.length;
           COLORS.forEach((segment, index) => {
             ctx.fillStyle = segment.css + (index === gate.userData.colorIndex ? "25" : "10");
@@ -606,19 +933,60 @@
           ctx.shadowBlur = 0;
         });
 
-        const orbColor = COLORS[currentColor].css;
+        powerUps.filter(powerUp => !powerUp.userData.collected).forEach(powerUp => {
+          const progress = Math.max(0, Math.min(1, Math.exp(powerUp.position.z / 27)));
+          if (progress <= 0 || progress > 1) return;
+          const x = center + (powerUp.position.x / 4.5) * nearHalf;
+          const y = horizon + (floor - horizon) * progress;
+          const radius = Math.max(7, Math.min(21, progress * 24));
+          const color = powerUp.userData.type === "shield" ? "#38e6d3" : "#ff4fb8";
+          ctx.beginPath();
+          ctx.arc(x, y, radius * 1.45, 0, Math.PI * 2);
+          ctx.strokeStyle = color;
+          ctx.lineWidth = Math.max(1.5, progress * 3);
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 16 * progress;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(x, y, radius * 0.58, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        });
+
+        const orbColor = rainbowTimer > 0 ? null : COLORS[currentColor].css;
         const orbX = center + (player.position.x / 4.5) * nearHalf;
         const orbY = height * 0.76;
         const orbRadius = Math.max(12, Math.min(31, width * 0.025));
+        if (shieldCharges > 0 || graceTimer > 0) {
+          const shieldColor = graceTimer > 0 ? "#68f2df" : "#38e6d3";
+          ctx.beginPath();
+          ctx.arc(orbX, orbY, orbRadius * 1.55, 0, Math.PI * 2);
+          ctx.strokeStyle = shieldColor;
+          ctx.lineWidth = 2;
+          ctx.shadowColor = shieldColor;
+          ctx.shadowBlur = 18;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
         ctx.beginPath();
         ctx.ellipse(orbX, height * 0.83, orbRadius * 1.7, orbRadius * 0.36, 0, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(0,0,0,.38)";
         ctx.fill();
         ctx.beginPath();
         ctx.arc(orbX, orbY + Math.sin(t * (state === "running" ? 5 : 1.15)) * 4, orbRadius, 0, Math.PI * 2);
-        ctx.shadowColor = orbColor;
+        const orbGradient = ctx.createLinearGradient(orbX - orbRadius, orbY, orbX + orbRadius, orbY);
+        if (rainbowTimer > 0) {
+          orbGradient.addColorStop(0, "#38e6d3");
+          orbGradient.addColorStop(.5, "#ff4fb8");
+          orbGradient.addColorStop(1, "#c5ff4a");
+        } else {
+          orbGradient.addColorStop(0, orbColor);
+          orbGradient.addColorStop(1, orbColor);
+        }
+        ctx.shadowColor = rainbowTimer > 0 ? "#ff4fb8" : orbColor;
         ctx.shadowBlur = 28;
-        ctx.fillStyle = orbColor;
+        ctx.fillStyle = orbGradient;
         ctx.fill();
         ctx.shadowBlur = 0;
         ctx.beginPath();
@@ -633,6 +1001,8 @@
         lastTime = time;
         const t = time * 0.001;
         const colorLerp = 1 - Math.exp(-dt * 16);
+        if (rainbowTimer > 0) targetOrbColor.setHSL((t * 0.42) % 1, 0.95, 0.58);
+        else targetOrbColor.copy(selectedOrbColor);
         orbMat.color.lerp(targetOrbColor, colorLerp);
         orbMat.emissive.lerp(targetOrbColor, colorLerp);
         orbHalo.material.color.lerp(targetOrbColor, colorLerp);
@@ -640,10 +1010,22 @@
         player.position.x = THREE.MathUtils.damp(player.position.x, LANE_X[currentColor], 18, dt);
         colorPulse = THREE.MathUtils.damp(colorPulse, 0, 12, dt);
         orb.scale.setScalar(THREE.MathUtils.damp(orb.scale.x, 1 + colorPulse, 18, dt));
+        shieldBubble.visible = shieldCharges > 0 || graceTimer > 0;
+        shieldBubble.material.color.setHex(graceTimer > 0 ? 0x68f2df : 0x38e6d3);
+        shieldBubble.material.opacity = 0.1 + (0.07 * (0.5 + Math.sin(t * 7) * 0.5));
+        const boostPulse = speedBoostTimer > 0 ? 0.5 + Math.sin(t * 17) * 0.5 : 0;
+          laneLineMat.opacity = 0.5 + boostPulse * 0.42;
+          ribMat.opacity = 0.28 + boostPulse * 0.35;
+        boostLight.intensity = speedBoostTimer > 0 ? 9 + boostPulse * 13 : 0;
         if (state === "running") {
           elapsed += dt;
-          speed = 13.5 + Math.min(8, elapsed * 0.11);
+          graceTimer = Math.max(0, graceTimer - dt);
+          rainbowTimer = Math.max(0, rainbowTimer - dt);
+          speedBoostTimer = Math.max(0, speedBoostTimer - dt);
+          speed = (13.5 + Math.min(8, elapsed * 0.11)) * (speedBoostTimer > 0 ? 1.25 : 1);
           distance += speed * dt * 0.72;
+          powerUpSpawnTimer -= dt;
+          if (powerUpSpawnTimer <= 0 && powerUps.length < 2) spawnPowerUp();
           player.position.y = Math.sin(t * 5) * 0.055;
           orb.rotation.y += dt * 1.2;
           orb.rotation.x += dt * 0.7;
@@ -651,11 +1033,43 @@
             rib.position.z += speed * dt;
             if (rib.position.z > 8) rib.position.z -= 120;
           });
+          for (let i = 2; i < particlePositions.length; i += 3) {
+            particlePositions[i] += speed * dt;
+            if (particlePositions[i] > 4) particlePositions[i] -= 104;
+          }
+          positionAttribute.needsUpdate = true;
+          powerUps.forEach(powerUp => {
+            const previousZ = powerUp.position.z;
+            powerUp.position.z += speed * dt;
+            powerUp.position.y = 0.12 + Math.sin(t * 2.7 + powerUp.userData.phase) * 0.12;
+            powerUp.rotation.y += dt * 1.8;
+            powerUp.rotation.x += dt * 0.9;
+            if (powerUp.userData.core) {
+              powerUp.userData.core.scale.setScalar(1 + Math.sin(t * 5 + powerUp.userData.phase) * 0.08);
+            }
+            const pickupPlane = -(PLAYER_RADIUS + 0.34);
+            const crossedPlayer = previousZ < pickupPlane && powerUp.position.z >= pickupPlane;
+            if (!powerUp.userData.collected && crossedPlayer &&
+                Math.abs(player.position.x - powerUp.position.x) <= PLAYER_RADIUS + 0.34) {
+              collectPowerUp(powerUp);
+            }
+          });
+          powerUps = powerUps.filter(powerUp => {
+            if (powerUp.userData.collected || powerUp.position.z > 10) {
+              disposePowerUp(powerUp);
+              return false;
+            }
+            return true;
+          });
+          updatePowerHUD();
           gates.forEach(gate => {
             if (state !== "running") return;
             const previousZ = gate.position.z;
             gate.position.z += speed * dt;
-            gate.rotation.z = Math.sin(t * 0.6 + gate.position.z) * 0.006;
+            const movement = Math.sin(elapsed * gate.userData.movementSpeed + gate.userData.movementPhase);
+            gate.position.x = gate.userData.moving ? movement * gate.userData.movementAmplitude : 0;
+            gate.rotation.y = gate.userData.moving ? movement * 0.12 : 0;
+            gate.rotation.z = gate.userData.moving ? Math.sin(elapsed * 1.2 + gate.userData.movementPhase) * 0.018 : 0;
             const collisionPlane = -(PLAYER_RADIUS + GATE_HALF_DEPTH);
             if (!gate.userData.checked && previousZ < collisionPlane && gate.position.z >= collisionPlane) {
               resolveGateCollision(gate);
@@ -687,19 +1101,27 @@
       requestAnimationFrame(animate);
 
       function resize() {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
+        const fallbackSize = getSceneSize();
+        const width = Math.max(1, Math.round(window.innerWidth || fallbackSize.width));
+        const height = Math.max(1, Math.round(window.innerHeight || fallbackSize.height));
         if (renderer) {
           camera.aspect = width / height;
-          camera.fov = width < 650 ? 68 : 62;
+          camera.fov = isMobileViewport() ? 68 : 62;
           camera.updateProjectionMatrix();
-          renderer.setSize(width, height);
-          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.7));
+          renderer.setPixelRatio(getPixelRatio());
+          renderer.setSize(width, height, false);
         } else {
           resizeFallback();
         }
       }
-      window.addEventListener("resize", resize);
+      resize();
+      window.addEventListener("resize", resize, { passive: true });
+      window.addEventListener("orientationchange", () => requestAnimationFrame(resize), { passive: true });
+      window.visualViewport?.addEventListener("resize", resize, { passive: true });
+      if (window.ResizeObserver) {
+        const sceneResizeObserver = new ResizeObserver(resize);
+        sceneResizeObserver.observe(sceneRoot);
+      }
       el("startButton").addEventListener("click", startGame);
       el("prevColor").addEventListener("click", () => cycleColor(-1));
       el("nextColor").addEventListener("click", () => cycleColor(1));
@@ -710,22 +1132,26 @@
         if (event.code === "ArrowRight" || event.code === "KeyD") cycleColor(1);
         if ((event.code === "Space" || event.code === "Enter") && state !== "running") startGame();
       }, { passive: false });
-      let touchX = null;
-      let touchY = null;
+      let gestureStart = null;
       const game = el("game");
-      game.addEventListener("touchstart", event => {
-        if (event.target.closest("button")) return;
-        const touch = event.changedTouches[0];
-        touchX = touch.clientX; touchY = touch.clientY;
+      game.addEventListener("pointerdown", event => {
+        if (event.button !== 0 || (event.target instanceof Element && event.target.closest("button"))) return;
+        gestureStart = { id: event.pointerId, x: event.clientX, y: event.clientY };
+        try { game.setPointerCapture(event.pointerId); } catch {}
       }, { passive: true });
-      game.addEventListener("touchend", event => {
-        if (touchX === null || event.target.closest("button")) { touchX = null; return; }
-        const touch = event.changedTouches[0];
-        const dx = touch.clientX - touchX;
-        const dy = touch.clientY - touchY;
-        if (Math.abs(dx) > 28 && Math.abs(dx) > Math.abs(dy) * 1.1) cycleColor(dx < 0 ? -1 : 1);
-        touchX = null; touchY = null;
+      game.addEventListener("pointerup", event => {
+        if (!gestureStart || gestureStart.id !== event.pointerId) return;
+        const start = gestureStart;
+        gestureStart = null;
+        const dx = event.clientX - start.x;
+        const dy = event.clientY - start.y;
+        if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+          if (state === "running") cycleColor(dx < 0 ? -1 : 1);
+          return;
+        }
+        if (state !== "running") startGame();
       }, { passive: true });
+      game.addEventListener("pointercancel", () => { gestureStart = null; }, { passive: true });
       window.addEventListener("contextmenu", event => event.preventDefault());
     })();
   </script>
