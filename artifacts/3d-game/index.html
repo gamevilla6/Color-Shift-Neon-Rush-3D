@@ -838,7 +838,7 @@
       <span class="power-chip fever" id="feverStatus" hidden>Fever · 5s</span>
     </div>
     <div class="auto-color-indicator" id="autoColorIndicator" role="status" aria-live="polite" hidden>
-      <span class="auto-color-dot" id="autoColorDot"></span><strong>AUTO</strong><span id="autoColorName">CYAN</span>
+      <span class="auto-color-dot" id="autoColorDot"></span><strong>HYBRID</strong><span id="autoColorName">CYAN</span>
     </div>
     <div class="ghost-status" id="ghostStatus" role="status" aria-live="polite" aria-atomic="true">RACING GHOST RECORD</div>
     <div class="boost-banner" id="speedBanner" hidden>SPEED UP! <span><b id="speedTime">5</b>s</span></div>
@@ -861,10 +861,10 @@
         <span class="swatch" data-color="yellow" style="background:var(--yellow)"></span>
       </div>
     </div>
-    <div class="controls-hint" id="controlsHint"><strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Color cycles every 4.5s · steer to match</div>
+    <div class="controls-hint" id="controlsHint"><strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Tap / Space / W to change color · auto-cycle every 3.5s</div>
     <div class="mobile-controls" aria-label="Lane controls and optional gravity flip">
       <button class="tap-control" id="laneLeft" type="button" aria-label="Shift lane left">←<small>LANE</small></button>
-      <button class="tap-control color-switch" id="switchColor" type="button" aria-label="Player color cycles automatically" disabled>✦<small>AUTO</small></button>
+      <button class="tap-control color-switch" id="switchColor" type="button" aria-label="Manually cycle player color">✦<small>COLOR</small></button>
       <button class="tap-control" id="laneRight" type="button" aria-label="Shift lane right">→<small>LANE</small></button>
     </div>
     <section class="overlay home-screen" id="overlay">
@@ -877,7 +877,7 @@
       <div class="card home-card" id="card">
         <div class="eyebrow" id="eyebrow">A color reaction test</div>
         <h1 aria-label="Color Shift: Neon Rush 3D"><span class="title-light" id="titleTop">COLOR SHIFT:</span><span class="title-accent" id="titleBottom">NEON RUSH 3D</span></h1>
-        <p class="intro" id="intro">The ball cycles Red, Cyan, and Yellow automatically every 4.5 seconds. Steer into the lane glowing with its current color. Collect Prism Shield, Time Warp, and 2X score boosts across ten evolving worlds.</p>
+        <p class="intro" id="intro">The ball cycles Red, Cyan, and Yellow automatically every 3.5 seconds. Tap, press Space, or use W / ↑ to switch early; the timer resets after each manual shift. Steer into the lane glowing with its current color.</p>
         <div class="color-key" id="colorKey">
           <span class="key-chip"><i style="color:var(--red);background:var(--red)"></i>Red</span>
           <span class="key-chip"><i style="color:var(--cyan);background:var(--cyan)"></i>Cyan</span>
@@ -917,7 +917,7 @@
           <button class="secondary-btn" id="settingsButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="settingsPanel">Settings</button>
           </div>
         </div>
-        <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; color auto-cycles every 4.5s</span><span class="mobile-hint">Tap to start · swipe lanes · color auto-cycles</span></div>
+        <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / W / ↑</b> change color</span><span class="mobile-hint">Tap to start · swipe to steer · tap to change color</span></div>
         <div class="small-note" id="dailyTokenNote" hidden></div>
         <section class="shop-panel" id="shopPanel" aria-label="Player skins shop" hidden>
           <div class="shop-header">
@@ -969,8 +969,8 @@
           </div>
           <div class="settings-controls">
             <div><span>Steer</span><strong>A / D · ← / → · swipe</strong></div>
-            <div><span>Color</span><strong>Auto-cycle · 4.5 sec</strong></div>
-            <div><span>Anti-Gravity</span><strong>Space · tap · flip</strong></div>
+            <div><span>Color</span><strong>Tap / Space / W / ↑ · auto-cycle 3.5 sec</strong></div>
+            <div><span>Anti-Gravity</span><strong>Flip button · Space · tap</strong></div>
           </div>
           <button class="secondary-btn settings-back" id="settingsBack" type="button">Back to game</button>
         </section>
@@ -4739,7 +4739,7 @@ void main() {
       const START_GRACE_SECONDS = 1;
       const BASE_FORWARD_SPEED = 11.8;
       const PURSUIT_WALL_SPEED = BASE_FORWARD_SPEED * 0.72 + 2;
-      const AUTO_COLOR_INTERVAL_SECONDS = 4.5;
+      const AUTO_COLOR_INTERVAL_SECONDS = 3.5;
       const MIN_GATE_REACTION_SECONDS = 2.15;
       const ITEM_LEAD_SECONDS = 2.15;
       const MIN_ITEM_NOTICE_SECONDS = 2.1;
@@ -6284,28 +6284,30 @@ void main() {
             : pursuit ? "LASER PURSUIT · BOSS RUSH"
             : mirror ? "MIRROR MATRIX · HARDCORE" : quantum ? "QUANTUM SINGULARITY" : "A color reaction test";
           el("intro").textContent = blackout
-            ? "A pitch-black tunnel hides distant gates in dense fog. Follow the ball's auto-cycling color and steer as each neon hazard emerges."
+            ? "A pitch-black tunnel hides distant gates in dense fog. Follow the ball's color and steer as each neon hazard emerges; tap or press Space to switch early."
             : pursuit
-            ? "A red-magenta laser wall is closing from behind. Keep your speed up, match each gate, and survive the rotating split-color gauntlet."
+            ? "A red-magenta laser wall is closing from behind. Keep your speed up, match each gate, and tap or press Space to switch color before the next rotating gate."
             : mirror
-            ? "Steering is mirrored: Left moves right and Right moves left. Colors cycle Yellow → Cyan → Red. Survive for 2× score and crystal rewards."
+            ? "Steering is mirrored: Left moves right and Right moves left. Colors cycle Yellow → Cyan → Red. Tap or press Space to switch early; survive for 2× rewards."
             : quantum
-            ? "Match each plasma gate, then flip gravity between the tunnel floor and ceiling."
+            ? "Match each plasma gate, then flip gravity between floor and ceiling. Tap or press Space to flip; use W / ↑ to change color early."
             : selectedMode === "timeAttack"
-              ? "Match neon gates, collect crystals, and score as much as you can in 60 seconds."
-              : "Match each neon gate, collect crystals, and build your best streak.";
+              ? "Match neon gates, collect crystals, and score as much as you can in 60 seconds. Tap or press Space to switch color early."
+              : "Match each neon gate, collect crystals, and build your best streak. Tap or press Space to switch color early.";
           el("startHint").innerHTML = quantum
-            ? '<span class="desktop-hint"><b>A / ←</b> steer &nbsp;·&nbsp; <b>Space / tap</b> flip gravity</span><span class="mobile-hint">Swipe to steer · tap to flip gravity</span>'
+            ? '<span class="desktop-hint"><b>A / ←</b> steer &nbsp;·&nbsp; <b>Space / tap</b> flip gravity &nbsp;·&nbsp; <b>W / ↑</b> change color</span><span class="mobile-hint">Swipe to steer · tap to flip · use color button to switch</span>'
             : pursuit
-            ? '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right</span><span class="mobile-hint">Swipe lanes · outrun the pursuit wall</span>'
+            ? '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / tap</b> change color</span><span class="mobile-hint">Swipe lanes · tap to change color · outrun the wall</span>'
             : mirror
-            ? '<span class="desktop-hint"><b>A / ←</b> move right &nbsp;·&nbsp; <b>D / →</b> move left</span><span class="mobile-hint">Swipe left moves right · colors reverse · 2× rewards</span>'
-            : '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right</span><span class="mobile-hint">Swipe to shift lanes · color auto-cycles</span>';
+            ? '<span class="desktop-hint"><b>A / ←</b> move right &nbsp;·&nbsp; <b>D / →</b> move left &nbsp;·&nbsp; <b>Space / tap</b> change color</span><span class="mobile-hint">Swipe to steer · tap to change color · 2× rewards</span>'
+            : '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / tap</b> change color</span><span class="mobile-hint">Swipe to steer · tap to change color</span>';
           el("controlsHint").innerHTML = pursuit
-            ? "<strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Stay ahead of the laser wall · rotating gates"
+            ? "<strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Tap / Space / W to change color · stay ahead of the laser wall"
             : mirror
-            ? "<strong>← / A</strong> move right&nbsp;&nbsp; <strong>D / →</strong> move left<br>Reverse color cycle · 2× score and crystals"
-            : "<strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Color cycles every 4.5s · steer to match";
+            ? "<strong>← / A</strong> move right&nbsp;&nbsp; <strong>D / →</strong> move left<br>Tap / Space / W to change color · reverse cycle · 2× rewards"
+            : quantum
+            ? "<strong>← / A</strong> steer&nbsp;&nbsp; <strong>Space / tap</strong> flip gravity<br>W / ↑ or color button changes color"
+            : "<strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Tap / Space / W to change color · auto-cycle every 3.5s";
           el("laneLeft").innerHTML = mirror ? "→<small>RIGHT</small>" : "←<small>LANE</small>";
           el("laneRight").innerHTML = mirror ? "←<small>LEFT</small>" : "→<small>LANE</small>";
           el("laneLeft").setAttribute("aria-label", mirror ? "Press left to move to the right lane in Mirror Matrix mode" : "Shift lane left");
@@ -6333,9 +6335,9 @@ void main() {
           control.innerHTML = '↕<small>FLIP</small>';
           control.setAttribute("aria-label", "Flip gravity between tunnel floor and ceiling");
         } else {
-          control.disabled = true;
-          control.innerHTML = '✦<small>AUTO</small>';
-          control.setAttribute("aria-label", "Player color cycles automatically");
+          control.disabled = false;
+          control.innerHTML = '✦<small>COLOR</small>';
+          control.setAttribute("aria-label", "Manually cycle player color now");
         }
       }
       function openShop() {
@@ -6465,6 +6467,12 @@ void main() {
         colorPulse = 0.15;
         unlockAudio();
         playCue("color");
+      }
+      function manuallyCycleColor() {
+        if (state !== "running" || !acceptPlayerInput()) return false;
+        autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
+        advanceAutomaticColor();
+        return true;
       }
       function updateLaneIndicator() {
         el("laneCurrent").textContent = "Lane " + (currentLane + 1) + " / " + LANE_X.length;
@@ -6819,14 +6827,14 @@ void main() {
         showRunStatus(dailyPowerName
           ? "Grace 1s · " + dailyPowerName + " ready"
           : antiGravityModeActive
-            ? "Grace 1s · color auto-cycles · Space / tap flips gravity"
+            ? "Grace 1s · Space / tap flips gravity · W / ↑ switches color"
             : blackoutModeActive
-              ? "Grace 1s · Blackout · gates emerge from fog · color auto-cycles"
+              ? "Grace 1s · Blackout · tap / Space switches color · 3.5s auto-cycle"
             : mirrorMatrixModeActive
               ? "Grace 1s · Mirror Matrix · controls reversed · 2× score and crystals"
             : laserPursuitModeActive
               ? "Grace 1s · Laser Pursuit · keep your pace up and clear rotating gates"
-            : "Grace 1s · color auto-cycles · steer to its matching lane", 1600);
+            : "Grace 1s · tap / Space / W to switch color · auto-cycle every 3.5s", 1600);
       }
       function pauseGame(reason = "manual") {
         if (state !== "running") return;
@@ -7806,10 +7814,11 @@ void main() {
       el("laneRight").addEventListener("click", () => shiftLane(1));
       el("switchColor").addEventListener("click", () => {
         if (antiGravityModeActive) flipGravity();
+        else manuallyCycleColor();
       });
       window.addEventListener("keydown", event => {
-        if (event.repeat && ["ArrowLeft", "ArrowRight", "KeyA", "KeyD", "Space", "Escape", "KeyP"].includes(event.code)) return;
-        if (["ArrowLeft", "ArrowRight", "Space", "Escape"].includes(event.code)) event.preventDefault();
+        if (event.repeat && ["ArrowLeft", "ArrowRight", "ArrowUp", "KeyA", "KeyD", "KeyW", "Space", "Escape", "KeyP"].includes(event.code)) return;
+        if (["ArrowLeft", "ArrowRight", "ArrowUp", "Space", "Escape"].includes(event.code)) event.preventDefault();
         if (event.code === "Escape" && el("card").classList.contains("settings-open")) {
           closeSettings();
           el("settingsButton").focus();
@@ -7823,7 +7832,11 @@ void main() {
         if (state === "running") {
           if (event.code === "ArrowLeft" || event.code === "KeyA") shiftLane(-1);
           if (event.code === "ArrowRight" || event.code === "KeyD") shiftLane(1);
-          if (event.code === "Space" && antiGravityModeActive) flipGravity();
+          if (event.code === "Space") {
+            if (antiGravityModeActive) flipGravity();
+            else manuallyCycleColor();
+          }
+          if (event.code === "KeyW" || event.code === "ArrowUp") manuallyCycleColor();
           return;
         }
         if ((event.code === "Space" || event.code === "Enter") && el("dailyModal").hidden && !el("card").classList.contains("shop-open") && !el("card").classList.contains("settings-open")) startGame();
@@ -7841,6 +7854,7 @@ void main() {
         if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
           if (state === "running") {
             if (antiGravityModeActive) flipGravity();
+            else manuallyCycleColor();
             return;
           }
         }
