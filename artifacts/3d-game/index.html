@@ -50,7 +50,7 @@
     .sound-toggle[aria-pressed="false"] { color: #858b98; }
     .sound-toggle:disabled { cursor: not-allowed; opacity: .55; }
     .sound-icon { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
-    .hud { position: absolute; z-index: 5; top: 94px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: clamp(14px, 4vw, 48px); opacity: 0; transition: opacity .35s ease; pointer-events: none; }
+    .hud { position: absolute; z-index: 5; top: 94px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: clamp(14px, 4vw, 48px); opacity: 0; transition: opacity .55s ease; pointer-events: none; }
     .hud.visible { opacity: 1; }
     #game.is-running .topbar { opacity: 0; visibility: hidden; }
     #game.is-running .hud { top: 0; left: 0; right: 0; width: 100%; max-width: none; height: 0; transform: none; display: block; }
@@ -133,7 +133,7 @@
     .swatch.active { opacity: 1; transform: scaleX(1.18); }
     .controls-hint { position: absolute; z-index: 5; right: clamp(20px, 5vw, 72px); bottom: max(36px, env(safe-area-inset-bottom)); color: rgba(220,228,236,.74); text-align: right; font-size: 9px; line-height: 1.9; letter-spacing: .08em; pointer-events: none; }
     .controls-hint strong { color: rgba(245,242,233,.91); font-weight: 500; }
-    .overlay { position: absolute; z-index: 10; inset: 0; display: grid; place-items: center; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 24px; background: radial-gradient(ellipse at 50% 43%, rgba(9,12,19,.07) 0%, rgba(9,12,19,.28) 42%, rgba(9,12,19,.72) 100%); transition: opacity .35s ease, visibility .35s; }
+    .overlay { position: absolute; z-index: 10; inset: 0; display: grid; place-items: center; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 24px; background: radial-gradient(ellipse at 50% 43%, rgba(9,12,19,.07) 0%, rgba(9,12,19,.28) 42%, rgba(9,12,19,.72) 100%); transition: opacity .55s ease, visibility .55s; }
     .overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; overflow: hidden; }
     .card { width: min(100%, 490px); text-align: center; transform: translateY(0); transition: transform .4s cubic-bezier(.2,.8,.2,1); }
     .overlay.hidden .card { transform: translateY(12px); }
@@ -210,10 +210,20 @@
     .achievement-banner span { display: block; color: var(--lime); font-size: 7px; letter-spacing: .2em; }
     .achievement-banner strong { display: block; margin-top: 4px; color: #fff; font: 850 14px system-ui, sans-serif; letter-spacing: .05em; }
     .achievement-banner small { display: block; margin-top: 3px; color: #b3bdc6; font-size: 8px; }
-    .mode-selector { display: flex; justify-content: center; gap: 8px; margin: 0 auto 19px; }
+    .mode-selector { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); justify-content: center; gap: 8px; width: 100%; margin: 0 auto 19px; }
     .mode-btn { min-height: 38px; padding: 9px 13px; border: 1px solid rgba(233,241,246,.16); background: rgba(8,13,20,.66); color: #9da6b0; cursor: pointer; font: 750 8px system-ui, sans-serif; letter-spacing: .13em; text-transform: uppercase; touch-action: manipulation; }
     .mode-btn[aria-pressed="true"] { border-color: rgba(56,230,211,.72); background: rgba(56,230,211,.12); color: #c8fff7; box-shadow: 0 0 16px rgba(56,230,211,.12); }
     #game.quantum-mode .mode-btn[aria-pressed="true"] { border-color: rgba(185,138,255,.78); background: rgba(143,92,255,.18); color: #eee4ff; box-shadow: 0 0 18px rgba(143,92,255,.22); }
+    #game.blackout-mode .mode-btn[aria-pressed="true"] { border-color: rgba(255,79,184,.78); background: rgba(255,40,117,.14); color: #fff0fa; box-shadow: 0 0 18px rgba(255,40,117,.22); }
+    #game.mirror-matrix-mode .mode-btn[aria-pressed="true"] { border-color: rgba(111,224,255,.82); background: linear-gradient(140deg, rgba(111,224,255,.2), rgba(190,103,255,.17)); color: #f4eaff; box-shadow: 0 0 18px rgba(157,113,255,.25); }
+    #game.mirror-matrix-mode #overlay.home-screen .mode-btn[aria-pressed="true"] { border-color: rgba(157,113,255,.92); background: linear-gradient(145deg, rgba(111,224,255,.22), rgba(190,103,255,.22)); color: #f4eaff; box-shadow: inset 0 0 16px rgba(157,113,255,.12), 0 0 18px rgba(157,113,255,.25); }
+    #game.laser-pursuit-mode .mode-btn[aria-pressed="true"] { border-color: rgba(255,76,128,.9); background: linear-gradient(140deg, rgba(255,47,102,.22), rgba(190,59,255,.18)); color: #fff0f5; box-shadow: 0 0 20px rgba(255,44,99,.28); }
+    .pursuit-vignette { position: absolute; z-index: 4; inset: 0; opacity: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 42%, rgba(255,20,65,.14) 68%, rgba(255,15,73,.92) 100%); mix-blend-mode: screen; transition: opacity .18s ease; }
+    .pursuit-vignette.active { animation: pursuitPulse .44s ease-in-out infinite alternate; }
+    @keyframes pursuitPulse { from { filter: brightness(.82); } to { filter: brightness(1.3); } }
+    .pursuit-warning { position: absolute; z-index: 6; top: max(96px, calc(env(safe-area-inset-top) + 84px)); left: 50%; transform: translateX(-50%); padding: 7px 12px; border: 1px solid rgba(255,73,122,.72); background: rgba(34,5,20,.82); color: #ffeaf0; font: 900 9px/1 ui-monospace, monospace; letter-spacing: .18em; text-shadow: 0 0 12px rgba(255,45,98,.85); box-shadow: 0 0 20px rgba(255,29,83,.22); white-space: nowrap; pointer-events: none; animation: pursuitPulse .44s ease-in-out infinite alternate; }
+    #game.laser-pursuit-mode .ghost-status { top: max(132px, calc(env(safe-area-inset-top) + 120px)); }
+    .pursuit-warning[hidden] { display: none !important; }
     #game.quantum-mode .gravity-indicator { border-color: rgba(185,138,255,.72); background: rgba(17,9,42,.84); }
     .daily-modal { position: absolute; z-index: 20; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: max(20px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom)); background: rgba(4,7,13,.82); backdrop-filter: blur(10px); }
     .daily-modal[hidden] { display: none !important; }
@@ -341,7 +351,7 @@
       isolation: isolate;
       overflow-y: auto;
       background:
-        radial-gradient(ellipse at 50% 43%, rgba(8, 17, 27, .42) 0%, rgba(6, 10, 18, .7) 73%),
+        radial-gradient(ellipse at 50% 43%, rgba(8, 17, 27, .42) 0%, rgba(6, 10, 18, .58) 73%),
         radial-gradient(ellipse at 50% 30%, rgba(22, 57, 67, .16), transparent 64%);
     }
     .menu-atmosphere {
@@ -406,10 +416,10 @@
       border: 1px solid rgba(103, 221, 233, .2);
       border-radius: 22px;
       background:
-        linear-gradient(145deg, rgba(15, 26, 39, .84), rgba(7, 12, 21, .72) 54%, rgba(20, 13, 29, .78));
+        linear-gradient(145deg, rgba(15, 26, 39, .68), rgba(7, 12, 21, .54) 54%, rgba(20, 13, 29, .62));
       box-shadow: 0 22px 90px rgba(0, 0, 0, .34), 0 0 42px rgba(45, 213, 228, .08), inset 0 1px rgba(255, 255, 255, .07);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       animation: homeCardReveal .68s cubic-bezier(.18,.76,.2,1) both;
     }
     #overlay.home-screen .card.home-card::before {
@@ -747,6 +757,7 @@
       #overlay.home-screen h1 { margin: 10px 0 13px; font-size: clamp(34px, 9vw, 46px); }
       #overlay.home-screen .intro { font-size: 15px; }
       #overlay.home-screen .mode-btn { min-height: 44px; font-size: 8px; }
+      #overlay.home-screen .mode-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       #overlay.home-screen .home-actions .primary-btn { min-height: 58px; font-size: 13px; }
       #overlay.home-screen .secondary-actions .secondary-btn { min-height: 44px; font-size: 8px; }
     }
@@ -777,7 +788,9 @@
     <div id="scene" aria-hidden="true"></div>
     <div class="grain"></div>
     <div class="fever-wash" id="feverWash"></div>
+    <div class="pursuit-vignette" id="pursuitVignette" aria-hidden="true"></div>
     <div class="flash" id="flash"></div>
+    <div class="pursuit-warning" id="pursuitWarning" role="status" aria-live="polite" hidden>LASER WALL CLOSING</div>
     <header class="topbar">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true"></div>
@@ -821,7 +834,7 @@
     <div class="power-status" id="powerStatus" hidden>
       <span class="power-chip shield" id="shieldStatus" hidden>Prism Shield Active!</span>
       <span class="power-chip time-warp" id="timeWarpStatus" hidden>Slow-Mo: <b id="timeWarpTime">5</b>s remaining</span>
-      <span class="power-chip score-boost" id="scoreBoostStatus" hidden>2X · <b id="scoreBoostTime">10</b>s</span>
+      <span class="power-chip score-boost" id="scoreBoostStatus" hidden><span id="scoreBoostMultiplier">2X</span> · <b id="scoreBoostTime">10</b>s</span>
       <span class="power-chip fever" id="feverStatus" hidden>Fever · 5s</span>
     </div>
     <div class="auto-color-indicator" id="autoColorIndicator" role="status" aria-live="polite" hidden>
@@ -829,7 +842,7 @@
     </div>
     <div class="ghost-status" id="ghostStatus" role="status" aria-live="polite" aria-atomic="true">RACING GHOST RECORD</div>
     <div class="boost-banner" id="speedBanner" hidden>SPEED UP! <span><b id="speedTime">5</b>s</span></div>
-    <div class="fever-banner" id="feverBanner" hidden>RAINBOW RUSH<span>FEVER · <b id="feverTime">5</b>s · 3X SCORE</span></div>
+    <div class="fever-banner" id="feverBanner" hidden>RAINBOW RUSH<span>FEVER · <b id="feverTime">5</b>s · <b id="feverScoreMultiplier">3X SCORE</b></span></div>
     <div class="environment-banner" id="environmentBanner" role="status" aria-live="polite" hidden>
       <span class="environment-kicker" id="environmentKicker">ZONE 01 / 10</span>
       <strong>ENTERING</strong>
@@ -848,7 +861,7 @@
         <span class="swatch" data-color="yellow" style="background:var(--yellow)"></span>
       </div>
     </div>
-    <div class="controls-hint"><strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Color cycles every 4.5s · steer to match</div>
+    <div class="controls-hint" id="controlsHint"><strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Color cycles every 4.5s · steer to match</div>
     <div class="mobile-controls" aria-label="Lane controls and optional gravity flip">
       <button class="tap-control" id="laneLeft" type="button" aria-label="Shift lane left">←<small>LANE</small></button>
       <button class="tap-control color-switch" id="switchColor" type="button" aria-label="Player color cycles automatically" disabled>✦<small>AUTO</small></button>
@@ -874,6 +887,9 @@
           <button class="mode-btn" id="endlessModeButton" type="button" aria-pressed="true" aria-label="Endless Runner Mode">Endless Runner</button>
           <button class="mode-btn" id="timeAttackModeButton" type="button" aria-pressed="false">Time Attack · 60s</button>
           <button class="mode-btn" id="antiGravityModeButton" type="button" aria-pressed="false" aria-label="Quantum Singularity: Anti-Gravity Mode" title="Quantum Singularity: Anti-Gravity Mode">Anti-Gravity</button>
+          <button class="mode-btn" id="blackoutModeButton" type="button" aria-pressed="false" aria-label="Blackout Nightmare Mode" title="Blackout Nightmare Mode">Blackout</button>
+          <button class="mode-btn" id="mirrorMatrixModeButton" type="button" aria-pressed="false" aria-label="Mirror Matrix Mode" title="Mirror Matrix Mode">Mirror Matrix</button>
+          <button class="mode-btn" id="laserPursuitModeButton" type="button" aria-pressed="false" aria-label="Laser Pursuit Mode" title="Laser Pursuit / Boss Rush Mode">Laser Pursuit</button>
         </div>
         <div id="results" hidden>
           <div class="game-over-brand">Color Shift:<span>Neon Rush 3D</span></div>
@@ -4717,8 +4733,12 @@ void main() {
       const SEGMENT_WIDTH = (GATE_HALF_WIDTH * 2) / COLORS.length;
       const LASER_HALF_WIDTH = 0.56;
       const FIRST_GATE_SPAWN_Z = -50;
+      const BLACKOUT_GATE_REVEAL_Z = -26;
+      const PURSUIT_START_GAP = 56;
+      const PURSUIT_WARNING_GAP = 22;
       const START_GRACE_SECONDS = 1;
       const BASE_FORWARD_SPEED = 11.8;
+      const PURSUIT_WALL_SPEED = BASE_FORWARD_SPEED * 0.72 + 2;
       const AUTO_COLOR_INTERVAL_SECONDS = 4.5;
       const MIN_GATE_REACTION_SECONDS = 2.15;
       const ITEM_LEAD_SECONDS = 2.15;
@@ -4745,6 +4765,9 @@ void main() {
       ];
       let environmentIndex = 0;
       let antiGravityModeActive = false;
+      let blackoutModeActive = false;
+      let mirrorMatrixModeActive = false;
+      let laserPursuitModeActive = false;
       const QUANTUM_THEME = {
         background: 0x08051a,
         fog: 0x160b35,
@@ -4772,6 +4795,15 @@ void main() {
       camera.lookAt(0, 0.5, -18);
       const CAMERA_BASE_Y = camera.position.y;
       const CAMERA_BASE_Z = camera.position.z;
+      const CAMERA_BLEND_SECONDS = 1.08;
+      const cameraLookTarget = new THREE.Vector3(0, 0.5, -18);
+      const cameraBlendFromPosition = camera.position.clone();
+      const cameraBlendFromTarget = cameraLookTarget.clone();
+      const cameraFollowPosition = new THREE.Vector3();
+      const cameraFollowTarget = new THREE.Vector3();
+      const menuCameraPosition = new THREE.Vector3();
+      const menuCameraTarget = new THREE.Vector3();
+      let cameraBlendProgress = 1;
       let cameraShakeTimer = 0;
       let cameraShakeIntensity = 0;
       let impactShakeTimer = 0;
@@ -4833,8 +4865,10 @@ void main() {
         resizeFallback();
       }
 
-      gameScene.add(new THREE.AmbientLight(0xffffff, 1.2));
-      gameScene.add(new THREE.HemisphereLight(0xbadfff, 0x101428, 0.9));
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+      gameScene.add(ambientLight);
+      const hemisphereLight = new THREE.HemisphereLight(0xbadfff, 0x101428, 0.9);
+      gameScene.add(hemisphereLight);
       const keyLight = new THREE.PointLight(0x38e6d3, 22, 40, 2);
       keyLight.position.set(0, 1.8, 2);
       gameScene.add(keyLight);
@@ -4900,9 +4934,12 @@ void main() {
         const nextIndex = Math.max(0, Math.min(ENVIRONMENTS.length - 1, index));
         const changed = nextIndex !== environmentIndex;
         environmentIndex = nextIndex;
-        const theme = antiGravityModeActive
+        const environmentTheme = antiGravityModeActive
           ? { ...ENVIRONMENTS[environmentIndex], ...QUANTUM_THEME }
           : ENVIRONMENTS[environmentIndex];
+        const theme = blackoutModeActive
+          ? { ...environmentTheme, background: 0x000000, fog: 0x000000, fogDensity: 0.045 }
+          : environmentTheme;
         environmentTargets = {
           background: new THREE.Color(theme.background),
           fog: new THREE.Color(theme.fog),
@@ -5068,6 +5105,17 @@ void main() {
       const orbLight = new THREE.PointLight(COLORS[1].hex, 16, 12, 2);
       orbLight.position.set(0, 0.65, 0);
       player.add(orbLight);
+      function applyModeLighting() {
+        const blackout = blackoutModeActive;
+        ambientLight.intensity = blackout ? 0.008 : 1.2;
+        hemisphereLight.intensity = blackout ? 0 : 0.9;
+        keyLight.intensity = blackout ? 0 : 22;
+        directionalLight.intensity = blackout ? 0 : 2.4;
+        tunnelLight.intensity = blackout ? 0 : 18;
+        farLight.intensity = blackout ? 0 : 22;
+        orbLight.intensity = blackout ? 0 : 16;
+        if (blackout) boostLight.intensity = 0;
+      }
       const targetOrbColor = new THREE.Color(COLORS[1].hex);
       const selectedOrbColor = new THREE.Color(COLORS[1].hex);
       const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.62, 32), new THREE.MeshBasicMaterial({ color: 0x02050a, transparent: true, opacity: 0.5 }));
@@ -5109,7 +5157,7 @@ void main() {
         oldGeometry.dispose();
         orbMat.roughness = skin.roughness;
         orbMat.metalness = skin.metalness;
-        orbMat.emissiveIntensity = skin.glow;
+        orbMat.emissiveIntensity = blackoutModeActive ? Math.max(2.2, skin.glow) : skin.glow;
         skinAccent.material.color.setHex(skin.accent);
         player.userData.skin = safeSkinId;
       }
@@ -5131,14 +5179,18 @@ void main() {
           frameMaterial: null,
           postGlow: null,
           level,
-          moving: score >= SLIDING_GATE_UNLOCK_SCORE,
+          moving: laserPursuitModeActive || score >= SLIDING_GATE_UNLOCK_SCORE,
           movementPhase: Math.random() * Math.PI * 2,
-          movementAmplitude: score >= SLIDING_GATE_UNLOCK_SCORE ? Math.min(0.95, 0.2 + Math.max(0, level - 3) * 0.1) : 0,
-          movementSpeed: 0.8 + Math.max(0, level - 3) * 0.15,
-          rotating: score >= ROTATING_GATE_UNLOCK_SCORE && level >= 3,
+          movementAmplitude: laserPursuitModeActive
+            ? 0.48 + Math.random() * 0.2
+            : score >= SLIDING_GATE_UNLOCK_SCORE ? Math.min(0.95, 0.2 + Math.max(0, level - 3) * 0.1) : 0,
+          movementSpeed: laserPursuitModeActive ? 0.62 : 0.8 + Math.max(0, level - 3) * 0.15,
+          rotating: laserPursuitModeActive || score >= ROTATING_GATE_UNLOCK_SCORE && level >= 3,
           rotationPhase: Math.random() * Math.PI * 2,
-          rotationSpeed: score >= ROTATING_GATE_UNLOCK_SCORE && level >= 3 ? 0.8 + Math.max(0, level - 5) * 0.18 : 0,
-          colorChanging: level >= 3,
+          rotationSpeed: laserPursuitModeActive
+            ? 0.34 + Math.random() * 0.14
+            : score >= ROTATING_GATE_UNLOCK_SCORE && level >= 3 ? 0.8 + Math.max(0, level - 5) * 0.18 : 0,
+          colorChanging: laserPursuitModeActive || level >= 3,
           flashPhase: Math.random() * 2,
           phantom: level >= 7,
           phantomActive: true,
@@ -5165,7 +5217,9 @@ void main() {
           const segmentMat = new THREE.MeshStandardMaterial({
             color: COLORS[segment].hex,
             emissive: COLORS[segment].hex,
-            emissiveIntensity: segment === colorIndex ? 2.2 : 0.6,
+            emissiveIntensity: blackoutModeActive
+              ? segment === colorIndex ? 2.6 : 1.55
+              : segment === colorIndex ? 2.2 : 0.6,
             metalness: 0,
             roughness: 0.3,
             transparent: true,
@@ -5231,9 +5285,11 @@ void main() {
           material.opacity = active
             ? mechanics.colorChanging ? 0.68 + pulse * 0.18 : 0.78
             : mechanics.colorChanging ? 0.18 + pulse * 0.08 : 0.26;
-          material.emissiveIntensity = active
-            ? mechanics.colorChanging ? 2.0 + pulse * 0.65 : 2.35
-            : 0.72;
+          material.emissiveIntensity = blackoutModeActive
+            ? active ? (mechanics.colorChanging ? 2.4 + pulse * 0.55 : 2.7) : 1.55
+            : active
+              ? mechanics.colorChanging ? 2.0 + pulse * 0.65 : 2.35
+              : 0.72;
         });
         if (mechanics.phantom) {
           mechanics.phantomActive = Math.sin(obstacleElapsed * mechanics.phantomSpeed + mechanics.phantomPhase) > 0.12;
@@ -5260,7 +5316,7 @@ void main() {
         const coreMaterial = new THREE.MeshStandardMaterial({
           color,
           emissive: color,
-          emissiveIntensity: 2.8,
+          emissiveIntensity: blackoutModeActive ? 3.2 : 2.8,
           metalness: 0.15,
           roughness: 0.25
         });
@@ -5351,7 +5407,7 @@ void main() {
         const gold = new THREE.MeshStandardMaterial({
           color: crystalBase,
           emissive: crystalGlow,
-          emissiveIntensity: 2.8,
+          emissiveIntensity: blackoutModeActive ? 3.2 : 2.8,
           metalness: 0.65,
           roughness: 0.2
         });
@@ -5429,6 +5485,59 @@ void main() {
         laser.userData.glow.visible = laser.userData.active;
         laser.userData.beam.material.opacity = 0.65 + blink * 0.35;
         laser.userData.glow.material.opacity = 0.12 + blink * 0.15;
+      }
+
+      function makeLaserPursuitWall() {
+        const wall = new THREE.Group();
+        wall.position.set(0, 0, PURSUIT_START_GAP);
+        wall.userData.wallMaterials = [];
+        const panelMaterial = new THREE.MeshBasicMaterial({
+          color: 0x74102f,
+          transparent: true,
+          opacity: 0.24,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        });
+        wall.userData.wallMaterials.push(panelMaterial);
+        const panel = new THREE.Mesh(
+          new THREE.BoxGeometry(GATE_HALF_WIDTH * 2 + 0.7, 3.55, 0.14),
+          panelMaterial
+        );
+        panel.position.y = 0.35;
+        wall.add(panel);
+
+        const redBeam = new THREE.MeshBasicMaterial({ color: 0xff2b61, transparent: true, opacity: 0.98 });
+        const magentaTrace = new THREE.MeshBasicMaterial({ color: 0xff49c8, transparent: true, opacity: 0.8 });
+        wall.userData.wallMaterials.push(redBeam, magentaTrace);
+        const upper = new THREE.Mesh(new THREE.BoxGeometry(GATE_HALF_WIDTH * 2 + 0.95, 0.12, 0.19), redBeam);
+        const lower = new THREE.Mesh(new THREE.BoxGeometry(GATE_HALF_WIDTH * 2 + 0.95, 0.12, 0.19), redBeam);
+        upper.position.set(0, 2.18, 0.02);
+        lower.position.set(0, -1.48, 0.02);
+        wall.add(upper, lower);
+
+        for (let line = -3; line <= 3; line++) {
+          const trace = new THREE.Mesh(
+            new THREE.BoxGeometry(GATE_HALF_WIDTH * 2 + 0.72, 0.025, 0.18),
+            magentaTrace
+          );
+          trace.position.set(0, 0.35 + line * 0.48, 0.025);
+          wall.add(trace);
+        }
+        for (let column = -4; column <= 4; column++) {
+          const material = column % 2 === 0 ? redBeam : magentaTrace;
+          const trace = new THREE.Mesh(
+            new THREE.BoxGeometry(0.025, 3.5, 0.18),
+            material
+          );
+          trace.position.set(column * 0.9, 0.35, 0.035);
+          wall.add(trace);
+        }
+        const emitter = new THREE.PointLight(0xff315f, 18, 18, 2);
+        emitter.position.set(0, 0.35, 0.65);
+        wall.add(emitter);
+        wall.userData.emitter = emitter;
+        gameScene.add(wall);
+        return wall;
       }
 
       const impactParticleGeometry = new THREE.SphereGeometry(0.055, 6, 6);
@@ -5518,6 +5627,9 @@ void main() {
       let powerUps = [];
       let crystalCoins = [];
       let lasers = [];
+      let laserPursuitWall = null;
+      let pursuitGap = PURSUIT_START_GAP;
+      let pursuitDangerActive = false;
       let impactBursts = [];
       let currentColor = 0;
       let autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
@@ -5547,6 +5659,50 @@ void main() {
       let powerUpSpawnTimer = 7;
       let crystalSpawnTimer = 3.5;
       let laserSpawnTimer = 10;
+      function updatePursuitWarning() {
+        const vignette = el("pursuitVignette");
+        const warning = el("pursuitWarning");
+        const distanceIntoWarning = Math.max(0, PURSUIT_WARNING_GAP - pursuitGap);
+        const active = laserPursuitModeActive && state === "running" && distanceIntoWarning > 0;
+        pursuitDangerActive = active;
+        el("game").classList.toggle("laser-danger", active);
+        vignette.classList.toggle("active", active);
+        vignette.style.opacity = active
+          ? String(0.12 + Math.min(1, distanceIntoWarning / PURSUIT_WARNING_GAP) * 0.74)
+          : "0";
+        warning.hidden = !active;
+        if (active) warning.textContent = "LASER WALL · " + Math.max(0, Math.ceil(pursuitGap)) + "M";
+      }
+      function resetLaserPursuitWall() {
+        if (laserPursuitWall) disposeGate(laserPursuitWall);
+        laserPursuitWall = null;
+        pursuitGap = PURSUIT_START_GAP;
+        pursuitDangerActive = false;
+        el("game").classList.remove("laser-danger");
+        el("pursuitVignette").classList.remove("active");
+        el("pursuitVignette").style.opacity = "0";
+        el("pursuitWarning").hidden = true;
+      }
+      function updateLaserPursuit(dt, distanceDelta, time) {
+        if (!laserPursuitModeActive || state !== "running") {
+          updatePursuitWarning();
+          return;
+        }
+        if (!laserPursuitWall) laserPursuitWall = makeLaserPursuitWall();
+        pursuitGap = Math.min(82, pursuitGap + distanceDelta - PURSUIT_WALL_SPEED * dt);
+        laserPursuitWall.position.z = pursuitGap;
+        laserPursuitWall.rotation.y = Math.sin(time * 1.8) * 0.025;
+        const closing = Math.max(0, PURSUIT_WARNING_GAP - pursuitGap) / PURSUIT_WARNING_GAP;
+        laserPursuitWall.userData.wallMaterials[0].opacity = 0.18 + closing * 0.18;
+        laserPursuitWall.userData.wallMaterials[1].opacity = 0.78 + Math.sin(time * 14) * 0.2;
+        laserPursuitWall.userData.wallMaterials[2].opacity = 0.52 + Math.sin(time * 9 + 1.2) * 0.22;
+        laserPursuitWall.userData.emitter.intensity = 12 + closing * 26;
+        updatePursuitWarning();
+        if (pursuitGap <= 0) {
+          laserPursuitWall.position.z = 0;
+          triggerGameOver("laser wall caught you");
+        }
+      }
       function nextGravityHazardSide() {
         const side = gravityHazardSerial % 2 === 0 ? "floor" : "ceiling";
         gravityHazardSerial++;
@@ -6080,9 +6236,15 @@ void main() {
         if (achievementQueue.length && !achievementNoticeTimer) displayNextAchievement();
       }
       function setGameMode(mode) {
-        if (state === "running" || !["endless", "timeAttack", "antiGravity"].includes(mode)) return;
+        if (state === "running" || !["endless", "timeAttack", "antiGravity", "blackout", "mirrorMatrix", "laserPursuit"].includes(mode)) return;
         selectedMode = mode;
         antiGravityModeActive = mode === "antiGravity";
+        blackoutModeActive = mode === "blackout";
+        mirrorMatrixModeActive = mode === "mirrorMatrix";
+        laserPursuitModeActive = mode === "laserPursuit";
+        applyModeLighting();
+        const activeSkin = PLAYER_SKINS[player.userData.skin] || PLAYER_SKINS.sphere;
+        orbMat.emissiveIntensity = blackoutModeActive ? Math.max(2.2, activeSkin.glow) : activeSkin.glow;
         gravityHazardSerial = 0;
         gravitySide = "floor";
         player.userData.gravityTargetY = antiGravityModeActive ? GRAVITY_FLOOR_Y : RUNNER_Y;
@@ -6091,12 +6253,20 @@ void main() {
         shadow.rotation.x = -Math.PI / 2;
         colorBeacon.position.y = 0.9;
         player.rotation.z = 0;
+        setOrbColor(mirrorMatrixModeActive ? COLORS.length - 1 : 1);
         el("game").classList.toggle("quantum-mode", antiGravityModeActive);
+        el("game").classList.toggle("blackout-mode", blackoutModeActive);
+        el("game").classList.toggle("mirror-matrix-mode", mirrorMatrixModeActive);
+        el("game").classList.toggle("laser-pursuit-mode", laserPursuitModeActive);
+        if (!laserPursuitModeActive) resetLaserPursuitWall();
         setParticleTheme(antiGravityModeActive);
         setEnvironment(environmentIndex, { announce: false, instant: true });
         el("endlessModeButton").setAttribute("aria-pressed", String(mode === "endless"));
         el("timeAttackModeButton").setAttribute("aria-pressed", String(mode === "timeAttack"));
         el("antiGravityModeButton").setAttribute("aria-pressed", String(mode === "antiGravity"));
+        el("blackoutModeButton").setAttribute("aria-pressed", String(mode === "blackout"));
+        el("mirrorMatrixModeButton").setAttribute("aria-pressed", String(mode === "mirrorMatrix"));
+        el("laserPursuitModeButton").setAttribute("aria-pressed", String(mode === "laserPursuit"));
         updateModeCopy();
         updateAutoColorControl();
         updateGravityIndicator();
@@ -6105,19 +6275,50 @@ void main() {
       }
       function updateModeCopy() {
         const quantum = selectedMode === "antiGravity";
+        const blackout = selectedMode === "blackout";
+        const mirror = selectedMode === "mirrorMatrix";
+        const pursuit = selectedMode === "laserPursuit";
         if (el("results").hidden) {
-          el("eyebrow").textContent = quantum ? "QUANTUM SINGULARITY" : "A color reaction test";
-          el("intro").textContent = quantum
+          el("eyebrow").textContent = blackout
+            ? "BLACKOUT NIGHTMARE"
+            : pursuit ? "LASER PURSUIT · BOSS RUSH"
+            : mirror ? "MIRROR MATRIX · HARDCORE" : quantum ? "QUANTUM SINGULARITY" : "A color reaction test";
+          el("intro").textContent = blackout
+            ? "A pitch-black tunnel hides distant gates in dense fog. Follow the ball's auto-cycling color and steer as each neon hazard emerges."
+            : pursuit
+            ? "A red-magenta laser wall is closing from behind. Keep your speed up, match each gate, and survive the rotating split-color gauntlet."
+            : mirror
+            ? "Steering is mirrored: Left moves right and Right moves left. Colors cycle Yellow → Cyan → Red. Survive for 2× score and crystal rewards."
+            : quantum
             ? "Match each plasma gate, then flip gravity between the tunnel floor and ceiling."
             : selectedMode === "timeAttack"
               ? "Match neon gates, collect crystals, and score as much as you can in 60 seconds."
               : "Match each neon gate, collect crystals, and build your best streak.";
           el("startHint").innerHTML = quantum
             ? '<span class="desktop-hint"><b>A / ←</b> steer &nbsp;·&nbsp; <b>Space / tap</b> flip gravity</span><span class="mobile-hint">Swipe to steer · tap to flip gravity</span>'
+            : pursuit
+            ? '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right</span><span class="mobile-hint">Swipe lanes · outrun the pursuit wall</span>'
+            : mirror
+            ? '<span class="desktop-hint"><b>A / ←</b> move right &nbsp;·&nbsp; <b>D / →</b> move left</span><span class="mobile-hint">Swipe left moves right · colors reverse · 2× rewards</span>'
             : '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right</span><span class="mobile-hint">Swipe to shift lanes · color auto-cycles</span>';
+          el("controlsHint").innerHTML = pursuit
+            ? "<strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Stay ahead of the laser wall · rotating gates"
+            : mirror
+            ? "<strong>← / A</strong> move right&nbsp;&nbsp; <strong>D / →</strong> move left<br>Reverse color cycle · 2× score and crystals"
+            : "<strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Color cycles every 4.5s · steer to match";
+          el("laneLeft").innerHTML = mirror ? "→<small>RIGHT</small>" : "←<small>LANE</small>";
+          el("laneRight").innerHTML = mirror ? "←<small>LEFT</small>" : "→<small>LANE</small>";
+          el("laneLeft").setAttribute("aria-label", mirror ? "Press left to move to the right lane in Mirror Matrix mode" : "Shift lane left");
+          el("laneRight").setAttribute("aria-label", mirror ? "Press right to move to the left lane in Mirror Matrix mode" : "Shift lane right");
         }
         if (selectedMode === "antiGravity") {
           if (!el("results").hidden) el("resultLine").textContent = "Quantum Singularity · Anti-Gravity";
+        } else if (pursuit) {
+          if (!el("results").hidden) el("resultLine").textContent = "Laser Pursuit · Boss Rush";
+        } else if (blackout) {
+          if (!el("results").hidden) el("resultLine").textContent = "Blackout Nightmare · Run summary";
+        } else if (mirror) {
+          if (!el("results").hidden) el("resultLine").textContent = "Mirror Matrix · 2× Score & Crystals";
         } else if (selectedMode === "timeAttack") {
           if (!el("results").hidden) el("resultLine").textContent = "Time Attack · Run summary";
         } else {
@@ -6260,7 +6461,7 @@ void main() {
         document.querySelectorAll(".swatch").forEach(s => s.classList.toggle("active", s.dataset.color === c.key));
       }
       function advanceAutomaticColor() {
-        setOrbColor(currentColor + 1);
+        setOrbColor(currentColor + (mirrorMatrixModeActive ? -1 : 1));
         colorPulse = 0.15;
         unlockAudio();
         playCue("color");
@@ -6276,6 +6477,7 @@ void main() {
       }
       function shiftLane(step) {
         if (state !== "running") return false;
+        if (mirrorMatrixModeActive) step = -step;
         const nextLane = THREE.MathUtils.clamp(currentLane + step, 0, LANE_X.length - 1);
         if (nextLane === currentLane || !acceptPlayerInput()) return false;
         currentLane = nextLane;
@@ -6372,8 +6574,8 @@ void main() {
         requestAnimationFrame(() => scoreDisplay.classList.add("score-pop"));
       }
       function getScoreMultiplier() {
-        if (feverTimer > 0) return 3;
-        return scoreBoosterTimer > 0 ? 2 : 1;
+        const activeMultiplier = feverTimer > 0 ? 3 : scoreBoosterTimer > 0 ? 2 : 1;
+        return activeMultiplier * (mirrorMatrixModeActive ? 2 : 1);
       }
       function showEnvironmentBanner(index) {
         const banner = el("environmentBanner");
@@ -6408,12 +6610,16 @@ void main() {
         el("scoreBoostStatus").hidden = !hasScoreBooster;
         el("feverStatus").hidden = !hasFever;
         el("powerStatus").hidden = !hasShield && !hasTimeWarp && !hasScoreBooster && !hasFever;
+        const scoreBoostMultiplier = mirrorMatrixModeActive ? 4 : 2;
+        const feverMultiplier = mirrorMatrixModeActive ? 6 : 3;
+        el("scoreBoostMultiplier").textContent = scoreBoostMultiplier + "X";
+        el("feverScoreMultiplier").textContent = feverMultiplier + "X SCORE";
         if (hasShield) el("shieldStatus").textContent = "Prism Shield Active!" + (shieldCharges > 1 ? " ×" + shieldCharges : "");
         if (hasTimeWarp) el("timeWarpTime").textContent = Math.max(1, Math.ceil(timeWarpTimer));
         if (hasScoreBooster) el("scoreBoostTime").textContent = Math.max(1, Math.ceil(scoreBoosterTimer));
         if (hasFever) {
           const seconds = Math.max(1, Math.ceil(feverTimer));
-          el("feverStatus").textContent = "Fever · " + seconds + "s · 3X";
+          el("feverStatus").textContent = "Fever · " + seconds + "s · " + feverMultiplier + "X";
           el("feverTime").textContent = seconds;
         }
         el("feverBanner").hidden = !hasFever;
@@ -6456,22 +6662,23 @@ void main() {
       function spawnLaser() {
         const z = -42 - Math.random() * 8;
         lasers.push(makeLaser(z));
-        laserSpawnTimer = 10 + Math.random() * 5;
+        laserSpawnTimer = laserPursuitModeActive ? 4.5 + Math.random() * 2.2 : 10 + Math.random() * 5;
       }
       function collectCrystalCoin(coin) {
         coin.userData.collected = true;
-        runCoins++;
-        progression.crystals = safeStoredCount(progression.crystals + 1);
-        progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + 1);
+        const crystalReward = mirrorMatrixModeActive ? 2 : 1;
+        runCoins += crystalReward;
+        progression.crystals = safeStoredCount(progression.crystals + crystalReward);
+        progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + crystalReward);
         progression.daily = normalizeDailyProgress(progression.daily);
-        progression.daily.crystalsCollected = safeStoredCount(progression.daily.crystalsCollected + 1);
+        progression.daily.crystalsCollected = safeStoredCount(progression.daily.crystalsCollected + crystalReward);
         score += 250 * getScoreMultiplier();
         saveProgression();
         renderProgressionUI();
         checkRunAchievements();
         checkDailyBounties();
         playCue("coin");
-        showRunStatus("Crystal +250 · Run " + runCoins, 800);
+        showRunStatus("Crystal ×" + crystalReward + " · Run " + runCoins, 800);
       }
       function collectPowerUp(powerUp) {
         powerUp.userData.collected = true;
@@ -6549,6 +6756,9 @@ void main() {
         clearImpactBursts();
         cameraShakeTimer = 0;
         cameraShakeIntensity = 0;
+        cameraBlendFromPosition.copy(camera.position);
+        cameraBlendFromTarget.copy(cameraLookTarget);
+        cameraBlendProgress = 0;
         el("overlay").classList.remove("home-screen");
         resetOverlay();
         state = "running";
@@ -6577,14 +6787,16 @@ void main() {
         if (dailyPowerName) renderProgressionUI();
         powerUpSpawnTimer = 7;
         crystalSpawnTimer = 3.5 + Math.random() * 1.5;
-        laserSpawnTimer = 10 + Math.random() * 2;
+        laserSpawnTimer = laserPursuitModeActive ? 3.5 + Math.random() * 1.5 : 10 + Math.random() * 2;
         runCoins = 0;
         graceTimer = START_GRACE_SECONDS;
         gravityHazardSerial = 0;
         setGravitySide("floor", true);
         applyPlayerSkin(progression.activeSkin);
+        resetLaserPursuitWall();
+        if (laserPursuitModeActive) laserPursuitWall = makeLaserPursuitWall();
         currentLane = 1;
-        setOrbColor(1);
+        setOrbColor(mirrorMatrixModeActive ? COLORS.length - 1 : 1);
         player.userData.targetX = LANE_X[currentLane];
         updateLaneIndicator();
         player.position.set(LANE_X[currentLane], antiGravityModeActive ? GRAVITY_FLOOR_Y : RUNNER_Y, 0);
@@ -6597,6 +6809,7 @@ void main() {
         colorPulse = 0;
         captureGhostSample(true);
         makeInitialGates();
+        updatePursuitWarning();
         updatePowerHUD();
         updateHUD();
         updateGravityIndicator();
@@ -6607,11 +6820,18 @@ void main() {
           ? "Grace 1s · " + dailyPowerName + " ready"
           : antiGravityModeActive
             ? "Grace 1s · color auto-cycles · Space / tap flips gravity"
+            : blackoutModeActive
+              ? "Grace 1s · Blackout · gates emerge from fog · color auto-cycles"
+            : mirrorMatrixModeActive
+              ? "Grace 1s · Mirror Matrix · controls reversed · 2× score and crystals"
+            : laserPursuitModeActive
+              ? "Grace 1s · Laser Pursuit · keep your pace up and clear rotating gates"
             : "Grace 1s · color auto-cycles · steer to its matching lane", 1600);
       }
       function pauseGame(reason = "manual") {
         if (state !== "running") return;
         state = "paused";
+        updatePursuitWarning();
         lastTime = performance.now();
         window.clearTimeout(statusTimer);
         window.clearTimeout(environmentNoticeTimer);
@@ -6648,6 +6868,7 @@ void main() {
       function resumeGame() {
         if (state !== "paused") return;
         state = "running";
+        updatePursuitWarning();
         lastTime = performance.now();
         el("game").classList.remove("is-paused");
         el("card").classList.remove("pause-open");
@@ -6802,6 +7023,7 @@ void main() {
         state = "over";
         el("game").classList.remove("is-running", "is-paused");
         el("pauseButton").hidden = true;
+        updatePursuitWarning();
         updateGravityIndicator();
         updateAutoColorIndicator();
         feverTimer = 0;
@@ -6828,13 +7050,25 @@ void main() {
         }
         el("eyebrow").textContent = reason === "time"
           ? "Time attack complete"
-          : selectedMode === "antiGravity" ? "Quantum run complete" : "Run complete";
+          : selectedMode === "antiGravity"
+            ? "Quantum run complete"
+            : blackoutModeActive
+              ? "Blackout run complete"
+              : laserPursuitModeActive
+                ? "Pursuit wall caught you"
+                : mirrorMatrixModeActive ? "Mirror Matrix run complete" : "Run complete";
         el("titleTop").textContent = reason === "time" ? "Time" : "Gate";
         el("titleBottom").textContent = reason === "time" ? "is up" : "missed";
         el("intro").textContent = reason === "time"
           ? "The clock is out. Your score is locked in—take another run and push your rank higher."
           : selectedMode === "antiGravity"
             ? "The quantum tunnel keeps moving. Recalibrate your gravity flips and try again."
+            : blackoutModeActive
+              ? "The darkness hides each gate until it draws near. Track the active color and steer into its matching lane for another run."
+              : laserPursuitModeActive
+                ? "The pursuit wall caught up. Clear the rotating gates and use every speed boost to stay ahead longer."
+              : mirrorMatrixModeActive
+                ? "The mirror reversed your steering and color cycle. Try again to earn double score and crystals."
             : "The tunnel keeps moving. Find your rhythm and take another run.";
         el("colorKey").hidden = true;
         el("startHint").hidden = true;
@@ -6848,7 +7082,13 @@ void main() {
         el("finalRank").textContent = playerRankForScore(final);
         el("resultLine").textContent = selectedMode === "antiGravity"
           ? "Quantum Singularity · Anti-Gravity"
-          : (selectedMode === "timeAttack" ? "Time Attack" : "Endless") + " · Run summary";
+          : blackoutModeActive
+            ? "Blackout Nightmare · Run summary"
+            : laserPursuitModeActive
+              ? "Laser Pursuit · Boss Rush"
+            : mirrorMatrixModeActive
+              ? "Mirror Matrix · 2× Score & Crystals"
+            : (selectedMode === "timeAttack" ? "Time Attack" : "Endless") + " · Run summary";
         el("bestMessage").textContent = isBest ? "New personal best" : "Personal best · " + best;
         el("mysteryReward").hidden = !isBest;
         if (isBest) el("crateReward").textContent = "+" + crateReward + " crystals";
@@ -6872,8 +7112,9 @@ void main() {
         const ctx = fallbackContext;
         if (!ctx) return;
         const { width, height } = getSceneSize();
-        const center = width * 0.5;
-        const horizon = height * 0.3;
+        const menuScene = state === "ready";
+        const center = width * 0.5 + (menuScene ? Math.sin(t * 0.2) * width * 0.012 : 0);
+        const horizon = height * (0.3 + (menuScene ? Math.sin(t * 0.16) * 0.008 : 0));
         const floor = height * 0.98;
         const farHalf = width * 0.055;
         const nearHalf = width * 0.47;
@@ -7016,6 +7257,34 @@ void main() {
           ctx.globalAlpha = 1;
         });
 
+        if (laserPursuitModeActive && pursuitGap < 34) {
+          const approach = Math.max(0, Math.min(1, (34 - pursuitGap) / 34));
+          const planeWidth = width * (0.3 + approach * 0.43);
+          const planeHeight = Math.max(5, height * (0.012 + approach * 0.035));
+          const planeY = height * (0.83 - approach * 0.035);
+          const planeX = center - planeWidth / 2;
+          ctx.save();
+          ctx.globalAlpha = 0.25 + approach * 0.55;
+          ctx.shadowColor = "#ff2b61";
+          ctx.shadowBlur = 12 + approach * 28;
+          const wallGradient = ctx.createLinearGradient(planeX, planeY, planeX + planeWidth, planeY);
+          wallGradient.addColorStop(0, "rgba(255,35,91,.12)");
+          wallGradient.addColorStop(0.5, "rgba(255,39,105,.72)");
+          wallGradient.addColorStop(1, "rgba(217,48,255,.18)");
+          ctx.fillStyle = wallGradient;
+          ctx.fillRect(planeX, planeY - planeHeight / 2, planeWidth, planeHeight);
+          ctx.strokeStyle = "#ff3c78";
+          ctx.lineWidth = Math.max(2, approach * 5);
+          ctx.strokeRect(planeX, planeY - planeHeight / 2, planeWidth, planeHeight);
+          ctx.beginPath();
+          ctx.moveTo(planeX, planeY);
+          ctx.lineTo(planeX + planeWidth, planeY);
+          ctx.strokeStyle = "#ff72bd";
+          ctx.lineWidth = Math.max(2, approach * 7);
+          ctx.stroke();
+          ctx.restore();
+        }
+
         powerUps.filter(powerUp => !powerUp.userData.collected).forEach(powerUp => {
           const progress = Math.max(0, Math.min(1, Math.exp(powerUp.position.z / 27)));
           if (progress <= 0 || progress > 1) return;
@@ -7119,15 +7388,17 @@ void main() {
         });
 
         const orbColor = COLORS[currentColor].css;
+        const menuPulse = menuScene ? 0.5 + Math.sin(t * 1.8) * 0.5 : 0;
+        const menuOrbOffset = menuScene ? 0.18 : 0;
         const orbX = center + (player.position.x / 4.5) * nearHalf;
-        const orbY = height * (0.76 - (player.position.y - RUNNER_Y) * 0.09);
+        const orbY = height * (0.76 + menuOrbOffset - (player.position.y - RUNNER_Y) * 0.09);
         const orbRadius = Math.max(20, Math.min(40, width * 0.045));
         ctx.beginPath();
         ctx.arc(orbX, orbY, orbRadius * 1.38, 0, Math.PI * 2);
         ctx.strokeStyle = orbColor;
         ctx.lineWidth = 2.5;
         ctx.shadowColor = orbColor;
-        ctx.shadowBlur = 19;
+        ctx.shadowBlur = 19 + menuPulse * 16;
         ctx.stroke();
         ctx.shadowBlur = 0;
         if (shieldCharges > 0 || graceTimer > 0) {
@@ -7154,7 +7425,7 @@ void main() {
         ctx.beginPath();
         ctx.ellipse(
           orbX,
-          height * (0.83 - (player.position.y - RUNNER_Y) * 0.08),
+          height * (0.83 + menuOrbOffset - (player.position.y - RUNNER_Y) * 0.08),
           orbRadius * 1.7,
           orbRadius * 0.36,
           0,
@@ -7163,7 +7434,7 @@ void main() {
         );
         ctx.fillStyle = "rgba(0,0,0,.38)";
         ctx.fill();
-        const orbDrawY = orbY + Math.sin(t * (state === "running" ? 5 : 1.15)) * 4;
+        const orbDrawY = orbY + Math.sin(t * (state === "running" ? 5 : 1.15)) * (menuScene ? 9 : 4);
         const skinAccentColor = "#" + PLAYER_SKINS[progression.activeSkin].accent.toString(16).padStart(6, "0");
         ctx.beginPath();
         if (progression.activeSkin === "diamond") {
@@ -7191,15 +7462,24 @@ void main() {
         ctx.shadowColor = orbColor;
         ctx.shadowBlur = 28;
         ctx.fillStyle = orbGradient;
+        ctx.globalAlpha = 0.92 + menuPulse * 0.08;
         ctx.fill();
+        ctx.globalAlpha = 1;
         ctx.strokeStyle = skinAccentColor;
         ctx.lineWidth = 2;
         ctx.shadowColor = skinAccentColor;
-        ctx.shadowBlur = 12;
+        ctx.shadowBlur = 12 + menuPulse * 10;
         ctx.stroke();
         ctx.shadowBlur = 0;
         ctx.beginPath();
-        ctx.arc(orbX - orbRadius * 0.28, orbY - orbRadius * 0.3, orbRadius * 0.24, 0, Math.PI * 2);
+        const glintAngle = t * 0.72;
+        ctx.arc(
+          orbX + Math.cos(glintAngle) * orbRadius * 0.3,
+          orbDrawY + Math.sin(glintAngle) * orbRadius * 0.22 - orbRadius * 0.22,
+          orbRadius * 0.24,
+          0,
+          Math.PI * 2
+        );
         ctx.fillStyle = "rgba(255,255,255,.7)";
         ctx.fill();
       }
@@ -7241,17 +7521,48 @@ void main() {
           LANE_X[currentLane],
           1 - Math.exp(-laneResponse * dt)
         );
-        if (antiGravityModeActive) {
+        if (state === "ready") {
+          player.position.y = RUNNER_Y + Math.sin(t * 1.45) * 0.16;
+        } else if (state === "running" && antiGravityModeActive) {
           player.position.y = THREE.MathUtils.damp(player.position.y, player.userData.gravityTargetY, 14, dt);
-        } else {
+        } else if (state === "running") {
           player.position.y = RUNNER_Y + Math.sin(t * 5) * 0.055;
+        } else {
+          player.position.y = THREE.MathUtils.damp(player.position.y, RUNNER_Y, 3.2, dt);
         }
-        camera.position.set(
-          player.position.x,
-          CAMERA_BASE_Y + (antiGravityModeActive ? (player.position.y - RUNNER_Y) * 0.32 : 0),
-          CAMERA_BASE_Z
-        );
-        camera.lookAt(player.position.x, player.position.y, -18);
+        const cameraEase = 1 - Math.exp(-dt * 3.2);
+        if (state === "ready") {
+          menuCameraPosition.set(
+            Math.sin(t * 0.2) * 1.12,
+            CAMERA_BASE_Y + Math.sin(t * 0.31) * 0.17,
+            CAMERA_BASE_Z + Math.cos(t * 0.16) * 0.32
+          );
+          menuCameraTarget.set(
+            Math.sin(t * 0.13) * 0.32,
+            4.7 + Math.sin(t * 0.24) * 0.07,
+            -18
+          );
+          camera.position.lerp(menuCameraPosition, cameraEase);
+          cameraLookTarget.lerp(menuCameraTarget, cameraEase);
+        } else {
+          cameraFollowPosition.set(
+            player.position.x,
+            CAMERA_BASE_Y + (antiGravityModeActive ? (player.position.y - RUNNER_Y) * 0.32 : 0),
+            CAMERA_BASE_Z
+          );
+          cameraFollowTarget.set(player.position.x, player.position.y, -18);
+          if (cameraBlendProgress < 1 && state === "running") {
+            cameraBlendProgress = Math.min(1, cameraBlendProgress + dt / CAMERA_BLEND_SECONDS);
+            const easedBlend = cameraBlendProgress * cameraBlendProgress * (3 - 2 * cameraBlendProgress);
+            camera.position.lerpVectors(cameraBlendFromPosition, cameraFollowPosition, easedBlend);
+            cameraLookTarget.lerpVectors(cameraBlendFromTarget, cameraFollowTarget, easedBlend);
+          } else {
+            cameraBlendProgress = 1;
+            camera.position.lerp(cameraFollowPosition, 1 - Math.exp(-dt * 14));
+            cameraLookTarget.lerp(cameraFollowTarget, 1 - Math.exp(-dt * 14));
+          }
+        }
+        camera.lookAt(cameraLookTarget);
         if (cameraShakeTimer > 0) {
           const shakeFade = cameraShakeTimer / 0.38;
           camera.position.x += (Math.random() - 0.5) * cameraShakeIntensity * shakeFade;
@@ -7262,6 +7573,13 @@ void main() {
         }
         colorPulse = THREE.MathUtils.damp(colorPulse, 0, 12, dt);
         orb.scale.setScalar(THREE.MathUtils.damp(orb.scale.x, 1 + colorPulse, 18, dt));
+        const activeSkinGlow = (PLAYER_SKINS[player.userData.skin] || PLAYER_SKINS.sphere).glow;
+        const menuPulse = 0.5 + Math.sin(t * 1.8) * 0.5;
+        orbMat.emissiveIntensity = (blackoutModeActive ? Math.max(2.2, activeSkinGlow) : activeSkinGlow)
+          * (state === "ready" ? 0.84 + menuPulse * 0.32 : 1);
+        orbLight.intensity = blackoutModeActive ? 0 : state === "ready" ? 14 + menuPulse * 8 : 16;
+        orb.rotation.y += dt * (state === "running" ? 1.2 : 0.44);
+        orb.rotation.x += dt * (state === "running" ? 0.7 : 0.24);
         shieldBubble.visible = shieldCharges > 0 || graceTimer > 0;
         if (graceTimer > 0) shieldBubble.material.color.setHex(0x68f2df);
         else shieldBubble.material.color.setHSL((t * 0.18) % 1, 0.9, 0.62);
@@ -7271,7 +7589,13 @@ void main() {
         const boostPulse = speedBoostTimer > 0 ? 0.5 + Math.sin(t * 17) * 0.5 : 0;
           laneLineMat.opacity = 0.5 + boostPulse * 0.42;
           ribMat.opacity = 0.28 + boostPulse * 0.35;
-        boostLight.intensity = speedBoostTimer > 0 ? 9 + boostPulse * 13 : 0;
+        boostLight.intensity = blackoutModeActive ? 0 : speedBoostTimer > 0 ? 9 + boostPulse * 13 : 0;
+        const particleDriftSpeed = state === "running" ? speed : state === "ready" ? 3.4 : 1.8;
+        for (let i = 2; i < particlePositions.length; i += 3) {
+          particlePositions[i] += particleDriftSpeed * dt;
+          if (particlePositions[i] > 4) particlePositions[i] -= 104;
+        }
+        positionAttribute.needsUpdate = true;
         if (state === "running") {
           autoColorTimer -= dt;
           while (autoColorTimer <= 0) {
@@ -7306,18 +7630,11 @@ void main() {
           crystalSpawnTimer -= dt;
           if (crystalSpawnTimer <= 0 && crystalCoins.length < 3) spawnCrystalCoin();
           laserSpawnTimer -= dt;
-          if (laserSpawnTimer <= 0 && lasers.length < 2) spawnLaser();
-          orb.rotation.y += dt * 1.2;
-          orb.rotation.x += dt * 0.7;
+          if (laserSpawnTimer <= 0 && lasers.length < (laserPursuitModeActive ? 3 : 2)) spawnLaser();
           ribs.forEach(rib => {
             rib.position.z += speed * dt;
             if (rib.position.z > 8) rib.position.z -= 120;
           });
-          for (let i = 2; i < particlePositions.length; i += 3) {
-            particlePositions[i] += speed * dt;
-            if (particlePositions[i] > 4) particlePositions[i] -= 104;
-          }
-          positionAttribute.needsUpdate = true;
           powerUps.forEach(powerUp => {
             const previousZ = powerUp.position.z;
             powerUp.position.z += obstacleSpeed * dt;
@@ -7385,6 +7702,10 @@ void main() {
             gate.rotation.z = gate.userData.rotating
               ? obstacleElapsed * gate.userData.rotationSpeed + gate.userData.rotationPhase
               : gate.userData.moving ? Math.sin(obstacleElapsed * 1.2 + gate.userData.movementPhase) * 0.018 : 0;
+            if (blackoutModeActive) {
+              gate.visible = gate.position.z >= BLACKOUT_GATE_REVEAL_Z &&
+                (!gate.userData.phantom || gate.userData.phantomActive);
+            }
             const collisionPlane = -(PLAYER_RADIUS + GATE_HALF_DEPTH);
             if (!gate.userData.checked && previousZ < collisionPlane && gate.position.z >= collisionPlane) {
               resolveGateCollision(gate);
@@ -7412,6 +7733,7 @@ void main() {
               timeRemaining = Math.max(0, timeRemaining - dt);
               if (timeRemaining <= 0) endGame("time");
             }
+            if (state === "running") updateLaserPursuit(dt, distanceDelta, t);
             updateHUD();
           }
         } else {
@@ -7458,6 +7780,9 @@ void main() {
       el("endlessModeButton").addEventListener("click", () => setGameMode("endless"));
       el("timeAttackModeButton").addEventListener("click", () => setGameMode("timeAttack"));
       el("antiGravityModeButton").addEventListener("click", () => setGameMode("antiGravity"));
+      el("blackoutModeButton").addEventListener("click", () => setGameMode("blackout"));
+      el("mirrorMatrixModeButton").addEventListener("click", () => setGameMode("mirrorMatrix"));
+      el("laserPursuitModeButton").addEventListener("click", () => setGameMode("laserPursuit"));
       el("dailySpinButton").addEventListener("click", spinDailyReward);
       el("dailyContinueButton").addEventListener("click", closeDailyReward);
       el("shopButton").addEventListener("click", openShop);
