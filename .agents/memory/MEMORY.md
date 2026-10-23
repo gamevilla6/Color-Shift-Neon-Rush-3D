@@ -1,3 +1,4 @@
 - [Artifact workflow restarts](artifact-workflow-restarts.md) — a Vite child can remain bound after a failed restart; verify the listener before retrying.
 - [Achievement notice lifecycle](achievement-notice-races.md) — invalidate queued timers and animation frames when transitions clear achievement banners.
-- [Overlay hit testing](overlay-hit-testing.md) — keep overlay buttons above the fixed canvas and visible in long mobile panels.
+- [Overlay hit testing](overlay-hit-testing.md) — hit-test menus above the canvas; separate long-panel scrolling from persistent navigation.
+- [Startup splash progress](startup-splash-progress.md) — tie loading progress to actual procedural setup and keep the splash until the first rendered frame.

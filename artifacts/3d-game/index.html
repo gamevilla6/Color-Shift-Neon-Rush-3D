@@ -25,11 +25,92 @@
       --accent: #68f2df;
     }
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; touch-action: none; background: #090c13; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; touch-action: pan-y; background: #090c13; }
     body { color: var(--ink); font-family: ui-monospace, monospace; -webkit-font-smoothing: antialiased; }
     button { font: inherit; }
     [hidden] { display: none !important; }
-    #game { position: relative; width: 100%; height: 100vh; height: 100dvh; min-height: 100vh; min-height: 100svh; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; background: radial-gradient(ellipse at 50% 34%, #18202b 0%, #0b1018 55%, #080b11 100%); }
+    #game { position: relative; width: 100%; height: 100vh; height: 100dvh; min-height: 100vh; min-height: 100svh; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; background: radial-gradient(ellipse at 50% 34%, #18202b 0%, #0b1018 55%, #080b11 100%); }
+    #splash-screen {
+      position: fixed;
+      z-index: 9999;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+      isolation: isolate;
+      background:
+        radial-gradient(ellipse at 50% 42%, rgba(34, 34, 92, .56) 0%, rgba(15, 13, 40, .62) 34%, rgba(4, 6, 18, .96) 78%),
+        radial-gradient(circle at 17% 22%, rgba(0, 255, 255, .13), transparent 29%),
+        radial-gradient(circle at 84% 78%, rgba(255, 0, 255, .12), transparent 33%),
+        #03040c;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity .8s ease, visibility 0s linear .8s;
+    }
+    #splash-screen[hidden] { display: none !important; }
+    #splash-screen.is-fading { opacity: 0; visibility: hidden; pointer-events: none; }
+    #splash-screen::before {
+      content: "";
+      position: absolute;
+      z-index: -2;
+      inset: -40% -20% -8%;
+      transform: perspective(700px) rotateX(62deg) translateY(20%);
+      transform-origin: center bottom;
+      background-image:
+        linear-gradient(rgba(68, 224, 255, .14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(218, 82, 255, .13) 1px, transparent 1px);
+      background-size: 52px 52px;
+      mask-image: linear-gradient(to top, rgba(0,0,0,.82), transparent 78%);
+      animation: splashGridDrift 20s linear infinite;
+    }
+    #splash-screen::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 48%, transparent 0 22%, rgba(5, 6, 16, .12) 58%, rgba(2, 3, 10, .7) 100%),
+        linear-gradient(180deg, rgba(2,3,10,.16), transparent 45%, rgba(2,3,10,.5));
+      pointer-events: none;
+    }
+    .splash-particles { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+    .splash-particles i { position: absolute; display: block; width: 3px; height: 3px; border-radius: 50%; background: #a8ffff; opacity: .35; box-shadow: 0 0 12px 2px rgba(0,255,255,.46); animation: splashParticleFloat 7s ease-in-out infinite alternate; }
+    .splash-particles i:nth-child(1) { left: 12%; top: 24%; animation-delay: -1.2s; }
+    .splash-particles i:nth-child(2) { left: 22%; top: 70%; width: 2px; height: 2px; animation-delay: -4.8s; }
+    .splash-particles i:nth-child(3) { left: 31%; top: 16%; background: #ff9cff; box-shadow: 0 0 13px 2px rgba(255,0,255,.48); animation-delay: -2.6s; }
+    .splash-particles i:nth-child(4) { left: 68%; top: 23%; width: 2px; height: 2px; animation-delay: -5.5s; }
+    .splash-particles i:nth-child(5) { left: 81%; top: 36%; background: #ff9cff; box-shadow: 0 0 12px 2px rgba(255,0,255,.42); animation-delay: -3s; }
+    .splash-particles i:nth-child(6) { left: 74%; top: 76%; width: 2px; height: 2px; animation-delay: -6s; }
+    .splash-particles i:nth-child(7) { left: 44%; top: 83%; background: #ff9cff; box-shadow: 0 0 11px 2px rgba(255,0,255,.42); animation-delay: -1.8s; }
+    .splash-particles i:nth-child(8) { left: 91%; top: 62%; width: 2px; height: 2px; animation-delay: -3.7s; }
+    .splash-content { width: min(100%, 720px); text-align: center; transform: translateY(-1vh); }
+    .splash-emblem { position: relative; display: grid; place-items: center; width: clamp(46px, 8vw, 68px); aspect-ratio: 1; margin: 0 auto clamp(24px, 5vh, 42px); border: 1px solid rgba(136, 251, 255, .7); border-radius: 50%; box-shadow: 0 0 18px rgba(0,255,255,.24), inset 0 0 18px rgba(255,0,255,.16); animation: splashEmblemPulse 2.2s ease-in-out infinite; }
+    .splash-emblem::before, .splash-emblem::after { content: ""; position: absolute; border: 1px solid rgba(255, 120, 255, .56); border-radius: 50%; }
+    .splash-emblem::before { inset: 7px; }
+    .splash-emblem::after { inset: 15px; background: linear-gradient(140deg, #00ffff, #ff00ff); border: 0; box-shadow: 0 0 15px rgba(0,255,255,.8), 0 0 27px rgba(255,0,255,.55); }
+    .splash-kicker { margin: 0 0 12px; color: #9cecff; font: 600 clamp(10px, 1.8vw, 13px)/1.2 "Orbitron", system-ui, sans-serif; letter-spacing: .34em; text-transform: uppercase; text-shadow: 0 0 15px rgba(0,255,255,.55); }
+    .splash-title { margin: 0; color: #f7f8ff; font: 900 clamp(46px, 10vw, 104px)/.96 "Orbitron", system-ui, sans-serif; letter-spacing: -.065em; text-transform: uppercase; text-shadow: 0 0 7px rgba(0,255,255,.9), 0 0 21px rgba(0,255,255,.56), 0 0 37px rgba(255,0,255,.48), 0 0 68px rgba(255,0,255,.27); animation: splashTitlePulse 2.4s ease-in-out infinite; }
+    .splash-subtitle { margin: clamp(9px, 1.7vh, 16px) 0 0; color: #ff8df6; font: 700 clamp(16px, 3.2vw, 27px)/1.15 "Orbitron", system-ui, sans-serif; letter-spacing: .34em; text-indent: .34em; text-shadow: 0 0 10px rgba(255,0,255,.74), 0 0 27px rgba(255,0,255,.46), 0 0 44px rgba(0,255,255,.28); }
+    .splash-tagline { margin: clamp(16px, 3vh, 27px) 0 0; color: rgba(205, 216, 239, .72); font: 600 clamp(12px, 2vw, 15px)/1.5 "Rajdhani", system-ui, sans-serif; letter-spacing: .16em; text-transform: uppercase; }
+    .splash-loader { width: min(100%, 420px); margin: clamp(42px, 8vh, 70px) auto 0; }
+    .splash-loader-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 11px; color: #d4e5f8; font: 700 clamp(11px, 2vw, 14px)/1.2 "Orbitron", system-ui, sans-serif; letter-spacing: .11em; text-align: left; text-transform: uppercase; }
+    #splash-status-text { overflow: hidden; color: rgba(194, 215, 235, .78); text-overflow: ellipsis; white-space: nowrap; }
+    #splash-percentage { flex: 0 0 auto; min-width: 42px; color: #f9c8ff; text-align: right; text-shadow: 0 0 12px rgba(255,0,255,.55); font-variant-numeric: tabular-nums; }
+    .splash-progress-track { height: 10px; overflow: hidden; padding: 2px; border: 1px solid rgba(90, 241, 255, .72); border-radius: 20px; background: rgba(4, 8, 20, .84); box-shadow: 0 0 13px rgba(0,255,255,.2), inset 0 0 8px rgba(0,0,0,.72); }
+    .splash-progress-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #00ffff 0%, #6385ff 48%, #ff00ff 100%); box-shadow: 0 0 13px rgba(0,255,255,.8), 0 0 25px rgba(255,0,255,.48); }
+    .splash-caption { margin: 14px 0 0; color: rgba(147, 162, 188, .54); font: 500 10px/1.4 "Orbitron", system-ui, sans-serif; letter-spacing: .2em; text-transform: uppercase; }
+    @keyframes splashGridDrift { to { background-position: 52px 52px; } }
+    @keyframes splashParticleFloat { from { transform: translate3d(0, 0, 0); opacity: .18; } to { transform: translate3d(12px, -20px, 0); opacity: .75; } }
+    @keyframes splashEmblemPulse { 0%, 100% { transform: scale(.96); filter: brightness(.9); } 50% { transform: scale(1.04); filter: brightness(1.3); } }
+    @keyframes splashTitlePulse { 0%, 100% { filter: brightness(.94); text-shadow: 0 0 7px rgba(0,255,255,.82), 0 0 21px rgba(0,255,255,.5), 0 0 37px rgba(255,0,255,.43), 0 0 68px rgba(255,0,255,.24); } 50% { filter: brightness(1.12); text-shadow: 0 0 10px rgba(0,255,255,1), 0 0 28px rgba(0,255,255,.72), 0 0 48px rgba(255,0,255,.63), 0 0 82px rgba(255,0,255,.35); } }
+    @media (max-width: 520px) {
+      .splash-content { transform: translateY(-2vh); }
+      .splash-title { font-size: clamp(42px, 11.8vw, 62px); letter-spacing: -.075em; }
+      .splash-subtitle { letter-spacing: .24em; text-indent: .24em; }
+      .splash-loader { margin-top: clamp(38px, 8vh, 58px); }
+    }
     #scene { position: absolute; inset: 0; }
     #scene canvas { position: fixed; top: 0; left: 0; z-index: 1; display: block; width: 100vw; height: 100vh; height: 100dvh; touch-action: none; }
     #scene canvas { pointer-events: none; }
@@ -161,7 +242,6 @@
     .secondary-btn:disabled { opacity: .46; cursor: not-allowed; transform: none; }
     .actions { flex-wrap: wrap; }
     .actions .secondary-btn { min-width: 138px; }
-    .card.shop-open > :not(.shop-panel) { display: none !important; }
     .card.pause-open > #dailyTokenNote { display: none !important; }
     .shop-panel { width: 100%; max-height: min(78vh, 620px); overflow-y: auto; padding: 15px; border: 1px solid rgba(56,230,211,.28); background: rgba(7,11,19,.84); box-shadow: 0 0 36px rgba(56,230,211,.1); text-align: left; }
     .shop-panel[hidden] { display: none !important; }
@@ -192,8 +272,6 @@
     .save-reset p { margin: 0 0 8px; color: #8d9aa8; font-size: 8px; line-height: 1.6; letter-spacing: .07em; }
     .reset-save-btn { width: min(100%, 220px); min-height: 40px; border-color: rgba(255,95,129,.48); color: #ff9aac; }
     .mobile-hint { display: none; }
-    .card.shop-open { width: min(calc(100vw - 48px), 1120px); max-width: 1120px; padding: 0; }
-    #overlay.home-screen .card.home-card.shop-open { width: min(calc(100vw - 48px), 1120px); max-width: 1120px; padding: 0; }
     .shop-panel {
       width: 100%;
       max-height: min(88vh, 920px);
@@ -228,7 +306,7 @@
     .achievement-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .achievement-category { min-width: 0; padding: 14px; border: 1px solid rgba(211,222,231,.12); background: linear-gradient(135deg, rgba(17,26,40,.88), rgba(10,15,24,.9)); }
     .achievement-category-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
-    .achievement-category-head h3 { margin: 0; color: #eff5fb; font: 700 15px "Orbitron", system-ui, sans-serif; letter-spacing: .02em; }
+    .achievement-category-head h3 { margin: 0; color: #eff5fb; font: 700 16px "Orbitron", system-ui, sans-serif; letter-spacing: .02em; }
     .achievement-category-head p { margin: 5px 0 0; color: #a4b1c0; font-size: 16px; line-height: 1.3; }
     .achievement-category-count { color: var(--cyan); font: 700 17px "Orbitron", system-ui, sans-serif; white-space: nowrap; }
     .achievement-category-count small { color: #77879a; font-size: 11px; }
@@ -262,7 +340,7 @@
     .skin-preview.plasma::before { background: radial-gradient(circle at 30% 25%, #fff, #a876ff 23%, #1c183b 72%); border: 1px solid #d1b5ff; }
     .skin-preview.shard::before { clip-path: polygon(50% 0, 100% 36%, 76% 100%, 22% 91%, 0 34%); transform: rotate(12deg); }
     .skin-preview.void::before { background: radial-gradient(circle at 32% 28%, #ffe7ff, #ff58ca 12%, #24102b 46%, #05060b 74%); border: 1px solid #ff98e0; }
-    .skin-card h3, .trail-card h3 { margin: 0; color: #f4f7ff; font: 700 13px "Orbitron", system-ui, sans-serif; }
+    .skin-card h3, .trail-card h3 { margin: 0; color: #f4f7ff; font: 700 clamp(14px, 1.2vw, 16px) "Orbitron", system-ui, sans-serif; }
     .skin-card p, .trail-card p { min-height: 42px; margin: 6px 0 10px; color: #a4b1c0; font-size: 16px; line-height: 1.35; }
     .cosmetic-cost, .trail-footer > span { display: flex; align-items: center; gap: 6px; margin-top: auto; color: #d8bd76; font: 600 10px "Orbitron", system-ui, sans-serif; }
     .skin-action { width: 100%; min-height: 44px; margin-top: 10px; font-size: 10px; }
@@ -278,9 +356,9 @@
     .trail-copy p { min-height: 0; margin: 5px 0 8px; }
     .trail-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; grid-column: 2; }
     .trail-action { min-width: 88px; min-height: 40px; font-size: 10px; }
-    .shop-notice { min-height: 26px; margin: 15px 0 8px; color: #a4fff2; font-size: 14px; line-height: 1.4; letter-spacing: .02em; }
+    .shop-notice { min-height: 26px; margin: 15px 0 8px; color: #a4fff2; font-size: 16px; line-height: 1.4; letter-spacing: .02em; }
     .save-reset { margin-top: 12px; padding-top: 13px; }
-    .save-reset p { font-size: 13px; }
+    .save-reset p { font-size: 16px; }
     .shop-back { min-height: 46px; font-size: 11px; }
     .result-line { margin: 24px 0 4px; color: #9ca4ad; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; }
     .game-over-brand { margin: 3px 0 12px; color: var(--accent); font-family: system-ui, sans-serif; font-size: 10px; font-weight: 800; letter-spacing: .16em; line-height: 1.5; text-transform: uppercase; text-shadow: 0 0 14px rgba(56,230,211,.32); }
@@ -565,8 +643,27 @@
     .achievement-banner strong { display: block; margin-top: 4px; color: #fff; font: 850 14px system-ui, sans-serif; letter-spacing: .05em; }
     .achievement-banner small { display: block; margin-top: 3px; color: #b3bdc6; font-size: 8px; }
     .mode-selector { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); justify-content: center; gap: 8px; width: 100%; margin: 0 auto 19px; }
-    .mode-btn { min-height: 38px; padding: 9px 13px; border: 1px solid rgba(233,241,246,.16); background: rgba(8,13,20,.66); color: #9da6b0; cursor: pointer; font: 750 8px system-ui, sans-serif; letter-spacing: .13em; text-transform: uppercase; touch-action: manipulation; }
-    .mode-btn[aria-pressed="true"] { border-color: rgba(56,230,211,.72); background: rgba(56,230,211,.12); color: #c8fff7; box-shadow: 0 0 16px rgba(56,230,211,.12); }
+    .mode-btn {
+      min-width: 0;
+      min-height: 56px;
+      padding: 10px;
+      border: 1px solid rgba(132, 210, 226, .34);
+      border-radius: 8px;
+      background: rgba(8, 15, 25, .82);
+      color: #d3e3e8;
+      cursor: pointer;
+      font: 800 clamp(1rem, 3.5vw, 1.25rem)/1.12 "Rajdhani", sans-serif;
+      letter-spacing: .025em;
+      text-align: center;
+      text-transform: uppercase;
+      touch-action: manipulation;
+      overflow-wrap: anywhere;
+      transition: transform .18s ease, border-color .18s ease, color .18s ease, background .18s ease, box-shadow .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mode-btn:hover { border-color: rgba(56, 234, 255, .68); background: rgba(16, 33, 46, .92); color: #fff; transform: translateY(-1px); }
+    .mode-btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+    .mode-btn[aria-pressed="true"] { border-color: rgba(56,230,211,.88); background: linear-gradient(145deg, rgba(56,234,255,.24), rgba(255,79,184,.16)); color: #f4ffff; box-shadow: inset 0 0 18px rgba(56,230,211,.13), 0 0 20px rgba(56,230,211,.23), 0 0 30px rgba(255,79,184,.09); text-shadow: 0 0 12px rgba(56,234,255,.42); }
     #game.quantum-mode .mode-btn[aria-pressed="true"] { border-color: rgba(185,138,255,.78); background: rgba(143,92,255,.18); color: #eee4ff; box-shadow: 0 0 18px rgba(143,92,255,.22); }
     #game.blackout-mode .mode-btn[aria-pressed="true"] { border-color: rgba(255,79,184,.78); background: rgba(255,40,117,.14); color: #fff0fa; box-shadow: 0 0 18px rgba(255,40,117,.22); }
     #game.mirror-matrix-mode .mode-btn[aria-pressed="true"] { border-color: rgba(111,224,255,.82); background: linear-gradient(140deg, rgba(111,224,255,.2), rgba(190,103,255,.17)); color: #f4eaff; box-shadow: 0 0 18px rgba(157,113,255,.25); }
@@ -643,8 +740,6 @@
       .primary-btn { width: min(100%, 250px); min-height: 56px; font-size: 18px; }
       .actions { flex-direction: column; gap: 8px; }
       .actions .primary-btn, .actions .secondary-btn { width: min(100%, 250px); }
-      .card.shop-open { width: calc(100vw - 32px); max-width: none; }
-      #overlay.home-screen .card.home-card.shop-open { width: calc(100vw - 32px); max-width: none; padding: 0; }
       .shop-panel { max-height: 88dvh; padding: 14px; border-radius: 14px; }
       .shop-header { align-items: flex-start; }
       .shop-balance { min-width: 118px; padding: 9px; font-size: 9px; }
@@ -863,25 +958,27 @@
     #overlay.home-screen .mode-btn {
       display: grid;
       min-width: 0;
-      min-height: 47px;
+      min-height: 64px;
       place-items: center;
-      padding: 7px 5px;
-      border: 1px solid rgba(162, 193, 204, .17);
-      border-radius: 6px;
-      background: rgba(7, 15, 24, .76);
-      color: #9aabb3;
-      font: 700 9px/1.2 "Rajdhani", sans-serif;
-      letter-spacing: .055em;
+      padding: 9px 7px;
+      border: 1px solid rgba(132, 210, 226, .34);
+      border-radius: 9px;
+      background: linear-gradient(145deg, rgba(11, 22, 33, .92), rgba(7, 14, 24, .84));
+      color: #d3e3e8;
+      font: 800 clamp(1rem, 3.5vw, 1.25rem)/1.12 "Rajdhani", sans-serif;
+      letter-spacing: .025em;
       text-align: center;
+      overflow-wrap: anywhere;
       transition: transform .18s ease, border-color .18s ease, color .18s ease, background .18s ease, box-shadow .18s ease;
     }
-    #overlay.home-screen .mode-btn:hover { transform: scale(1.025); border-color: rgba(56, 234, 255, .52); color: #f2ffff; }
+    #overlay.home-screen .mode-btn:hover { transform: scale(1.025); border-color: rgba(56, 234, 255, .68); color: #fff; }
     #overlay.home-screen .mode-btn.active,
     #overlay.home-screen .mode-btn[aria-pressed="true"] {
-      border-color: rgba(56, 234, 255, .72);
-      background: linear-gradient(145deg, rgba(56, 234, 255, .14), rgba(255, 79, 184, .06));
-      color: #eaffff;
-      box-shadow: inset 0 0 16px rgba(56, 234, 255, .075), 0 0 16px rgba(56, 234, 255, .08);
+      border-color: rgba(56, 234, 255, .9);
+      background: linear-gradient(145deg, rgba(56, 234, 255, .25), rgba(255, 79, 184, .17));
+      color: #f4ffff;
+      box-shadow: inset 0 0 18px rgba(56, 234, 255, .14), 0 0 22px rgba(56, 234, 255, .25), 0 0 30px rgba(255, 79, 184, .1);
+      text-shadow: 0 0 12px rgba(56, 234, 255, .45);
     }
     #overlay.home-screen .actions.home-actions {
       display: flex;
@@ -1150,53 +1247,74 @@
       z-index: 60;
       pointer-events: auto;
     }
-    #overlay.home-screen.rewards-open {
-      place-items: start center;
-      padding:
-        max(12px, env(safe-area-inset-top))
-        max(12px, env(safe-area-inset-right))
-        max(12px, env(safe-area-inset-bottom))
-        max(12px, env(safe-area-inset-left));
+    #rewards-screen {
+      position: fixed;
+      z-index: 70;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+      background:
+        radial-gradient(ellipse at 12% 8%, rgba(32, 198, 218, .14), transparent 38%),
+        radial-gradient(ellipse at 88% 92%, rgba(232, 62, 173, .15), transparent 42%),
+        radial-gradient(ellipse at 50% 48%, rgba(11, 15, 28, .88), rgba(3, 5, 12, .97) 78%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      touch-action: pan-y;
+      pointer-events: auto;
+      animation: rewardsReveal .24s ease-out both;
     }
-    #overlay.home-screen.rewards-open .card.home-card.shop-open {
-      width: min(100%, 1120px);
-      max-height: none;
-      overflow: visible;
-      padding: 0;
-    }
-    #overlay.home-screen.rewards-open .shop-panel {
+    #rewards-screen[hidden] { display: none !important; }
+    #rewards-screen .shop-panel {
       display: flex;
       flex-direction: column;
       min-height: 0;
-      height: min(920px, calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
-      max-height: min(920px, calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+      width: min(100%, 1120px);
+      height: min(920px, calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+      max-height: min(920px, calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
       overflow: hidden;
       padding: 0;
+      border-color: rgba(84, 242, 223, .42);
+      box-shadow: 0 24px 96px rgba(0, 0, 0, .6), 0 0 45px rgba(56, 230, 211, .14), 0 0 35px rgba(255, 79, 184, .08);
       pointer-events: auto;
     }
-    #overlay.home-screen.rewards-open .shop-panel button { pointer-events: auto; touch-action: manipulation; }
-    #overlay.home-screen.rewards-open .shop-scroll {
+    #rewards-screen .shop-header { align-items: center; }
+    #rewards-screen .shop-panel button { pointer-events: auto; touch-action: manipulation; }
+    #rewards-screen .shop-scroll {
       flex: 1 1 auto;
       min-height: 0;
       overflow-x: hidden;
       overflow-y: auto;
       overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
       scrollbar-gutter: stable;
       padding: clamp(16px, 2.4vw, 30px);
     }
-    #overlay.home-screen.rewards-open .shop-footer {
+    #rewards-screen .shop-footer {
       flex: 0 0 auto;
       z-index: 8;
       padding: 10px clamp(12px, 2.4vw, 30px) max(10px, env(safe-area-inset-bottom));
       border-top: 1px solid rgba(84,242,223,.18);
       background: linear-gradient(180deg, rgba(8,13,22,.94), rgba(7,11,19,.99));
     }
-    #overlay.home-screen.rewards-open .shop-back {
+    #rewards-screen .shop-back {
       display: flex;
       width: min(100%, 350px);
       min-height: 56px;
       margin: 0 auto;
     }
+    #rewards-screen .universal-menu-back:hover {
+      transform: translateY(-1px) scale(1.02);
+      border-color: rgba(255,79,184,.72);
+      background: linear-gradient(120deg, rgba(20,196,209,.14), rgba(155,111,255,.15) 55%, rgba(255,79,184,.15)), rgba(7,14,24,.9);
+      box-shadow: inset 0 1px rgba(255,255,255,.1), 0 0 22px rgba(84,242,223,.14), 0 0 22px rgba(255,79,184,.08);
+    }
+    #rewards-screen .universal-menu-back:active { transform: scale(.97); }
+    #rewards-screen .universal-menu-back:focus-visible { outline: 2px solid #8cfaff; outline-offset: 3px; }
+    @keyframes rewardsReveal { from { opacity: 0; } to { opacity: 1; } }
     #overlay.home-screen .universal-menu-back:hover,
     #overlay:not(.home-screen) .universal-menu-back:hover,
     #dailyModal .universal-menu-back:hover {
@@ -1234,7 +1352,11 @@
       #game .topbar .home-stats .coin-total { font-size: 10px; }
       #overlay.home-screen h1 { margin: 10px 0 13px; font-size: clamp(34px, 9vw, 46px); }
       #overlay.home-screen .intro { font-size: 15px; }
-      #overlay.home-screen .mode-btn { min-height: 44px; font-size: 8px; }
+      #overlay.home-screen .mode-btn {
+        min-height: 64px;
+        padding: 8px 5px;
+        font-size: clamp(1rem, 4vw, 1.125rem);
+      }
       #overlay.home-screen .mode-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       #overlay.home-screen .home-actions .primary-btn { min-height: 58px; font-size: 13px; }
       #overlay.home-screen .secondary-actions .secondary-btn { min-height: 44px; font-size: 8px; }
@@ -1243,12 +1365,12 @@
       #dailyModal .universal-menu-back { min-height: 56px; font-size: 9px; }
     }
     @media (max-width: 650px) {
-      #overlay.home-screen.rewards-open { padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom)); }
-      #overlay.home-screen.rewards-open .shop-panel {
+      #rewards-screen { padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom)); }
+      #rewards-screen .shop-panel {
         height: min(920px, calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
         max-height: min(920px, calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
       }
-      #overlay.home-screen.rewards-open .shop-scroll { padding: clamp(12px, 3.8vw, 16px); }
+      #rewards-screen .shop-scroll { padding: clamp(12px, 3.8vw, 16px); }
       .reward-tab {
         min-height: 50px;
         padding: 8px 3px;
@@ -1261,8 +1383,8 @@
       .shop-back { min-height: 56px; }
     }
     @media (max-width: 900px) and (orientation: landscape) {
-      #overlay.home-screen.rewards-open { padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
-      #overlay.home-screen.rewards-open .shop-panel {
+      #rewards-screen { padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
+      #rewards-screen .shop-panel {
         height: min(920px, calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
         max-height: min(920px, calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
       }
@@ -1273,7 +1395,13 @@
       #game .topbar .home-stat-icon { display: none; }
       #overlay.home-screen .home-card { padding-right: 13px; padding-left: 13px; }
       #overlay.home-screen h1 { font-size: 33px; }
-      #overlay.home-screen .mode-btn { padding-right: 3px; padding-left: 3px; font-size: 7px; }
+      #overlay.home-screen .mode-btn {
+        min-height: 64px;
+        padding-right: 4px;
+        padding-left: 4px;
+        font-size: clamp(1rem, 4.5vw, 1.0625rem);
+        letter-spacing: .015em;
+      }
     }
     @media (max-height: 730px) {
       #overlay.home-screen { padding-top: 82px; padding-bottom: 52px; }
@@ -1286,6 +1414,793 @@
       #overlay.home-screen *,
       #overlay.home-screen *::before,
       #overlay.home-screen *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    /* Flexible score cards and thumb-friendly audio controls. */
+    #game .topbar { z-index: 55; }
+    #game .topbar .brand { min-width: 0; flex: 1 1 auto; gap: clamp(6px, 1.5vw, 12px); }
+    #game .topbar .brand-name { font-size: clamp(12px, 1.45vw, 18px); white-space: nowrap; }
+    #game .topbar .brand-sub { font-size: clamp(7px, .8vw, 9px); }
+    #game .topbar .highscore.home-stats {
+      width: min(280px, 36vw);
+      min-width: 220px;
+      max-width: 100%;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      overflow: visible;
+    }
+    #game .topbar .home-stat-cell { min-width: 0; overflow: visible; }
+    #game .topbar .home-stat-copy { min-width: 0; overflow: visible; }
+    #game .topbar .home-stats .micro-label {
+      font-size: clamp(7px, .78vw, 9px);
+      letter-spacing: .07em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    #game .topbar .home-stats .record-value,
+    #game .topbar .home-stats .coin-total {
+      font-size: clamp(12px, 1.15vw, 15px);
+      line-height: 1.15;
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+    }
+    #game .topbar .home-stats .sound-toggle {
+      position: relative;
+      z-index: 12;
+      width: 100%;
+      min-width: 44px;
+      min-height: 44px;
+      grid-column: 1 / -1;
+      justify-content: center;
+      padding: 8px 12px;
+      font-size: clamp(8px, .8vw, 10px);
+      pointer-events: auto;
+      touch-action: manipulation;
+    }
+    #game .topbar .home-stats .sound-toggle[aria-pressed="true"] {
+      border-color: rgba(104, 242, 223, .46);
+      background: rgba(34, 178, 169, .12);
+      color: #c8fff4;
+    }
+    #game .topbar .home-stats .sound-toggle[aria-pressed="false"] {
+      border-color: rgba(178, 190, 204, .24);
+      background: rgba(6, 10, 17, .52);
+      color: #a0a9b3;
+    }
+    #game .topbar .sound-toggle:focus-visible,
+    #overlay.home-screen button:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 3px;
+    }
+    #game.is-running .hud .stat-value {
+      max-width: min(45vw, 210px);
+      font-size: clamp(18px, 5.4vw, 27px);
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+    }
+    #overlay.home-screen .settings-panel {
+      width: 100%;
+      max-width: 500px;
+      min-width: 0;
+      padding: clamp(14px, 3.4vw, 22px);
+      overflow: visible;
+      border: 1px solid rgba(118, 228, 238, .2);
+      border-radius: 12px;
+      background: linear-gradient(145deg, rgba(14, 26, 39, .78), rgba(8, 12, 23, .82));
+      box-shadow: inset 0 1px rgba(255,255,255,.05), 0 12px 32px rgba(0,0,0,.17);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    #overlay.home-screen .settings-option { min-width: 0; }
+    #overlay.home-screen .settings-option-copy { min-width: 0; }
+    #overlay.home-screen .settings-sound-toggle {
+      min-width: 100px;
+      min-height: 48px;
+      flex: 0 0 auto;
+      pointer-events: auto;
+      touch-action: manipulation;
+    }
+    #overlay.home-screen .settings-sound-toggle[aria-pressed="true"] {
+      border-color: rgba(104, 242, 223, .72);
+      background: rgba(56, 234, 255, .15);
+      color: #d8fffa;
+      box-shadow: 0 0 18px rgba(56, 234, 255, .14);
+    }
+    #overlay.home-screen .settings-sound-toggle[aria-pressed="false"] {
+      border-color: rgba(160, 177, 191, .32);
+      background: rgba(9, 14, 22, .62);
+      color: #99a3ae;
+    }
+    #overlay.home-screen .settings-back,
+    #overlay.home-screen .secondary-actions button,
+    #overlay.home-screen .actions > button {
+      position: relative;
+      z-index: 12;
+      pointer-events: auto;
+      touch-action: manipulation;
+    }
+    #overlay.home-screen.game-over-screen .card.home-card {
+      width: min(100%, 760px);
+      max-width: 760px;
+      overflow: visible;
+    }
+    #overlay.game-over-screen #results {
+      width: 100%;
+      max-width: 680px;
+      min-width: 0;
+      margin-inline: auto;
+      overflow: visible;
+    }
+    #overlay.game-over-screen .result-grid {
+      width: 100%;
+      max-width: 680px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: clamp(6px, 1.4vw, 10px);
+      overflow: visible;
+    }
+    #overlay.game-over-screen .result-cell {
+      min-width: 0;
+      max-width: 100%;
+      overflow: visible;
+    }
+    #overlay.game-over-screen .result-cell > span {
+      font-size: clamp(8px, 1vw, 10px);
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+    #overlay.game-over-screen .result-cell strong {
+      max-width: 100%;
+      font-size: clamp(22px, 4.4vw, 34px);
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      font-variant-numeric: tabular-nums;
+    }
+    #overlay.game-over-screen .score-cell strong { font-size: clamp(26px, 5.8vw, 46px); }
+    #overlay.game-over-screen .result-detail-row { width: 100%; max-width: 680px; margin-inline: auto; }
+    #overlay.game-over-screen .result-detail-row span { min-width: 0; overflow-wrap: anywhere; }
+    #overlay.game-over-screen .result-detail-row strong { font-size: clamp(9px, 1.4vw, 11px); overflow-wrap: anywhere; }
+    #overlay.game-over-screen .actions button {
+      position: relative;
+      z-index: 12;
+      pointer-events: auto;
+      touch-action: manipulation;
+    }
+    @media (max-width: 520px) {
+      #overlay.home-screen:not(.game-over-screen) { padding-top: max(108px, calc(env(safe-area-inset-top) + 96px)); }
+      #game .topbar { left: max(10px, env(safe-area-inset-left)); right: max(10px, env(safe-area-inset-right)); gap: 6px; }
+      #game .topbar .brand { gap: 6px; }
+      #game .topbar .brand-mark { width: 23px; height: 23px; flex: 0 0 auto; }
+      #game .topbar .brand-mark::after { inset: 8px; }
+      #game .topbar .brand-name { font-size: clamp(11px, 3vw, 14px); letter-spacing: .035em; }
+      #game .topbar .brand-sub { font-size: 7px; letter-spacing: .1em; }
+      #game .topbar .highscore.home-stats { width: min(224px, 56vw); min-width: 0; gap: 3px; padding: 6px; }
+      #game .topbar .home-stat-cell { gap: 4px; padding: 3px; }
+      #game .topbar .home-stat-icon { width: 14px; height: 14px; }
+      #game .topbar .home-stats .micro-label { font-size: clamp(7px, 1.8vw, 8px); letter-spacing: .025em; }
+      #game .topbar .home-stats .record-value,
+      #game .topbar .home-stats .coin-total { font-size: clamp(10px, 2.8vw, 12px); }
+      #game .topbar .home-stats .sound-toggle { min-height: 44px; font-size: 8px; }
+      #overlay.home-screen.game-over-screen .card.home-card { width: min(100%, 520px); max-width: 100%; }
+      #overlay.game-over-screen .result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(7px, 2vw, 10px); }
+      #overlay.game-over-screen .result-cell { min-height: 96px; padding: clamp(10px, 3vw, 14px); }
+      #overlay.game-over-screen .result-cell > span { font-size: clamp(8px, 2.2vw, 10px); }
+      #overlay.game-over-screen .result-cell strong { font-size: clamp(24px, 8vw, 36px); }
+      #overlay.game-over-screen .score-cell strong { font-size: clamp(28px, 9vw, 42px); }
+      #overlay.game-over-screen .result-detail-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        font-size: clamp(7px, 1.9vw, 8px);
+        letter-spacing: .07em;
+      }
+      #overlay.game-over-screen .result-detail-row span {
+        min-height: 44px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 3px;
+        border: 1px solid rgba(187, 213, 233, .12);
+        background: rgba(7, 12, 20, .5);
+        text-align: center;
+      }
+      #overlay.game-over-screen .result-detail-row strong { font-size: clamp(9px, 2.5vw, 11px); }
+      #overlay.home-screen .settings-option { gap: 8px; }
+      #overlay.home-screen .settings-option-copy strong { font-size: clamp(11px, 3vw, 13px); }
+      #overlay.home-screen .settings-option-copy small { font-size: clamp(12px, 3.2vw, 13px); }
+      #overlay.home-screen .settings-controls > div { flex-wrap: wrap; }
+      #overlay.home-screen .settings-controls strong { max-width: 100%; font-size: clamp(8px, 2.2vw, 9px); overflow-wrap: anywhere; }
+    }
+    @media (max-width: 370px) {
+      #game .topbar .highscore.home-stats { width: min(215px, 55vw); min-width: 0; }
+      #game .topbar .home-stat-icon { display: none; }
+      #overlay.game-over-screen .result-cell { padding: 9px 8px; }
+      #overlay.game-over-screen .result-cell strong { font-size: clamp(22px, 7.8vw, 31px); }
+      #overlay.game-over-screen .score-cell strong { font-size: clamp(25px, 8.5vw, 35px); }
+      #overlay.home-screen .settings-option { align-items: stretch; flex-wrap: wrap; }
+      #overlay.home-screen .settings-option-copy { flex: 1 1 100%; }
+      #overlay.home-screen .settings-sound-toggle { width: 100%; min-height: 48px; }
+    }
+    @media (max-height: 480px) and (orientation: landscape) {
+      #game .topbar { top: max(8px, env(safe-area-inset-top)); }
+      #game .topbar .highscore.home-stats { width: min(250px, 36vw); }
+      #overlay.home-screen:not(.game-over-screen) { padding: max(116px, calc(env(safe-area-inset-top) + 108px)) 18px 10px; }
+      #overlay.home-screen:not(.game-over-screen) .card.home-card {
+        max-height: calc(100dvh - 132px - env(safe-area-inset-top));
+        overflow-y: auto;
+      }
+      #overlay.home-screen.game-over-screen .card.home-card { max-height: 88dvh; overflow-y: auto; }
+      #overlay.home-screen .settings-panel { max-height: 68dvh; overflow-y: auto; }
+    }
+    .settings-screen {
+      position: fixed;
+      z-index: 85;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+      background:
+        radial-gradient(ellipse at 12% 6%, rgba(44, 222, 238, .18), transparent 38%),
+        radial-gradient(ellipse at 90% 92%, rgba(255, 65, 181, .18), transparent 43%),
+        radial-gradient(ellipse at 50% 45%, rgba(10, 15, 28, .88), rgba(2, 4, 12, .97) 78%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      pointer-events: auto;
+      touch-action: pan-y;
+      animation: settingsScreenReveal .28s ease-out both;
+    }
+    .settings-screen[hidden] { display: none !important; }
+    .settings-modal {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: min(100%, 790px);
+      max-height: min(94dvh, 940px);
+      overflow: hidden;
+      border: 1px solid rgba(75, 228, 239, .44);
+      border-radius: 22px;
+      background:
+        linear-gradient(145deg, rgba(14, 26, 40, .95), rgba(6, 10, 21, .96) 58%, rgba(24, 11, 31, .94));
+      box-shadow: 0 26px 100px rgba(0, 0, 0, .6), 0 0 42px rgba(42, 226, 239, .16), 0 0 34px rgba(255, 65, 181, .1), inset 0 1px rgba(255, 255, 255, .08);
+      pointer-events: auto;
+    }
+    .settings-modal::before {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(115deg, rgba(61, 233, 245, .055), transparent 42%, rgba(255, 71, 183, .06));
+      content: "";
+      pointer-events: none;
+    }
+    .settings-modal-header,
+    .settings-scroll,
+    .settings-footer { position: relative; z-index: 1; }
+    .settings-modal-header {
+      flex: 0 0 auto;
+      padding: 26px clamp(20px, 5vw, 40px) 18px;
+      border-bottom: 1px solid rgba(183, 219, 229, .13);
+      text-align: center;
+    }
+    .settings-kicker {
+      color: #7ef5f4;
+      font: 700 10px/1.5 "Orbitron", sans-serif;
+      letter-spacing: .22em;
+      text-shadow: 0 0 16px rgba(56, 234, 255, .5);
+    }
+    .settings-modal-header h2 {
+      margin: 10px 0 6px;
+      color: #f2f8ff;
+      font: 900 clamp(25px, 5.3vw, 40px)/1.12 "Orbitron", sans-serif;
+      letter-spacing: .035em;
+      text-shadow: 0 0 9px rgba(45, 238, 255, .75), 0 0 25px rgba(30, 204, 246, .38), 2px 0 rgba(255, 67, 186, .48);
+      animation: settingsTitlePulse 3.2s ease-in-out infinite;
+    }
+    .settings-modal-header p {
+      margin: 0;
+      color: #a4b5c3;
+      font: 500 16px/1.35 "Rajdhani", sans-serif;
+    }
+    .settings-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 10px clamp(16px, 4vw, 34px) 22px;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+    .settings-group {
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(157, 191, 210, .13);
+    }
+    .settings-group:last-child { border-bottom: 0; }
+    .settings-group-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .settings-index {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      place-items: center;
+      border: 1px solid rgba(67, 228, 240, .4);
+      border-radius: 10px;
+      background: rgba(49, 220, 234, .09);
+      color: #71f1f1;
+      font: 800 11px "Orbitron", sans-serif;
+      box-shadow: inset 0 0 14px rgba(56, 234, 255, .08), 0 0 16px rgba(56, 234, 255, .07);
+    }
+    .settings-group-heading h3 {
+      margin: 0;
+      color: #e9f5fb;
+      font: 800 16px/1.25 "Orbitron", sans-serif;
+      letter-spacing: .045em;
+    }
+    .settings-group-heading p {
+      margin: 4px 0 0;
+      color: #98aaba;
+      font: 500 15px/1.3 "Rajdhani", sans-serif;
+    }
+    .settings-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      padding: 12px 14px;
+      border: 1px solid rgba(152, 190, 206, .12);
+      border-radius: 12px;
+      background: rgba(4, 11, 21, .46);
+    }
+    .settings-toggle-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 9px;
+    }
+    .visual-toggle-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .settings-copy { min-width: 0; }
+    .settings-copy strong,
+    .settings-copy small { display: block; }
+    .settings-copy strong {
+      color: #e8f5fb;
+      font: 700 15px/1.25 "Orbitron", sans-serif;
+      overflow-wrap: anywhere;
+    }
+    .settings-copy small {
+      margin-top: 4px;
+      color: #9badbb;
+      font: 500 14px/1.3 "Rajdhani", sans-serif;
+    }
+    .settings-slider-control {
+      display: grid;
+      grid-template-columns: minmax(100px, 190px) 48px;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .settings-slider-control input[type="range"] {
+      width: 100%;
+      min-height: 44px;
+      margin: 0;
+      accent-color: #4be3ef;
+      cursor: pointer;
+      touch-action: pan-x;
+    }
+    .settings-slider-control input[type="range"]::-webkit-slider-runnable-track {
+      height: 5px;
+      border: 1px solid rgba(117, 232, 242, .34);
+      border-radius: 99px;
+      background: linear-gradient(90deg, rgba(59, 225, 239, .5), rgba(255, 74, 181, .42));
+    }
+    .settings-slider-control input[type="range"]::-webkit-slider-thumb {
+      width: 18px;
+      height: 18px;
+      margin-top: -7px;
+      border: 2px solid #c9ffff;
+      border-radius: 50%;
+      background: #35dbe7;
+      box-shadow: 0 0 13px rgba(45, 235, 247, .82);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .settings-slider-control input[type="range"]::-moz-range-track {
+      height: 5px;
+      border: 1px solid rgba(117, 232, 242, .34);
+      border-radius: 99px;
+      background: linear-gradient(90deg, rgba(59, 225, 239, .5), rgba(255, 74, 181, .42));
+    }
+    .settings-slider-control input[type="range"]::-moz-range-thumb {
+      width: 15px;
+      height: 15px;
+      border: 2px solid #c9ffff;
+      border-radius: 50%;
+      background: #35dbe7;
+      box-shadow: 0 0 13px rgba(45, 235, 247, .82);
+    }
+    .settings-slider-control output {
+      color: #8df6f1;
+      font: 800 13px "Orbitron", sans-serif;
+      text-align: right;
+      text-shadow: 0 0 10px rgba(56, 234, 255, .32);
+    }
+    .pref-switch {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 112px;
+      min-height: 48px;
+      padding: 7px 10px;
+      border: 1px solid rgba(133, 169, 187, .32);
+      border-radius: 10px;
+      background: rgba(9, 19, 31, .82);
+      color: #a6bbc8;
+      font: 800 10px "Orbitron", sans-serif;
+      letter-spacing: .06em;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease, box-shadow .16s ease;
+    }
+    .pref-switch:hover { transform: translateY(-1px); border-color: rgba(73, 230, 241, .6); }
+    .pref-switch:active { transform: scale(.97); }
+    .pref-switch:focus-visible,
+    .settings-return:focus-visible,
+    .settings-slider-control input:focus-visible {
+      outline: 2px solid #8efaff;
+      outline-offset: 3px;
+    }
+    .pref-switch[aria-checked="true"] {
+      border-color: rgba(69, 232, 239, .62);
+      background: linear-gradient(115deg, rgba(42, 203, 222, .17), rgba(255, 66, 182, .08));
+      color: #dcffff;
+      box-shadow: inset 0 0 14px rgba(56, 234, 255, .08), 0 0 14px rgba(56, 234, 255, .08);
+    }
+    .switch-track {
+      position: relative;
+      width: 34px;
+      height: 18px;
+      flex: 0 0 34px;
+      border: 1px solid rgba(148, 173, 191, .48);
+      border-radius: 99px;
+      background: rgba(3, 7, 14, .8);
+      transition: background .16s ease, border-color .16s ease;
+    }
+    .switch-track i {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #82939f;
+      transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
+    }
+    .pref-switch[aria-checked="true"] .switch-track { border-color: #63f5f2; background: rgba(49, 220, 231, .2); }
+    .pref-switch[aria-checked="true"] .switch-track i { transform: translateX(16px); background: #80ffff; box-shadow: 0 0 10px #35e8f1; }
+    .switch-name { color: #adc2cd; }
+    .pref-switch strong { min-width: 23px; color: #fff; text-align: right; }
+    .settings-hint {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px 12px;
+      margin-top: 10px;
+      color: #92a5b3;
+      font: 600 13px/1.35 "Rajdhani", sans-serif;
+    }
+    .settings-hint span { padding: 5px 8px; border: 1px solid rgba(140, 173, 191, .16); border-radius: 6px; background: rgba(3, 9, 17, .38); }
+    .settings-footer {
+      display: grid;
+      grid-template-columns: 1fr minmax(220px, 300px);
+      align-items: center;
+      gap: 14px;
+      flex: 0 0 auto;
+      padding: 15px clamp(16px, 4vw, 34px) max(16px, env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(183, 219, 229, .13);
+      background: rgba(3, 7, 15, .74);
+    }
+    .settings-footer > span {
+      color: #97aab9;
+      font: 500 14px/1.35 "Rajdhani", sans-serif;
+    }
+    .settings-return {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      padding: 12px 16px;
+      border: 1px solid rgba(76, 232, 244, .72);
+      border-radius: 10px;
+      background: linear-gradient(110deg, rgba(26, 176, 199, .76), rgba(100, 35, 110, .83));
+      color: #f3ffff;
+      font: 800 12px "Orbitron", sans-serif;
+      letter-spacing: .1em;
+      box-shadow: 0 0 21px rgba(56, 234, 255, .18), inset 0 0 17px rgba(255, 255, 255, .06);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform .17s ease, filter .17s ease, box-shadow .17s ease;
+    }
+    .settings-return:hover { transform: scale(1.025); filter: brightness(1.11); box-shadow: 0 0 27px rgba(56, 234, 255, .28); }
+    .settings-return:active { transform: scale(.97); }
+    @keyframes settingsScreenReveal { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes settingsTitlePulse {
+      0%, 100% { text-shadow: 0 0 8px rgba(45, 238, 255, .62), 0 0 22px rgba(30, 204, 246, .3), 2px 0 rgba(255, 67, 186, .35); }
+      50% { text-shadow: 0 0 13px rgba(45, 238, 255, .92), 0 0 34px rgba(30, 204, 246, .48), 2px 0 rgba(255, 67, 186, .58); }
+    }
+    @media (max-width: 640px) {
+      .settings-screen { padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); }
+      .settings-modal { max-height: 96dvh; border-radius: 17px; }
+      .settings-modal-header { padding: 20px 18px 13px; }
+      .settings-scroll { padding: 6px 14px 14px; }
+      .settings-group { padding: 14px 0; }
+      .settings-toggle-grid { grid-template-columns: minmax(0, 1fr); }
+      .visual-toggle-grid { grid-template-columns: minmax(0, 1fr); }
+      .settings-footer { grid-template-columns: 1fr; gap: 7px; padding: 10px 14px max(10px, env(safe-area-inset-bottom)); }
+      .settings-footer > span { text-align: center; }
+      .settings-return { width: 100%; min-height: 52px; }
+    }
+    @media (max-width: 390px) {
+      .settings-row { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+      .settings-slider-control { grid-template-columns: minmax(0, 1fr) 50px; width: 100%; }
+      .pref-switch { width: 100%; justify-content: flex-start; }
+      .pref-switch strong { margin-left: auto; }
+      .settings-hint { justify-content: flex-start; }
+    }
+    @media (max-height: 540px) and (orientation: landscape) {
+      .settings-screen { padding: 4px max(10px, env(safe-area-inset-right)) 4px max(10px, env(safe-area-inset-left)); }
+      .settings-modal { width: min(100%, 980px); max-height: 100dvh; border-radius: 12px; }
+      .settings-modal-header { padding: 10px 20px 8px; }
+      .settings-modal-header h2 { margin: 4px 0; font-size: clamp(22px, 4vw, 30px); }
+      .settings-modal-header p { font-size: 14px; }
+      .settings-scroll { padding-top: 4px; padding-bottom: 8px; }
+      .settings-group { padding: 10px 0; }
+      .settings-group-heading { margin-bottom: 6px; }
+      .settings-footer { padding-top: 8px; padding-bottom: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .settings-screen, .settings-modal-header h2 { animation: none; }
+      .pref-switch, .settings-return { transition: none; }
+    }
+    /* Start-screen score card: keep the records in the menu flow, not in the header. */
+    #game .topbar {
+      align-items: center;
+      gap: 12px;
+    }
+    #game .topbar > .topbar-sound-toggle {
+      display: inline-flex;
+      position: relative;
+      z-index: 12;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 8px 12px;
+      border: 1px solid rgba(156, 193, 203, .25);
+      border-radius: 8px;
+      background: rgba(6, 14, 24, .76);
+      color: #c8fff4;
+      font: 700 clamp(8px, .85vw, 10px)/1.1 "Orbitron", sans-serif;
+      letter-spacing: .07em;
+      pointer-events: auto;
+      touch-action: manipulation;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    #game .topbar > .topbar-sound-toggle[aria-pressed="true"] {
+      border-color: rgba(104, 242, 223, .46);
+      background: rgba(34, 178, 169, .12);
+    }
+    #game .topbar > .topbar-sound-toggle[aria-pressed="false"] {
+      border-color: rgba(178, 190, 204, .24);
+      background: rgba(6, 10, 17, .52);
+      color: #a0a9b3;
+    }
+    #game .topbar > .topbar-sound-toggle .sound-icon {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.35;
+    }
+    #overlay.home-screen #start-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(7px, 1.7vw, 12px);
+      width: min(100%, 460px);
+      min-width: 0;
+      max-width: 100%;
+      margin: 0 auto clamp(14px, 2.6vh, 20px);
+      padding: clamp(9px, 2.2vw, 14px);
+      overflow: visible;
+      border: 1px solid rgba(104, 225, 237, .29);
+      border-radius: 13px;
+      background: linear-gradient(135deg, rgba(174, 227, 234, .085), rgba(13, 27, 42, .62) 58%, rgba(49, 26, 54, .32));
+      box-shadow: inset 0 1px rgba(255, 255, 255, .065), 0 9px 26px rgba(0, 0, 0, .2), 0 0 19px rgba(56, 234, 255, .07);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      text-align: left;
+    }
+    #overlay.home-screen #start-stats .home-stat-cell {
+      min-width: 0;
+      gap: clamp(6px, 1.7vw, 10px);
+      padding: clamp(7px, 1.8vw, 11px);
+      overflow: visible;
+      border: 1px solid rgba(177, 216, 226, .09);
+      border-radius: 9px;
+      background: rgba(4, 11, 20, .34);
+    }
+    #overlay.home-screen #start-stats .home-stat-icon {
+      width: clamp(16px, 4.4vw, 21px);
+      height: clamp(16px, 4.4vw, 21px);
+      flex: 0 0 auto;
+    }
+    #overlay.home-screen #start-stats .home-stat-copy {
+      min-width: 0;
+      max-width: 100%;
+      overflow: visible;
+      overflow-wrap: anywhere;
+    }
+    #overlay.home-screen #start-stats .micro-label {
+      margin: 0;
+      color: #a7bac5;
+      font: 700 clamp(9px, 2.4vw, 12px)/1.25 "Orbitron", sans-serif;
+      letter-spacing: clamp(.015em, .18vw, .065em);
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: normal;
+    }
+    #overlay.home-screen #start-stats .record-value,
+    #overlay.home-screen #start-stats .coin-total {
+      max-width: 100%;
+      margin-top: 5px;
+      color: #f2fbff;
+      font: 800 clamp(17px, 4.1vw, 24px)/1.12 "Orbitron", sans-serif;
+      letter-spacing: clamp(.01em, .12vw, .05em);
+      font-variant-numeric: tabular-nums;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    #overlay.home-screen #start-stats .coin-total::before { content: none; }
+    #overlay.home-screen #start-stats .crystal-icon {
+      stroke: #ffd479;
+      filter: drop-shadow(0 0 6px rgba(255, 212, 121, .48));
+    }
+    #overlay.home-screen:not(.game-over-screen) .mode-selector { margin-bottom: 11px; }
+    #overlay.home-screen.game-over-screen #start-stats { display: none; }
+    @media (max-width: 520px) {
+      #overlay.home-screen #start-stats {
+        width: 100%;
+        gap: 6px;
+        margin-bottom: 15px;
+        padding: 8px;
+      }
+      #overlay.home-screen #start-stats .home-stat-cell {
+        gap: 6px;
+        padding: 8px 6px;
+      }
+      #overlay.home-screen #start-stats .record-value,
+      #overlay.home-screen #start-stats .coin-total { font-size: clamp(16px, 4.6vw, 21px); }
+    }
+    @media (max-width: 350px) {
+      #overlay.home-screen #start-stats { gap: 5px; padding: 6px; }
+      #overlay.home-screen #start-stats .home-stat-cell { gap: 5px; padding: 7px 5px; }
+      #overlay.home-screen #start-stats .micro-label { font-size: clamp(8px, 2.65vw, 10px); }
+      #overlay.home-screen #start-stats .record-value,
+      #overlay.home-screen #start-stats .coin-total { font-size: clamp(15px, 4.8vw, 17px); }
+      #game .topbar > .topbar-sound-toggle { padding: 7px 9px; }
+    }
+    @media (max-height: 480px) and (orientation: landscape) {
+      #overlay.home-screen #start-stats {
+        width: min(100%, 390px);
+        margin-bottom: 10px;
+        padding: 7px;
+      }
+      #overlay.home-screen #start-stats .home-stat-cell { padding: 6px 8px; }
+    }
+    #game .topbar > .topbar-sound-toggle:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 3px;
+    }
+    @media (max-width: 520px) and (max-height: 640px) {
+      #overlay.home-screen:not(.game-over-screen) {
+        padding: max(64px, calc(env(safe-area-inset-top) + 54px)) 10px 10px;
+      }
+      #overlay.home-screen:not(.game-over-screen) .card.home-card {
+        max-height: calc(100dvh - 76px - env(safe-area-inset-top));
+        padding: 12px;
+        border-radius: 15px;
+      }
+      #overlay.home-screen:not(.game-over-screen) .intro,
+      #overlay.home-screen:not(.game-over-screen) .color-key,
+      #overlay.home-screen:not(.game-over-screen) #startHint { display: none; }
+      #overlay.home-screen:not(.game-over-screen) h1 {
+        margin: 6px 0 10px;
+        font-size: clamp(29px, 8.4vw, 38px);
+      }
+      #overlay.home-screen:not(.game-over-screen) .mode-selector {
+        gap: 5px;
+        margin-bottom: 8px;
+      }
+      #overlay.home-screen:not(.game-over-screen) .mode-btn {
+        min-height: 64px;
+        padding: 8px 4px;
+        font-size: clamp(1rem, 4.5vw, 1.0625rem);
+      }
+      #overlay.home-screen:not(.game-over-screen) #start-stats {
+        margin-bottom: 9px;
+        padding: 6px;
+      }
+      #overlay.home-screen:not(.game-over-screen) #start-stats .home-stat-cell { padding: 6px 5px; }
+      #overlay.home-screen:not(.game-over-screen) .home-actions { gap: 6px; }
+      #overlay.home-screen:not(.game-over-screen) .home-actions .primary-btn { min-height: 50px; }
+      #overlay.home-screen:not(.game-over-screen) .secondary-actions .secondary-btn { min-height: 40px; }
+    }
+    @media (max-height: 480px) and (orientation: landscape) {
+      #overlay.home-screen:not(.game-over-screen) {
+        padding: max(58px, calc(env(safe-area-inset-top) + 48px)) 12px 8px;
+      }
+      #overlay.home-screen:not(.game-over-screen) .card.home-card {
+        width: min(100%, 720px);
+        max-height: calc(100dvh - 68px - env(safe-area-inset-top));
+        padding: 8px 18px;
+      }
+      #overlay.home-screen:not(.game-over-screen) .eyebrow,
+      #overlay.home-screen:not(.game-over-screen) .intro,
+      #overlay.home-screen:not(.game-over-screen) .color-key,
+      #overlay.home-screen:not(.game-over-screen) #startHint { display: none; }
+      #overlay.home-screen:not(.game-over-screen) h1 {
+        margin: 1px 0 4px;
+        font-size: clamp(26px, 3.6vw, 30px);
+      }
+      #overlay.home-screen:not(.game-over-screen) .mode-selector {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 5px;
+        margin-bottom: 8px;
+      }
+      #overlay.home-screen:not(.game-over-screen) .mode-btn {
+        min-height: 52px;
+        padding: 6px;
+        font-size: clamp(1rem, 2vw, 1.125rem);
+      }
+      #overlay.home-screen:not(.game-over-screen) #start-stats {
+        width: min(100%, 440px);
+        gap: 4px;
+        margin-bottom: 6px;
+        padding: 4px;
+      }
+      #overlay.home-screen:not(.game-over-screen) #start-stats .home-stat-cell {
+        gap: 6px;
+        padding: 4px 6px;
+      }
+      #overlay.home-screen:not(.game-over-screen) #start-stats .home-stat-icon { width: 16px; height: 16px; }
+      #overlay.home-screen:not(.game-over-screen) #start-stats .micro-label { font-size: 10px; }
+      #overlay.home-screen:not(.game-over-screen) #start-stats .record-value,
+      #overlay.home-screen:not(.game-over-screen) #start-stats .coin-total { margin-top: 2px; font-size: 16px; }
+      #overlay.home-screen:not(.game-over-screen) .home-actions { gap: 6px; }
+      #overlay.home-screen:not(.game-over-screen) .home-actions .primary-btn { min-height: 44px; }
+      #overlay.home-screen:not(.game-over-screen) .secondary-actions .secondary-btn { min-height: 38px; }
+    }
+    #overlay.game-over-screen .result-detail-row b {
+      max-width: min(30vw, 140px);
+      color: inherit;
+      font: inherit;
+      letter-spacing: inherit;
+      text-align: center;
+      text-transform: uppercase;
+      white-space: normal;
+      overflow-wrap: anywhere;
     }
   </style>
 </head>
@@ -1302,26 +2217,10 @@
         <div class="brand-mark" aria-hidden="true"></div>
         <div><div class="brand-name">Color Shift</div><div class="brand-sub">Neon Rush 3D</div></div>
       </div>
-      <div class="highscore home-stats" aria-label="Player stats">
-        <div class="home-stat-cell">
-          <svg class="home-stat-icon score-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v3a4 4 0 0 1-8 0V4Zm0 2H5v1a4 4 0 0 0 4 4m7-5h3v1a4 4 0 0 1-4 4m-3 1v4m-4 4h8m-7-4h6l1 4H8l1-4Z"/></svg>
-          <div class="home-stat-copy">
-            <div class="micro-label">Best score</div>
-            <div class="record-value" id="bestTop">00000</div>
-          </div>
-        </div>
-        <div class="home-stat-cell">
-          <svg class="home-stat-icon crystal-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 8 7-8 13L4 9l8-7Zm-8 7h16M8 9l4 13 4-13-4-7-4 7Z"/></svg>
-          <div class="home-stat-copy">
-            <div class="micro-label">Neon crystals</div>
-            <div class="coin-total" aria-label="Total crystals collected"><span id="coinTotal">00000</span></div>
-          </div>
-        </div>
-        <button class="sound-toggle" id="soundToggle" type="button" aria-label="Mute sound" aria-pressed="true" title="Mute sound">
-          <svg class="sound-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6v4h3l4 3V3L5 6H2Z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5"/></svg>
-          <span id="soundLabel">SOUND ON</span>
-        </button>
-      </div>
+      <button class="sound-toggle topbar-sound-toggle" id="soundToggle" type="button" aria-label="Mute sound" aria-pressed="true" title="Mute sound">
+        <svg class="sound-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6v4h3l4 3V3L5 6H2Z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5"/></svg>
+        <span id="soundLabel">SOUND ON</span>
+      </button>
     </header>
     <button class="pause-button" id="pauseButton" type="button" aria-label="Pause run" title="Pause run" hidden>
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h3v12H3zM10 2h3v12h-3z"/></svg>
@@ -1390,12 +2289,28 @@
           <span class="key-chip"><i style="color:var(--yellow);background:var(--yellow)"></i>Yellow</span>
         </div>
         <div class="mode-selector" id="modeSelector" role="group" aria-label="Choose game mode">
-          <button class="mode-btn" id="endlessModeButton" type="button" aria-pressed="true" aria-label="Endless Runner Mode">Endless Runner</button>
-          <button class="mode-btn" id="timeAttackModeButton" type="button" aria-pressed="false">Time Attack · 60s</button>
+          <button class="mode-btn" id="endlessModeButton" type="button" aria-pressed="true" aria-label="Classic Mode" title="Classic endless runner">Classic Mode</button>
+          <button class="mode-btn" id="timeAttackModeButton" type="button" aria-pressed="false" aria-label="Time Attack Mode, sixty seconds" title="Time Attack Mode · 60 seconds">Time Attack</button>
           <button class="mode-btn" id="antiGravityModeButton" type="button" aria-pressed="false" aria-label="Quantum Singularity: Anti-Gravity Mode" title="Quantum Singularity: Anti-Gravity Mode">Anti-Gravity</button>
           <button class="mode-btn" id="blackoutModeButton" type="button" aria-pressed="false" aria-label="Blackout Nightmare Mode" title="Blackout Nightmare Mode">Blackout</button>
           <button class="mode-btn" id="mirrorMatrixModeButton" type="button" aria-pressed="false" aria-label="Mirror Matrix Mode" title="Mirror Matrix Mode">Mirror Matrix</button>
           <button class="mode-btn" id="laserPursuitModeButton" type="button" aria-pressed="false" aria-label="Laser Pursuit Mode" title="Laser Pursuit / Boss Rush Mode">Laser Pursuit</button>
+        </div>
+        <div class="highscore home-stats" id="start-stats" aria-label="Your high score and Neon Crystal totals">
+          <div class="home-stat-cell">
+            <svg class="home-stat-icon score-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v3a4 4 0 0 1-8 0V4Zm0 2H5v1a4 4 0 0 0 4 4m7-5h3v1a4 4 0 0 1-4 4m-3 1v4m-4 4h8m-7-4h6l1 4H8l1-4Z"/></svg>
+            <div class="home-stat-copy">
+              <div class="micro-label" id="bestModeLabel">Classic high score</div>
+              <div class="record-value" id="bestTop">00000</div>
+            </div>
+          </div>
+          <div class="home-stat-cell">
+            <svg class="home-stat-icon crystal-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 8 7-8 13L4 9l8-7Zm-8 7h16M8 9l4 13 4-13-4-7-4 7Z"/></svg>
+            <div class="home-stat-copy">
+              <div class="micro-label">Neon crystals</div>
+              <div class="coin-total" aria-label="Total crystals collected"><span id="coinTotal">00000</span></div>
+            </div>
+          </div>
         </div>
         <div id="results" hidden>
           <div class="game-over-brand">Color Shift:<span>Neon Rush 3D</span></div>
@@ -1415,7 +2330,7 @@
             <div class="result-cell distance-cell"><span>Distance covered</span><strong id="finalDistance">0m</strong><small><b id="finalGates">0</b> gates passed</small></div>
           </div>
           <div class="result-detail-row">
-            <span>BEST <strong id="finalBest">0</strong></span>
+            <span><b id="finalBestLabel">Classic high score</b><strong id="finalBest">0</strong></span>
             <span>MAX STREAK <strong id="finalMaxStreak">×0</strong></span>
             <span>RANK <strong id="finalRank">Rookie</strong></span>
           </div>
@@ -1431,16 +2346,108 @@
           <button class="secondary-btn home-return-btn universal-menu-back" id="homeButton" type="button" aria-label="Return to the main menu" hidden>⌂ MAIN MENU</button>
           <div class="secondary-actions">
             <button class="secondary-btn" id="shopButton" type="button">Rewards &amp; Skins</button>
-          <button class="secondary-btn" id="settingsButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="settingsPanel">Settings</button>
+          <button class="secondary-btn" id="settingsButton" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settings-screen">Settings</button>
           </div>
         </div>
         <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / W / ↑</b> change color</span><span class="mobile-hint">Tap to start · swipe to steer · tap to change color</span></div>
         <div class="small-note" id="dailyTokenNote" hidden></div>
-        <section class="shop-panel" id="shopPanel" aria-label="Rewards and achievements" hidden>
-          <div class="shop-scroll" id="shopScroll">
+      </div>
+    </section>
+    <section class="settings-screen" id="settings-screen" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+      <div class="settings-modal">
+        <header class="settings-modal-header">
+          <div class="settings-kicker">COLOR SHIFT · CONTROL DECK</div>
+          <h2 id="settingsTitle">⚙ SYSTEM SETTINGS</h2>
+          <p>Calibrate your run. Changes save automatically.</p>
+        </header>
+        <div class="settings-scroll" id="settingsScroll">
+          <section class="settings-group" aria-labelledby="audioSettingsTitle">
+            <div class="settings-group-heading">
+              <span class="settings-index">01</span>
+              <div><h3 id="audioSettingsTitle">Audio matrix</h3><p>Procedural sound, synthesized live in your browser.</p></div>
+            </div>
+            <div class="settings-row settings-volume-row">
+              <div class="settings-copy"><strong>Master volume</strong><small>Adjust all game audio</small></div>
+              <div class="settings-slider-control">
+                <input id="masterVolumeSlider" type="range" min="0" max="100" step="1" value="78" aria-label="Master volume">
+                <output id="masterVolumeOutput" for="masterVolumeSlider">78%</output>
+              </div>
+            </div>
+            <div class="settings-toggle-grid">
+              <div class="settings-row">
+                <div class="settings-copy"><strong>Sound effects</strong><small>Clicks, color shifts, crystals and impacts</small></div>
+                <button class="pref-switch" id="sfxToggleButton" type="button" role="switch" aria-checked="true" aria-label="Sound effects">
+                  <span class="switch-track" aria-hidden="true"><i></i></span><span class="switch-name">SFX</span><strong id="settingsSoundLabel">ON</strong>
+                </button>
+              </div>
+              <div class="settings-row">
+                <div class="settings-copy"><strong>Ambient synth</strong><small>Soft evolving notes during a run</small></div>
+                <button class="pref-switch" id="ambientToggleButton" type="button" role="switch" aria-checked="true" aria-label="Ambient synth music">
+                  <span class="switch-track" aria-hidden="true"><i></i></span><span class="switch-name">AMBIENT</span><strong id="ambientState">ON</strong>
+                </button>
+              </div>
+            </div>
+          </section>
+          <section class="settings-group" aria-labelledby="visualSettingsTitle">
+            <div class="settings-group-heading">
+              <span class="settings-index">02</span>
+              <div><h3 id="visualSettingsTitle">Visual systems</h3><p>Balance atmosphere and performance for your device.</p></div>
+            </div>
+            <div class="settings-toggle-grid visual-toggle-grid">
+              <div class="settings-row">
+                <div class="settings-copy"><strong>Neon bloom</strong><small>Brighter emissive lights and glow</small></div>
+                <button class="pref-switch" id="neonGlowToggle" type="button" role="switch" aria-checked="true" aria-label="Neon bloom and glow intensity">
+                  <span class="switch-track" aria-hidden="true"><i></i></span><span class="switch-name">GLOW</span><strong id="neonGlowState">ON</strong>
+                </button>
+              </div>
+              <div class="settings-row">
+                <div class="settings-copy"><strong>Background particles</strong><small>Floating neon dust in the tunnel</small></div>
+                <button class="pref-switch" id="backgroundParticlesToggle" type="button" role="switch" aria-checked="true" aria-label="Background particles">
+                  <span class="switch-track" aria-hidden="true"><i></i></span><span class="switch-name">DUST</span><strong id="backgroundParticlesState">ON</strong>
+                </button>
+              </div>
+              <div class="settings-row">
+                <div class="settings-copy"><strong>Dynamic fog</strong><small>Depth haze that shifts between zones</small></div>
+                <button class="pref-switch" id="dynamicFogToggle" type="button" role="switch" aria-checked="true" aria-label="Dynamic fog">
+                  <span class="switch-track" aria-hidden="true"><i></i></span><span class="switch-name">FOG</span><strong id="dynamicFogState">ON</strong>
+                </button>
+              </div>
+            </div>
+          </section>
+          <section class="settings-group" aria-labelledby="controlSettingsTitle">
+            <div class="settings-group-heading">
+              <span class="settings-index">03</span>
+              <div><h3 id="controlSettingsTitle">Control response</h3><p>Fine-tune touch steering and the lane glide.</p></div>
+            </div>
+            <div class="settings-row settings-volume-row">
+              <div class="settings-copy"><strong>Swipe sensitivity</strong><small>Higher sensitivity reacts to shorter swipes</small></div>
+              <div class="settings-slider-control">
+                <input id="swipeSensitivitySlider" type="range" min="0" max="100" step="1" value="60" aria-label="Swipe sensitivity">
+                <output id="swipeSensitivityOutput" for="swipeSensitivitySlider">60%</output>
+              </div>
+            </div>
+            <div class="settings-row settings-volume-row">
+              <div class="settings-copy"><strong>Lane glide</strong><small>Choose between snappy and smoother lane shifts</small></div>
+              <div class="settings-slider-control">
+                <input id="laneSmoothnessSlider" type="range" min="0" max="100" step="1" value="70" aria-label="Lane shifting smoothness">
+                <output id="laneSmoothnessOutput" for="laneSmoothnessSlider">70%</output>
+              </div>
+            </div>
+            <div class="settings-hint"><span>A / D or swipe</span><span>← → steer</span><span>Tap / Space change color</span></div>
+          </section>
+        </div>
+        <footer class="settings-footer">
+          <span id="settingsSaveNote" role="status" aria-live="polite">Preferences save as you change them</span>
+          <button class="settings-return" id="settingsBack" type="button" aria-label="Save settings and return to the main menu">⌂ BACK / MAIN MENU</button>
+        </footer>
+      </div>
+    </section>
+    <section class="rewards-screen" id="rewards-screen" role="dialog" aria-modal="true" aria-labelledby="rewardsTitle" hidden>
+      <div class="shop-panel" id="shopPanel">
+        <div class="shop-scroll" id="shopScroll">
           <div class="shop-header">
-            <div><div class="eyebrow">PLAYER PROGRESSION</div><h2 class="shop-title">Rewards Hub</h2><p class="shop-intro">Every run moves you closer to a new tier, skin, or trail.</p></div>
-            <div class="shop-balance">CRYSTAL BALANCE<br><strong id="shopBalance">00000</strong></div>
+            <div><div class="eyebrow">PLAYER PROGRESSION</div><h2 class="shop-title" id="rewardsTitle">Rewards &amp; Achievements</h2><p class="shop-intro">Earn milestones, collect crystals, and customize your next run.</p></div>
+            <div class="shop-balance"><span>💎 NEON CRYSTALS</span><strong id="shopBalance">00000</strong></div>
           </div>
           <nav class="reward-tabs" role="tablist" aria-label="Rewards categories">
             <button class="reward-tab active" id="rewardTabAchievements" type="button" role="tab" aria-selected="true" aria-controls="rewardPanelAchievements" tabindex="0" data-reward-tab="achievements">Milestones</button>
@@ -1448,13 +2455,13 @@
             <button class="reward-tab" id="rewardTabTrails" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelTrails" tabindex="-1" data-reward-tab="trails">Glow Trails</button>
           </nav>
           <div class="reward-tab-panel" id="rewardPanelAchievements" data-reward-panel="achievements" role="tabpanel" aria-labelledby="rewardTabAchievements" tabindex="0">
-            <div class="shop-section-heading"><div><h3>Achievement Tracks</h3><p>Four tiers per discipline. Claim crystal rewards as soon as a milestone is complete.</p></div><span class="achievement-tier-key">BRONZE · SILVER · GOLD · DIAMOND</span></div>
+            <div class="shop-section-heading"><div><h3>Achievement Tracks</h3><p>Claim crystal rewards when a milestone is complete.</p></div><span class="achievement-tier-key">BRONZE · SILVER · GOLD · DIAMOND</span></div>
             <div class="achievement-list" id="achievementList"></div>
             <div class="shop-section-label">Daily Bounties</div>
             <div class="achievement-list daily-list" id="dailyBountyList"></div>
           </div>
           <div class="reward-tab-panel" id="rewardPanelSkins" data-reward-panel="skins" role="tabpanel" aria-labelledby="rewardTabSkins" tabindex="0" hidden>
-            <div class="shop-section-heading"><div><h3>Player Skins</h3><p>Claim a form once, then equip it for future runs.</p></div><span class="achievement-tier-key">3D COSMETICS</span></div>
+            <div class="shop-section-heading"><div><h3>Player Skins</h3><p>Unlock a 3D ball skin with crystals, then equip it for future runs.</p></div><span class="achievement-tier-key">3D COSMETICS</span></div>
             <div class="skin-grid" id="skinGrid"></div>
           </div>
           <div class="reward-tab-panel" id="rewardPanelTrails" data-reward-panel="trails" role="tabpanel" aria-labelledby="rewardTabTrails" tabindex="0" hidden>
@@ -1466,33 +2473,10 @@
             <p>Progress, claimed rewards, owned cosmetics, and equipped styles are saved on this device.</p>
             <button class="secondary-btn reset-save-btn" id="resetLocalData" type="button">Reset local save</button>
           </div>
-          </div>
-          <div class="shop-footer">
-            <button class="secondary-btn shop-back universal-menu-back" id="shopBack" type="button" aria-label="Return to the main menu">⌂ MAIN MENU</button>
-          </div>
-        </section>
-        <section class="settings-panel" id="settingsPanel" aria-label="Settings" hidden>
-          <div class="settings-header">
-            <div class="eyebrow">RUN CONFIGURATION</div>
-            <h2 class="settings-title">Settings</h2>
-          </div>
-          <div class="settings-option">
-            <div class="settings-option-copy">
-              <strong>Procedural sound</strong>
-              <small>Original effects generated in your browser</small>
-            </div>
-            <button class="settings-sound-toggle" id="settingsSoundButton" type="button" aria-label="Toggle sound" aria-pressed="true">
-              <svg class="sound-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6v4h3l4 3V3L5 6H2Z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5"/></svg>
-              <span>SOUND <strong id="settingsSoundLabel">ON</strong></span>
-            </button>
-          </div>
-          <div class="settings-controls">
-            <div><span>Steer</span><strong>A / D · ← / → · swipe</strong></div>
-            <div><span>Color</span><strong>Tap / Space / W / ↑ · auto-cycle 3.5 sec</strong></div>
-            <div><span>Anti-Gravity</span><strong>Flip button · Space · tap</strong></div>
-          </div>
-          <button class="secondary-btn settings-back universal-menu-back" id="settingsBack" type="button" aria-label="Return to the main menu">⌂ MAIN MENU</button>
-        </section>
+        </div>
+        <div class="shop-footer">
+          <button class="secondary-btn shop-back universal-menu-back" id="shopBack" type="button" aria-label="Return to the main menu">🏠 MAIN MENU</button>
+        </div>
       </div>
     </section>
     <section class="daily-modal" id="dailyModal" role="dialog" aria-modal="true" aria-labelledby="dailyTitle" hidden>
@@ -1509,6 +2493,28 @@
         <button class="primary-btn" id="dailySpinButton" type="button">Spin for reward</button>
         <button class="secondary-btn" id="dailyContinueButton" type="button" hidden>Continue</button>
         <button class="secondary-btn universal-menu-back" id="dailyMainMenuButton" type="button" aria-label="Return to the main menu">⌂ MAIN MENU</button>
+      </div>
+    </section>
+    <section class="splash-screen" id="splash-screen" role="status" aria-label="Loading Color Shift: Neon Rush 3D">
+      <div class="splash-particles" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+      <div class="splash-content">
+        <div class="splash-emblem" aria-hidden="true"></div>
+        <p class="splash-kicker">A neon arcade experience</p>
+        <h1 class="splash-title">Color Shift</h1>
+        <p class="splash-subtitle">Neon Rush 3D</p>
+        <p class="splash-tagline">Enter the color stream</p>
+        <div class="splash-loader">
+          <div class="splash-loader-heading">
+            <span id="splash-status-text" aria-live="polite">Preparing the neon core</span>
+            <span id="splash-percentage">0%</span>
+          </div>
+          <div class="splash-progress-track" id="splash-progress-track" role="progressbar" aria-label="Game loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="splash-progress-fill" id="splash-progress-fill"></div>
+          </div>
+          <p class="splash-caption">Synchronizing the neon tunnel</p>
+        </div>
       </div>
     </section>
   </main>
@@ -5357,11 +6363,111 @@ void main() {
       let environmentNoticeTimer = 0;
       let environmentNoticeToken = 0;
       let state = "ready";
+      const SETTINGS_STORAGE_KEY = "colorShiftGameSettings";
+      const DEFAULT_SETTINGS = {
+        masterVolume: 78,
+        sfxEnabled: true,
+        ambientEnabled: true,
+        neonGlow: true,
+        backgroundParticles: true,
+        dynamicFog: true,
+        swipeSensitivity: 60,
+        laneSmoothness: 70
+      };
+      function boundedPreference(value, min, max, fallback) {
+        const numeric = Number(value);
+        return Number.isFinite(numeric) ? Math.min(max, Math.max(min, numeric)) : fallback;
+      }
+      function loadSettings() {
+        let stored = {};
+        try {
+          stored = JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY) || "{}") || {};
+        } catch (error) {
+          stored = {};
+        }
+        return {
+          masterVolume: boundedPreference(stored.masterVolume, 0, 100, DEFAULT_SETTINGS.masterVolume),
+          sfxEnabled: typeof stored.sfxEnabled === "boolean" ? stored.sfxEnabled : DEFAULT_SETTINGS.sfxEnabled,
+          ambientEnabled: typeof stored.ambientEnabled === "boolean" ? stored.ambientEnabled : DEFAULT_SETTINGS.ambientEnabled,
+          neonGlow: typeof stored.neonGlow === "boolean" ? stored.neonGlow : DEFAULT_SETTINGS.neonGlow,
+          backgroundParticles: typeof stored.backgroundParticles === "boolean" ? stored.backgroundParticles : DEFAULT_SETTINGS.backgroundParticles,
+          dynamicFog: typeof stored.dynamicFog === "boolean" ? stored.dynamicFog : DEFAULT_SETTINGS.dynamicFog,
+          swipeSensitivity: boundedPreference(stored.swipeSensitivity, 0, 100, DEFAULT_SETTINGS.swipeSensitivity),
+          laneSmoothness: boundedPreference(stored.laneSmoothness, 0, 100, DEFAULT_SETTINGS.laneSmoothness)
+        };
+      }
+      const gamePreferences = loadSettings();
+      function saveSettings() {
+        try {
+          localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(gamePreferences));
+        } catch (error) {
+          // Preferences remain active for this session if storage is unavailable.
+        }
+      }
+      const getGlowScale = () => gamePreferences.neonGlow ? 1 : 0.56;
+      const getSwipeThreshold = () => Math.round(44 - gamePreferences.swipeSensitivity * 0.3);
+      const getLaneResponseScale = () => 1.45 - gamePreferences.laneSmoothness / 100 * 0.65;
       const el = (id) => document.getElementById(id);
+      const splashScreen = el("splash-screen");
+      const splashProgressFill = el("splash-progress-fill");
+      const splashProgressTrack = el("splash-progress-track");
+      const splashPercentage = el("splash-percentage");
+      const splashStatus = el("splash-status-text");
+      const splashStartedAt = performance.now();
+      let splashProgress = 0;
+      let splashProgressTarget = 0;
+      let splashProgressFrame = 0;
+      let splashCompletionStarted = false;
+      let splashFadePending = false;
+      function setSplashProgress(value, message) {
+        splashProgressTarget = THREE.MathUtils.clamp(value, 0, 100);
+        if (message) splashStatus.textContent = message;
+        if (!splashProgressFrame) splashProgressFrame = requestAnimationFrame(animateSplashProgress);
+      }
+      function animateSplashProgress() {
+        const remaining = splashProgressTarget - splashProgress;
+        splashProgress = Math.abs(remaining) < 0.12
+          ? splashProgressTarget
+          : splashProgress + remaining * 0.13;
+        const visiblePercent = Math.floor(splashProgress + 0.5);
+        splashProgressFill.style.width = `${splashProgress}%`;
+        splashPercentage.textContent = `${visiblePercent}%`;
+        splashProgressTrack.setAttribute("aria-valuenow", String(visiblePercent));
+        if (Math.abs(splashProgressTarget - splashProgress) >= 0.12) {
+          splashProgressFrame = requestAnimationFrame(animateSplashProgress);
+          return;
+        }
+        splashProgressFrame = 0;
+        if (splashFadePending && splashProgressTarget >= 100) {
+          splashFadePending = false;
+          splashScreen.classList.add("is-fading");
+          window.setTimeout(() => {
+            splashScreen.hidden = true;
+          }, 900);
+        }
+      }
+      function completeSplash() {
+        if (splashCompletionStarted) return;
+        splashCompletionStarted = true;
+        setSplashProgress(96, "Synchronizing the display");
+        const minimumVisibleMs = Math.max(0, 820 - (performance.now() - splashStartedAt));
+        const fontsReady = document.fonts?.ready?.catch(() => undefined) ?? Promise.resolve();
+        const fontTimeout = new Promise(resolve => window.setTimeout(resolve, 550));
+        Promise.race([fontsReady, fontTimeout]).then(() => {
+          window.setTimeout(() => {
+            splashFadePending = true;
+            setSplashProgress(100, "Ready to run");
+          }, minimumVisibleMs);
+        });
+      }
+      setSplashProgress(8, "Preparing the neon core");
       const sceneRoot = el("scene");
       const gameScene = new THREE.Scene();
       gameScene.background = new THREE.Color(ENVIRONMENTS[0].background);
-      gameScene.fog = new THREE.FogExp2(ENVIRONMENTS[0].fog, ENVIRONMENTS[0].fogDensity);
+      gameScene.fog = new THREE.FogExp2(
+        ENVIRONMENTS[0].fog,
+        gamePreferences.dynamicFog ? ENVIRONMENTS[0].fogDensity : 0
+      );
       const camera = new THREE.PerspectiveCamera(window.innerWidth < 650 ? 68 : 62, 1, 0.1, 180);
       // Keep the camera below the tunnel roof while aiming down the path at incoming gates.
       camera.position.set(0, 1.45, 7.5);
@@ -5427,7 +6533,7 @@ void main() {
         renderer.setSize(width, height, false);
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.35;
+        renderer.toneMappingExposure = gamePreferences.neonGlow ? 1.35 : 0.95;
         sceneRoot.appendChild(renderer.domElement);
       } catch (error) {
         fallbackCanvas = document.createElement("canvas");
@@ -5437,6 +6543,7 @@ void main() {
         fallbackContext = fallbackCanvas.getContext("2d");
         resizeFallback();
       }
+      setSplashProgress(42, "Building the procedural tunnel");
 
       const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
       gameScene.add(ambientLight);
@@ -5460,8 +6567,8 @@ void main() {
 
       const tunnel = new THREE.Group();
       gameScene.add(tunnel);
-      const tunnelMat = new THREE.MeshStandardMaterial({ color: 0x17212b, emissive: 0x061719, emissiveIntensity: 0.85, metalness: 0.45, roughness: 0.48, side: THREE.DoubleSide });
-      const sideMat = new THREE.MeshStandardMaterial({ color: 0x121a24, emissive: 0x060a18, emissiveIntensity: 0.45, metalness: 0.2, roughness: 0.78, side: THREE.DoubleSide });
+      const tunnelMat = new THREE.MeshStandardMaterial({ color: 0x17212b, emissive: 0x061719, emissiveIntensity: 0.85 * getGlowScale(), metalness: 0.45, roughness: 0.48, side: THREE.DoubleSide });
+      const sideMat = new THREE.MeshStandardMaterial({ color: 0x121a24, emissive: 0x060a18, emissiveIntensity: 0.45 * getGlowScale(), metalness: 0.2, roughness: 0.78, side: THREE.DoubleSide });
       const floor = new THREE.Mesh(new THREE.PlaneGeometry(9, 124), tunnelMat);
       floor.rotation.x = -Math.PI / 2;
       floor.position.set(0, -2.25, -44);
@@ -5528,7 +6635,7 @@ void main() {
         if (instant) {
           gameScene.background.copy(environmentTargets.background);
           gameScene.fog.color.copy(environmentTargets.fog);
-          gameScene.fog.density = environmentTargets.fogDensity;
+          gameScene.fog.density = gamePreferences.dynamicFog ? environmentTargets.fogDensity : 0;
           laneLineMat.color.copy(environmentTargets.grid);
           railMat.color.copy(environmentTargets.rail);
           ribMat.color.copy(environmentTargets.grid);
@@ -5549,7 +6656,8 @@ void main() {
         const blend = 1 - Math.exp(-dt * 2.1);
         gameScene.background.lerp(environmentTargets.background, blend);
         gameScene.fog.color.lerp(environmentTargets.fog, blend);
-        gameScene.fog.density = THREE.MathUtils.lerp(gameScene.fog.density, environmentTargets.fogDensity, blend);
+        const targetFogDensity = gamePreferences.dynamicFog ? environmentTargets.fogDensity : 0;
+        gameScene.fog.density = THREE.MathUtils.lerp(gameScene.fog.density, targetFogDensity, blend);
         laneLineMat.color.lerp(environmentTargets.grid, blend);
         railMat.color.lerp(environmentTargets.rail, blend);
         ribMat.color.lerp(environmentTargets.grid, blend);
@@ -5612,10 +6720,12 @@ void main() {
         })
       );
       particleField.frustumCulled = false;
+      particleField.visible = gamePreferences.backgroundParticles;
       gameScene.add(particleField);
 
       const player = new THREE.Group();
       gameScene.add(player);
+      setSplashProgress(61, "Creating the neon runner");
       player.position.set(LANE_X[1], RUNNER_Y, 0);
       player.userData.gravityTargetY = RUNNER_Y;
       const ghostBall = new THREE.Mesh(
@@ -5642,7 +6752,7 @@ void main() {
       ghostHalo.rotation.x = Math.PI / 2;
       ghostBall.add(ghostHalo);
       gameScene.add(ghostBall);
-      const orbMat = new THREE.MeshStandardMaterial({ color: COLORS[1].hex, emissive: COLORS[1].hex, emissiveIntensity: 3.8, metalness: 0.1, roughness: 0.2 });
+      const orbMat = new THREE.MeshStandardMaterial({ color: COLORS[1].hex, emissive: COLORS[1].hex, emissiveIntensity: 3.8 * getGlowScale(), metalness: 0.1, roughness: 0.2 });
       const orb = new THREE.Mesh(new THREE.SphereGeometry(PLAYER_RADIUS, 20, 16), orbMat);
       player.add(orb);
       const orbHalo = new THREE.Mesh(
@@ -5675,18 +6785,18 @@ void main() {
       );
       shieldBubble.visible = false;
       player.add(shieldBubble);
-      const orbLight = new THREE.PointLight(COLORS[1].hex, 16, 12, 2);
+      const orbLight = new THREE.PointLight(COLORS[1].hex, 16 * getGlowScale(), 12, 2);
       orbLight.position.set(0, 0.65, 0);
       player.add(orbLight);
       function applyModeLighting() {
         const blackout = blackoutModeActive;
         ambientLight.intensity = blackout ? 0.008 : 1.2;
         hemisphereLight.intensity = blackout ? 0 : 0.9;
-        keyLight.intensity = blackout ? 0 : 22;
-        directionalLight.intensity = blackout ? 0 : 2.4;
-        tunnelLight.intensity = blackout ? 0 : 18;
-        farLight.intensity = blackout ? 0 : 22;
-        orbLight.intensity = blackout ? 0 : 16;
+        keyLight.intensity = blackout ? 0 : 22 * getGlowScale();
+        directionalLight.intensity = blackout ? 0 : 2.4 * getGlowScale();
+        tunnelLight.intensity = blackout ? 0 : 18 * getGlowScale();
+        farLight.intensity = blackout ? 0 : 22 * getGlowScale();
+        orbLight.intensity = blackout ? 0 : 16 * getGlowScale();
         if (blackout) boostLight.intensity = 0;
       }
       const targetOrbColor = new THREE.Color(COLORS[1].hex);
@@ -5739,9 +6849,23 @@ void main() {
         skinAccent.material.opacity = safeSkinId === "voidBlackhole" ? 1 : 0.9;
         orbMat.roughness = skin.roughness;
         orbMat.metalness = skin.metalness;
-        orbMat.emissiveIntensity = blackoutModeActive ? Math.max(2.2, skin.glow) : skin.glow;
+        orbMat.emissiveIntensity = (blackoutModeActive ? Math.max(2.2, skin.glow) : skin.glow) * getGlowScale();
         skinAccent.material.color.setHex(skin.accent);
         player.userData.skin = safeSkinId;
+      }
+      function applyVisualPreferences() {
+        const glowScale = getGlowScale();
+        if (renderer) renderer.toneMappingExposure = gamePreferences.neonGlow ? 1.35 : 0.95;
+        tunnelMat.emissiveIntensity = 0.85 * glowScale;
+        sideMat.emissiveIntensity = 0.45 * glowScale;
+        particleField.visible = gamePreferences.backgroundParticles;
+        if (gameScene.fog) {
+          const fogTarget = environmentTargets?.fogDensity ?? ENVIRONMENTS[0].fogDensity;
+          gameScene.fog.density = gamePreferences.dynamicFog ? fogTarget : 0;
+        }
+        const skin = PLAYER_SKINS[player.userData.skin] || PLAYER_SKINS.sphere;
+        orbMat.emissiveIntensity = (blackoutModeActive ? Math.max(2.2, skin.glow) : skin.glow) * glowScale;
+        applyModeLighting();
       }
 
       function makeGate(colorIndex, z, stackIndex = 0) {
@@ -5799,9 +6923,9 @@ void main() {
           const segmentMat = new THREE.MeshStandardMaterial({
             color: COLORS[segment].hex,
             emissive: COLORS[segment].hex,
-            emissiveIntensity: blackoutModeActive
+            emissiveIntensity: (blackoutModeActive
               ? segment === colorIndex ? 2.6 : 1.55
-              : segment === colorIndex ? 2.2 : 0.6,
+              : segment === colorIndex ? 2.2 : 0.6) * getGlowScale(),
             metalness: 0,
             roughness: 0.3,
             transparent: true,
@@ -5829,7 +6953,7 @@ void main() {
           marker.position.set(LANE_X[lane], antiGravityModeActive ? -1.32 : -1.48, 0.04);
           group.add(marker);
         }
-        const postGlow = new THREE.PointLight(color, 7, 8, 2);
+        const postGlow = new THREE.PointLight(color, 7 * getGlowScale(), 8, 2);
         postGlow.position.set(0, 0, 0.7);
         group.userData.postGlow = postGlow;
         group.add(postGlow);
@@ -5867,11 +6991,11 @@ void main() {
           material.opacity = active
             ? mechanics.colorChanging ? 0.68 + pulse * 0.18 : 0.78
             : mechanics.colorChanging ? 0.18 + pulse * 0.08 : 0.26;
-          material.emissiveIntensity = blackoutModeActive
+          material.emissiveIntensity = (blackoutModeActive
             ? active ? (mechanics.colorChanging ? 2.4 + pulse * 0.55 : 2.7) : 1.55
             : active
               ? mechanics.colorChanging ? 2.0 + pulse * 0.65 : 2.35
-              : 0.72;
+              : 0.72) * getGlowScale();
         });
         if (mechanics.phantom) {
           mechanics.phantomActive = Math.sin(obstacleElapsed * mechanics.phantomSpeed + mechanics.phantomPhase) > 0.12;
@@ -5898,7 +7022,7 @@ void main() {
         const coreMaterial = new THREE.MeshStandardMaterial({
           color,
           emissive: color,
-          emissiveIntensity: blackoutModeActive ? 3.2 : 2.8,
+          emissiveIntensity: (blackoutModeActive ? 3.2 : 2.8) * getGlowScale(),
           metalness: 0.15,
           roughness: 0.25
         });
@@ -6408,9 +7532,36 @@ void main() {
       let statusTimer = 0;
       let flashTimer = 0;
       let dailySpinTimer = 0;
-      let soundEnabled = true;
+      const SOUND_PREFERENCE_KEY = "colorShiftSoundEnabled";
+      function loadSoundPreference() {
+        try {
+          const saved = localStorage.getItem(SOUND_PREFERENCE_KEY);
+          return saved === null ? gamePreferences.sfxEnabled : saved !== "false";
+        } catch (error) {
+          return gamePreferences.sfxEnabled;
+        }
+      }
+      function saveSoundPreference() {
+        gamePreferences.sfxEnabled = soundEnabled;
+        saveSettings();
+        try {
+          localStorage.setItem(SOUND_PREFERENCE_KEY, String(soundEnabled));
+        } catch (error) {
+          // The game remains playable if storage is unavailable.
+        }
+      }
+      let soundEnabled = loadSoundPreference();
+      gamePreferences.sfxEnabled = soundEnabled;
+      let ambientEnabled = gamePreferences.ambientEnabled;
+      let masterVolume = gamePreferences.masterVolume;
       let audioContext = null;
+      let masterGain = null;
+      let sfxGain = null;
+      let ambientGain = null;
+      let audioResumePromise = null;
       let audioUnavailable = false;
+      let ambientAudioElapsed = 0;
+      let ambientNoteIndex = 0;
       const soundToggle = el("soundToggle");
       const soundLabel = el("soundLabel");
       function updateSoundControl() {
@@ -6420,32 +7571,94 @@ void main() {
         soundToggle.title = audioUnavailable ? "Sound unavailable in this browser" : soundEnabled ? "Mute sound" : "Enable sound";
         soundLabel.textContent = audioUnavailable ? "SOUND N/A" : soundEnabled ? "SOUND ON" : "SOUND OFF";
         const settingsSoundLabel = el("settingsSoundLabel");
-        const settingsSoundButton = el("settingsSoundButton");
+        const settingsSoundButton = el("sfxToggleButton");
         if (settingsSoundLabel) settingsSoundLabel.textContent = audioUnavailable ? "N/A" : soundEnabled ? "ON" : "OFF";
         if (settingsSoundButton) {
           settingsSoundButton.disabled = audioUnavailable;
           settingsSoundButton.setAttribute("aria-pressed", String(soundEnabled && !audioUnavailable));
           settingsSoundButton.setAttribute("aria-label", audioUnavailable ? "Sound unavailable" : soundEnabled ? "Mute sound" : "Enable sound");
         }
+        const ambientToggle = el("ambientToggleButton");
+        if (ambientToggle) {
+          ambientToggle.setAttribute("aria-checked", String(ambientEnabled));
+          el("ambientState").textContent = ambientEnabled ? "ON" : "OFF";
+        }
+        [
+          ["neonGlowToggle", "neonGlowState", gamePreferences.neonGlow],
+          ["backgroundParticlesToggle", "backgroundParticlesState", gamePreferences.backgroundParticles],
+          ["dynamicFogToggle", "dynamicFogState", gamePreferences.dynamicFog]
+        ].forEach(([buttonId, stateId, enabled]) => {
+          const button = el(buttonId);
+          if (!button) return;
+          button.setAttribute("aria-checked", String(enabled));
+          el(stateId).textContent = enabled ? "ON" : "OFF";
+        });
+        const volumeSlider = el("masterVolumeSlider");
+        if (volumeSlider) {
+          volumeSlider.value = String(masterVolume);
+          el("masterVolumeOutput").textContent = Math.round(masterVolume) + "%";
+        }
+        const sensitivitySlider = el("swipeSensitivitySlider");
+        if (sensitivitySlider) {
+          sensitivitySlider.value = String(gamePreferences.swipeSensitivity);
+          el("swipeSensitivityOutput").textContent = Math.round(gamePreferences.swipeSensitivity) + "%";
+        }
+        const smoothnessSlider = el("laneSmoothnessSlider");
+        if (smoothnessSlider) {
+          smoothnessSlider.value = String(gamePreferences.laneSmoothness);
+          el("laneSmoothnessOutput").textContent = Math.round(gamePreferences.laneSmoothness) + "%";
+        }
       }
       function unlockAudio() {
-        if (audioUnavailable || !soundEnabled) return;
+        if (audioUnavailable || (!soundEnabled && !ambientEnabled)) return Promise.resolve(false);
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         if (!AudioContextClass) {
           audioUnavailable = true;
           updateSoundControl();
-          return;
+          return Promise.resolve(false);
         }
         try {
-          if (!audioContext) audioContext = new AudioContextClass();
-          if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+          if (!audioContext || audioContext.state === "closed") {
+            audioContext = new AudioContextClass();
+            masterGain = null;
+          }
+          if (!masterGain) {
+            masterGain = audioContext.createGain();
+            sfxGain = audioContext.createGain();
+            ambientGain = audioContext.createGain();
+            masterGain.gain.setValueAtTime(masterVolume / 100, audioContext.currentTime);
+            sfxGain.gain.setValueAtTime(soundEnabled ? 1 : 0, audioContext.currentTime);
+            ambientGain.gain.setValueAtTime(ambientEnabled ? 1 : 0, audioContext.currentTime);
+            sfxGain.connect(masterGain);
+            ambientGain.connect(masterGain);
+            masterGain.connect(audioContext.destination);
+          }
+          if (audioContext.state !== "running") {
+            if (!audioResumePromise) {
+              audioResumePromise = audioContext.resume()
+                .then(() => audioContext.state === "running")
+                .catch(() => false)
+                .finally(() => { audioResumePromise = null; });
+            }
+            return audioResumePromise;
+          }
+          return Promise.resolve(true);
         } catch (error) {
           audioUnavailable = true;
           updateSoundControl();
+          return Promise.resolve(false);
         }
       }
-      function playTone(startFrequency, endFrequency, startTime, duration, type, volume) {
-        if (!soundEnabled || !audioContext || audioContext.state !== "running") return;
+      function updateMasterMute() {
+        if (!audioContext || !masterGain || audioContext.state === "closed") return;
+        const now = audioContext.currentTime;
+        masterGain.gain.cancelScheduledValues(now);
+        masterGain.gain.setTargetAtTime(masterVolume / 100, now, 0.012);
+        sfxGain?.gain.setTargetAtTime(soundEnabled ? 1 : 0, now, 0.012);
+        ambientGain?.gain.setTargetAtTime(ambientEnabled ? 1 : 0, now, 0.012);
+      }
+      function playTone(startFrequency, endFrequency, startTime, duration, type, volume, bus = "sfx") {
+        if ((bus === "ambient" ? !ambientEnabled : !soundEnabled) || !audioContext || audioContext.state !== "running") return;
         try {
           const oscillator = audioContext.createOscillator();
           const gain = audioContext.createGain();
@@ -6456,22 +7669,68 @@ void main() {
           gain.gain.exponentialRampToValueAtTime(volume, startTime + Math.min(0.015, duration * 0.25));
           gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
           oscillator.connect(gain);
-          gain.connect(audioContext.destination);
+          gain.connect(bus === "ambient" ? (ambientGain || masterGain || audioContext.destination) : (sfxGain || masterGain || audioContext.destination));
           oscillator.start(startTime);
           oscillator.stop(startTime + duration + 0.01);
         } catch (error) {
           // Audio failures must never interrupt a run.
         }
       }
-      function playCue(cue) {
+      function playCrashNoise(startTime) {
         if (!soundEnabled || !audioContext || audioContext.state !== "running") return;
+        const duration = 0.42;
+        try {
+          const sampleCount = Math.max(1, Math.floor(audioContext.sampleRate * duration));
+          const buffer = audioContext.createBuffer(1, sampleCount, audioContext.sampleRate);
+          const samples = buffer.getChannelData(0);
+          for (let i = 0; i < sampleCount; i++) {
+            const envelope = 1 - i / sampleCount;
+            samples[i] = (Math.random() * 2 - 1) * envelope * envelope;
+          }
+          const source = audioContext.createBufferSource();
+          const filter = audioContext.createBiquadFilter();
+          const gain = audioContext.createGain();
+          source.buffer = buffer;
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(1250, startTime);
+          filter.frequency.exponentialRampToValueAtTime(100, startTime + duration);
+          filter.Q.setValueAtTime(1.4, startTime);
+          gain.gain.setValueAtTime(0.0001, startTime);
+          gain.gain.exponentialRampToValueAtTime(0.11, startTime + 0.018);
+          gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+          source.connect(filter);
+          filter.connect(gain);
+          gain.connect(sfxGain || masterGain || audioContext.destination);
+          source.start(startTime);
+          source.stop(startTime + duration + 0.01);
+          playTone(142, 42, startTime, 0.38, "sawtooth", 0.07);
+        } catch (error) {
+          // Generated noise is optional; the oscillator crash remains available.
+          playTone(142, 42, startTime, 0.38, "sawtooth", 0.07);
+        }
+      }
+      function playCue(cue) {
+        if (!soundEnabled || audioUnavailable) return;
+        if (!audioContext || audioContext.state !== "running") {
+          const resume = unlockAudio();
+          if (resume && typeof resume.then === "function") {
+            resume.then(() => {
+              if (soundEnabled && audioContext && audioContext.state === "running") playCue(cue);
+            });
+          }
+          return;
+        }
         const now = audioContext.currentTime;
-        if (cue === "lane") {
+        if (cue === "button") {
+          playTone(980, 1370, now, 0.055, "sine", 0.026);
+        } else if (cue === "lane") {
           const lanePitch = [390, 470, 560][currentLane] || 470;
           playTone(lanePitch * 0.9, lanePitch, now, 0.07, "triangle", 0.028);
+          playTone(175, 105, now, 0.06, "sine", 0.012);
         } else if (cue === "color") {
           const colorPitch = [440, 520, 610][currentColor] || 440;
           playTone(colorPitch * 0.78, colorPitch, now, 0.085, "triangle", 0.035);
+          playTone(colorPitch * 1.55, colorPitch * 1.42, now + 0.012, 0.13, "sine", 0.018);
         } else if (cue === "gate") {
           playTone(620, 760, now, 0.09, "sine", 0.04);
           playTone(790, 960, now + 0.075, 0.11, "sine", 0.035);
@@ -6482,33 +7741,128 @@ void main() {
           playTone(880, 1180, now, 0.075, "sine", 0.035);
           playTone(1180, 1480, now + 0.055, 0.1, "sine", 0.03);
         } else if (cue === "gameOver") {
-          playTone(300, 105, now, 0.32, "triangle", 0.055);
+          playTone(300, 82, now, 0.36, "triangle", 0.065);
+          playCrashNoise(now);
         }
       }
+      const AMBIENT_NOTES = [146.83, 174.61, 196, 220, 164.81, 261.63];
+      function playAmbientNote() {
+        if (!ambientEnabled || !audioContext || audioContext.state !== "running") return;
+        const now = audioContext.currentTime;
+        const root = AMBIENT_NOTES[ambientNoteIndex % AMBIENT_NOTES.length];
+        ambientNoteIndex++;
+        playTone(root, root * 1.002, now, 1.45, "sine", 0.012, "ambient");
+        playTone(root * 1.5, root * 1.48, now + 0.16, 1.15, "triangle", 0.006, "ambient");
+      }
+      function updateAmbientAudio(dt) {
+        if (state !== "running") {
+          ambientAudioElapsed = 0;
+          return;
+        }
+        ambientAudioElapsed += dt;
+        if (ambientAudioElapsed >= 4.6) {
+          ambientAudioElapsed = 0;
+          playAmbientNote();
+        }
+      }
+      document.addEventListener("click", event => {
+        const button = event.target.closest("button");
+        if (!button || button.disabled || !soundEnabled) return;
+        if (["laneLeft", "laneRight", "switchColor", "soundToggle", "sfxToggleButton", "ambientToggleButton"].includes(button.id)) return;
+        if (button.closest("#achievementList")) return;
+        playCue("button");
+      });
       updateSoundControl();
       const BEST_KEY = "colorSwipeBestScore";
       const COINS_KEY = "colorShiftTotalCoins";
       const HIGH_SCORE_KEY = "highScore";
+      const MODE_HIGH_SCORE_KEYS = Object.freeze({
+        endless: "neonHighScore_classic",
+        timeAttack: "neonHighScore_timeAttack",
+        antiGravity: "neonHighScore_antiGravity",
+        blackout: "neonHighScore_blackout",
+        mirrorMatrix: "neonHighScore_mirrorMatrix",
+        laserPursuit: "neonHighScore_laser"
+      });
+      const MODE_HIGH_SCORE_LABELS = Object.freeze({
+        endless: "Classic high score",
+        timeAttack: "Time Attack high score",
+        antiGravity: "Anti-Gravity high score",
+        blackout: "Blackout high score",
+        mirrorMatrix: "Mirror Matrix high score",
+        laserPursuit: "Laser Pursuit high score"
+      });
       const GHOST_RUN_KEY = "ghostRunData";
       const NEON_CRYSTALS_KEY = "neonCrystals";
       const PROGRESSION_KEY = "colorShiftProgressionV2";
       const LEGACY_PROGRESSION_KEY = "colorShiftProgressionV1";
       const DAILY_COOLDOWN_MS = 24 * 60 * 60 * 1000;
-      let best = 0;
-      try {
-        best = Math.max(
-          0,
-          safeStoredCount(localStorage.getItem(HIGH_SCORE_KEY)),
-          Number(localStorage.getItem(BEST_KEY)) || 0,
-          Number(localStorage.getItem("colorSwipeBest")) || 0
-        );
-      } catch (error) {
-        best = 0;
-      }
       function safeStoredCount(value) {
         const parsed = Number(value);
         return Number.isFinite(parsed) && parsed >= 0 ? Math.min(1000000000, Math.floor(parsed)) : 0;
       }
+      function readLegacyHighScore() {
+        try {
+          return Math.max(
+            0,
+            safeStoredCount(localStorage.getItem(HIGH_SCORE_KEY)),
+            safeStoredCount(localStorage.getItem(BEST_KEY)),
+            safeStoredCount(localStorage.getItem("colorSwipeBest"))
+          );
+        } catch (error) {
+          return 0;
+        }
+      }
+      function loadModeHighScore(mode) {
+        const key = MODE_HIGH_SCORE_KEYS[mode];
+        if (!key) return 0;
+        try {
+          const stored = localStorage.getItem(key);
+          if (stored !== null) return safeStoredCount(stored);
+          const legacyBest = mode === "endless" ? readLegacyHighScore() : 0;
+          if (mode === "endless" && legacyBest > 0) localStorage.setItem(key, String(legacyBest));
+          return legacyBest;
+        } catch (error) {
+          return mode === "endless" ? readLegacyHighScore() : 0;
+        }
+      }
+      function syncLegacyHighScore() {
+        try {
+          for (const key of Object.values(MODE_HIGH_SCORE_KEYS)) {
+            if (localStorage.getItem(key) === null) localStorage.setItem(key, "0");
+          }
+          const modeScores = Object.values(MODE_HIGH_SCORE_KEYS).map(key =>
+            safeStoredCount(localStorage.getItem(key))
+          );
+          const overallBest = Math.max(readLegacyHighScore(), ...modeScores);
+          localStorage.setItem(HIGH_SCORE_KEY, String(overallBest));
+          localStorage.setItem(BEST_KEY, String(overallBest));
+          localStorage.setItem("colorSwipeBest", String(overallBest));
+          return overallBest;
+        } catch (error) {
+          return 0;
+        }
+      }
+      function saveModeHighScore(mode, value) {
+        const key = MODE_HIGH_SCORE_KEYS[mode];
+        if (!key) return safeStoredCount(value);
+        let modeBest = Math.max(loadModeHighScore(mode), safeStoredCount(value));
+        try {
+          localStorage.setItem(key, String(modeBest));
+        } catch (error) {
+          // Keep the current mode's best in memory when storage is unavailable.
+        }
+        if (mode === selectedMode) best = modeBest;
+        syncLegacyHighScore();
+        return modeBest;
+      }
+      function updateModeHighScoreDisplay() {
+        const label = MODE_HIGH_SCORE_LABELS[selectedMode] || MODE_HIGH_SCORE_LABELS.endless;
+        el("bestTop").textContent = String(best).padStart(5, "0");
+        el("bestModeLabel").textContent = label;
+        el("finalBestLabel").textContent = label;
+      }
+      let best = loadModeHighScore(selectedMode);
       function normalizeGhostSamples(value) {
         if (!Array.isArray(value) || value.length < 2) return [];
         const stride = Math.max(1, Math.ceil(value.length / GHOST_MAX_SAMPLES));
@@ -6640,7 +7994,7 @@ void main() {
       }
       const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
       try {
-        localStorage.setItem(HIGH_SCORE_KEY, String(best));
+        syncLegacyHighScore();
       } catch (error) {
         // The HUD still uses the in-memory best score if storage is unavailable.
       }
@@ -6770,7 +8124,7 @@ void main() {
           // Progress remains usable for this visit if browser storage is blocked or full.
         }
       }
-      el("bestTop").textContent = String(best).padStart(5, "0");
+      updateModeHighScoreDisplay();
       function updateCoinDisplay() {
         const displayValue = String(progression.crystals).padStart(5, "0");
         el("coinTotal").textContent = displayValue;
@@ -6876,6 +8230,7 @@ void main() {
       applyPlayerSkin(progression.activeSkin);
       renderProgressionUI();
       saveProgression();
+      setSplashProgress(83, "Loading saved progress");
       function displayNextAchievement() {
         const banner = el("achievementBanner");
         if (state === "over") {
@@ -7013,13 +8368,15 @@ void main() {
       function setGameMode(mode) {
         if (state === "running" || !["endless", "timeAttack", "antiGravity", "blackout", "mirrorMatrix", "laserPursuit"].includes(mode)) return;
         selectedMode = mode;
+        best = loadModeHighScore(mode);
+        updateModeHighScoreDisplay();
         antiGravityModeActive = mode === "antiGravity";
         blackoutModeActive = mode === "blackout";
         mirrorMatrixModeActive = mode === "mirrorMatrix";
         laserPursuitModeActive = mode === "laserPursuit";
         applyModeLighting();
         const activeSkin = PLAYER_SKINS[player.userData.skin] || PLAYER_SKINS.sphere;
-        orbMat.emissiveIntensity = blackoutModeActive ? Math.max(2.2, activeSkin.glow) : activeSkin.glow;
+        orbMat.emissiveIntensity = (blackoutModeActive ? Math.max(2.2, activeSkin.glow) : activeSkin.glow) * getGlowScale();
         gravityHazardSerial = 0;
         gravitySide = "floor";
         player.userData.gravityTargetY = antiGravityModeActive ? GRAVITY_FLOOR_Y : RUNNER_Y;
@@ -7118,9 +8475,7 @@ void main() {
       function openShop() {
         if (state === "running") return;
         closeSettings();
-        el("overlay").classList.add("rewards-open");
-        el("card").classList.add("shop-open");
-        el("shopPanel").hidden = false;
+        el("rewards-screen").hidden = false;
         el("shopScroll").scrollTop = 0;
         el("shopNotice").textContent = "";
         setRewardsTab(activeRewardsTab);
@@ -7128,9 +8483,7 @@ void main() {
         document.querySelector('[data-reward-tab="' + activeRewardsTab + '"]')?.focus({ preventScroll: true });
       }
       function closeShop() {
-        el("card").classList.remove("shop-open");
-        el("shopPanel").hidden = true;
-        el("overlay").classList.remove("rewards-open");
+        el("rewards-screen").hidden = true;
       }
       function setRewardsTab(tab) {
         const validTabs = ["achievements", "skins", "trails"];
@@ -7148,16 +8501,15 @@ void main() {
         el("shopScroll").scrollTop = 0;
       }
       function openSettings() {
-        if (state === "running") return;
+        if (state !== "ready") return;
         closeShop();
-        el("card").classList.add("settings-open");
-        el("settingsPanel").hidden = false;
+        updateSoundControl();
+        el("settings-screen").hidden = false;
         el("settingsButton").setAttribute("aria-expanded", "true");
-        el("settingsSoundButton").focus();
+        el("sfxToggleButton").focus();
       }
       function closeSettings() {
-        el("card").classList.remove("settings-open");
-        el("settingsPanel").hidden = true;
+        el("settings-screen").hidden = true;
         el("settingsButton").setAttribute("aria-expanded", "false");
       }
       function resetLocalProgress() {
@@ -7172,6 +8524,7 @@ void main() {
             BEST_KEY,
             "colorSwipeBest",
             HIGH_SCORE_KEY,
+            ...Object.values(MODE_HIGH_SCORE_KEYS),
             COINS_KEY,
             NEON_CRYSTALS_KEY,
             GHOST_RUN_KEY
@@ -7203,6 +8556,7 @@ void main() {
         setEnvironment(0, { announce: false, instant: true });
         applyPlayerSkin("sphere");
         setOrbColor(1);
+        updateModeHighScoreDisplay();
         player.userData.targetX = LANE_X[currentLane];
         updateLaneIndicator();
         clearTimeout(achievementNoticeTimer);
@@ -7210,7 +8564,7 @@ void main() {
         achievementQueue = [];
         el("achievementBanner").classList.remove("visible");
         el("achievementBanner").hidden = true;
-        el("bestTop").textContent = "00000";
+        updateModeHighScoreDisplay();
         el("finalBest").textContent = "0";
         saveProgression();
         renderProgressionUI();
@@ -7590,7 +8944,7 @@ void main() {
           resumeGame();
           return;
         }
-        if (state === "running" || !el("dailyModal").hidden || el("card").classList.contains("settings-open")) return;
+        if (state === "running" || !el("dailyModal").hidden || !el("settings-screen").hidden) return;
         if (!restartPaused && dailySpinReady()) {
           maybeShowDailyReward();
           return;
@@ -7598,6 +8952,8 @@ void main() {
         closeSettings();
         closeShop();
         unlockAudio();
+        best = loadModeHighScore(selectedMode);
+        updateModeHighScoreDisplay();
         window.clearTimeout(statusTimer);
         window.clearTimeout(flashTimer);
         window.clearTimeout(environmentNoticeTimer);
@@ -7983,7 +9339,8 @@ void main() {
         el("overlay").classList.remove("hidden", "game-over-screen");
         resetOverlay();
         el("overlay").classList.add("home-screen");
-        el("bestTop").textContent = String(best).padStart(5, "0");
+        best = loadModeHighScore(selectedMode);
+        updateModeHighScoreDisplay();
         renderProgressionUI();
         updatePowerHUD();
         updatePursuitWarning();
@@ -8029,19 +9386,15 @@ void main() {
         flashTimer = window.setTimeout(() => el("flash").classList.remove("on"), 120);
         updateHUD();
         const final = Math.floor(score);
+        best = loadModeHighScore(selectedMode);
+        updateModeHighScoreDisplay();
         const previousBest = best;
         const isBest = final > best;
         let crateReward = 0;
         if (isBest) {
           if (ghostRecordCandidate) persistGhostRunData(runGhostSamples);
-          best = final;
-          try {
-            localStorage.setItem(HIGH_SCORE_KEY, String(best));
-            localStorage.setItem(BEST_KEY, String(best));
-          } catch (error) {
-            // Keep the current run playable if browser storage is unavailable.
-          }
-          el("bestTop").textContent = String(best).padStart(5, "0");
+          best = saveModeHighScore(selectedMode, final);
+          updateModeHighScoreDisplay();
           crateReward = grantMysteryCrate();
         }
         el("eyebrow").textContent = reason === "time"
@@ -8139,19 +9492,21 @@ void main() {
 
         const leftAt = progress => center - (farHalf + (nearHalf - farHalf) * progress);
         const rightAt = progress => center + (farHalf + (nearHalf - farHalf) * progress);
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
-          const offset = i * 3;
-          const depth = Math.max(0, Math.min(1, Math.exp(particlePositions[offset + 2] / 27)));
-          const spread = farHalf + (nearHalf - farHalf) * depth;
-          const dustX = center + (particlePositions[offset] / 4.5) * spread;
-          const dustY = horizon + (floor - horizon) * depth - particlePositions[offset + 1] * height * 0.045 * depth;
-          const red = Math.round(particleColors[offset] * 255);
-          const green = Math.round(particleColors[offset + 1] * 255);
-          const blue = Math.round(particleColors[offset + 2] * 255);
-          ctx.beginPath();
-          ctx.arc(dustX, dustY, Math.max(0.8, depth * 2.2), 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${red},${green},${blue},${0.35 + depth * 0.4})`;
-          ctx.fill();
+        if (gamePreferences.backgroundParticles) {
+          for (let i = 0; i < PARTICLE_COUNT; i++) {
+            const offset = i * 3;
+            const depth = Math.max(0, Math.min(1, Math.exp(particlePositions[offset + 2] / 27)));
+            const spread = farHalf + (nearHalf - farHalf) * depth;
+            const dustX = center + (particlePositions[offset] / 4.5) * spread;
+            const dustY = horizon + (floor - horizon) * depth - particlePositions[offset + 1] * height * 0.045 * depth;
+            const red = Math.round(particleColors[offset] * 255);
+            const green = Math.round(particleColors[offset + 1] * 255);
+            const blue = Math.round(particleColors[offset + 2] * 255);
+            ctx.beginPath();
+            ctx.arc(dustX, dustY, Math.max(0.8, depth * 2.2), 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${red},${green},${blue},${0.35 + depth * 0.4})`;
+            ctx.fill();
+          }
         }
         ctx.beginPath();
         ctx.moveTo(leftAt(0), horizon);
@@ -8516,6 +9871,8 @@ void main() {
         const dt = Math.min((time - (lastTime || time)) / 1000, 0.045);
         lastTime = time;
         const t = time * 0.001;
+        if (state === "running") updateAmbientAudio(dt);
+        else ambientAudioElapsed = 0;
         if (state === "paused") return;
         updateEnvironmentTransition(dt);
         if (feverTimer > 0) {
@@ -8542,7 +9899,7 @@ void main() {
         const beaconDirection = antiGravityModeActive && gravitySide === "ceiling" ? -1 : 1;
         colorBeacon.position.y = beaconDirection * (0.9 + Math.sin(t * 3.2) * 0.045);
         colorBeacon.rotation.y += dt * 1.5;
-        const laneResponse = environmentIndex >= 8 ? 3.8 : environmentIndex >= 4 ? 5.2 : 18;
+        const laneResponse = (environmentIndex >= 8 ? 3.8 : environmentIndex >= 4 ? 5.2 : 18) * getLaneResponseScale();
         player.position.x = THREE.MathUtils.lerp(
           player.position.x,
           LANE_X[currentLane],
@@ -8604,8 +9961,9 @@ void main() {
         const activeSkinGlow = (PLAYER_SKINS[player.userData.skin] || PLAYER_SKINS.sphere).glow;
         const menuPulse = 0.5 + Math.sin(t * 1.8) * 0.5;
         orbMat.emissiveIntensity = (blackoutModeActive ? Math.max(2.2, activeSkinGlow) : activeSkinGlow)
+          * getGlowScale()
           * (state === "ready" ? 0.84 + menuPulse * 0.32 : 1);
-        orbLight.intensity = blackoutModeActive ? 0 : state === "ready" ? 14 + menuPulse * 8 : 16;
+        orbLight.intensity = blackoutModeActive ? 0 : (state === "ready" ? 14 + menuPulse * 8 : 16) * getGlowScale();
         orb.rotation.y += dt * (state === "running" ? 1.2 : 0.44);
         orb.rotation.x += dt * (state === "running" ? 0.7 : 0.24);
         shieldBubble.visible = shieldCharges > 0 || graceTimer > 0;
@@ -8617,13 +9975,15 @@ void main() {
         const boostPulse = speedBoostTimer > 0 ? 0.5 + Math.sin(t * 17) * 0.5 : 0;
           laneLineMat.opacity = 0.5 + boostPulse * 0.42;
           ribMat.opacity = 0.28 + boostPulse * 0.35;
-        boostLight.intensity = blackoutModeActive ? 0 : speedBoostTimer > 0 ? 9 + boostPulse * 13 : 0;
+        boostLight.intensity = blackoutModeActive ? 0 : speedBoostTimer > 0 ? (9 + boostPulse * 13) * getGlowScale() : 0;
         const particleDriftSpeed = state === "running" ? speed : state === "ready" ? 3.4 : 1.8;
-        for (let i = 2; i < particlePositions.length; i += 3) {
-          particlePositions[i] += particleDriftSpeed * dt;
-          if (particlePositions[i] > 4) particlePositions[i] -= 104;
+        if (gamePreferences.backgroundParticles) {
+          for (let i = 2; i < particlePositions.length; i += 3) {
+            particlePositions[i] += particleDriftSpeed * dt;
+            if (particlePositions[i] > 4) particlePositions[i] -= 104;
+          }
+          positionAttribute.needsUpdate = true;
         }
-        positionAttribute.needsUpdate = true;
         if (state === "running") {
           autoColorTimer -= dt;
           while (autoColorTimer <= 0) {
@@ -8779,6 +10139,7 @@ void main() {
         updateImpactBursts(dt);
         if (renderer) renderer.render(gameScene, camera);
         else drawFallback(t);
+        if (!splashCompletionStarted) completeSplash();
       }
       requestAnimationFrame(animate);
 
@@ -8845,7 +10206,10 @@ void main() {
          if (button) claimAchievementReward(button.dataset.tier);
        });
       el("settingsButton").addEventListener("click", openSettings);
-        el("settingsBack").addEventListener("click", returnToHome);
+        el("settingsBack").addEventListener("click", () => {
+          saveSettings();
+          returnToHome();
+        });
       el("pauseButton").addEventListener("click", pauseGame);
       el("restartButton").addEventListener("click", () => startGame(true));
         el("homeButton").addEventListener("click", returnToHome);
@@ -8853,11 +10217,54 @@ void main() {
       el("resetLocalData").addEventListener("click", resetLocalProgress);
       const toggleSound = () => {
         soundEnabled = !soundEnabled;
-        if (soundEnabled) unlockAudio();
+        saveSoundPreference();
+        updateMasterMute();
         updateSoundControl();
+        if (soundEnabled) {
+          unlockAudio().then(() => {
+            if (soundEnabled && audioContext && audioContext.state === "running") playCue("button");
+          });
+        }
       };
       soundToggle.addEventListener("click", toggleSound);
-      el("settingsSoundButton").addEventListener("click", toggleSound);
+      el("sfxToggleButton").addEventListener("click", toggleSound);
+      el("ambientToggleButton").addEventListener("click", () => {
+        ambientEnabled = !ambientEnabled;
+        gamePreferences.ambientEnabled = ambientEnabled;
+        saveSettings();
+        updateMasterMute();
+        updateSoundControl();
+        if (ambientEnabled) unlockAudio();
+      });
+      el("masterVolumeSlider").addEventListener("input", event => {
+        masterVolume = boundedPreference(event.currentTarget.value, 0, 100, DEFAULT_SETTINGS.masterVolume);
+        gamePreferences.masterVolume = masterVolume;
+        saveSettings();
+        updateMasterMute();
+        updateSoundControl();
+      });
+      el("swipeSensitivitySlider").addEventListener("input", event => {
+        gamePreferences.swipeSensitivity = boundedPreference(event.currentTarget.value, 0, 100, DEFAULT_SETTINGS.swipeSensitivity);
+        saveSettings();
+        updateSoundControl();
+      });
+      el("laneSmoothnessSlider").addEventListener("input", event => {
+        gamePreferences.laneSmoothness = boundedPreference(event.currentTarget.value, 0, 100, DEFAULT_SETTINGS.laneSmoothness);
+        saveSettings();
+        updateSoundControl();
+      });
+      [
+        ["neonGlowToggle", "neonGlow"],
+        ["backgroundParticlesToggle", "backgroundParticles"],
+        ["dynamicFogToggle", "dynamicFog"]
+      ].forEach(([buttonId, preferenceKey]) => {
+        el(buttonId).addEventListener("click", () => {
+          gamePreferences[preferenceKey] = !gamePreferences[preferenceKey];
+          saveSettings();
+          applyVisualPreferences();
+          updateSoundControl();
+        });
+      });
       el("laneLeft").addEventListener("click", () => shiftLane(-1));
       el("laneRight").addEventListener("click", () => shiftLane(1));
       el("switchColor").addEventListener("click", () => {
@@ -8866,14 +10273,31 @@ void main() {
       });
       window.addEventListener("keydown", event => {
         if (event.repeat && ["ArrowLeft", "ArrowRight", "ArrowUp", "KeyA", "KeyD", "KeyW", "Space", "Escape", "KeyP"].includes(event.code)) return;
-        if (["ArrowLeft", "ArrowRight", "ArrowUp", "Space", "Escape"].includes(event.code)) event.preventDefault();
+        if (!el("settings-screen").hidden && event.key === "Tab") {
+          const focusable = Array.from(el("settings-screen").querySelectorAll('button:not([disabled]), input:not([disabled])'));
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last?.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first?.focus();
+          }
+          return;
+        }
         if (event.code === "Escape" &&
             (!el("dailyModal").hidden ||
-              el("card").classList.contains("shop-open") ||
-              el("card").classList.contains("settings-open"))) {
+              !el("rewards-screen").hidden ||
+              !el("settings-screen").hidden)) {
+          event.preventDefault();
           returnToHome();
           return;
         }
+        const interactiveTarget = event.target instanceof Element && event.target.closest("button, input, select, textarea, [contenteditable='true']");
+        if (interactiveTarget && event.code !== "Escape") return;
+        if (state === "running" && ["ArrowLeft", "ArrowRight", "ArrowUp", "Space"].includes(event.code)) event.preventDefault();
+        if (event.code === "Escape") event.preventDefault();
         if (event.code === "Escape" || event.code === "KeyP") {
           if (state === "running") pauseGame();
           else if (state === "paused") resumeGame();
@@ -8889,7 +10313,7 @@ void main() {
           if (event.code === "KeyW" || event.code === "ArrowUp") manuallyCycleColor();
           return;
         }
-        if ((event.code === "Space" || event.code === "Enter") && el("dailyModal").hidden && !el("card").classList.contains("shop-open") && !el("card").classList.contains("settings-open")) startGame();
+        if ((event.code === "Space" || event.code === "Enter") && el("dailyModal").hidden && el("rewards-screen").hidden && el("settings-screen").hidden) startGame();
       }, { passive: false });
       let gestureStart = null;
       const game = el("game");
@@ -8897,10 +10321,11 @@ void main() {
         if (start.swiped) return;
         const dx = x - start.x;
         const dy = y - start.y;
-        if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+        if (Math.abs(dx) > getSwipeThreshold() && Math.abs(dx) > Math.abs(dy) * 1.15) {
           if (state === "running") shiftLane(dx < 0 ? -1 : 1);
           return;
         }
+        if (Math.abs(dx) >= 20 || Math.abs(dy) >= 20) return;
         if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
           if (state === "running") {
             if (antiGravityModeActive) flipGravity();
@@ -8908,10 +10333,10 @@ void main() {
             return;
           }
         }
-        if (state !== "running" && el("dailyModal").hidden && !el("card").classList.contains("shop-open") && !el("card").classList.contains("settings-open")) startGame();
+        if (state !== "running" && el("dailyModal").hidden && el("rewards-screen").hidden && el("settings-screen").hidden) startGame();
       };
       game.addEventListener("pointerdown", event => {
-        if (event.pointerType === "touch" || event.button !== 0 || (event.target instanceof Element && event.target.closest("button"))) return;
+        if (event.pointerType === "touch" || event.button !== 0 || (event.target instanceof Element && event.target.closest("button, #overlay .card, #rewards-screen, #settings-screen, #dailyModal"))) return;
         gestureStart = { id: event.pointerId, source: "pointer", x: event.clientX, y: event.clientY, swiped: false };
         try { game.setPointerCapture(event.pointerId); } catch {}
       }, { passive: true });
@@ -8925,7 +10350,7 @@ void main() {
         if (gestureStart?.source === "pointer" && gestureStart.id === event.pointerId) gestureStart = null;
       }, { passive: true });
       game.addEventListener("touchstart", event => {
-        if (event.target instanceof Element && event.target.closest("button")) return;
+        if (event.target instanceof Element && event.target.closest("button, #overlay .card, #rewards-screen, #settings-screen, #dailyModal")) return;
         if (event.touches.length > 1) {
           gestureStart = null;
           return;
@@ -8942,7 +10367,7 @@ void main() {
         if (gestureStart.swiped) return;
         const dx = touch.clientX - gestureStart.x;
         const dy = touch.clientY - gestureStart.y;
-        if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+        if (Math.abs(dx) > getSwipeThreshold() && Math.abs(dx) > Math.abs(dy) * 1.15) {
           gestureStart.swiped = true;
           if (state === "running") shiftLane(dx < 0 ? -1 : 1);
         }
@@ -8971,6 +10396,7 @@ void main() {
         if (document.hidden) pauseForBackground();
         else if (state !== "paused") maybeShowDailyReward();
       });
+      setSplashProgress(94, "Warming up the first frame");
     })();
   </script>
 </body>
