@@ -342,8 +342,10 @@
     .skin-preview.void::before { background: radial-gradient(circle at 32% 28%, #ffe7ff, #ff58ca 12%, #24102b 46%, #05060b 74%); border: 1px solid #ff98e0; }
     .skin-card h3, .trail-card h3 { margin: 0; color: #f4f7ff; font: 700 clamp(14px, 1.2vw, 16px) "Orbitron", system-ui, sans-serif; }
     .skin-card p, .trail-card p { min-height: 42px; margin: 6px 0 10px; color: #a4b1c0; font-size: 16px; line-height: 1.35; }
-    .cosmetic-cost, .trail-footer > span { display: flex; align-items: center; gap: 6px; margin-top: auto; color: #d8bd76; font: 600 10px "Orbitron", system-ui, sans-serif; }
-    .skin-action { width: 100%; min-height: 44px; margin-top: 10px; font-size: 10px; }
+    .cosmetic-cost, .trail-footer > span { display: flex; align-items: center; gap: 6px; margin-top: auto; color: #d8bd76; font: 600 clamp(8px, .8vw, 10px) "Orbitron", system-ui, sans-serif; white-space: nowrap; }
+    .skin-purchase-row { display: flex; align-items: center; gap: 6px; min-width: 0; margin-top: auto; }
+    .skin-purchase-row .cosmetic-cost { margin-top: 0; }
+    .skin-purchase-row .skin-action { flex: 1; width: auto; min-width: 76px; min-height: 44px; margin-top: 0; padding-inline: 5px; font-size: 10px; }
     .skin-action:disabled, .trail-action:disabled { opacity: .75; cursor: not-allowed; }
     .trail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .trail-card { display: grid; grid-template-columns: 62px minmax(0, 1fr); column-gap: 12px; min-width: 0; padding: 14px; border: 1px solid rgba(211,222,231,.12); background: linear-gradient(135deg, rgba(17,26,40,.9), rgba(10,15,24,.94)); }
@@ -786,6 +788,7 @@
       .mobile-controls { bottom: max(8px, env(safe-area-inset-bottom)); }
     }
     @media (max-width: 520px) {
+      .skin-grid { grid-template-columns: 1fr; }
       .shop-header { flex-direction: column; }
       .shop-balance { width: 100%; }
       .achievement-category-head h3 { font-size: 13px; }
@@ -6240,19 +6243,19 @@ void main() {
       ];
       const PLAYER_SKINS = {
         sphere: { name: "Sphere", description: "The original neon runner.", cost: 0, accent: 0x68f2df, roughness: 0.2, metalness: 0.1, glow: 3.8, shape: "sphere" },
-        diamond: { name: "Diamond", description: "A sharply cut prism.", cost: 30, accent: 0xffd25e, roughness: 0.13, metalness: 0.45, glow: 4.6, shape: "diamond" },
-        star: { name: "Star", description: "A radiant five-point core.", cost: 60, accent: 0xff58d6, roughness: 0.16, metalness: 0.25, glow: 4.3, shape: "star" },
-        plasmaOrb: { name: "Plasma Orb", description: "A charged orb wrapped in violet light.", cost: 50, accent: 0xa876ff, roughness: 0.12, metalness: 0.28, glow: 4.8, shape: "plasma" },
-        cyberShard: { name: "Cyber Shard", description: "A faceted shard tuned for speed.", cost: 85, accent: 0x54f4ff, roughness: 0.1, metalness: 0.5, glow: 4.9, shape: "shard" },
-        goldenSphere: { name: "Golden Sphere", description: "A polished core with solar trim.", cost: 125, accent: 0xffc74f, roughness: 0.12, metalness: 0.72, glow: 4.4, shape: "sphere" },
-        voidBlackhole: { name: "Void Blackhole", description: "A dark singularity edged in hot pink.", cost: 180, accent: 0xff58ca, roughness: 0.08, metalness: 0.58, glow: 5.1, shape: "void" }
+        diamond: { name: "Diamond", description: "A sharply cut prism.", cost: 50, accent: 0xffd25e, roughness: 0.13, metalness: 0.45, glow: 4.6, shape: "diamond" },
+        star: { name: "Star", description: "A radiant five-point core.", cost: 100, accent: 0xff58d6, roughness: 0.16, metalness: 0.25, glow: 4.3, shape: "star" },
+        plasmaOrb: { name: "Plasma Orb", description: "A charged orb wrapped in violet light.", cost: 150, accent: 0xa876ff, roughness: 0.12, metalness: 0.28, glow: 4.8, shape: "plasma" },
+        cyberShard: { name: "Cyber Shard", description: "A faceted shard tuned for speed.", cost: 250, accent: 0x54f4ff, roughness: 0.1, metalness: 0.5, glow: 4.9, shape: "shard" },
+        goldenSphere: { name: "Golden Sphere", description: "A polished core with solar trim.", cost: 500, accent: 0xffc74f, roughness: 0.12, metalness: 0.72, glow: 4.4, shape: "sphere" },
+        voidBlackhole: { name: "Void Blackhole", description: "A dark singularity edged in hot pink.", cost: 1000, accent: 0xff58ca, roughness: 0.08, metalness: 0.58, glow: 5.1, shape: "void" }
       };
       const TRAIL_STYLES = {
         none: { name: "No Trail", description: "A clean run with no particle trail.", cost: 0, color: 0x68f2df, secondary: 0x68f2df },
-        aurora: { name: "Aurora Wake", description: "Cool cyan particles with a violet edge.", cost: 20, color: 0x4fefff, secondary: 0x9d7bff },
-        ember: { name: "Solar Ember", description: "Warm gold sparks with a red core.", cost: 40, color: 0xffd057, secondary: 0xff5a63 },
-        prism: { name: "Prism Stream", description: "A bright shifting-spectrum particle wake.", cost: 65, color: 0xff5ac8, secondary: 0x5df5e8 },
-        singularity: { name: "Singularity Dust", description: "Violet motes pulled through the void.", cost: 95, color: 0x9f72ff, secondary: 0xf45dff }
+        aurora: { name: "Aurora Wake", description: "Cool cyan particles with a violet edge.", cost: 200, color: 0x4fefff, secondary: 0x9d7bff },
+        ember: { name: "Solar Ember", description: "Warm gold sparks with a red core.", cost: 300, color: 0xffd057, secondary: 0xff5a63 },
+        prism: { name: "Prism Stream", description: "A bright shifting-spectrum particle wake.", cost: 400, color: 0xff5ac8, secondary: 0x5df5e8 },
+        singularity: { name: "Singularity Dust", description: "Violet motes pulled through the void.", cost: 500, color: 0x9f72ff, secondary: 0xf45dff }
       };
       const ACHIEVEMENTS = [
         { id: "distanceMaster", title: "Distance Master", description: "Reach 1,000 meters in one run." },
@@ -8157,7 +8160,7 @@ void main() {
       function renderCosmeticButtonState(owned, active, affordable, cost) {
         if (active) return { label: "EQUIPPED", disabled: true };
         if (owned) return { label: "EQUIP", disabled: false };
-        if (affordable) return { label: "CLAIM", disabled: false };
+        if (affordable) return { label: "BUY", disabled: false };
         return { label: "LOCKED · " + cost, disabled: true };
       }
       function renderProgressionUI() {
@@ -8178,8 +8181,10 @@ void main() {
           return '<article class="skin-card' + (active ? " active" : "") + '" data-skin-card="' + skinId + '">' +
             '<div class="skin-preview ' + skin.shape + '" style="--skin-color:#' + skin.accent.toString(16).padStart(6, "0") + '" aria-hidden="true"><span></span></div>' +
             '<h3>' + skin.name + '</h3><p>' + skin.description + '</p>' +
-            '<div class="cosmetic-cost">' + (owned ? active ? "EQUIPPED" : "CLAIMED" : '<span class="crystal-mark" aria-hidden="true"></span>' + skin.cost + " CRYSTALS") + '</div>' +
-            '<button class="secondary-btn skin-action" type="button" data-skin="' + skinId + '" ' + (buttonState.disabled ? "disabled" : "") + '>' + buttonState.label + '</button>' +
+            '<div class="skin-purchase-row">' +
+              '<div class="cosmetic-cost">' + (owned ? active ? "EQUIPPED" : "OWNED" : '<span class="crystal-mark" aria-hidden="true"></span>' + skin.cost + " CRYSTALS") + '</div>' +
+              '<button class="secondary-btn skin-action" type="button" data-skin="' + skinId + '" ' + (buttonState.disabled ? "disabled" : "") + '>' + buttonState.label + '</button>' +
+            '</div>' +
             '</article>';
         }).join("");
         el("trailGrid").innerHTML = Object.entries(TRAIL_STYLES).map(([trailId, trail]) => {
@@ -8581,9 +8586,12 @@ void main() {
           }
           progression.crystals -= skin.cost;
           progression.ownedSkins.push(skinId);
-          el("shopNotice").textContent = skin.name + " claimed. Equip it when you are ready.";
+          progression.activeSkin = skinId;
+          applyPlayerSkin(skinId);
+          el("shopNotice").textContent = skin.name + " purchased and equipped.";
           saveProgression();
           renderProgressionUI();
+          unlockAudio();
           playCue("power");
           return;
         } else {
@@ -8606,7 +8614,8 @@ void main() {
           }
           progression.crystals -= trail.cost;
           progression.ownedTrails.push(trailId);
-          el("shopNotice").textContent = trail.name + " claimed. Equip it to leave a trail in your next run.";
+          progression.activeTrail = trailId;
+          el("shopNotice").textContent = trail.name + " purchased and equipped.";
           saveProgression();
           renderProgressionUI();
           playCue("power");
