@@ -3,8 +3,8 @@ type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 export const modules: ModuleMap = {
   "./components/mockups/color-shift-gameover/Current.tsx": () => import("../components/mockups/color-shift-gameover/Current.tsx"),
   "./components/mockups/color-shift-gameover/SessionSummary.tsx": () => import("../components/mockups/color-shift-gameover/SessionSummary.tsx"),
-  "./components/mockups/color-shift-home/ArcadeHome.tsx": () => import("../components/mockups/color-shift-home/ArcadeHome.tsx"),
-  "./components/mockups/color-shift-home/Current.tsx": () => import("../components/mockups/color-shift-home/Current.tsx"),
   "./components/mockups/color-shift-rewards/Current.tsx": () => import("../components/mockups/color-shift-rewards/Current.tsx"),
-  "./components/mockups/color-shift-rewards/RewardsHub.tsx": () => import("../components/mockups/color-shift-rewards/RewardsHub.tsx")
+  "./components/mockups/color-shift-rewards/RewardsHub.tsx": () => import("../components/mockups/color-shift-rewards/RewardsHub.tsx"),
+  "./components/mockups/color-shift-home/ArcadeHome.tsx": () => import("../components/mockups/color-shift-home/ArcadeHome.tsx"),
+  "./components/mockups/color-shift-home/Current.tsx": () => import("../components/mockups/color-shift-home/Current.tsx")
 };

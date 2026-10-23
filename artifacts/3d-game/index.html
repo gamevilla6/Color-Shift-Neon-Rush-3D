@@ -1150,13 +1150,52 @@
       z-index: 60;
       pointer-events: auto;
     }
-    #overlay.home-screen .shop-panel .shop-back {
-      position: sticky;
-      bottom: max(8px, env(safe-area-inset-bottom));
+    #overlay.home-screen.rewards-open {
+      place-items: start center;
+      padding:
+        max(12px, env(safe-area-inset-top))
+        max(12px, env(safe-area-inset-right))
+        max(12px, env(safe-area-inset-bottom))
+        max(12px, env(safe-area-inset-left));
+    }
+    #overlay.home-screen.rewards-open .card.home-card.shop-open {
+      width: min(100%, 1120px);
+      max-height: none;
+      overflow: visible;
+      padding: 0;
+    }
+    #overlay.home-screen.rewards-open .shop-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      height: min(920px, calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+      max-height: min(920px, calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+      overflow: hidden;
+      padding: 0;
+      pointer-events: auto;
+    }
+    #overlay.home-screen.rewards-open .shop-panel button { pointer-events: auto; touch-action: manipulation; }
+    #overlay.home-screen.rewards-open .shop-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+      padding: clamp(16px, 2.4vw, 30px);
+    }
+    #overlay.home-screen.rewards-open .shop-footer {
+      flex: 0 0 auto;
       z-index: 8;
+      padding: 10px clamp(12px, 2.4vw, 30px) max(10px, env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(84,242,223,.18);
+      background: linear-gradient(180deg, rgba(8,13,22,.94), rgba(7,11,19,.99));
+    }
+    #overlay.home-screen.rewards-open .shop-back {
+      display: flex;
       width: min(100%, 350px);
       min-height: 56px;
-      margin: 12px auto 4px;
+      margin: 0 auto;
     }
     #overlay.home-screen .universal-menu-back:hover,
     #overlay:not(.home-screen) .universal-menu-back:hover,
@@ -1202,6 +1241,31 @@
       #overlay.home-screen .universal-menu-back,
       #overlay:not(.home-screen) .universal-menu-back,
       #dailyModal .universal-menu-back { min-height: 56px; font-size: 9px; }
+    }
+    @media (max-width: 650px) {
+      #overlay.home-screen.rewards-open { padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom)); }
+      #overlay.home-screen.rewards-open .shop-panel {
+        height: min(920px, calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+        max-height: min(920px, calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+      }
+      #overlay.home-screen.rewards-open .shop-scroll { padding: clamp(12px, 3.8vw, 16px); }
+      .reward-tab {
+        min-height: 50px;
+        padding: 8px 3px;
+        font-size: clamp(11px, 2.9vw, 13px);
+        line-height: 1.2;
+        letter-spacing: .02em;
+      }
+      .tier-claim { min-width: 96px; min-height: 46px; font-size: 11px; }
+      .skin-action, .trail-action { min-height: 46px; font-size: 11px; }
+      .shop-back { min-height: 56px; }
+    }
+    @media (max-width: 900px) and (orientation: landscape) {
+      #overlay.home-screen.rewards-open { padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
+      #overlay.home-screen.rewards-open .shop-panel {
+        height: min(920px, calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+        max-height: min(920px, calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+      }
     }
     @media (max-width: 370px) {
       #game .topbar { right: 9px; left: 9px; }
@@ -1373,26 +1437,27 @@
         <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / W / ↑</b> change color</span><span class="mobile-hint">Tap to start · swipe to steer · tap to change color</span></div>
         <div class="small-note" id="dailyTokenNote" hidden></div>
         <section class="shop-panel" id="shopPanel" aria-label="Rewards and achievements" hidden>
+          <div class="shop-scroll" id="shopScroll">
           <div class="shop-header">
             <div><div class="eyebrow">PLAYER PROGRESSION</div><h2 class="shop-title">Rewards Hub</h2><p class="shop-intro">Every run moves you closer to a new tier, skin, or trail.</p></div>
             <div class="shop-balance">CRYSTAL BALANCE<br><strong id="shopBalance">00000</strong></div>
           </div>
           <nav class="reward-tabs" role="tablist" aria-label="Rewards categories">
-            <button class="reward-tab active" type="button" role="tab" aria-selected="true" data-reward-tab="achievements">Milestones</button>
-            <button class="reward-tab" type="button" role="tab" aria-selected="false" data-reward-tab="skins">Ball Skins</button>
-            <button class="reward-tab" type="button" role="tab" aria-selected="false" data-reward-tab="trails">Glow Trails</button>
+            <button class="reward-tab active" id="rewardTabAchievements" type="button" role="tab" aria-selected="true" aria-controls="rewardPanelAchievements" tabindex="0" data-reward-tab="achievements">Milestones</button>
+            <button class="reward-tab" id="rewardTabSkins" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelSkins" tabindex="-1" data-reward-tab="skins">Ball Skins</button>
+            <button class="reward-tab" id="rewardTabTrails" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelTrails" tabindex="-1" data-reward-tab="trails">Glow Trails</button>
           </nav>
-          <div class="reward-tab-panel" data-reward-panel="achievements" role="tabpanel">
+          <div class="reward-tab-panel" id="rewardPanelAchievements" data-reward-panel="achievements" role="tabpanel" aria-labelledby="rewardTabAchievements" tabindex="0">
             <div class="shop-section-heading"><div><h3>Achievement Tracks</h3><p>Four tiers per discipline. Claim crystal rewards as soon as a milestone is complete.</p></div><span class="achievement-tier-key">BRONZE · SILVER · GOLD · DIAMOND</span></div>
             <div class="achievement-list" id="achievementList"></div>
             <div class="shop-section-label">Daily Bounties</div>
             <div class="achievement-list daily-list" id="dailyBountyList"></div>
           </div>
-          <div class="reward-tab-panel" data-reward-panel="skins" role="tabpanel" hidden>
+          <div class="reward-tab-panel" id="rewardPanelSkins" data-reward-panel="skins" role="tabpanel" aria-labelledby="rewardTabSkins" tabindex="0" hidden>
             <div class="shop-section-heading"><div><h3>Player Skins</h3><p>Claim a form once, then equip it for future runs.</p></div><span class="achievement-tier-key">3D COSMETICS</span></div>
             <div class="skin-grid" id="skinGrid"></div>
           </div>
-          <div class="reward-tab-panel" data-reward-panel="trails" role="tabpanel" hidden>
+          <div class="reward-tab-panel" id="rewardPanelTrails" data-reward-panel="trails" role="tabpanel" aria-labelledby="rewardTabTrails" tabindex="0" hidden>
             <div class="shop-section-heading"><div><h3>Particle Trails</h3><p>Choose the glow that follows you through the tunnel.</p></div><span class="achievement-tier-key">RUN EFFECTS</span></div>
             <div class="trail-grid" id="trailGrid"></div>
           </div>
@@ -1401,7 +1466,10 @@
             <p>Progress, claimed rewards, owned cosmetics, and equipped styles are saved on this device.</p>
             <button class="secondary-btn reset-save-btn" id="resetLocalData" type="button">Reset local save</button>
           </div>
-          <button class="secondary-btn shop-back universal-menu-back" id="shopBack" type="button" aria-label="Return to the main menu">⌂ MAIN MENU</button>
+          </div>
+          <div class="shop-footer">
+            <button class="secondary-btn shop-back universal-menu-back" id="shopBack" type="button" aria-label="Return to the main menu">⌂ MAIN MENU</button>
+          </div>
         </section>
         <section class="settings-panel" id="settingsPanel" aria-label="Settings" hidden>
           <div class="settings-header">
@@ -7050,15 +7118,19 @@ void main() {
       function openShop() {
         if (state === "running") return;
         closeSettings();
+        el("overlay").classList.add("rewards-open");
         el("card").classList.add("shop-open");
         el("shopPanel").hidden = false;
+        el("shopScroll").scrollTop = 0;
         el("shopNotice").textContent = "";
         setRewardsTab(activeRewardsTab);
         renderProgressionUI();
+        document.querySelector('[data-reward-tab="' + activeRewardsTab + '"]')?.focus({ preventScroll: true });
       }
       function closeShop() {
         el("card").classList.remove("shop-open");
         el("shopPanel").hidden = true;
+        el("overlay").classList.remove("rewards-open");
       }
       function setRewardsTab(tab) {
         const validTabs = ["achievements", "skins", "trails"];
@@ -7068,10 +7140,12 @@ void main() {
           const selected = button.dataset.rewardTab === tab;
           button.classList.toggle("active", selected);
           button.setAttribute("aria-selected", String(selected));
+          button.tabIndex = selected ? 0 : -1;
         });
         document.querySelectorAll("[data-reward-panel]").forEach(panel => {
           panel.hidden = panel.dataset.rewardPanel !== tab;
         });
+        el("shopScroll").scrollTop = 0;
       }
       function openSettings() {
         if (state === "running") return;
@@ -8744,6 +8818,20 @@ void main() {
        document.querySelectorAll("[data-reward-tab]").forEach(button => {
          button.addEventListener("click", () => setRewardsTab(button.dataset.rewardTab));
        });
+        el("shopPanel").querySelector(".reward-tabs").addEventListener("keydown", event => {
+          const tabs = Array.from(el("shopPanel").querySelectorAll("[data-reward-tab]"));
+          const currentIndex = tabs.indexOf(event.target.closest("[data-reward-tab]"));
+          if (currentIndex < 0) return;
+          let nextIndex = currentIndex;
+          if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabs.length;
+          else if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+          else if (event.key === "Home") nextIndex = 0;
+          else if (event.key === "End") nextIndex = tabs.length - 1;
+          else return;
+          event.preventDefault();
+          setRewardsTab(tabs[nextIndex].dataset.rewardTab);
+          tabs[nextIndex].focus({ preventScroll: true });
+        });
        el("skinGrid").addEventListener("click", event => {
          const button = event.target.closest("[data-skin]");
          if (button) chooseSkin(button.dataset.skin);
