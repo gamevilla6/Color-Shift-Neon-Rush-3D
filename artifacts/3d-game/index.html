@@ -161,6 +161,11 @@
     .stat { min-width: 74px; text-align: center; }
     .stat-value { font-family: system-ui, sans-serif; font-weight: 800; font-size: clamp(27px, 4vw, 38px); line-height: .9; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
     .stat-label { margin-top: 8px; font-size: 8px; letter-spacing: .2em; color: #89919c; text-transform: uppercase; }
+    #timeAttackStat.time-bonus .stat-value { animation: timeBonusPulse .5s ease-out; }
+    @keyframes timeBonusPulse {
+      0%, 100% { color: #f4f7fb; transform: scale(1); text-shadow: 0 0 16px rgba(56,234,255,.18); }
+      35% { color: var(--lime); transform: scale(1.22); text-shadow: 0 0 20px rgba(197,255,74,.75); }
+    }
     .stat.combo-hot .stat-value { color: var(--lime); text-shadow: 0 0 18px rgba(197,255,74,.65); transform: scale(1.08); }
     .stat-value { transition: color .2s, text-shadow .2s, transform .2s; }
     #score.score-pop { animation: scorePop .44s cubic-bezier(.2,.8,.2,1); }
@@ -203,6 +208,11 @@
     .environment-banner { position: absolute; z-index: 7; top: clamp(210px, 31vh, 260px); left: 50%; width: min(calc(100vw - 32px), 350px); padding: 10px 16px 12px; border: 1px solid color-mix(in srgb, var(--zone-color) 65%, transparent); background: rgba(7, 11, 19, .82); color: var(--zone-color); text-align: center; pointer-events: none; opacity: 0; transform: translate(-50%, 10px) scale(.96); box-shadow: 0 0 0 rgba(0,0,0,0); backdrop-filter: blur(10px); transition: opacity .28s ease, transform .32s cubic-bezier(.2,.8,.2,1), box-shadow .32s ease; }
     .environment-banner[hidden] { display: none !important; }
     .environment-banner.visible { opacity: 1; transform: translate(-50%, 0) scale(1); box-shadow: 0 0 28px color-mix(in srgb, var(--zone-color) 22%, transparent); }
+    .environment-indicator { --zone-color: var(--cyan); position: absolute; z-index: 6; left: 50%; bottom: max(76px, calc(env(safe-area-inset-bottom) + 68px)); display: flex; align-items: center; gap: 8px; max-width: calc(100vw - 32px); padding: 6px 10px; transform: translateX(-50%); border: 1px solid color-mix(in srgb, var(--zone-color) 48%, transparent); border-radius: 999px; background: rgba(6,10,17,.78); color: var(--zone-color); font: 700 8px/1 ui-monospace, monospace; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; pointer-events: none; backdrop-filter: blur(8px); box-shadow: 0 0 16px color-mix(in srgb, var(--zone-color) 14%, transparent); }
+    .environment-indicator[hidden], #game:not(.is-running) .environment-indicator, #game.is-paused .environment-indicator { display: none !important; }
+    .environment-indicator span { color: rgba(225,232,240,.58); }
+    .environment-indicator strong { overflow: hidden; max-width: min(46vw, 180px); color: #f4f7fb; text-overflow: ellipsis; }
+    @media (min-width: 901px) and (hover: hover) { .environment-indicator { bottom: 22px; } }
     .environment-kicker { display: block; margin-bottom: 4px; color: rgba(238,244,250,.6); font-size: 8px; letter-spacing: .2em; text-transform: uppercase; }
     .environment-banner strong { display: block; color: #f4f4ee; font: 800 10px system-ui, sans-serif; letter-spacing: .17em; }
     .environment-name { display: block; margin-top: 3px; font: 800 16px system-ui, sans-serif; letter-spacing: .06em; text-shadow: 0 0 14px color-mix(in srgb, var(--zone-color) 72%, transparent); }
@@ -2252,9 +2262,13 @@
     <div class="boost-banner" id="speedBanner" hidden>SPEED UP! <span><b id="speedTime">5</b>s</span></div>
     <div class="fever-banner" id="feverBanner" hidden>RAINBOW RUSH<span>FEVER · <b id="feverTime">5</b>s · <b id="feverScoreMultiplier">3X SCORE</b></span></div>
     <div class="environment-banner" id="environmentBanner" role="status" aria-live="polite" hidden>
-      <span class="environment-kicker" id="environmentKicker">ZONE 01 / 10</span>
+      <span class="environment-kicker" id="environmentKicker">STAGE 01 · THEME 01 / 14</span>
       <strong>ENTERING</strong>
       <span class="environment-name" id="environmentName">Cyber Grid</span>
+    </div>
+    <div class="environment-indicator" id="environmentIndicator" role="status" aria-live="polite" hidden>
+      <span id="environmentIndicatorStage">STAGE 01 · THEME 01/14</span>
+      <strong id="environmentIndicatorName">Cyber Grid</strong>
     </div>
     <div class="achievement-banner" id="achievementBanner" role="status" aria-live="polite" hidden>
       <span id="achievementKicker">ACHIEVEMENT UNLOCKED</span>
@@ -6333,8 +6347,23 @@ void main() {
       const GRAVITY_CEILING_Y = 1.15;
       const SLIDING_GATE_UNLOCK_SCORE = 500;
       const ROTATING_GATE_UNLOCK_SCORE = 1500;
+      const ENVIRONMENT_SCORE_MILESTONE = 300;
+      const ENVIRONMENT_GATE_MILESTONE = 10;
+      const TIME_ATTACK_START_SECONDS = 60;
+      const TIME_ATTACK_GATE_BONUS_SECONDS = 2;
+      const TIME_ATTACK_CRYSTAL_BONUS_SECONDS = 3;
+      const CRYSTAL_SPAWN_INITIAL_DELAY = 8.5;
+      const CRYSTAL_SPAWN_INITIAL_JITTER = 2.5;
+      const CRYSTAL_SPAWN_INTERVAL = 10.5;
+      const CRYSTAL_SPAWN_JITTER = 4.5;
+      const CRYSTAL_SPAWN_RETRY_DELAY = 3;
+      const MAX_ACTIVE_CRYSTALS = 2;
       const ENVIRONMENTS = [
         { name: "Cyber Grid", background: 0x050515, fog: 0x050515, fogDensity: 0.009, grid: 0x38e6d3, rail: 0xc5ff4a, key: 0x38e6d3, tunnel: 0xff4fb8, far: 0xc5ff4a, ground: 0x17212b, groundGlow: 0x061719 },
+        { name: "Sunset Alley", background: 0x251119, fog: 0x251119, fogDensity: 0.0095, grid: 0xff8b4a, rail: 0xffd36e, key: 0xff7447, tunnel: 0xe94f89, far: 0xffc857, ground: 0x2b1621, groundGlow: 0x46172d },
+        { name: "Quantum Void", background: 0x100823, fog: 0x100823, fogDensity: 0.0095, grid: 0xa88cff, rail: 0x55eaff, key: 0x8c71ff, tunnel: 0x4e56ff, far: 0x43e5ff, ground: 0x160f2c, groundGlow: 0x2b1a59 },
+        { name: "Matrix Rain", background: 0x04150e, fog: 0x04150e, fogDensity: 0.010, grid: 0x65ff9b, rail: 0x00d36f, key: 0x3aff90, tunnel: 0x00ff94, far: 0xc3ff5a, ground: 0x0d2015, groundGlow: 0x052511 },
+        { name: "Laser Core", background: 0x1c0615, fog: 0x1c0615, fogDensity: 0.010, grid: 0xff4f93, rail: 0x45eaff, key: 0xff3f68, tunnel: 0xff3fa1, far: 0x88f7ff, ground: 0x280b20, groundGlow: 0x4a0c37 },
         { name: "Chromatic Causeway", background: 0x061627, fog: 0x061627, fogDensity: 0.0095, grid: 0x45c6ff, rail: 0xffc857, key: 0x45c6ff, tunnel: 0x966bff, far: 0xff4fb8, ground: 0x101d2b, groundGlow: 0x071523 },
         { name: "Prism Drift", background: 0x170a25, fog: 0x170a25, fogDensity: 0.0085, grid: 0xff5ade, rail: 0x4dffe1, key: 0xff5ade, tunnel: 0x4dffe1, far: 0xffc857, ground: 0x21142b, groundGlow: 0x170d20 },
         { name: "Voltage Reef", background: 0x041b20, fog: 0x041b20, fogDensity: 0.010, grid: 0x46f0c1, rail: 0x4ccaff, key: 0x46f0c1, tunnel: 0x4ccaff, far: 0xc5ff4a, ground: 0x0e2525, groundGlow: 0x08201b },
@@ -6345,23 +6374,46 @@ void main() {
         { name: "Double Helix", background: 0x200918, fog: 0x200918, fogDensity: 0.0105, grid: 0xff5ca8, rail: 0x50e9ff, key: 0xff5ca8, tunnel: 0x50e9ff, far: 0xffcf57, ground: 0x2a1020, groundGlow: 0x230a1b },
         { name: "The Singularity", background: 0x03030c, fog: 0x03030c, fogDensity: 0.013, grid: 0xe9f5ff, rail: 0xba75ff, key: 0xba75ff, tunnel: 0x46f8ee, far: 0xff5a94, ground: 0x10101c, groundGlow: 0x090a16 }
       ];
+      // Laser Pursuit starts in its core, then cycles through five established zones.
+      const LASER_ENVIRONMENTS = [
+        ENVIRONMENTS[4],
+        ENVIRONMENTS[0],
+        ENVIRONMENTS[1],
+        ENVIRONMENTS[2],
+        ENVIRONMENTS[3]
+      ];
+      const BLACKOUT_ENVIRONMENTS = [
+        { name: "Midnight Grid", background: 0x02040b, fog: 0x07111b, fogDensity: 0.036, grid: 0x167d91, rail: 0x536b24, key: 0x126171, tunnel: 0x48213b, far: 0x31551f, ground: 0x060a12, groundGlow: 0x04131a },
+        { name: "Eclipse Alley", background: 0x0b0308, fog: 0x19070e, fogDensity: 0.038, grid: 0x8a3157, rail: 0x9a5828, key: 0x722344, tunnel: 0x7e2946, far: 0x78441f, ground: 0x10060d, groundGlow: 0x210a17 },
+        { name: "Void Core", background: 0x04020c, fog: 0x10091d, fogDensity: 0.040, grid: 0x5d438d, rail: 0x286e83, key: 0x49366f, tunnel: 0x402f75, far: 0x1e5368, ground: 0x090612, groundGlow: 0x160d2b },
+        { name: "Deep Matrix", background: 0x020805, fog: 0x07130b, fogDensity: 0.037, grid: 0x187449, rail: 0x527020, key: 0x125c36, tunnel: 0x145e3e, far: 0x405b1b, ground: 0x050d08, groundGlow: 0x06190d },
+        { name: "Dark Nebula", background: 0x08040e, fog: 0x180d22, fogDensity: 0.039, grid: 0x68418c, rail: 0x326e8a, key: 0x583775, tunnel: 0x65316e, far: 0x245368, ground: 0x0d0715, groundGlow: 0x1c0c27 }
+      ];
+      const MIRROR_ENVIRONMENTS = [
+        { name: "Glass Grid", background: 0x06131f, fog: 0x0c2233, fogDensity: 0.010, grid: 0x68e9ff, rail: 0xf07bff, key: 0x4ccbe8, tunnel: 0x7559df, far: 0x54ffd8, ground: 0x102031, groundGlow: 0x102a3c },
+        { name: "Prism Alley", background: 0x19091d, fog: 0x291331, fogDensity: 0.011, grid: 0xff7be7, rail: 0x75eaff, key: 0xe45fd0, tunnel: 0x9f4fc2, far: 0x72ffd8, ground: 0x28142d, groundGlow: 0x3e1844 },
+        { name: "Holographic Void", background: 0x09071f, fog: 0x171338, fogDensity: 0.011, grid: 0x9e88ff, rail: 0x65f4ff, key: 0x8170e8, tunnel: 0x5a52c6, far: 0x69ffe3, ground: 0x17152e, groundGlow: 0x28235a },
+        { name: "Crystalline Matrix", background: 0x04171b, fog: 0x0a252c, fogDensity: 0.012, grid: 0x63ffd0, rail: 0x83aaff, key: 0x45dcb7, tunnel: 0x3696b0, far: 0xc7fffb, ground: 0x0d282a, groundGlow: 0x10453f },
+        { name: "Mirror Core", background: 0x16091e, fog: 0x261135, fogDensity: 0.013, grid: 0xff84c9, rail: 0xb6a0ff, key: 0xd574e8, tunnel: 0x8654bd, far: 0x72eaff, ground: 0x25132d, groundGlow: 0x38184c }
+      ];
       let environmentIndex = 0;
       let antiGravityModeActive = false;
       let blackoutModeActive = false;
       let mirrorMatrixModeActive = false;
       let laserPursuitModeActive = false;
-      const QUANTUM_THEME = {
-        background: 0x08051a,
-        fog: 0x160b35,
-        fogDensity: 0.0105,
-        grid: 0x9b6dff,
-        rail: 0x65e6ff,
-        key: 0xb58aff,
-        tunnel: 0x7453ff,
-        far: 0x4bcfff,
-        ground: 0x17112e,
-        groundGlow: 0x3c1d78
-      };
+      function getEnvironmentSet() {
+        if (blackoutModeActive) return BLACKOUT_ENVIRONMENTS;
+        if (mirrorMatrixModeActive) return MIRROR_ENVIRONMENTS;
+        if (laserPursuitModeActive) return LASER_ENVIRONMENTS;
+        return ENVIRONMENTS;
+      }
+      function getEnvironmentTheme(stageIndex = environmentIndex) {
+        const themes = getEnvironmentSet();
+        const themeIndex = ((Math.floor(stageIndex) % themes.length) + themes.length) % themes.length;
+        return themes[themeIndex];
+      }
+      let nextEnvironmentScoreMilestone = ENVIRONMENT_SCORE_MILESTONE;
+      let nextEnvironmentGateMilestone = ENVIRONMENT_GATE_MILESTONE;
       let environmentTargets = null;
       let environmentNoticeTimer = 0;
       let environmentNoticeToken = 0;
@@ -6494,7 +6546,10 @@ void main() {
       let fallbackContext = null;
       const isCoarsePointer = () => window.matchMedia?.("(pointer: coarse)").matches ?? false;
       const isMobileViewport = () => window.innerWidth < 650 || isCoarsePointer();
-      const getPixelRatio = () => Math.min(window.devicePixelRatio || 1, 2);
+      const getPixelRatio = () => Math.min(
+        window.devicePixelRatio || 1,
+        isMobileViewport() ? 1.5 : 2
+      );
       const getSceneSize = () => {
         const bounds = sceneRoot.getBoundingClientRect();
         return {
@@ -6530,6 +6585,8 @@ void main() {
           context: webglContext,
           ...contextAttributes
         });
+        renderer.shadowMap.enabled = false;
+        renderer.shadowMap.autoUpdate = false;
         renderer.domElement.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;z-index:1;display:block;touch-action:none";
         renderer.setPixelRatio(getPixelRatio());
         const { width, height } = getSceneSize();
@@ -6614,15 +6671,10 @@ void main() {
       }
 
       function setEnvironment(index, { announce = true, instant = false } = {}) {
-        const nextIndex = Math.max(0, Math.min(ENVIRONMENTS.length - 1, index));
+        const nextIndex = Math.max(0, Math.floor(Number(index) || 0));
         const changed = nextIndex !== environmentIndex;
         environmentIndex = nextIndex;
-        const environmentTheme = antiGravityModeActive
-          ? { ...ENVIRONMENTS[environmentIndex], ...QUANTUM_THEME }
-          : ENVIRONMENTS[environmentIndex];
-        const theme = blackoutModeActive
-          ? { ...environmentTheme, background: 0x000000, fog: 0x000000, fogDensity: 0.045 }
-          : environmentTheme;
+        const theme = getEnvironmentTheme(environmentIndex);
         environmentTargets = {
           background: new THREE.Color(theme.background),
           fog: new THREE.Color(theme.fog),
@@ -6651,7 +6703,38 @@ void main() {
           tunnelMat.emissive.copy(environmentTargets.groundGlow);
           sideMat.color.copy(environmentTargets.ground);
         }
+        updateEnvironmentIndicator();
         if (changed && announce) showEnvironmentBanner(environmentIndex);
+      }
+      function updateEnvironmentIndicator() {
+        const theme = getEnvironmentTheme(environmentIndex);
+        const indicator = el("environmentIndicator");
+        indicator.hidden = state !== "running";
+        indicator.style.setProperty("--zone-color", new THREE.Color(theme.grid).getStyle());
+        el("environmentIndicatorName").textContent = theme.name;
+        const themeCount = getEnvironmentSet().length;
+        const themeNumber = (environmentIndex % themeCount) + 1;
+        el("environmentIndicatorStage").textContent =
+          "STAGE " + String(environmentIndex + 1).padStart(2, "0") +
+          " · THEME " + String(themeNumber).padStart(2, "0") + "/" + themeCount;
+      }
+      function resetEnvironmentMilestones() {
+        nextEnvironmentScoreMilestone = ENVIRONMENT_SCORE_MILESTONE;
+        nextEnvironmentGateMilestone = ENVIRONMENT_GATE_MILESTONE;
+      }
+      function advanceEnvironmentIfNeeded() {
+        if (state !== "running") return;
+        let stagesToAdvance = 0;
+        while (score >= nextEnvironmentScoreMilestone || passed >= nextEnvironmentGateMilestone) {
+          if (score >= nextEnvironmentScoreMilestone) {
+            nextEnvironmentScoreMilestone += ENVIRONMENT_SCORE_MILESTONE;
+          }
+          if (passed >= nextEnvironmentGateMilestone) {
+            nextEnvironmentGateMilestone += ENVIRONMENT_GATE_MILESTONE;
+          }
+          stagesToAdvance++;
+        }
+        if (stagesToAdvance > 0) setEnvironment(environmentIndex + stagesToAdvance);
       }
 
       function updateEnvironmentTransition(dt) {
@@ -6793,12 +6876,12 @@ void main() {
       player.add(orbLight);
       function applyModeLighting() {
         const blackout = blackoutModeActive;
-        ambientLight.intensity = blackout ? 0.008 : 1.2;
-        hemisphereLight.intensity = blackout ? 0 : 0.9;
-        keyLight.intensity = blackout ? 0 : 22 * getGlowScale();
-        directionalLight.intensity = blackout ? 0 : 2.4 * getGlowScale();
-        tunnelLight.intensity = blackout ? 0 : 18 * getGlowScale();
-        farLight.intensity = blackout ? 0 : 22 * getGlowScale();
+        ambientLight.intensity = blackout ? 0.015 : 1.2;
+        hemisphereLight.intensity = blackout ? 0.025 : 0.9;
+        keyLight.intensity = blackout ? 0.7 : 22 * getGlowScale();
+        directionalLight.intensity = blackout ? 0.08 : 2.4 * getGlowScale();
+        tunnelLight.intensity = blackout ? 0.55 : 18 * getGlowScale();
+        farLight.intensity = blackout ? 0.35 : 22 * getGlowScale();
         orbLight.intensity = blackout ? 0 : 16 * getGlowScale();
         if (blackout) boostLight.intensity = 0;
       }
@@ -6876,8 +6959,9 @@ void main() {
         group.position.set(0, 0, z);
         group.visible = state !== "ready";
         const level = environmentIndex + 1;
+        const difficultyLevel = Math.min(level, 10);
         const gateGravitySide = antiGravityModeActive ? nextGravityHazardSide() : null;
-        const narrowing = level < 7 ? 0 : level === 7 ? 0.18 : level === 8 ? 0.28 : level === 9 ? 0.4 : 0.5;
+        const narrowing = difficultyLevel < 7 ? 0 : difficultyLevel === 7 ? 0.18 : difficultyLevel === 8 ? 0.28 : difficultyLevel === 9 ? 0.4 : 0.5;
         group.userData = {
           colorIndex,
           requiredLane: colorIndex,
@@ -6886,29 +6970,31 @@ void main() {
           segmentPanels: [],
           markerMaterials: [],
           frameMaterial: null,
-          postGlow: null,
           level,
           moving: laserPursuitModeActive || score >= SLIDING_GATE_UNLOCK_SCORE,
           movementPhase: Math.random() * Math.PI * 2,
           movementAmplitude: laserPursuitModeActive
             ? 0.48 + Math.random() * 0.2
             : score >= SLIDING_GATE_UNLOCK_SCORE ? Math.min(0.95, 0.2 + Math.max(0, level - 3) * 0.1) : 0,
-          movementSpeed: laserPursuitModeActive ? 0.62 : 0.8 + Math.max(0, level - 3) * 0.15,
+          movementSpeed: laserPursuitModeActive ? 0.62 : Math.min(1.85, 0.8 + Math.max(0, difficultyLevel - 3) * 0.15),
           rotating: laserPursuitModeActive || score >= ROTATING_GATE_UNLOCK_SCORE && level >= 3,
           rotationPhase: Math.random() * Math.PI * 2,
           rotationSpeed: laserPursuitModeActive
             ? 0.34 + Math.random() * 0.14
-            : score >= ROTATING_GATE_UNLOCK_SCORE && level >= 3 ? 0.8 + Math.max(0, level - 5) * 0.18 : 0,
-          colorChanging: laserPursuitModeActive || level >= 3,
+            : score >= ROTATING_GATE_UNLOCK_SCORE && difficultyLevel >= 3
+              ? Math.min(1.7, 0.8 + Math.max(0, difficultyLevel - 5) * 0.18)
+              : 0,
+          colorChanging: laserPursuitModeActive || difficultyLevel >= 3,
           flashPhase: Math.random() * 2,
-          phantom: level >= 7,
+          prismPhase: Math.random() * Math.PI * 2,
+          phantom: difficultyLevel >= 7,
           phantomActive: true,
           phantomPhase: Math.random() * Math.PI * 2,
-          phantomSpeed: level >= 7 ? 3.4 + (level - 7) * 0.35 : 0,
+          phantomSpeed: difficultyLevel >= 7 ? 3.4 + Math.min(3, difficultyLevel - 7) * 0.35 : 0,
           narrowing,
           gravitySide: gateGravitySide,
           gravityBand: null,
-          stacked: level >= 9,
+          stacked: difficultyLevel >= 9,
           stackIndex,
           checked: false
         };
@@ -6956,10 +7042,6 @@ void main() {
           marker.position.set(LANE_X[lane], antiGravityModeActive ? -1.32 : -1.48, 0.04);
           group.add(marker);
         }
-        const postGlow = new THREE.PointLight(color, 7 * getGlowScale(), 8, 2);
-        postGlow.position.set(0, 0, 0.7);
-        group.userData.postGlow = postGlow;
-        group.add(postGlow);
         if (gateGravitySide) {
           const bandColor = gateGravitySide === "ceiling" ? 0xb992ff : 0x69e8ff;
           const gravityBand = new THREE.Mesh(
@@ -6982,14 +7064,19 @@ void main() {
           mechanics.requiredLane = activeColorIndex;
           gate.colorIndex = activeColorIndex;
           mechanics.frameMaterial.color.setHex(COLORS[activeColorIndex].hex);
-          mechanics.postGlow.color.setHex(COLORS[activeColorIndex].hex);
-          mechanics.markerMaterials.forEach((material, lane) => {
+          for (let lane = 0; lane < mechanics.markerMaterials.length; lane++) {
+            const material = mechanics.markerMaterials[lane];
             material.opacity = lane === activeColorIndex ? 1 : 0.38;
-          });
+          }
+        }
+        if (mirrorMatrixModeActive) {
+          const prismHue = (obstacleElapsed * 0.12 + mechanics.prismPhase / (Math.PI * 2)) % 1;
+          mechanics.frameMaterial.color.setHSL(prismHue, 0.96, 0.66);
         }
         const pulse = 0.5 + 0.5 * Math.sin(obstacleElapsed * (mechanics.colorChanging ? 11 : 4) + mechanics.flashPhase);
         mechanics.frameMaterial.opacity = mechanics.colorChanging ? 0.62 + pulse * 0.34 : 0.76;
-        mechanics.segmentMaterials.forEach((material, lane) => {
+        for (let lane = 0; lane < mechanics.segmentMaterials.length; lane++) {
+          const material = mechanics.segmentMaterials[lane];
           const active = lane === activeColorIndex;
           material.opacity = active
             ? mechanics.colorChanging ? 0.68 + pulse * 0.18 : 0.78
@@ -6998,8 +7085,8 @@ void main() {
             ? active ? (mechanics.colorChanging ? 2.4 + pulse * 0.55 : 2.7) : 1.55
             : active
               ? mechanics.colorChanging ? 2.0 + pulse * 0.65 : 2.35
-              : 0.72) * getGlowScale();
-        });
+              : mirrorMatrixModeActive ? 1.05 : 0.72) * getGlowScale();
+        }
         if (mechanics.phantom) {
           mechanics.phantomActive = Math.sin(obstacleElapsed * mechanics.phantomSpeed + mechanics.phantomPhase) > 0.12;
           gate.visible = mechanics.phantomActive;
@@ -7174,9 +7261,6 @@ void main() {
         );
         beam.position.y = surfaceY;
         group.add(beam);
-        const emitter = new THREE.PointLight(glowColor, 3.5, 4.5, 2);
-        emitter.position.set(0, surfaceY + (gravitySide === "ceiling" ? -0.12 : 0.12), 0.4);
-        group.add(emitter);
         group.userData.beam = beam;
         group.userData.glow = glow;
         gameScene.add(group);
@@ -7285,29 +7369,38 @@ void main() {
         impactBursts.push({ particles, material, life: 0.62, duration: 0.62 });
       }
       function updateImpactBursts(dt) {
-        impactBursts = impactBursts.filter(burst => {
+        let writeIndex = 0;
+        for (let burstIndex = 0; burstIndex < impactBursts.length; burstIndex++) {
+          const burst = impactBursts[burstIndex];
           burst.life -= dt;
           const fade = Math.max(0, burst.life / burst.duration);
           burst.material.opacity = fade;
-          burst.particles.forEach(particle => {
+          for (let particleIndex = 0; particleIndex < burst.particles.length; particleIndex++) {
+            const particle = burst.particles[particleIndex];
             particle.vy -= 3.2 * dt;
             particle.mesh.position.x += particle.vx * dt;
             particle.mesh.position.y += particle.vy * dt;
             particle.mesh.position.z += particle.vz * dt;
             particle.mesh.scale.setScalar(Math.max(0.01, fade));
-          });
-          if (burst.life > 0) return true;
-          burst.particles.forEach(particle => gameScene.remove(particle.mesh));
+          }
+          if (burst.life > 0) {
+            impactBursts[writeIndex++] = burst;
+            continue;
+          }
+          for (let particleIndex = 0; particleIndex < burst.particles.length; particleIndex++) {
+            gameScene.remove(burst.particles[particleIndex].mesh);
+          }
           burst.material.dispose();
-          return false;
-        });
+        }
+        impactBursts.length = writeIndex;
       }
       function clearTrailParticles() {
-        trailParticles.forEach(particle => {
-          gameScene.remove(particle.mesh);
-          particle.material.dispose();
-        });
-        trailParticles = [];
+        for (let i = 0; i < trailParticles.length; i++) {
+          const particle = trailParticles[i];
+          particle.mesh.visible = false;
+          trailParticlePool.push(particle);
+        }
+        trailParticles.length = 0;
         trailEmitAccumulator = 0;
       }
       function emitTrailParticle() {
@@ -7315,35 +7408,40 @@ void main() {
         if (!style || progression.activeTrail === "none" || state !== "running") return;
         if (trailParticles.length >= 30) {
           const oldest = trailParticles.shift();
-          gameScene.remove(oldest.mesh);
-          oldest.material.dispose();
+          oldest.mesh.visible = false;
+          trailParticlePool.push(oldest);
         }
         const useSecondary = Math.random() > 0.55;
-        const material = new THREE.MeshBasicMaterial({
-          color: useSecondary ? style.secondary : style.color,
-          transparent: true,
-          opacity: 0.86,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending
-        });
-        const mesh = new THREE.Mesh(trailParticleGeometry, material);
+        let particle = trailParticlePool.pop();
+        if (!particle) {
+          const material = new THREE.MeshBasicMaterial({
+            color: style.color,
+            transparent: true,
+            opacity: 0.86,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending
+          });
+          const mesh = new THREE.Mesh(trailParticleGeometry, material);
+          particle = { mesh, material, age: 0, life: 0, vx: 0, vy: 0, vz: 0 };
+          gameScene.add(mesh);
+        }
+        const { mesh, material } = particle;
+        material.color.setHex(useSecondary ? style.secondary : style.color);
+        material.opacity = 0.86;
         const size = 0.42 + Math.random() * 0.58;
         mesh.scale.setScalar(size);
+        mesh.visible = true;
         mesh.position.set(
           player.position.x + (Math.random() - 0.5) * 0.42,
           player.position.y + (Math.random() - 0.5) * 0.38,
           player.position.z + 0.58 + Math.random() * 0.32
         );
-        gameScene.add(mesh);
-        trailParticles.push({
-          mesh,
-          material,
-          age: 0,
-          life: 0.48 + Math.random() * 0.22,
-          vx: (Math.random() - 0.5) * 0.55,
-          vy: (Math.random() - 0.5) * 0.5,
-          vz: 1.1 + Math.random() * 0.75
-        });
+        particle.age = 0;
+        particle.life = 0.48 + Math.random() * 0.22;
+        particle.vx = (Math.random() - 0.5) * 0.55;
+        particle.vy = (Math.random() - 0.5) * 0.5;
+        particle.vz = 1.1 + Math.random() * 0.75;
+        trailParticles.push(particle);
       }
       function updateTrailParticles(dt) {
         if (state === "running" && progression.activeTrail !== "none") {
@@ -7353,7 +7451,9 @@ void main() {
             emitTrailParticle();
           }
         }
-        trailParticles = trailParticles.filter(particle => {
+        let writeIndex = 0;
+        for (let readIndex = 0; readIndex < trailParticles.length; readIndex++) {
+          const particle = trailParticles[readIndex];
           particle.age += dt;
           const fade = Math.max(0, 1 - particle.age / particle.life);
           particle.material.opacity = fade * 0.86;
@@ -7361,11 +7461,14 @@ void main() {
           particle.mesh.position.y += particle.vy * dt;
           particle.mesh.position.z += particle.vz * dt;
           particle.mesh.scale.setScalar((0.25 + fade * 0.75) * 0.75);
-          if (particle.age < particle.life) return true;
-          gameScene.remove(particle.mesh);
-          particle.material.dispose();
-          return false;
-        });
+          if (particle.age < particle.life) {
+            trailParticles[writeIndex++] = particle;
+            continue;
+          }
+          particle.mesh.visible = false;
+          trailParticlePool.push(particle);
+        }
+        trailParticles.length = writeIndex;
       }
       function triggerImpactEffects(color, strength = 1) {
         cameraShakeTimer = Math.max(cameraShakeTimer, 0.38);
@@ -7397,6 +7500,19 @@ void main() {
       function disposeLaser(laser) {
         disposeGate(laser);
       }
+      function compactExpiredObjects(items, dispose, removeCollected = false) {
+        let writeIndex = 0;
+        for (let readIndex = 0; readIndex < items.length; readIndex++) {
+          const item = items[readIndex];
+          if (item.position.z > 10 || (removeCollected && item.userData.collected)) {
+            dispose(item);
+            continue;
+          }
+          if (writeIndex !== readIndex) items[writeIndex] = item;
+          writeIndex++;
+        }
+        items.length = writeIndex;
+      }
 
       let gates = [];
       let powerUps = [];
@@ -7407,6 +7523,7 @@ void main() {
       let pursuitDangerActive = false;
       let impactBursts = [];
       let trailParticles = [];
+      let trailParticlePool = [];
       let trailEmitAccumulator = 0;
       let currentColor = 0;
       let autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
@@ -7432,11 +7549,11 @@ void main() {
       let ghostBestAtRunStart = 0;
       let ghostRecordCandidate = false;
       let selectedMode = "endless";
-      let timeRemaining = 60;
+      let timeRemaining = TIME_ATTACK_START_SECONDS;
       let feverTimer = 0;
       let nextGateZ = FIRST_GATE_SPAWN_Z;
       let powerUpSpawnTimer = 7;
-      let crystalSpawnTimer = 3.5;
+      let crystalSpawnTimer = CRYSTAL_SPAWN_INITIAL_DELAY + Math.random() * CRYSTAL_SPAWN_INITIAL_JITTER;
       let laserSpawnTimer = 10;
       function updatePursuitWarning() {
         const vignette = el("pursuitVignette");
@@ -8421,15 +8538,15 @@ void main() {
             : pursuit ? "LASER PURSUIT · BOSS RUSH"
             : mirror ? "MIRROR MATRIX · HARDCORE" : quantum ? "QUANTUM SINGULARITY" : "A color reaction test";
           el("intro").textContent = blackout
-            ? "A pitch-black tunnel hides distant gates in dense fog. Follow the ball's color and steer as each neon hazard emerges; tap or press Space to switch early."
+            ? "Neon hazards emerge from dense, tinted fog only when close. Match the ball's color and steer through five dark environments that shift as you score or clear gates."
             : pursuit
-            ? "A red-magenta laser wall is closing from behind. Keep your speed up, match each gate, and tap or press Space to switch color before the next rotating gate."
+            ? "A red-magenta laser wall chases you through rotating gates. Every 300 points or 10 cleared gates, the uninterrupted pursuit shifts through Laser Core, Cyber Grid, Sunset Alley, Quantum Void, and Matrix Rain."
             : mirror
-            ? "Steering is mirrored: Left moves right and Right moves left. Colors cycle Yellow → Cyan → Red. Tap or press Space to switch early; survive for 2× rewards."
+            ? "Left moves right; colors cycle Yellow → Cyan → Red. Prism gates shift through five reflective environments every 300 points or 10 clears. Tap or press Space to switch color early; earn 2× rewards."
             : quantum
-            ? "Match each plasma gate, then flip gravity between floor and ceiling. Tap or press Space to flip; use W / ↑ to change color early."
+            ? "Match each plasma gate, then flip between floor and ceiling to dodge vertical hazards. Tap or press Space to flip; use W / ↑ to change color. New tunnel themes arrive as your score and gate clears reach milestones."
             : selectedMode === "timeAttack"
-              ? "Match neon gates, collect crystals, and score as much as you can in 60 seconds. Tap or press Space to switch color early."
+              ? "Score as much as you can before the 60-second clock runs out. Every gate adds 2 seconds, every crystal adds 3, and the tunnel shifts through new neon environments."
               : "Match each neon gate, collect crystals, and build your best streak. Tap or press Space to switch color early.";
           el("startHint").innerHTML = quantum
             ? '<span class="desktop-hint"><b>A / ←</b> steer &nbsp;·&nbsp; <b>Space / tap</b> flip gravity &nbsp;·&nbsp; <b>W / ↑</b> change color</span><span class="mobile-hint">Swipe to steer · tap to flip · use color button to switch</span>'
@@ -8437,6 +8554,8 @@ void main() {
             ? '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / tap</b> change color</span><span class="mobile-hint">Swipe lanes · tap to change color · outrun the wall</span>'
             : mirror
             ? '<span class="desktop-hint"><b>A / ←</b> move right &nbsp;·&nbsp; <b>D / →</b> move left &nbsp;·&nbsp; <b>Space / tap</b> change color</span><span class="mobile-hint">Swipe to steer · tap to change color · 2× rewards</span>'
+            : selectedMode === "timeAttack"
+            ? '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / tap</b> change color · gates +2s · crystals +3s</span><span class="mobile-hint">Swipe to steer · tap to change color · gates +2s · crystals +3s</span>'
             : '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / tap</b> change color</span><span class="mobile-hint">Swipe to steer · tap to change color</span>';
           el("controlsHint").innerHTML = pursuit
             ? "<strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Tap / Space / W to change color · stay ahead of the laser wall"
@@ -8555,9 +8674,10 @@ void main() {
         ghostRecordCandidate = false;
         ghostBall.visible = false;
         el("ghostStatus").classList.remove("visible");
-        timeRemaining = 60;
+        timeRemaining = TIME_ATTACK_START_SECONDS;
         currentLane = 1;
         lastPlayerInputAt = -Infinity;
+        resetEnvironmentMilestones();
         setEnvironment(0, { announce: false, instant: true });
         applyPlayerSkin("sphere");
         setOrbColor(1);
@@ -8775,6 +8895,16 @@ void main() {
         el("timeAttackStat").hidden = selectedMode !== "timeAttack";
         el("timeAttackTime").textContent = String(Math.max(0, Math.ceil(timeRemaining)));
       }
+      function addTimeAttackBonus(seconds) {
+        if (selectedMode !== "timeAttack" || state !== "running") return 0;
+        timeRemaining += seconds;
+        el("timeAttackTime").textContent = String(Math.ceil(timeRemaining));
+        const timerStat = el("timeAttackStat");
+        timerStat.classList.remove("time-bonus");
+        void timerStat.offsetWidth;
+        timerStat.classList.add("time-bonus");
+        return seconds;
+      }
       function popScore() {
         const scoreDisplay = el("score");
         scoreDisplay.classList.remove("score-pop");
@@ -8786,13 +8916,15 @@ void main() {
       }
       function showEnvironmentBanner(index) {
         const banner = el("environmentBanner");
-        const theme = antiGravityModeActive
-          ? { ...ENVIRONMENTS[index], ...QUANTUM_THEME }
-          : ENVIRONMENTS[index];
+        const theme = getEnvironmentTheme(index);
         const token = ++environmentNoticeToken;
         window.clearTimeout(environmentNoticeTimer);
         banner.style.setProperty("--zone-color", new THREE.Color(theme.grid).getStyle());
-        el("environmentKicker").textContent = "ZONE " + String(index + 1).padStart(2, "0") + " / 10";
+        const themeCount = getEnvironmentSet().length;
+        const themeNumber = (index % themeCount) + 1;
+        el("environmentKicker").textContent =
+          "STAGE " + String(index + 1).padStart(2, "0") +
+          " · THEME " + String(themeNumber).padStart(2, "0") + " / " + themeCount;
         el("environmentName").textContent = theme.name;
         banner.hidden = false;
         banner.classList.remove("visible");
@@ -8859,12 +8991,12 @@ void main() {
       function spawnCrystalCoin() {
         const z = getSafeItemSpawnZ();
         if (z === null) {
-          crystalSpawnTimer = 1.5;
+          crystalSpawnTimer = CRYSTAL_SPAWN_RETRY_DELAY + Math.random() * 2;
           return;
         }
         const lane = Math.floor(Math.random() * LANE_X.length);
         crystalCoins.push(makeCrystalCoin(lane, z));
-        crystalSpawnTimer = 6.5 + Math.random() * 3.5;
+        crystalSpawnTimer = CRYSTAL_SPAWN_INTERVAL + Math.random() * CRYSTAL_SPAWN_JITTER;
       }
       function spawnLaser() {
         const z = -42 - Math.random() * 8;
@@ -8874,18 +9006,24 @@ void main() {
       function collectCrystalCoin(coin) {
         coin.userData.collected = true;
         const crystalReward = mirrorMatrixModeActive ? 2 : 1;
+        const timeBonus = addTimeAttackBonus(TIME_ATTACK_CRYSTAL_BONUS_SECONDS);
         runCoins += crystalReward;
         progression.crystals = safeStoredCount(progression.crystals + crystalReward);
         progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + crystalReward);
         progression.daily = normalizeDailyProgress(progression.daily);
         progression.daily.crystalsCollected = safeStoredCount(progression.daily.crystalsCollected + crystalReward);
         score += 250 * getScoreMultiplier();
+        advanceEnvironmentIfNeeded();
         saveProgression();
         renderProgressionUI();
         checkRunAchievements();
         checkDailyBounties();
         playCue("coin");
-        showRunStatus("Crystal ×" + crystalReward + " · Run " + runCoins, 800);
+        showRunStatus(
+          "Crystal ×" + crystalReward + " · Run " + runCoins +
+          (timeBonus ? " · +" + timeBonus + "s" : ""),
+          800
+        );
       }
       function collectPowerUp(powerUp) {
         powerUp.userData.collected = true;
@@ -8987,7 +9125,8 @@ void main() {
         el("game").classList.remove("is-paused");
         el("pauseButton").hidden = false;
         distance = 0; passed = 0; score = 0; combo = 0; maxCombo = 0;
-        timeRemaining = 60;
+        timeRemaining = TIME_ATTACK_START_SECONDS;
+        resetEnvironmentMilestones();
         feverTimer = 0;
         elapsed = 0; obstacleElapsed = 0; speed = BASE_FORWARD_SPEED;
         ghostBestAtRunStart = best;
@@ -9007,7 +9146,7 @@ void main() {
         const dailyPowerName = consumeStoredPowerUp();
         if (dailyPowerName) renderProgressionUI();
         powerUpSpawnTimer = 7;
-        crystalSpawnTimer = 3.5 + Math.random() * 1.5;
+        crystalSpawnTimer = CRYSTAL_SPAWN_INITIAL_DELAY + Math.random() * CRYSTAL_SPAWN_INITIAL_JITTER;
         laserSpawnTimer = laserPursuitModeActive ? 3.5 + Math.random() * 1.5 : 10 + Math.random() * 2;
         runCoins = 0;
         graceTimer = START_GRACE_SECONDS;
@@ -9125,13 +9264,15 @@ void main() {
         }
         const gatePoints = combo * 100;
         score += gatePoints * getScoreMultiplier();
+        const timeBonus = addTimeAttackBonus(TIME_ATTACK_GATE_BONUS_SECONDS);
+        advanceEnvironmentIfNeeded();
         updatePowerHUD();
         if (passed % 5 === 0) {
           speedBoostTimer = 5;
           updatePowerHUD();
-          showRunStatus("SPEED UP!", 1400);
+          showRunStatus("SPEED UP!" + (timeBonus ? " · +" + timeBonus + "s" : ""), 1400);
         } else {
-          showRunStatus(message + " · ×" + combo, 460);
+          showRunStatus(message + " · ×" + combo + (timeBonus ? " · +" + timeBonus + "s" : ""), 460);
         }
         updateHUD();
         popScore();
@@ -9295,7 +9436,8 @@ void main() {
         speed = BASE_FORWARD_SPEED;
         elapsed = 0;
         obstacleElapsed = 0;
-        timeRemaining = 60;
+        timeRemaining = TIME_ATTACK_START_SECONDS;
+        resetEnvironmentMilestones();
         feverTimer = 0;
         graceTimer = 0;
         shieldCharges = 0;
@@ -9304,7 +9446,7 @@ void main() {
         speedBoostTimer = 0;
         autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
         powerUpSpawnTimer = 7;
-        crystalSpawnTimer = 3.5;
+        crystalSpawnTimer = CRYSTAL_SPAWN_INITIAL_DELAY + Math.random() * CRYSTAL_SPAWN_INITIAL_JITTER;
         laserSpawnTimer = laserPursuitModeActive ? 4.5 : 10;
         ghostBestAtRunStart = best;
         ghostRecordCandidate = false;
@@ -9476,6 +9618,12 @@ void main() {
         animateResultScoreTicker(final);
       }
 
+      const fallbackGateOrder = [];
+      function compareGateDepth(a, b) {
+        return a.position.z - b.position.z;
+      }
+      const fallbackPowerColors = { prism: "#ff58d6", warp: "#4d9dff", booster: "#ffc83d" };
+      const fallbackShieldColors = ["#ff4b9b", "#ffc84d", "#c5ff4a", "#38e6d3", "#548cff", "#b46aff"];
       function drawFallback(t) {
         const ctx = fallbackContext;
         if (!ctx) return;
@@ -9502,7 +9650,8 @@ void main() {
         const leftAt = progress => center - (farHalf + (nearHalf - farHalf) * progress);
         const rightAt = progress => center + (farHalf + (nearHalf - farHalf) * progress);
         if (gamePreferences.backgroundParticles) {
-          for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const particleStride = isMobileViewport() ? 2 : 1;
+          for (let i = 0; i < PARTICLE_COUNT; i += particleStride) {
             const offset = i * 3;
             const depth = Math.max(0, Math.min(1, Math.exp(particlePositions[offset + 2] / 27)));
             const spread = farHalf + (nearHalf - farHalf) * depth;
@@ -9551,7 +9700,8 @@ void main() {
           ctx.stroke();
           ctx.globalAlpha = 1;
         }
-        [-1, 1].forEach(side => {
+        for (let sideIndex = 0; sideIndex < 2; sideIndex++) {
+          const side = sideIndex === 0 ? -1 : 1;
           ctx.beginPath();
           ctx.moveTo(center + side * farHalf, horizon);
           ctx.lineTo(center + side * nearHalf, floor);
@@ -9560,25 +9710,32 @@ void main() {
           ctx.lineWidth = 2;
           ctx.stroke();
           ctx.globalAlpha = 1;
-        });
+        }
 
-        [...gates].filter(gate => gate.visible).sort((a, b) => a.position.z - b.position.z).forEach(gate => {
+        fallbackGateOrder.length = 0;
+        for (let i = 0; i < gates.length; i++) {
+          if (gates[i].visible) fallbackGateOrder.push(gates[i]);
+        }
+        fallbackGateOrder.sort(compareGateDepth);
+        for (let gateIndex = 0; gateIndex < fallbackGateOrder.length; gateIndex++) {
+          const gate = fallbackGateOrder[gateIndex];
           const progress = Math.max(0, Math.min(1, Math.exp(gate.position.z / 27)));
-          if (progress <= 0 || progress > 1) return;
+          if (progress <= 0 || progress > 1) continue;
           const y = horizon + (floor - horizon) * progress;
           const halfWidth = width * (0.035 + 0.37 * progress);
           const halfHeight = height * (0.012 + 0.13 * progress);
           const gateCenter = center + (gate.position.x / 4.5) * nearHalf;
           const x = gateCenter - halfWidth;
           const segmentWidth = halfWidth * 2 / COLORS.length;
-          COLORS.forEach((segment, index) => {
+          for (let index = 0; index < COLORS.length; index++) {
+            const segment = COLORS[index];
             ctx.fillStyle = segment.css + (index === gate.userData.colorIndex ? "25" : "10");
             ctx.fillRect(x + index * segmentWidth, y - halfHeight, segmentWidth, halfHeight * 2);
             ctx.strokeStyle = segment.css;
             ctx.globalAlpha = index === gate.userData.colorIndex ? 1 : 0.4;
             ctx.lineWidth = Math.max(1, progress * 3);
             ctx.strokeRect(x + index * segmentWidth, y - halfHeight, segmentWidth, halfHeight * 2);
-          });
+          }
           ctx.globalAlpha = 1;
           ctx.shadowColor = COLORS[gate.userData.colorIndex].css;
           ctx.shadowBlur = 12 * progress;
@@ -9599,11 +9756,12 @@ void main() {
             ctx.stroke();
             ctx.shadowBlur = 0;
           }
-        });
+        }
 
-        lasers.forEach(laser => {
+        for (let i = 0; i < lasers.length; i++) {
+          const laser = lasers[i];
           const progress = Math.max(0, Math.min(1, Math.exp(laser.position.z / 27)));
-          if (progress <= 0 || progress > 1) return;
+          if (progress <= 0 || progress > 1) continue;
           const gateY = horizon + (floor - horizon) * progress;
           const halfWidth = width * (0.035 + 0.37 * progress);
           const y = antiGravityModeActive
@@ -9625,7 +9783,7 @@ void main() {
           ctx.stroke();
           ctx.shadowBlur = 0;
           ctx.globalAlpha = 1;
-        });
+        }
 
         if (laserPursuitModeActive && pursuitGap < 34) {
           const approach = Math.max(0, Math.min(1, (34 - pursuitGap) / 34));
@@ -9655,19 +9813,16 @@ void main() {
           ctx.restore();
         }
 
-        powerUps.filter(powerUp => !powerUp.userData.collected).forEach(powerUp => {
+        for (let i = 0; i < powerUps.length; i++) {
+          const powerUp = powerUps[i];
+          if (powerUp.userData.collected) continue;
           const progress = Math.max(0, Math.min(1, Math.exp(powerUp.position.z / 27)));
-          if (progress <= 0 || progress > 1) return;
+          if (progress <= 0 || progress > 1) continue;
           const x = center + (powerUp.position.x / 4.5) * nearHalf;
           const y = horizon + (floor - horizon) * progress;
           const radius = Math.max(7, Math.min(21, progress * 24));
           const type = powerUp.userData.type;
-          const powerColor = {
-            prism: "#ff58d6",
-            warp: "#4d9dff",
-            booster: "#ffc83d"
-          };
-          const color = powerColor[powerUp.userData.type] ?? "#ff58d6";
+          const color = fallbackPowerColors[type] ?? "#ff58d6";
           ctx.save();
           ctx.translate(x, y);
           ctx.rotate(t * 1.1 + powerUp.userData.phase);
@@ -9712,11 +9867,13 @@ void main() {
           }
           ctx.shadowBlur = 0;
           ctx.restore();
-        });
+        }
 
-        crystalCoins.filter(coin => !coin.userData.collected).forEach(coin => {
+        for (let i = 0; i < crystalCoins.length; i++) {
+          const coin = crystalCoins[i];
+          if (coin.userData.collected) continue;
           const progress = Math.max(0, Math.min(1, Math.exp(coin.position.z / 27)));
-          if (progress <= 0 || progress > 1) return;
+          if (progress <= 0 || progress > 1) continue;
           const x = center + (coin.position.x / 4.5) * nearHalf;
           const y = horizon + (floor - horizon) * progress;
           const radius = Math.max(7, Math.min(23, progress * 24));
@@ -9738,10 +9895,12 @@ void main() {
           ctx.stroke();
           ctx.restore();
           ctx.shadowBlur = 0;
-        });
+        }
 
-        impactBursts.forEach(burst => {
-          burst.particles.forEach(particle => {
+        for (let burstIndex = 0; burstIndex < impactBursts.length; burstIndex++) {
+          const burst = impactBursts[burstIndex];
+          for (let particleIndex = 0; particleIndex < burst.particles.length; particleIndex++) {
+            const particle = burst.particles[particleIndex];
             const x = center + (particle.mesh.position.x / 4.5) * nearHalf;
             const y = height * 0.76 - (particle.mesh.position.y - player.position.y) * height * 0.055;
             const radius = Math.max(1.5, 5 * (burst.life / burst.duration));
@@ -9754,8 +9913,8 @@ void main() {
             ctx.fill();
             ctx.shadowBlur = 0;
             ctx.globalAlpha = 1;
-          });
-        });
+          }
+        }
 
         const orbColor = COLORS[currentColor].css;
         const menuPulse = menuScene ? 0.5 + Math.sin(t * 1.8) * 0.5 : 0;
@@ -9772,24 +9931,23 @@ void main() {
         ctx.stroke();
         ctx.shadowBlur = 0;
         if (shieldCharges > 0 || graceTimer > 0) {
-          const shieldColors = shieldCharges > 0
-            ? ["#ff4b9b", "#ffc84d", "#c5ff4a", "#38e6d3", "#548cff", "#b46aff"]
-            : ["#68f2df"];
-          shieldColors.forEach((shieldColor, index) => {
+          const shieldCount = shieldCharges > 0 ? fallbackShieldColors.length : 1;
+          for (let index = 0; index < shieldCount; index++) {
+            const shieldColor = shieldCharges > 0 ? fallbackShieldColors[index] : "#68f2df";
             ctx.beginPath();
             ctx.arc(
               orbX,
               orbY,
               orbRadius * 1.55,
-              (index / shieldColors.length) * Math.PI * 2,
-              ((index + 0.82) / shieldColors.length) * Math.PI * 2
+              (index / shieldCount) * Math.PI * 2,
+              ((index + 0.82) / shieldCount) * Math.PI * 2
             );
             ctx.strokeStyle = shieldColor;
             ctx.lineWidth = 2.5;
             ctx.shadowColor = shieldColor;
             ctx.shadowBlur = 18;
             ctx.stroke();
-          });
+          }
           ctx.shadowBlur = 0;
         }
         ctx.beginPath();
@@ -10009,7 +10167,9 @@ void main() {
           speedBoostTimer = Math.max(0, speedBoostTimer - dt);
           obstacleElapsed += dt * obstacleTimeScale;
           const runSpeed = BASE_FORWARD_SPEED + Math.min(4.5, elapsed * 0.045);
-          const lateZoneMultiplier = environmentIndex >= 8 ? 1 + (environmentIndex - 7) * 0.12 : 1;
+          const lateZoneMultiplier = environmentIndex >= 8
+            ? Math.min(1.6, 1 + (environmentIndex - 7) * 0.12)
+            : 1;
           speed = Math.min(22, runSpeed * lateZoneMultiplier) * (speedBoostTimer > 0 ? 1.25 : 1);
           const obstacleDt = dt * obstacleTimeScale;
           const obstacleSpeed = speed * obstacleTimeScale;
@@ -10018,23 +10178,25 @@ void main() {
           checkRunAchievements();
           checkDailyBounties();
           score += distanceDelta * runScoreMultiplier;
+          advanceEnvironmentIfNeeded();
           recordGhostProgress(dt);
           updateGhostRunner(dt);
-          const nextEnvironment = Math.min(ENVIRONMENTS.length - 1, Math.floor(distance / 500));
-          if (nextEnvironment !== environmentIndex) setEnvironment(nextEnvironment);
           powerUpSpawnTimer -= dt;
           if (powerUpSpawnTimer <= 0 && powerUps.length < 2) spawnPowerUp();
           crystalSpawnTimer -= dt;
-          if (crystalSpawnTimer <= 0 && crystalCoins.length < 3) spawnCrystalCoin();
+          if (crystalSpawnTimer <= 0 && crystalCoins.length < MAX_ACTIVE_CRYSTALS) spawnCrystalCoin();
           laserSpawnTimer -= dt;
           if (laserSpawnTimer <= 0 && lasers.length < (laserPursuitModeActive ? 3 : 2)) spawnLaser();
-          ribs.forEach(rib => {
+          for (let i = 0; i < ribs.length; i++) {
+            const rib = ribs[i];
             rib.position.z += speed * dt;
             if (rib.position.z > 8) rib.position.z -= 120;
-          });
-          powerUps.forEach(powerUp => {
+          }
+          for (let i = 0; i < powerUps.length; i++) {
+            const powerUp = powerUps[i];
             const previousZ = powerUp.position.z;
             powerUp.position.z += obstacleSpeed * dt;
+            if (blackoutModeActive) powerUp.visible = powerUp.position.z >= BLACKOUT_GATE_REVEAL_Z;
             powerUp.position.y = 0.12 + Math.sin(obstacleElapsed * 2.7 + powerUp.userData.phase) * 0.12;
             powerUp.rotation.y += obstacleDt * 1.8;
             powerUp.rotation.x += obstacleDt * 0.9;
@@ -10047,18 +10209,14 @@ void main() {
                 Math.abs(player.position.x - powerUp.position.x) <= PLAYER_RADIUS + 0.34) {
               collectPowerUp(powerUp);
             }
-          });
-          powerUps = powerUps.filter(powerUp => {
-            if (powerUp.userData.collected || powerUp.position.z > 10) {
-              disposePowerUp(powerUp);
-              return false;
-            }
-            return true;
-          });
-          crystalCoins.forEach(coin => {
-            if (coin.userData.collected) return;
+          }
+          compactExpiredObjects(powerUps, disposePowerUp, true);
+          for (let i = 0; i < crystalCoins.length; i++) {
+            const coin = crystalCoins[i];
+            if (coin.userData.collected) continue;
             const previousZ = coin.position.z;
             coin.position.z += speed * dt;
+            if (blackoutModeActive) coin.visible = coin.position.z >= BLACKOUT_GATE_REVEAL_Z;
             coin.position.y = 0.12 + Math.sin(t * 3 + coin.userData.phase) * 0.13;
             coin.rotation.y += dt * 2.4;
             coin.rotation.x += dt * 0.75;
@@ -10069,16 +10227,12 @@ void main() {
                 (!antiGravityModeActive || Math.abs(player.position.y - coin.position.y) <= 1.45)) {
               collectCrystalCoin(coin);
             }
-          });
-          crystalCoins = crystalCoins.filter(coin => {
-            if (coin.userData.collected || coin.position.z > 10) {
-              disposeCrystalCoin(coin);
-              return false;
-            }
-            return true;
-          });
-          lasers.forEach(laser => {
-            if (state !== "running") return;
+          }
+          compactExpiredObjects(crystalCoins, disposeCrystalCoin, true);
+          for (let i = 0; i < lasers.length; i++) {
+            const laser = lasers[i];
+            if (state !== "running") continue;
+            if (blackoutModeActive) laser.visible = laser.position.z >= BLACKOUT_GATE_REVEAL_Z;
             updateLaserVisual(laser);
             const previousZ = laser.position.z;
             laser.position.z += obstacleSpeed * dt;
@@ -10086,10 +10240,11 @@ void main() {
             if (!laser.userData.checked && previousZ < collisionPlane && laser.position.z >= collisionPlane) {
               resolveLaserCollision(laser);
             }
-          });
+          }
           updatePowerHUD();
-          gates.forEach(gate => {
-            if (state !== "running") return;
+          for (let i = 0; i < gates.length; i++) {
+            const gate = gates[i];
+            if (state !== "running") continue;
             updateGateMechanics(gate);
             const previousZ = gate.position.z;
             gate.position.z += obstacleSpeed * dt;
@@ -10107,16 +10262,10 @@ void main() {
             if (!gate.userData.checked && previousZ < collisionPlane && gate.position.z >= collisionPlane) {
               resolveGateCollision(gate);
             }
-          });
+          }
           if (state === "running") {
-            gates = gates.filter(gate => {
-              if (gate.position.z > 10) { disposeGate(gate); return false; }
-              return true;
-            });
-            lasers = lasers.filter(laser => {
-              if (laser.position.z > 10) { disposeLaser(laser); return false; }
-              return true;
-            });
+            compactExpiredObjects(gates, disposeGate);
+            compactExpiredObjects(lasers, disposeLaser);
             if (environmentIndex >= 8 && gates.length <= 3) {
               const pairSpacing = getGateSpawnSpacing();
               gates.push(makeGate(currentColor, nextGateZ, 0));
@@ -10140,10 +10289,11 @@ void main() {
             player.position.y = RUNNER_Y + Math.sin(t * 1.15) * 0.09;
           }
           orb.rotation.y += dt * 0.35;
-          ribs.forEach(rib => {
+          for (let i = 0; i < ribs.length; i++) {
+            const rib = ribs[i];
             rib.position.z += dt * 1.5;
             if (rib.position.z > 8) rib.position.z -= 120;
-          });
+          }
         }
         updateImpactBursts(dt);
         if (renderer) renderer.render(gameScene, camera);
