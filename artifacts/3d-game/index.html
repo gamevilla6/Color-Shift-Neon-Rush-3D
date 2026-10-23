@@ -153,7 +153,7 @@
     #game.is-running .controls-hint { display: none !important; }
     #game.is-running .grain { opacity: .018; }
     #game.is-running.is-paused .mobile-controls { visibility: hidden; opacity: 0; }
-    .pause-button { position: absolute; z-index: 7; top: max(14px, env(safe-area-inset-top)); left: 50%; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid rgba(226,239,247,.2); border-radius: 50%; background: rgba(6,10,17,.48); color: rgba(238,246,251,.84); cursor: pointer; pointer-events: auto; transform: translateX(-50%); backdrop-filter: blur(7px); transition: opacity .2s, border-color .2s, background .2s; }
+    .pause-button { position: absolute; z-index: 7; top: max(14px, env(safe-area-inset-top)); left: 50%; display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 1px solid rgba(226,239,247,.2); border-radius: 50%; background: rgba(6,10,17,.48); color: rgba(238,246,251,.84); cursor: pointer; pointer-events: auto; transform: translateX(-50%); backdrop-filter: blur(7px); transition: opacity .2s, border-color .2s, background .2s; }
     .pause-button:hover { border-color: rgba(56,234,255,.56); background: rgba(6,10,17,.75); }
     .pause-button[hidden] { display: none !important; }
     .pause-button svg { width: 15px; height: 15px; fill: currentColor; }
@@ -230,6 +230,78 @@
     .overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; overflow: hidden; }
     .card { width: min(100%, 490px); text-align: center; transform: translateY(0); transition: transform .4s cubic-bezier(.2,.8,.2,1); }
     .overlay.hidden .card { transform: translateY(12px); }
+    .pause-screen {
+      position: fixed;
+      z-index: 100;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      background: radial-gradient(ellipse at 50% 35%, rgba(24, 30, 54, .72), rgba(3, 5, 12, .94) 72%), rgba(3, 5, 12, .78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      pointer-events: auto;
+      touch-action: pan-y;
+      overscroll-behavior: contain;
+    }
+    .pause-screen[hidden] { display: none !important; }
+    .pause-panel {
+      width: min(100%, 440px);
+      max-height: 100%;
+      margin: auto;
+      overflow-y: auto;
+      padding: clamp(22px, 6vw, 38px);
+      border: 1px solid rgba(56, 234, 255, .34);
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(12, 18, 32, .94), rgba(8, 10, 20, .9));
+      box-shadow: 0 0 38px rgba(56, 234, 255, .13), 0 0 72px rgba(255, 79, 184, .09), inset 0 1px rgba(255, 255, 255, .07);
+      text-align: center;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+    .pause-kicker { margin: 0 0 10px; color: var(--cyan); font: 700 11px/1.3 "Orbitron", system-ui, sans-serif; letter-spacing: .2em; text-transform: uppercase; }
+    .pause-panel h2 { margin: 0; color: #f6f4ff; font: 900 clamp(1.6rem, 7vw, 2.55rem)/1.1 "Orbitron", system-ui, sans-serif; letter-spacing: .05em; text-shadow: 0 0 10px rgba(56, 234, 255, .58), 0 0 25px rgba(255, 79, 184, .24); }
+    .pause-copy { margin: 12px auto 24px; max-width: 34ch; color: rgba(225, 233, 244, .72); font-size: clamp(14px, 3.8vw, 16px); line-height: 1.5; }
+    .pause-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .pause-action {
+      display: flex;
+      width: 100%;
+      min-width: 0;
+      min-height: 56px;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border: 1px solid rgba(134, 220, 235, .32);
+      border-radius: 12px;
+      background: rgba(8, 15, 25, .9);
+      color: #eaf6ff;
+      cursor: pointer;
+      pointer-events: auto;
+      touch-action: manipulation;
+      font: 800 clamp(1rem, 4vw, 1.15rem)/1.2 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .1em;
+      text-align: center;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+    .pause-action:hover { transform: scale(1.025); border-color: var(--cyan); box-shadow: 0 0 18px rgba(56, 234, 255, .16); }
+    .pause-action:active { transform: scale(.975); }
+    .pause-action:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    .pause-action.primary { border-color: rgba(56, 234, 255, .76); background: linear-gradient(100deg, rgba(56, 234, 255, .2), rgba(255, 79, 184, .16)); color: #fff; box-shadow: inset 0 0 20px rgba(56, 234, 255, .08); }
+    .pause-action.home { border-color: rgba(255, 79, 184, .48); }
+    @media (max-height: 520px) and (orientation: landscape) {
+      .pause-screen { align-items: flex-start; padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+      .pause-panel { width: min(100%, 700px); padding: 14px 20px; border-radius: 16px; }
+      .pause-kicker { margin-bottom: 5px; font-size: 9px; }
+      .pause-panel h2 { font-size: clamp(1.35rem, 5vh, 1.9rem); }
+      .pause-copy { margin: 6px auto 12px; font-size: 14px; }
+      .pause-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .pause-action { min-height: 48px; padding: 8px 12px; font-size: clamp(.9rem, 2.7vw, 1rem); }
+    }
+    @media (prefers-reduced-motion: reduce) { .pause-action { transition: none; } }
     .eyebrow { display: inline-flex; align-items: center; gap: 9px; margin-bottom: 14px; color: var(--accent); font-size: 9px; letter-spacing: .23em; text-transform: uppercase; }
     .eyebrow::before, .eyebrow::after { content: ""; width: 22px; height: 1px; background: currentColor; opacity: .7; }
     h1 { margin: 0; font-family: system-ui, sans-serif; font-size: clamp(42px, 5.5vw, 66px); font-weight: 900; line-height: .88; letter-spacing: -.045em; text-transform: uppercase; }
@@ -728,7 +800,7 @@
       #game.is-running .hud .stat:first-child { left: max(14px, env(safe-area-inset-left)); }
       #game.is-running .hud .stat:last-child { right: max(14px, env(safe-area-inset-right)); }
       #game.is-running .hud .stat-value { font-size: clamp(20px, 6vw, 25px); }
-      .pause-button { top: max(10px, env(safe-area-inset-top)); width: 44px; height: 44px; }
+      .pause-button { top: max(10px, env(safe-area-inset-top)); width: 48px; height: 48px; }
       .stat { flex: 1 1 0; min-width: 0; }
       .stat-value { font-size: clamp(22px, 7vw, 28px); }
       .stat-label { margin-top: 6px; font-size: 6px; letter-spacing: .1em; }
@@ -2370,6 +2442,21 @@
         <div class="small-note" id="dailyTokenNote" hidden></div>
       </div>
     </section>
+    <section class="pause-screen" id="pause-screen" role="dialog" aria-modal="true" aria-labelledby="pauseTitle" aria-describedby="pauseDescription" hidden>
+      <div class="pause-panel">
+        <header>
+          <div class="pause-kicker">NEON RUSH · RUN HELD</div>
+          <h2 id="pauseTitle">RUN PAUSED</h2>
+          <p class="pause-copy" id="pauseDescription">Your progress is safe. Resume when you're ready.</p>
+        </header>
+        <div class="pause-actions">
+          <button class="pause-action primary" id="pauseResumeButton" type="button">RESUME</button>
+          <button class="pause-action" id="pauseRestartButton" type="button">RESTART</button>
+          <button class="pause-action" id="pauseSettingsButton" type="button">SETTINGS</button>
+          <button class="pause-action home" id="pauseHomeButton" type="button">MAIN MENU</button>
+        </div>
+      </div>
+    </section>
     <section class="settings-screen" id="settings-screen" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
       <div class="settings-modal">
         <header class="settings-modal-header">
@@ -2455,7 +2542,7 @@
         </div>
         <footer class="settings-footer">
           <span id="settingsSaveNote" role="status" aria-live="polite">Preferences save as you change them</span>
-          <button class="settings-return" id="settingsBack" type="button" aria-label="Save settings and return to the main menu">⌂ BACK / MAIN MENU</button>
+          <button class="settings-return" id="settingsBack" type="button" aria-label="Save settings and return to the previous screen">⌂ BACK</button>
         </footer>
       </div>
     </section>
@@ -8597,7 +8684,7 @@ void main() {
         }
       }
       function openShop() {
-        if (state === "running") return;
+        if (state !== "ready") return;
         closeSettings();
         el("rewards-screen").hidden = false;
         el("shopScroll").scrollTop = 0;
@@ -8624,17 +8711,27 @@ void main() {
         });
         el("shopScroll").scrollTop = 0;
       }
+      let settingsReturnToPause = false;
       function openSettings() {
-        if (state !== "ready") return;
+        const fromPause = state === "paused";
+        if (state !== "ready" && !fromPause) return;
         closeShop();
+        settingsReturnToPause = fromPause;
+        if (fromPause) el("pause-screen").hidden = true;
         updateSoundControl();
         el("settings-screen").hidden = false;
         el("settingsButton").setAttribute("aria-expanded", "true");
         el("sfxToggleButton").focus();
       }
-      function closeSettings() {
+      function closeSettings(restorePausedMenu = true) {
+        const shouldRestorePause = settingsReturnToPause;
+        settingsReturnToPause = false;
         el("settings-screen").hidden = true;
         el("settingsButton").setAttribute("aria-expanded", "false");
+        if (restorePausedMenu && shouldRestorePause && state === "paused") {
+          el("pause-screen").hidden = false;
+          el("pauseSettingsButton").focus({ preventScroll: true });
+        }
       }
       function resetLocalProgress() {
         const confirmed = window.confirm(
@@ -9096,7 +9193,7 @@ void main() {
           maybeShowDailyReward();
           return;
         }
-        closeSettings();
+        closeSettings(false);
         closeShop();
         unlockAudio();
         best = loadModeHighScore(selectedMode);
@@ -9173,6 +9270,7 @@ void main() {
         updatePowerHUD();
         updateHUD();
         updateGravityIndicator();
+        el("pause-screen").hidden = true;
         el("overlay").classList.add("hidden");
         el("hud").classList.add("visible");
         el("runStatus").classList.add("visible");
@@ -9206,25 +9304,12 @@ void main() {
         el("game").classList.add("is-paused");
         el("feverWash").classList.remove("active");
         el("game").classList.remove("fever-active");
-        el("eyebrow").textContent = "Run paused";
-        el("titleTop").textContent = "Take";
-        el("titleBottom").textContent = "a breath";
-        el("intro").textContent = reason === "background"
+        el("pauseDescription").textContent = reason === "background"
           ? "Your run paused when you left the game. Resume it or restart whenever you're ready."
-          : "Your run is paused. Resume it or restart whenever you're ready.";
-        el("colorKey").hidden = true;
-        el("modeSelector").hidden = true;
-        el("results").hidden = true;
-        el("mysteryReward").hidden = true;
-        el("shopButton").hidden = true;
-        el("settingsButton").hidden = true;
-        el("card").classList.add("pause-open");
-        el("restartButton").hidden = false;
-        el("startHint").hidden = false;
-        el("startHint").textContent = "Resume or restart when you're ready · Esc / P";
-        el("startButton").textContent = "Resume run";
-        el("overlay").classList.remove("hidden");
-        el("homeButton").hidden = false;
+          : "Your progress is safe. Resume when you're ready.";
+        el("overlay").classList.add("hidden");
+        el("pause-screen").hidden = false;
+        el("pauseResumeButton").focus({ preventScroll: true });
       }
       function resumeGame() {
         if (state !== "paused") return;
@@ -9232,17 +9317,15 @@ void main() {
         updatePursuitWarning();
         lastTime = performance.now();
         el("game").classList.remove("is-paused");
-        el("card").classList.remove("pause-open");
-        el("modeSelector").hidden = false;
+        el("pause-screen").hidden = true;
         el("pauseButton").hidden = false;
-        el("restartButton").hidden = true;
-        el("homeButton").hidden = true;
         el("overlay").classList.add("hidden");
         el("hud").classList.add("visible");
         el("runStatus").classList.add("visible");
         updateGravityIndicator();
         updateAutoColorIndicator();
         updatePowerHUD();
+        el("pauseButton").focus({ preventScroll: true });
       }
       function awardGatePass(message) {
         passed++;
@@ -9405,6 +9488,8 @@ void main() {
         resultTickerFrame = requestAnimationFrame(tick);
       }
       function returnToHome() {
+        closeSettings(false);
+        closeShop();
         resultTickerToken++;
         achievementNoticeToken++;
         if (resultTickerFrame) cancelAnimationFrame(resultTickerFrame);
@@ -9475,6 +9560,7 @@ void main() {
         clearImpactBursts();
         el("game").classList.remove("is-running", "is-paused", "game-over-active", "impact-shake", "fever-active", "laser-danger");
         el("pauseButton").hidden = true;
+        el("pause-screen").hidden = true;
         el("hud").classList.remove("visible");
         el("runStatus").classList.remove("visible");
         el("ghostStatus").classList.remove("visible");
@@ -10367,12 +10453,17 @@ void main() {
       el("settingsButton").addEventListener("click", openSettings);
         el("settingsBack").addEventListener("click", () => {
           saveSettings();
-          returnToHome();
+           if (settingsReturnToPause && state === "paused") closeSettings();
+           else returnToHome();
         });
       el("pauseButton").addEventListener("click", pauseGame);
       el("restartButton").addEventListener("click", () => startGame(true));
         el("homeButton").addEventListener("click", returnToHome);
         el("dailyMainMenuButton").addEventListener("click", returnToHome);
+       el("pauseResumeButton").addEventListener("click", resumeGame);
+       el("pauseRestartButton").addEventListener("click", () => startGame(true));
+       el("pauseSettingsButton").addEventListener("click", openSettings);
+       el("pauseHomeButton").addEventListener("click", returnToHome);
       el("resetLocalData").addEventListener("click", resetLocalProgress);
       const toggleSound = () => {
         soundEnabled = !soundEnabled;
@@ -10445,10 +10536,27 @@ void main() {
           }
           return;
         }
+        if (state === "paused" && !el("pause-screen").hidden && event.key === "Tab") {
+          const focusable = Array.from(el("pause-screen").querySelectorAll("button:not([disabled])"));
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last?.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first?.focus();
+          }
+          return;
+        }
+        if (event.code === "Escape" && !el("settings-screen").hidden) {
+          event.preventDefault();
+          if (state === "paused") closeSettings();
+          else returnToHome();
+          return;
+        }
         if (event.code === "Escape" &&
-            (!el("dailyModal").hidden ||
-              !el("rewards-screen").hidden ||
-              !el("settings-screen").hidden)) {
+            (!el("dailyModal").hidden || !el("rewards-screen").hidden)) {
           event.preventDefault();
           returnToHome();
           return;
@@ -10495,7 +10603,7 @@ void main() {
         if (state !== "running" && el("dailyModal").hidden && el("rewards-screen").hidden && el("settings-screen").hidden) startGame();
       };
       game.addEventListener("pointerdown", event => {
-        if (event.pointerType === "touch" || event.button !== 0 || (event.target instanceof Element && event.target.closest("button, #overlay .card, #rewards-screen, #settings-screen, #dailyModal"))) return;
+        if (event.pointerType === "touch" || event.button !== 0 || (event.target instanceof Element && event.target.closest("button, #overlay .card, #pause-screen, #rewards-screen, #settings-screen, #dailyModal"))) return;
         gestureStart = { id: event.pointerId, source: "pointer", x: event.clientX, y: event.clientY, swiped: false };
         try { game.setPointerCapture(event.pointerId); } catch {}
       }, { passive: true });
@@ -10509,7 +10617,7 @@ void main() {
         if (gestureStart?.source === "pointer" && gestureStart.id === event.pointerId) gestureStart = null;
       }, { passive: true });
       game.addEventListener("touchstart", event => {
-        if (event.target instanceof Element && event.target.closest("button, #overlay .card, #rewards-screen, #settings-screen, #dailyModal")) return;
+        if (event.target instanceof Element && event.target.closest("button, #overlay .card, #pause-screen, #rewards-screen, #settings-screen, #dailyModal")) return;
         if (event.touches.length > 1) {
           gestureStart = null;
           return;
