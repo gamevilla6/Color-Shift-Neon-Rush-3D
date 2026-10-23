@@ -28,6 +28,7 @@
     html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; touch-action: none; background: #090c13; }
     body { color: var(--ink); font-family: ui-monospace, monospace; -webkit-font-smoothing: antialiased; }
     button { font: inherit; }
+    [hidden] { display: none !important; }
     #game { position: relative; width: 100%; height: 100vh; height: 100dvh; min-height: 100vh; min-height: 100svh; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; background: radial-gradient(ellipse at 50% 34%, #18202b 0%, #0b1018 55%, #080b11 100%); }
     #scene { position: absolute; inset: 0; }
     #scene canvas { position: fixed; top: 0; left: 0; z-index: 1; display: block; width: 100vw; height: 100vh; height: 100dvh; touch-action: none; }
@@ -294,6 +295,268 @@
     .crate-icon { display: grid; place-items: center; width: 25px; height: 25px; border: 1px solid #ffe29a; background: linear-gradient(135deg, #ffd25e 0 42%, #bb64ff 43% 57%, #ff8b40 58%); color: #281a08; font: 900 13px system-ui, sans-serif; box-shadow: 0 0 12px rgba(255,210,94,.6); }
     .mystery-reward strong { display: block; margin-bottom: 3px; font: 850 9px system-ui, sans-serif; }
     @keyframes crateGlow { from { filter: brightness(.88); transform: scale(.99); } to { filter: brightness(1.3); transform: scale(1.015); } }
+    #game.game-over-active .topbar { opacity: 0; visibility: hidden; }
+    #overlay.game-over-screen {
+      isolation: isolate;
+      overflow-y: auto;
+      background:
+        radial-gradient(ellipse at 50% 46%, rgba(38, 12, 24, .62), rgba(4, 7, 13, .84) 70%),
+        rgba(4, 7, 13, .66);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    #overlay.game-over-screen #modeSelector[hidden],
+    #overlay.game-over-screen #colorKey[hidden],
+    #overlay.game-over-screen #startHint[hidden],
+    #overlay.game-over-screen #dailyTokenNote[hidden],
+    #overlay.game-over-screen .secondary-actions { display: none !important; }
+    #overlay.game-over-screen::before {
+      position: fixed;
+      z-index: 1;
+      inset: 7px;
+      border: 1px solid rgba(255, 73, 103, .26);
+      background: radial-gradient(ellipse at center, transparent 42%, rgba(82, 7, 25, .11) 73%, rgba(127, 10, 35, .26) 100%);
+      box-shadow: inset 0 0 72px rgba(255, 39, 76, .13), 0 0 22px rgba(255, 40, 77, .12);
+      opacity: .82;
+      pointer-events: none;
+      content: "";
+      animation: gameOverVignette 2.4s ease-in-out infinite;
+    }
+    #overlay.home-screen.game-over-screen .card.home-card {
+      width: min(100%, 760px);
+      max-height: min(91dvh, 900px);
+      padding: clamp(22px, 4vw, 38px) clamp(20px, 4vw, 38px);
+      border-color: rgba(255, 92, 116, .34);
+      background:
+        radial-gradient(ellipse at 50% -12%, rgba(255, 65, 99, .19), transparent 44%),
+        linear-gradient(145deg, rgba(18, 23, 35, .92), rgba(7, 10, 18, .95) 60%, rgba(24, 10, 24, .91));
+      box-shadow: 0 24px 100px rgba(0, 0, 0, .62), 0 0 46px rgba(255, 42, 80, .15), inset 0 1px rgba(255, 255, 255, .09);
+    }
+    #overlay.home-screen.game-over-screen .card.home-card::before {
+      background: linear-gradient(118deg, rgba(255, 67, 92, .09), transparent 38%, rgba(56, 234, 255, .075));
+    }
+    #overlay.home-screen.game-over-screen h1 { font-size: clamp(36px, 6.6vw, 62px); }
+    #overlay.home-screen.game-over-screen .title-light {
+      color: #fff4f5;
+      text-shadow: 0 0 10px rgba(255, 84, 112, .72), 0 0 30px rgba(255, 39, 75, .4), 2px 0 rgba(56, 234, 255, .34);
+    }
+    #overlay.home-screen.game-over-screen .title-accent {
+      color: #ff718a;
+      text-shadow: 0 0 12px rgba(255, 58, 91, .8), 0 0 32px rgba(255, 34, 76, .46), -2px 0 rgba(56, 234, 255, .3);
+    }
+    #overlay.game-over-screen .eyebrow {
+      color: #ff9cae;
+      text-align: center;
+      text-shadow: 0 0 16px rgba(255, 53, 90, .55);
+    }
+    #overlay.game-over-screen h1 {
+      margin: 10px 0 14px;
+      text-align: center;
+      font-size: clamp(36px, 6.6vw, 62px);
+      animation: sessionGlitch 4.8s steps(1, end) infinite;
+    }
+    #overlay.game-over-screen .title-light {
+      color: #fff4f5;
+      text-shadow: 0 0 10px rgba(255, 84, 112, .72), 0 0 30px rgba(255, 39, 75, .4), 2px 0 rgba(56, 234, 255, .34);
+    }
+    #overlay.game-over-screen .title-accent {
+      color: #ff718a;
+      text-shadow: 0 0 12px rgba(255, 58, 91, .8), 0 0 32px rgba(255, 34, 76, .46), -2px 0 rgba(56, 234, 255, .3);
+    }
+    #overlay.game-over-screen .intro {
+      max-width: 54ch;
+      margin: 0 auto 8px;
+      color: rgba(235, 221, 228, .78);
+      text-align: center;
+      font-size: clamp(15px, 1.5vw, 17px);
+    }
+    #overlay.game-over-screen .result-line {
+      margin: 10px 0 13px;
+      color: #aab8c7;
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: .17em;
+    }
+    #overlay.game-over-screen .game-over-brand { margin: 0 0 4px; text-align: center; font-size: 10px; }
+    #overlay.game-over-screen .result-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 15px 0 10px; }
+    #overlay.game-over-screen .result-cell {
+      position: relative;
+      display: flex;
+      min-height: 112px;
+      flex-direction: column;
+      justify-content: center;
+      padding: 14px 12px;
+      overflow: hidden;
+      border-color: rgba(198, 218, 235, .17);
+      background: linear-gradient(145deg, rgba(18, 28, 42, .78), rgba(8, 13, 22, .86));
+      box-shadow: inset 0 1px rgba(255,255,255,.035), 0 8px 25px rgba(0,0,0,.12);
+    }
+    #overlay.game-over-screen .result-cell::before {
+      position: absolute;
+      inset: 0 0 auto;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(56, 234, 255, .45), transparent);
+      content: "";
+    }
+    #overlay.game-over-screen .result-cell > span {
+      order: -1;
+      margin: 0 0 10px;
+      color: rgba(204, 216, 229, .67);
+      font: 700 9px/1.35 "Orbitron", sans-serif;
+      letter-spacing: .12em;
+    }
+    #overlay.game-over-screen .result-cell strong {
+      overflow: hidden;
+      color: #f8fbff;
+      font: 800 clamp(22px, 4vw, 34px)/1 "Rajdhani", sans-serif;
+      letter-spacing: .02em;
+      text-overflow: ellipsis;
+      text-shadow: 0 0 17px rgba(56, 234, 255, .22);
+      white-space: nowrap;
+    }
+    #overlay.game-over-screen .score-cell strong { color: #fff; font-size: clamp(32px, 6vw, 48px); text-shadow: 0 0 18px rgba(56,234,255,.42), 0 0 35px rgba(255,79,184,.16); }
+    #overlay.game-over-screen .crystal-cell strong { color: #ffd77a; text-shadow: 0 0 18px rgba(255,201,88,.3); }
+    #overlay.game-over-screen .wallet-cell strong { color: #7ef5f4; }
+    #overlay.game-over-screen .distance-cell strong { color: #d7c5ff; text-shadow: 0 0 18px rgba(164,124,255,.34); }
+    #overlay.game-over-screen .result-cell small {
+      margin-top: 7px;
+      color: rgba(212, 221, 232, .62);
+      font: 600 11px "Rajdhani", sans-serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    #overlay.game-over-screen .result-cell small b { color: #fff; font-size: 14px; }
+    .result-detail-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 7px 20px;
+      margin: 11px 0 5px;
+      color: rgba(183, 198, 214, .66);
+      font: 700 8px "Orbitron", sans-serif;
+      letter-spacing: .13em;
+    }
+    .result-detail-row span { display: inline-flex; align-items: baseline; gap: 6px; }
+    .result-detail-row strong { color: #e9f3ff; font-size: 10px; letter-spacing: .05em; }
+    .result-detail-row span:first-child strong { color: #ffd77a; }
+    #overlay.game-over-screen .best-callout {
+      margin: 10px 0 14px;
+      color: #aebbc9;
+      font: 700 9px "Orbitron", sans-serif;
+      letter-spacing: .12em;
+      text-align: center;
+    }
+    .new-record-badge {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: fit-content;
+      max-width: 100%;
+      min-height: 58px;
+      margin: 13px auto 12px;
+      padding: 9px 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 220, 125, .64);
+      border-radius: 4px;
+      background: linear-gradient(105deg, rgba(255, 193, 72, .15), rgba(70, 232, 255, .12) 52%, rgba(255, 79, 184, .13));
+      box-shadow: 0 0 24px rgba(255, 199, 82, .18), inset 0 0 18px rgba(255,255,255,.045);
+      animation: recordBadgePulse 1.8s ease-in-out infinite;
+    }
+    .new-record-badge[hidden] { display: none !important; }
+    .new-record-badge::before {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 15%, rgba(255,255,255,.18) 49%, transparent 70%);
+      transform: translateX(-120%);
+      content: "";
+      animation: recordSweep 2.5s ease-in-out infinite;
+    }
+    .record-trophy { position: relative; z-index: 1; color: #ffe08a; font-size: 25px; filter: drop-shadow(0 0 10px rgba(255,215,97,.74)); }
+    .record-badge-copy { position: relative; z-index: 1; text-align: left; }
+    .record-badge-copy strong { display: block; color: #fff2b8; font: 900 clamp(12px, 2.5vw, 16px) "Orbitron", sans-serif; letter-spacing: .14em; text-shadow: 0 0 12px rgba(255,212,93,.55), 0 0 20px rgba(56,234,255,.27); }
+    .record-badge-copy small { display: block; margin-top: 4px; color: rgba(222, 241, 245, .72); font: 600 12px "Rajdhani", sans-serif; letter-spacing: .05em; }
+    .record-spark { position: absolute; z-index: 1; width: 3px; height: 3px; border-radius: 50%; background: #fff0a6; box-shadow: 0 0 9px 2px rgba(255,213,103,.85); animation: recordSpark 1.5s ease-in-out infinite; }
+    .spark-one { top: 15%; left: 15%; }
+    .spark-two { top: 72%; left: 29%; animation-delay: -.45s; }
+    .spark-three { top: 24%; right: 17%; animation-delay: -.9s; }
+    .spark-four { top: 75%; right: 30%; animation-delay: -.2s; }
+    #overlay.game-over-screen .mystery-reward { margin: 10px auto 13px; }
+    #overlay.game-over-screen .home-actions { width: min(100%, 530px); gap: 10px; margin: 17px auto 0; }
+    #overlay.game-over-screen .home-actions .primary-btn {
+      min-height: 60px;
+      border-color: rgba(115, 242, 255, .72);
+      background: linear-gradient(105deg, rgba(38, 190, 213, .94), rgba(69, 225, 224, .95) 52%, rgba(164, 112, 255, .9));
+      color: #041219;
+      font: 900 12px "Orbitron", sans-serif;
+      letter-spacing: .17em;
+      text-shadow: none;
+      box-shadow: 0 0 24px rgba(56,234,255,.26), inset 0 1px rgba(255,255,255,.38);
+      animation: summaryPlayPulse 2.6s ease-in-out infinite;
+    }
+    #overlay.game-over-screen .home-actions .primary-btn:hover { transform: scale(1.035); filter: brightness(1.08); }
+    #overlay.game-over-screen .home-actions .primary-btn:active { transform: scale(.97); }
+    #overlay.game-over-screen .home-return-btn {
+      min-height: 52px;
+      border: 1px solid rgba(201, 222, 238, .26);
+      background: rgba(9, 14, 23, .58);
+      color: rgba(224, 235, 246, .84);
+      font: 700 10px "Orbitron", sans-serif;
+      letter-spacing: .16em;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    #overlay.game-over-screen .home-return-btn:hover { transform: scale(1.025); border-color: rgba(56,234,255,.6); background: rgba(15,25,38,.8); }
+    #overlay.game-over-screen .home-return-btn:active { transform: scale(.97); }
+    #overlay.game-over-screen .home-return-btn[hidden] { display: none !important; }
+    @media (max-width: 520px) {
+      #overlay.home-screen.game-over-screen { padding: max(70px, calc(env(safe-area-inset-top) + 58px)) 12px max(18px, env(safe-area-inset-bottom)); }
+      #overlay.home-screen.game-over-screen .card.home-card { width: 100%; max-height: 90dvh; padding: 20px 16px 18px; }
+      #overlay.game-over-screen h1 { font-size: clamp(34px, 10vw, 48px); }
+      #overlay.game-over-screen h1 { margin: 6px 0 8px; }
+      #overlay.game-over-screen .result-line { margin: 6px 0 9px; }
+      #overlay.game-over-screen .result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 9px 0 7px; }
+      #overlay.game-over-screen .result-cell { min-height: 74px; padding: 10px; }
+      #overlay.game-over-screen .result-cell > span { margin-bottom: 8px; font-size: 8px; }
+      #overlay.game-over-screen .result-cell strong { font-size: clamp(24px, 8vw, 35px); }
+      #overlay.game-over-screen .score-cell strong { font-size: clamp(34px, 10vw, 46px); }
+      #overlay.game-over-screen .result-detail-row { gap: 8px 12px; font-size: 7px; }
+      #overlay.game-over-screen .result-detail-row strong { font-size: 9px; }
+      #overlay.game-over-screen .best-callout { margin: 6px 0 8px; }
+      .new-record-badge { width: min(100%, 390px); padding: 8px 13px; }
+      .record-trophy { font-size: 22px; }
+      #overlay.game-over-screen .mystery-reward { margin: 7px auto 8px; }
+      #overlay.game-over-screen .home-actions { gap: 8px; margin-top: 10px; }
+      #overlay.game-over-screen .home-actions .primary-btn { min-height: 54px; }
+      #overlay.game-over-screen .home-return-btn { min-height: 50px; }
+    }
+    @media (max-height: 730px) {
+      #overlay.home-screen.game-over-screen { padding-top: max(50px, calc(env(safe-area-inset-top) + 38px)); padding-bottom: 12px; }
+      #overlay.home-screen.game-over-screen .card.home-card { max-height: 92dvh; padding-top: 16px; padding-bottom: 14px; }
+      #overlay.game-over-screen .result-grid { margin-top: 9px; }
+      #overlay.game-over-screen .result-cell { min-height: 82px; }
+      #overlay.game-over-screen .home-actions { margin-top: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #overlay.game-over-screen::before,
+      #overlay.game-over-screen h1,
+      .new-record-badge,
+      .new-record-badge::before,
+      .record-spark,
+      #overlay.game-over-screen .home-actions .primary-btn { animation: none !important; }
+    }
+    @keyframes gameOverVignette { 0%, 100% { opacity: .58; } 50% { opacity: .95; } }
+    @keyframes sessionGlitch {
+      0%, 89%, 93%, 100% { transform: translateX(0); filter: none; }
+      90% { transform: translateX(2px) skewX(-1deg); filter: drop-shadow(2px 0 rgba(56,234,255,.65)); }
+      91% { transform: translateX(-2px); filter: drop-shadow(-2px 0 rgba(255,58,91,.7)); }
+      92% { transform: translateX(1px); filter: brightness(1.18); }
+    }
+    @keyframes recordBadgePulse { 0%, 100% { filter: brightness(.96); box-shadow: 0 0 21px rgba(255,199,82,.15), inset 0 0 18px rgba(255,255,255,.04); } 50% { filter: brightness(1.13); box-shadow: 0 0 32px rgba(255,199,82,.28), 0 0 38px rgba(56,234,255,.14), inset 0 0 22px rgba(255,255,255,.08); } }
+    @keyframes recordSweep { 0%, 30% { transform: translateX(-120%); } 70%, 100% { transform: translateX(120%); } }
+    @keyframes recordSpark { 0%, 100% { opacity: .25; transform: scale(.7); } 48% { opacity: 1; transform: scale(1.7); } }
+    @keyframes summaryPlayPulse { 0%, 100% { box-shadow: 0 0 19px rgba(56,234,255,.2), inset 0 1px rgba(255,255,255,.34); } 50% { box-shadow: 0 0 31px rgba(56,234,255,.35), 0 0 35px rgba(255,79,184,.15), inset 0 1px rgba(255,255,255,.44); } }
     .achievement-banner { position: absolute; z-index: 12; top: max(190px, calc(env(safe-area-inset-top) + 170px)); left: 50%; width: min(calc(100% - 30px), 360px); padding: 10px 14px; border: 1px solid rgba(197,255,74,.56); background: rgba(8,13,20,.94); color: #eaf4d0; text-align: center; pointer-events: none; opacity: 0; transform: translate(-50%, -10px) scale(.96); transition: opacity .24s ease, transform .24s ease; box-shadow: 0 0 24px rgba(197,255,74,.18); }
     .achievement-banner[hidden] { display: none !important; }
     .achievement-banner.visible { opacity: 1; transform: translate(-50%, 0) scale(1); }
@@ -846,6 +1109,45 @@
     }
     #overlay.home-screen .settings-back:hover { transform: scale(1.05); border-color: #ff4fb8; }
     #overlay.home-screen .settings-back:active { transform: scale(.97); }
+    #overlay.home-screen .universal-menu-back,
+    #overlay:not(.home-screen) .universal-menu-back,
+    #dailyModal .universal-menu-back {
+      display: flex;
+      width: min(100%, 350px);
+      min-height: 54px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      margin: 10px auto 0;
+      padding: 12px 16px;
+      border: 1px solid rgba(84, 242, 223, .48);
+      border-radius: 7px;
+      background: linear-gradient(120deg, rgba(20, 196, 209, .1), rgba(155, 111, 255, .1) 55%, rgba(255, 79, 184, .1)), rgba(7, 14, 24, .78);
+      color: #d5ffff;
+      box-shadow: inset 0 1px rgba(255,255,255,.08), 0 0 18px rgba(84,242,223,.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      cursor: pointer;
+      touch-action: manipulation;
+      font: 700 10px "Orbitron", sans-serif;
+      letter-spacing: .14em;
+      text-align: center;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+    #overlay.home-screen .universal-menu-back:hover,
+    #overlay:not(.home-screen) .universal-menu-back:hover,
+    #dailyModal .universal-menu-back:hover {
+      transform: translateY(-1px) scale(1.02);
+      border-color: rgba(255,79,184,.72);
+      background: linear-gradient(120deg, rgba(20,196,209,.14), rgba(155,111,255,.15) 55%, rgba(255,79,184,.15)), rgba(7,14,24,.9);
+      box-shadow: inset 0 1px rgba(255,255,255,.1), 0 0 22px rgba(84,242,223,.14), 0 0 22px rgba(255,79,184,.08);
+    }
+    #overlay.home-screen .universal-menu-back:active,
+    #overlay:not(.home-screen) .universal-menu-back:active,
+    #dailyModal .universal-menu-back:active { transform: scale(.97); }
+    #overlay.home-screen .universal-menu-back:focus-visible,
+    #overlay:not(.home-screen) .universal-menu-back:focus-visible,
+    #dailyModal .universal-menu-back:focus-visible { outline: 2px solid #8cfaff; outline-offset: 3px; }
     #overlay.home-screen button:focus-visible {
       outline: 2px solid #8cfaff;
       outline-offset: 3px;
@@ -873,6 +1175,9 @@
       #overlay.home-screen .mode-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       #overlay.home-screen .home-actions .primary-btn { min-height: 58px; font-size: 13px; }
       #overlay.home-screen .secondary-actions .secondary-btn { min-height: 44px; font-size: 8px; }
+      #overlay.home-screen .universal-menu-back,
+      #overlay:not(.home-screen) .universal-menu-back,
+      #dailyModal .universal-menu-back { min-height: 56px; font-size: 9px; }
     }
     @media (max-width: 370px) {
       #game .topbar { right: 9px; left: 9px; }
@@ -1007,14 +1312,24 @@
         <div id="results" hidden>
           <div class="game-over-brand">Color Shift:<span>Neon Rush 3D</span></div>
           <div class="result-line" id="resultLine">Endless · Run summary</div>
+          <div class="new-record-badge" id="newRecordBadge" hidden>
+            <span class="record-trophy" aria-hidden="true">🏆</span>
+            <span class="record-badge-copy"><strong>NEW HIGH SCORE!</strong><small>You just set a new personal record</small></span>
+            <span class="record-spark spark-one" aria-hidden="true"></span>
+            <span class="record-spark spark-two" aria-hidden="true"></span>
+            <span class="record-spark spark-three" aria-hidden="true"></span>
+            <span class="record-spark spark-four" aria-hidden="true"></span>
+          </div>
           <div class="result-grid">
-            <div class="result-cell"><strong id="finalScore">0</strong><span>Current score</span></div>
-            <div class="result-cell"><strong id="finalBest">0</strong><span>Best score</span></div>
-            <div class="result-cell"><strong id="finalGates">0</strong><span>Gates cleared</span></div>
-            <div class="result-cell"><strong id="finalDistance">0m</strong><span>Distance</span></div>
-            <div class="result-cell"><strong id="finalMaxStreak">×0</strong><span>Max streak</span></div>
-            <div class="result-cell"><strong id="finalRunCrystals">0</strong><span>Crystals gathered</span></div>
-            <div class="result-cell rank-cell"><strong id="finalRank">Rookie</strong><span>Player rank</span></div>
+            <div class="result-cell score-cell"><span>Final score</span><strong id="finalScore" aria-label="Final score">0</strong></div>
+            <div class="result-cell crystal-cell"><span>Run crystals</span><strong id="finalRunCrystals">0</strong></div>
+            <div class="result-cell wallet-cell"><span>Total wallet</span><strong id="finalWallet">0</strong></div>
+            <div class="result-cell distance-cell"><span>Distance covered</span><strong id="finalDistance">0m</strong><small><b id="finalGates">0</b> gates passed</small></div>
+          </div>
+          <div class="result-detail-row">
+            <span>BEST <strong id="finalBest">0</strong></span>
+            <span>MAX STREAK <strong id="finalMaxStreak">×0</strong></span>
+            <span>RANK <strong id="finalRank">Rookie</strong></span>
           </div>
           <div class="best-callout" id="bestMessage">New personal best</div>
           <div class="mystery-reward" id="mysteryReward" hidden>
@@ -1025,6 +1340,7 @@
         <div class="actions home-actions">
           <button class="primary-btn" id="startButton">Tap to Play <span class="button-arrow">↗</span></button>
           <button class="secondary-btn" id="restartButton" type="button" hidden>Restart run</button>
+          <button class="secondary-btn home-return-btn universal-menu-back" id="homeButton" type="button" aria-label="Return to the main menu" hidden>⌂ MAIN MENU</button>
           <div class="secondary-actions">
             <button class="secondary-btn" id="shopButton" type="button">Rewards &amp; Skins</button>
           <button class="secondary-btn" id="settingsButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="settingsPanel">Settings</button>
@@ -1061,7 +1377,7 @@
             <p>Progress, claimed rewards, owned cosmetics, and equipped styles are saved on this device.</p>
             <button class="secondary-btn reset-save-btn" id="resetLocalData" type="button">Reset local save</button>
           </div>
-          <button class="secondary-btn shop-back" id="shopBack" type="button">Back to home</button>
+          <button class="secondary-btn shop-back universal-menu-back" id="shopBack" type="button" aria-label="Return to the main menu">⌂ MAIN MENU</button>
         </section>
         <section class="settings-panel" id="settingsPanel" aria-label="Settings" hidden>
           <div class="settings-header">
@@ -1083,7 +1399,7 @@
             <div><span>Color</span><strong>Tap / Space / W / ↑ · auto-cycle 3.5 sec</strong></div>
             <div><span>Anti-Gravity</span><strong>Flip button · Space · tap</strong></div>
           </div>
-          <button class="secondary-btn settings-back" id="settingsBack" type="button">Back to game</button>
+          <button class="secondary-btn settings-back universal-menu-back" id="settingsBack" type="button" aria-label="Return to the main menu">⌂ MAIN MENU</button>
         </section>
       </div>
     </section>
@@ -1100,6 +1416,7 @@
         <div class="daily-result" id="dailyResult" role="status" aria-live="polite">Your reward is ready.</div>
         <button class="primary-btn" id="dailySpinButton" type="button">Spin for reward</button>
         <button class="secondary-btn" id="dailyContinueButton" type="button" hidden>Continue</button>
+        <button class="secondary-btn universal-menu-back" id="dailyMainMenuButton" type="button" aria-label="Return to the main menu">⌂ MAIN MENU</button>
       </div>
     </section>
   </main>
@@ -5883,6 +6200,8 @@ void main() {
       let score = 0;
       let combo = 0;
       let maxCombo = 0;
+      let resultTickerFrame = 0;
+      let resultTickerToken = 0;
       let speed = BASE_FORWARD_SPEED;
       let lastTime = 0;
       let elapsed = 0;
@@ -5987,6 +6306,7 @@ void main() {
       let runCoins = 0;
       let achievementQueue = [];
       let achievementNoticeTimer = 0;
+      let achievementNoticeToken = 0;
       let shieldCharges = 0;
       let timeWarpTimer = 0;
       let scoreBoosterTimer = 0;
@@ -5995,6 +6315,7 @@ void main() {
       let graceTimer = 0;
       let statusTimer = 0;
       let flashTimer = 0;
+      let dailySpinTimer = 0;
       let soundEnabled = true;
       let audioContext = null;
       let audioUnavailable = false;
@@ -6465,25 +6786,39 @@ void main() {
       saveProgression();
       function displayNextAchievement() {
         const banner = el("achievementBanner");
+        if (state === "over") {
+          achievementQueue = [];
+          banner.classList.remove("visible");
+          banner.hidden = true;
+          achievementNoticeTimer = 0;
+          return;
+        }
         if (achievementQueue.length === 0) {
           banner.classList.remove("visible");
           banner.hidden = true;
           achievementNoticeTimer = 0;
           return;
         }
+        const token = ++achievementNoticeToken;
         const item = achievementQueue.shift();
         el("achievementTitle").textContent = item.title;
         el("achievementDescription").textContent = item.description;
         el("achievementKicker").textContent = item.kicker || "ACHIEVEMENT UNLOCKED";
         banner.hidden = false;
         banner.classList.remove("visible");
-        requestAnimationFrame(() => banner.classList.add("visible"));
+        requestAnimationFrame(() => {
+          if (token === achievementNoticeToken && state !== "over") banner.classList.add("visible");
+        });
         achievementNoticeTimer = window.setTimeout(() => {
+          if (token !== achievementNoticeToken || state === "over") return;
           banner.classList.remove("visible");
-          achievementNoticeTimer = window.setTimeout(displayNextAchievement, 280);
+          achievementNoticeTimer = window.setTimeout(() => {
+            if (token === achievementNoticeToken && state !== "over") displayNextAchievement();
+          }, 280);
         }, 2500);
       }
       function queueProgressionNotice(item, kicker) {
+        if (state === "over") return;
         achievementQueue.push({ ...item, kicker });
         if (!el("dailyModal").hidden) return;
         if (!achievementNoticeTimer) displayNextAchievement();
@@ -6531,6 +6866,8 @@ void main() {
       }
       function maybeShowDailyReward() {
         if (state !== "ready" || !dailySpinReady()) return;
+        window.clearTimeout(dailySpinTimer);
+        dailySpinTimer = 0;
         el("dailyModal").hidden = false;
         el("dailyWheel").style.transform = "rotate(0deg)";
         el("dailyResult").textContent = "Your reward is ready.";
@@ -6569,7 +6906,9 @@ void main() {
         el("dailyResult").textContent = "The wheel is spinning…";
         const stopAngle = 360 * 5 + (360 - resultIndex * 45 - 22.5);
         el("dailyWheel").style.transform = "rotate(" + stopAngle + "deg)";
-        window.setTimeout(() => {
+        window.clearTimeout(dailySpinTimer);
+        dailySpinTimer = window.setTimeout(() => {
+          dailySpinTimer = 0;
           el("dailyResult").textContent = "You won " + reward.label + "!";
           el("dailySpinButton").hidden = true;
           el("dailyContinueButton").hidden = false;
@@ -7101,8 +7440,16 @@ void main() {
       }
       function resetOverlay() {
         closeShop();
-        el("card").classList.remove("pause-open");
+        closeSettings();
+        resultTickerToken++;
+        if (resultTickerFrame) cancelAnimationFrame(resultTickerFrame);
+        resultTickerFrame = 0;
+        el("game").classList.remove("game-over-active");
+        el("overlay").classList.remove("game-over-screen");
+        el("card").classList.remove("pause-open", "game-over-open");
         el("restartButton").hidden = true;
+        el("homeButton").hidden = true;
+        el("dailyModal").hidden = true;
         el("eyebrow").textContent = "A color reaction test";
         el("titleTop").textContent = "Color Shift:";
         el("titleBottom").textContent = "Neon Rush 3D";
@@ -7110,8 +7457,11 @@ void main() {
         el("startHint").hidden = false;
         el("modeSelector").hidden = false;
         el("results").hidden = true;
+        el("newRecordBadge").hidden = true;
         el("mysteryReward").hidden = true;
         el("shopButton").hidden = false;
+        el("settingsButton").hidden = false;
+        el("startButton").innerHTML = 'Tap to Play <span class="button-arrow">↗</span>';
         updateModeCopy();
         updateGravityIndicator();
       }
@@ -7269,6 +7619,7 @@ void main() {
         el("startHint").textContent = "Resume or restart when you're ready · Esc / P";
         el("startButton").textContent = "Resume run";
         el("overlay").classList.remove("hidden");
+        el("homeButton").hidden = false;
       }
       function resumeGame() {
         if (state !== "paused") return;
@@ -7279,6 +7630,8 @@ void main() {
         el("card").classList.remove("pause-open");
         el("modeSelector").hidden = false;
         el("pauseButton").hidden = false;
+        el("restartButton").hidden = true;
+        el("homeButton").hidden = true;
         el("overlay").classList.add("hidden");
         el("hud").classList.add("visible");
         el("runStatus").classList.add("visible");
@@ -7419,6 +7772,126 @@ void main() {
         if (value >= 1500) return "Spark Runner";
         return "Rookie";
       }
+      function animateResultScoreTicker(targetScore) {
+        const token = ++resultTickerToken;
+        if (resultTickerFrame) cancelAnimationFrame(resultTickerFrame);
+        resultTickerFrame = 0;
+        const target = Math.max(0, Math.floor(targetScore));
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reducedMotion || target === 0) {
+          el("finalScore").textContent = target.toLocaleString("en-US");
+          return;
+        }
+        const startedAt = performance.now();
+        const duration = 1120;
+        const tick = now => {
+          if (token !== resultTickerToken || state !== "over") {
+            resultTickerFrame = 0;
+            return;
+          }
+          const progress = Math.min(1, (now - startedAt) / duration);
+          const eased = 1 - Math.pow(1 - progress, 4);
+          el("finalScore").textContent = Math.round(target * eased).toLocaleString("en-US");
+          if (progress < 1) resultTickerFrame = requestAnimationFrame(tick);
+          else resultTickerFrame = 0;
+        };
+        resultTickerFrame = requestAnimationFrame(tick);
+      }
+      function returnToMainMenu() {
+        resultTickerToken++;
+        achievementNoticeToken++;
+        if (resultTickerFrame) cancelAnimationFrame(resultTickerFrame);
+        resultTickerFrame = 0;
+        window.clearTimeout(statusTimer);
+        window.clearTimeout(environmentNoticeTimer);
+        environmentNoticeToken++;
+        window.clearTimeout(impactShakeTimer);
+        window.clearTimeout(flashTimer);
+        window.clearTimeout(dailySpinTimer);
+        window.clearTimeout(achievementNoticeTimer);
+        statusTimer = 0;
+        environmentNoticeTimer = 0;
+        impactShakeTimer = 0;
+        flashTimer = 0;
+        dailySpinTimer = 0;
+        achievementNoticeTimer = 0;
+        achievementQueue = [];
+        el("achievementBanner").classList.remove("visible");
+        el("achievementBanner").hidden = true;
+        el("dailyModal").hidden = true;
+        state = "ready";
+        distance = 0;
+        passed = 0;
+        score = 0;
+        combo = 0;
+        maxCombo = 0;
+        runCoins = 0;
+        speed = BASE_FORWARD_SPEED;
+        elapsed = 0;
+        obstacleElapsed = 0;
+        timeRemaining = 60;
+        feverTimer = 0;
+        graceTimer = 0;
+        shieldCharges = 0;
+        timeWarpTimer = 0;
+        scoreBoosterTimer = 0;
+        speedBoostTimer = 0;
+        autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
+        powerUpSpawnTimer = 7;
+        crystalSpawnTimer = 3.5;
+        laserSpawnTimer = laserPursuitModeActive ? 4.5 : 10;
+        ghostBestAtRunStart = best;
+        ghostRecordCandidate = false;
+        runGhostSamples = [];
+        ghostSampleAccumulator = 0;
+        activeGhostData = null;
+        ghostReplayCursor = 0;
+        ghostBall.visible = false;
+        currentLane = 1;
+        lastPlayerInputAt = -Infinity;
+        cameraShakeTimer = 0;
+        cameraShakeIntensity = 0;
+        colorPulse = 0;
+        setEnvironment(0, { announce: false, instant: true });
+        setGravitySide("floor", true);
+        setOrbColor(mirrorMatrixModeActive ? COLORS.length - 1 : 1);
+        player.userData.targetX = LANE_X[currentLane];
+        player.position.set(LANE_X[currentLane], RUNNER_Y, 0);
+        player.rotation.set(0, 0, 0);
+        orb.rotation.set(0, 0, 0);
+        ghostBall.position.set(LANE_X[currentLane] + 0.38, player.position.y, -2.4);
+        ribs.forEach((rib, index) => { rib.position.z = -index * 8 - 1; });
+        resetLaserPursuitWall();
+        makeInitialGates();
+        clearTrailParticles();
+        clearImpactBursts();
+        el("game").classList.remove("is-running", "is-paused", "game-over-active", "impact-shake", "fever-active", "laser-danger");
+        el("pauseButton").hidden = true;
+        el("hud").classList.remove("visible");
+        el("runStatus").classList.remove("visible");
+        el("ghostStatus").classList.remove("visible");
+        el("environmentBanner").classList.remove("visible");
+        el("environmentBanner").hidden = true;
+        el("flash").classList.remove("on");
+        el("flash").style.background = "";
+        el("feverWash").classList.remove("active");
+        el("pursuitWarning").hidden = true;
+        el("pursuitVignette").classList.remove("active");
+        el("pursuitVignette").style.opacity = "0";
+        el("overlay").classList.add("home-screen");
+        el("overlay").classList.remove("hidden", "game-over-screen");
+        resetOverlay();
+        el("overlay").classList.add("home-screen");
+        el("bestTop").textContent = String(best).padStart(5, "0");
+        renderProgressionUI();
+        updatePowerHUD();
+        updatePursuitWarning();
+        updateGravityIndicator();
+        updateAutoColorIndicator();
+        updateHUD();
+        saveProgression();
+        el("startButton").focus({ preventScroll: true });
+      }
       function triggerGameOver(reason = "collision") {
         endGame(reason);
       }
@@ -7434,8 +7907,15 @@ void main() {
         environmentNoticeToken++;
         el("environmentBanner").classList.remove("visible");
         el("environmentBanner").hidden = true;
+        achievementNoticeToken++;
+        window.clearTimeout(achievementNoticeTimer);
+        achievementNoticeTimer = 0;
+        achievementQueue = [];
+        el("achievementBanner").classList.remove("visible");
+        el("achievementBanner").hidden = true;
         state = "over";
         el("game").classList.remove("is-running", "is-paused");
+        el("game").classList.add("game-over-active");
         el("pauseButton").hidden = true;
         updatePursuitWarning();
         updateGravityIndicator();
@@ -7448,6 +7928,7 @@ void main() {
         flashTimer = window.setTimeout(() => el("flash").classList.remove("on"), 120);
         updateHUD();
         const final = Math.floor(score);
+        const previousBest = best;
         const isBest = final > best;
         let crateReward = 0;
         if (isBest) {
@@ -7471,8 +7952,8 @@ void main() {
               : laserPursuitModeActive
                 ? "Pursuit wall caught you"
                 : mirrorMatrixModeActive ? "Mirror Matrix run complete" : "Run complete";
-        el("titleTop").textContent = reason === "time" ? "Time" : "Gate";
-        el("titleBottom").textContent = reason === "time" ? "is up" : "missed";
+        el("titleTop").textContent = reason === "time" ? "TIME" : "SESSION";
+        el("titleBottom").textContent = reason === "time" ? "EXPIRED" : "TERMINATED";
         el("intro").textContent = reason === "time"
           ? "The clock is out. Your score is locked in—take another run and push your rank higher."
           : selectedMode === "antiGravity"
@@ -7486,13 +7967,15 @@ void main() {
             : "The tunnel keeps moving. Find your rhythm and take another run.";
         el("colorKey").hidden = true;
         el("startHint").hidden = true;
+        el("modeSelector").hidden = true;
         el("results").hidden = false;
-        el("finalScore").textContent = String(final);
-        el("finalBest").textContent = String(best);
-        el("finalGates").textContent = String(passed);
-        el("finalDistance").textContent = Math.floor(distance) + "m";
+        el("finalScore").textContent = "0";
+        el("finalBest").textContent = best.toLocaleString("en-US");
+        el("finalGates").textContent = passed.toLocaleString("en-US");
+        el("finalDistance").textContent = Math.floor(distance).toLocaleString("en-US") + "m";
         el("finalMaxStreak").textContent = "×" + maxCombo;
-        el("finalRunCrystals").textContent = String(runCoins);
+        el("finalRunCrystals").textContent = runCoins.toLocaleString("en-US");
+        el("finalWallet").textContent = progression.crystals.toLocaleString("en-US");
         el("finalRank").textContent = playerRankForScore(final);
         el("resultLine").textContent = selectedMode === "antiGravity"
           ? "Quantum Singularity · Anti-Gravity"
@@ -7503,9 +7986,14 @@ void main() {
             : mirrorMatrixModeActive
               ? "Mirror Matrix · 2× Score & Crystals"
             : (selectedMode === "timeAttack" ? "Time Attack" : "Endless") + " · Run summary";
-        el("bestMessage").textContent = isBest ? "New personal best" : "Personal best · " + best;
+        el("bestMessage").textContent = isBest
+          ? "PREVIOUS BEST · " + previousBest.toLocaleString("en-US")
+          : "PERSONAL BEST · " + best.toLocaleString("en-US");
+        el("newRecordBadge").hidden = !isBest;
         el("mysteryReward").hidden = !isBest;
         if (isBest) el("crateReward").textContent = "+" + crateReward + " crystals";
+        el("homeButton").hidden = false;
+        el("restartButton").hidden = true;
         timeWarpTimer = 0;
         scoreBoosterTimer = 0;
         speedBoostTimer = 0;
@@ -7514,12 +8002,15 @@ void main() {
         el("ghostStatus").classList.remove("visible");
         updatePowerHUD();
         saveProgression();
-        el("startButton").innerHTML = 'Run again <span class="button-arrow">↗</span>';
+        el("startButton").innerHTML = 'Play Again <span class="button-arrow">↗</span>';
         el("shopButton").hidden = true;
         el("settingsButton").hidden = true;
         el("hud").classList.remove("visible");
         el("runStatus").classList.remove("visible");
+        el("card").classList.add("game-over-open");
+        el("overlay").classList.add("home-screen", "game-over-screen");
         el("overlay").classList.remove("hidden");
+        animateResultScoreTicker(final);
       }
 
       function drawFallback(t) {
@@ -8222,7 +8713,7 @@ void main() {
       el("dailySpinButton").addEventListener("click", spinDailyReward);
       el("dailyContinueButton").addEventListener("click", closeDailyReward);
       el("shopButton").addEventListener("click", openShop);
-      el("shopBack").addEventListener("click", closeShop);
+       el("shopBack").addEventListener("click", returnToMainMenu);
        document.querySelectorAll("[data-reward-tab]").forEach(button => {
          button.addEventListener("click", () => setRewardsTab(button.dataset.rewardTab));
        });
@@ -8239,9 +8730,11 @@ void main() {
          if (button) claimAchievementReward(button.dataset.tier);
        });
       el("settingsButton").addEventListener("click", openSettings);
-      el("settingsBack").addEventListener("click", closeSettings);
+       el("settingsBack").addEventListener("click", returnToMainMenu);
       el("pauseButton").addEventListener("click", pauseGame);
       el("restartButton").addEventListener("click", () => startGame(true));
+       el("homeButton").addEventListener("click", returnToMainMenu);
+       el("dailyMainMenuButton").addEventListener("click", returnToMainMenu);
       el("resetLocalData").addEventListener("click", resetLocalProgress);
       const toggleSound = () => {
         soundEnabled = !soundEnabled;
@@ -8259,9 +8752,11 @@ void main() {
       window.addEventListener("keydown", event => {
         if (event.repeat && ["ArrowLeft", "ArrowRight", "ArrowUp", "KeyA", "KeyD", "KeyW", "Space", "Escape", "KeyP"].includes(event.code)) return;
         if (["ArrowLeft", "ArrowRight", "ArrowUp", "Space", "Escape"].includes(event.code)) event.preventDefault();
-        if (event.code === "Escape" && el("card").classList.contains("settings-open")) {
-          closeSettings();
-          el("settingsButton").focus();
+        if (event.code === "Escape" &&
+            (!el("dailyModal").hidden ||
+              el("card").classList.contains("shop-open") ||
+              el("card").classList.contains("settings-open"))) {
+          returnToMainMenu();
           return;
         }
         if (event.code === "Escape" || event.code === "KeyP") {

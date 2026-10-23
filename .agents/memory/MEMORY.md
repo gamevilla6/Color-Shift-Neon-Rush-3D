@@ -1,1 +1,2 @@
 - [Artifact workflow restarts](artifact-workflow-restarts.md) — a Vite child can remain bound after a failed restart; verify the listener before retrying.
+- [Achievement notice lifecycle](achievement-notice-races.md) — invalidate queued timers and animation frames when transitions clear achievement banners.
