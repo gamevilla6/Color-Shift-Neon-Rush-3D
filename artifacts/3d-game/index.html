@@ -1134,6 +1134,21 @@
       text-align: center;
       transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
     }
+    #overlay:not(.hidden) {
+      z-index: 50;
+      pointer-events: auto;
+    }
+    #overlay:not(.hidden) .card,
+    #dailyModal:not([hidden]) .daily-card { pointer-events: auto; }
+    #overlay:not(.hidden) button,
+    #dailyModal:not([hidden]) button {
+      pointer-events: auto;
+      touch-action: manipulation;
+    }
+    #dailyModal:not([hidden]) {
+      z-index: 60;
+      pointer-events: auto;
+    }
     #overlay.home-screen .universal-menu-back:hover,
     #overlay:not(.home-screen) .universal-menu-back:hover,
     #dailyModal .universal-menu-back:hover {
@@ -7281,7 +7296,7 @@ void main() {
       setOrbColor(1);
       updateLaneIndicator();
 
-      function makeInitialGates() {
+      function clearRunObjects() {
         gates.forEach(disposeGate);
         gates = [];
         powerUps.forEach(disposePowerUp);
@@ -7292,6 +7307,9 @@ void main() {
         lasers = [];
         gravityHazardSerial = 0;
         nextGateZ = FIRST_GATE_SPAWN_Z;
+      }
+      function makeInitialGates() {
+        clearRunObjects();
         for (let i = 0; i < 5; i++) {
           gates.push(makeGate(currentColor, nextGateZ));
           nextGateZ -= getGateSpawnSpacing();
@@ -7797,7 +7815,7 @@ void main() {
         };
         resultTickerFrame = requestAnimationFrame(tick);
       }
-      function returnToMainMenu() {
+      function returnToHome() {
         resultTickerToken++;
         achievementNoticeToken++;
         if (resultTickerFrame) cancelAnimationFrame(resultTickerFrame);
@@ -7862,7 +7880,7 @@ void main() {
         ghostBall.position.set(LANE_X[currentLane] + 0.38, player.position.y, -2.4);
         ribs.forEach((rib, index) => { rib.position.z = -index * 8 - 1; });
         resetLaserPursuitWall();
-        makeInitialGates();
+        clearRunObjects();
         clearTrailParticles();
         clearImpactBursts();
         el("game").classList.remove("is-running", "is-paused", "game-over-active", "impact-shake", "fever-active", "laser-danger");
@@ -8713,7 +8731,7 @@ void main() {
       el("dailySpinButton").addEventListener("click", spinDailyReward);
       el("dailyContinueButton").addEventListener("click", closeDailyReward);
       el("shopButton").addEventListener("click", openShop);
-       el("shopBack").addEventListener("click", returnToMainMenu);
+       el("shopBack").addEventListener("click", returnToHome);
        document.querySelectorAll("[data-reward-tab]").forEach(button => {
          button.addEventListener("click", () => setRewardsTab(button.dataset.rewardTab));
        });
@@ -8730,11 +8748,11 @@ void main() {
          if (button) claimAchievementReward(button.dataset.tier);
        });
       el("settingsButton").addEventListener("click", openSettings);
-       el("settingsBack").addEventListener("click", returnToMainMenu);
+        el("settingsBack").addEventListener("click", returnToHome);
       el("pauseButton").addEventListener("click", pauseGame);
       el("restartButton").addEventListener("click", () => startGame(true));
-       el("homeButton").addEventListener("click", returnToMainMenu);
-       el("dailyMainMenuButton").addEventListener("click", returnToMainMenu);
+        el("homeButton").addEventListener("click", returnToHome);
+        el("dailyMainMenuButton").addEventListener("click", returnToHome);
       el("resetLocalData").addEventListener("click", resetLocalProgress);
       const toggleSound = () => {
         soundEnabled = !soundEnabled;
@@ -8756,7 +8774,7 @@ void main() {
             (!el("dailyModal").hidden ||
               el("card").classList.contains("shop-open") ||
               el("card").classList.contains("settings-open"))) {
-          returnToMainMenu();
+          returnToHome();
           return;
         }
         if (event.code === "Escape" || event.code === "KeyP") {
