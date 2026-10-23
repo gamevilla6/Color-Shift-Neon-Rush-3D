@@ -190,6 +190,96 @@
     .save-reset p { margin: 0 0 8px; color: #8d9aa8; font-size: 8px; line-height: 1.6; letter-spacing: .07em; }
     .reset-save-btn { width: min(100%, 220px); min-height: 40px; border-color: rgba(255,95,129,.48); color: #ff9aac; }
     .mobile-hint { display: none; }
+    .card.shop-open { width: min(calc(100vw - 48px), 1120px); max-width: 1120px; padding: 0; }
+    #overlay.home-screen .card.home-card.shop-open { width: min(calc(100vw - 48px), 1120px); max-width: 1120px; padding: 0; }
+    .shop-panel {
+      width: 100%;
+      max-height: min(88vh, 920px);
+      max-height: min(88dvh, 920px);
+      overflow: auto;
+      overscroll-behavior: contain;
+      padding: clamp(16px, 2.4vw, 30px);
+      border: 1px solid rgba(84,242,223,.31);
+      border-radius: 18px;
+      background:
+        radial-gradient(ellipse at 90% 0%, rgba(119,80,195,.13), transparent 38%),
+        linear-gradient(145deg, rgba(9,14,24,.97), rgba(8,12,20,.96));
+      box-shadow: 0 22px 90px rgba(0,0,0,.38), 0 0 45px rgba(56,230,211,.09);
+      font-family: "Rajdhani", system-ui, sans-serif;
+      scrollbar-color: rgba(84,242,223,.4) rgba(255,255,255,.04);
+    }
+    .shop-header { align-items: center; gap: 20px; margin-bottom: 18px; }
+    .shop-title { font-family: "Orbitron", system-ui, sans-serif; font-size: clamp(25px, 3vw, 38px); letter-spacing: -.04em; }
+    .shop-intro { margin: 9px 0 0; color: #a7b4c3; font-size: clamp(16px, 1.4vw, 17px); line-height: 1.35; }
+    .shop-balance { min-width: 155px; padding: 12px 14px; border: 1px solid rgba(255,211,106,.26); background: rgba(255,211,106,.06); font-size: 11px; }
+    .shop-balance strong { display: inline-block; margin-top: 4px; font: 700 clamp(20px, 2.6vw, 29px)/1 "Orbitron", system-ui, sans-serif; }
+    .reward-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 5px; margin: 0 0 21px; border: 1px solid rgba(233,241,246,.1); background: rgba(3,7,13,.52); }
+    .reward-tab { min-height: 48px; padding: 10px; border: 1px solid transparent; background: transparent; color: #9ca9b8; cursor: pointer; font: 700 12px "Orbitron", system-ui, sans-serif; letter-spacing: .08em; transition: color .18s, border-color .18s, background .18s, transform .18s; touch-action: manipulation; }
+    .reward-tab:hover { color: #fff; transform: translateY(-1px); }
+    .reward-tab.active { border-color: rgba(84,242,223,.38); background: linear-gradient(100deg, rgba(84,242,223,.13), rgba(155,111,255,.1)); color: #c8fff8; box-shadow: inset 0 0 18px rgba(84,242,223,.05); }
+    .reward-tab:focus-visible, .shop-panel button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    .reward-tab-panel[hidden] { display: none !important; }
+    .shop-section-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; margin: 4px 0 14px; }
+    .shop-section-heading h3 { margin: 0; color: #f4f7ff; font: 700 clamp(20px, 2.2vw, 27px)/1.15 "Orbitron", system-ui, sans-serif; }
+    .shop-section-heading p { margin: 6px 0 0; color: #a6b1c0; font-size: 16px; line-height: 1.4; }
+    .achievement-tier-key { color: #79899b; font: 600 9px "Orbitron", system-ui, sans-serif; letter-spacing: .08em; text-align: right; white-space: nowrap; }
+    .achievement-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .achievement-category { min-width: 0; padding: 14px; border: 1px solid rgba(211,222,231,.12); background: linear-gradient(135deg, rgba(17,26,40,.88), rgba(10,15,24,.9)); }
+    .achievement-category-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .achievement-category-head h3 { margin: 0; color: #eff5fb; font: 700 15px "Orbitron", system-ui, sans-serif; letter-spacing: .02em; }
+    .achievement-category-head p { margin: 5px 0 0; color: #a4b1c0; font-size: 16px; line-height: 1.3; }
+    .achievement-category-count { color: var(--cyan); font: 700 17px "Orbitron", system-ui, sans-serif; white-space: nowrap; }
+    .achievement-category-count small { color: #77879a; font-size: 11px; }
+    .achievement-tier-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .achievement-tier { min-width: 0; padding: 9px; border: 1px solid rgba(211,222,231,.09); background: rgba(5,9,16,.62); }
+    .tier-heading, .tier-footer { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .tier-heading strong { color: #d2dbe5; font: 700 11px "Orbitron", system-ui, sans-serif; text-transform: uppercase; }
+    .tier-heading span { overflow: hidden; color: #8291a2; font: 600 9px "Orbitron", system-ui, sans-serif; letter-spacing: .03em; text-overflow: ellipsis; white-space: nowrap; }
+    .achievement-tier.unlocked { border-color: rgba(84,242,223,.34); background: linear-gradient(135deg, rgba(84,242,223,.08), rgba(7,12,20,.8)); }
+    .achievement-tier.unlocked .tier-heading strong { color: #bdf9ef; }
+    .tier-progress { height: 7px; overflow: hidden; margin: 9px 0; border-radius: 10px; background: rgba(143,160,180,.16); }
+    .tier-progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #38eaff, #a479ff); box-shadow: 0 0 12px rgba(84,242,223,.48); transition: width .45s ease; }
+    .achievement-tier:nth-child(3) .tier-progress span { background: linear-gradient(90deg, #bd7bff, #f078d2); }
+    .achievement-tier:nth-child(4) .tier-progress span { background: linear-gradient(90deg, #ffcb58, #fff0a1); }
+    .tier-reward { display: inline-flex; align-items: center; gap: 5px; color: #f4d071; font: 700 11px "Orbitron", system-ui, sans-serif; }
+    .crystal-mark { display: inline-block; width: 9px; height: 12px; background: linear-gradient(145deg, #fff1a4, #ffc24b 58%, #e88b2b); clip-path: polygon(50% 0, 100% 30%, 79% 100%, 21% 100%, 0 30%); filter: drop-shadow(0 0 5px rgba(255,196,73,.55)); }
+    .tier-claim { min-width: 83px; min-height: 38px; padding: 7px 10px; color: var(--cyan); font-size: 10px; }
+    .tier-claim:not(:disabled):hover, .skin-action:not(:disabled):hover, .trail-action:not(:disabled):hover { color: #07121b; background: var(--cyan); transform: scale(1.04); }
+    .tier-claim:disabled { border-color: rgba(128,148,167,.12); background: rgba(128,148,167,.04); color: #718094; cursor: not-allowed; }
+    .shop-section-label { margin: 23px 0 10px; color: #bac6d3; font: 700 11px "Orbitron", system-ui, sans-serif; letter-spacing: .15em; }
+    .achievement-row { min-height: 64px; padding: 12px 14px; }
+    .achievement-row strong { color: #eff5fb; font-size: 14px; }
+    .achievement-row small { color: #a2afbd; font-size: 16px; line-height: 1.35; }
+    .achievement-state { font-size: 10px; }
+    .skin-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .skin-card { display: flex; flex-direction: column; min-width: 0; min-height: 230px; padding: 14px; border: 1px solid rgba(233,241,246,.13); background: linear-gradient(150deg, rgba(17,26,42,.95), rgba(10,15,26,.95)); transition: transform .2s, border-color .2s, background .2s; }
+    .skin-card:hover { transform: translateY(-2px); border-color: rgba(183,125,255,.42); }
+    .skin-card.active { border-color: rgba(84,242,223,.65); background: linear-gradient(150deg, rgba(17,39,47,.96), rgba(10,18,29,.96)); }
+    .skin-preview { width: 100%; height: 94px; margin: 0 0 12px; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; background: radial-gradient(ellipse, color-mix(in srgb, var(--skin-color), transparent 86%), transparent 72%); }
+    .skin-preview::before { width: 42px; height: 42px; }
+    .skin-preview.plasma::before { background: radial-gradient(circle at 30% 25%, #fff, #a876ff 23%, #1c183b 72%); border: 1px solid #d1b5ff; }
+    .skin-preview.shard::before { clip-path: polygon(50% 0, 100% 36%, 76% 100%, 22% 91%, 0 34%); transform: rotate(12deg); }
+    .skin-preview.void::before { background: radial-gradient(circle at 32% 28%, #ffe7ff, #ff58ca 12%, #24102b 46%, #05060b 74%); border: 1px solid #ff98e0; }
+    .skin-card h3, .trail-card h3 { margin: 0; color: #f4f7ff; font: 700 13px "Orbitron", system-ui, sans-serif; }
+    .skin-card p, .trail-card p { min-height: 42px; margin: 6px 0 10px; color: #a4b1c0; font-size: 16px; line-height: 1.35; }
+    .cosmetic-cost, .trail-footer > span { display: flex; align-items: center; gap: 6px; margin-top: auto; color: #d8bd76; font: 600 10px "Orbitron", system-ui, sans-serif; }
+    .skin-action { width: 100%; min-height: 44px; margin-top: 10px; font-size: 10px; }
+    .skin-action:disabled, .trail-action:disabled { opacity: .75; cursor: not-allowed; }
+    .trail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .trail-card { display: grid; grid-template-columns: 62px minmax(0, 1fr); column-gap: 12px; min-width: 0; padding: 14px; border: 1px solid rgba(211,222,231,.12); background: linear-gradient(135deg, rgba(17,26,40,.9), rgba(10,15,24,.94)); }
+    .trail-card.active { border-color: rgba(84,242,223,.58); }
+    .trail-sample { position: relative; display: grid; place-items: center; grid-row: span 2; min-height: 74px; overflow: hidden; border: 1px solid rgba(255,255,255,.07); background: rgba(4,8,15,.7); }
+    .trail-sample i { position: absolute; width: 44px; height: 3px; border-radius: 50%; background: var(--trail-color); box-shadow: 0 0 8px var(--trail-color), 0 0 18px var(--trail-secondary); transform: rotate(-36deg); }
+    .trail-sample i:nth-child(2) { width: 30px; margin: 9px 0 0 8px; background: var(--trail-secondary); }
+    .trail-sample i:nth-child(3) { width: 19px; margin: -10px 12px 0 0; opacity: .7; }
+    .trail-copy { min-width: 0; }
+    .trail-copy p { min-height: 0; margin: 5px 0 8px; }
+    .trail-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; grid-column: 2; }
+    .trail-action { min-width: 88px; min-height: 40px; font-size: 10px; }
+    .shop-notice { min-height: 26px; margin: 15px 0 8px; color: #a4fff2; font-size: 14px; line-height: 1.4; letter-spacing: .02em; }
+    .save-reset { margin-top: 12px; padding-top: 13px; }
+    .save-reset p { font-size: 13px; }
+    .shop-back { min-height: 46px; font-size: 11px; }
     .result-line { margin: 24px 0 4px; color: #9ca4ad; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; }
     .game-over-brand { margin: 3px 0 12px; color: var(--accent); font-family: system-ui, sans-serif; font-size: 10px; font-weight: 800; letter-spacing: .16em; line-height: 1.5; text-transform: uppercase; text-shadow: 0 0 14px rgba(56,230,211,.32); }
     .game-over-brand span { display: block; color: var(--magenta); text-shadow: 0 0 14px rgba(255,79,184,.42); }
@@ -289,10 +379,20 @@
       .primary-btn { width: min(100%, 250px); min-height: 56px; font-size: 18px; }
       .actions { flex-direction: column; gap: 8px; }
       .actions .primary-btn, .actions .secondary-btn { width: min(100%, 250px); }
-      .shop-panel { padding: 11px; }
-      .skin-grid { gap: 5px; }
-      .skin-card { padding: 8px 5px 6px; }
-      .skin-action { font-size: 7px; }
+      .card.shop-open { width: calc(100vw - 32px); max-width: none; }
+      #overlay.home-screen .card.home-card.shop-open { width: calc(100vw - 32px); max-width: none; padding: 0; }
+      .shop-panel { max-height: 88dvh; padding: 14px; border-radius: 14px; }
+      .shop-header { align-items: flex-start; }
+      .shop-balance { min-width: 118px; padding: 9px; font-size: 9px; }
+      .reward-tabs { gap: 4px; margin-bottom: 16px; }
+      .reward-tab { min-height: 46px; padding: 8px 4px; font-size: 9px; letter-spacing: .04em; }
+      .achievement-list, .trail-grid { grid-template-columns: 1fr; }
+      .skin-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .skin-card { min-height: 212px; padding: 11px; }
+      .shop-section-heading { align-items: flex-start; flex-direction: column; }
+      .achievement-tier-key { text-align: left; }
+      .achievement-category { padding: 12px; }
+      .shop-back { width: min(100%, 300px); }
       .small-note { font-size: 7px; line-height: 1.8; }
       .mobile-hint { display: inline; }
       .desktop-hint { display: none; }
@@ -325,6 +425,19 @@
       .best-callout { margin: 8px 0 10px; }
       .color-panel { bottom: max(10px, env(safe-area-inset-bottom)); }
       .mobile-controls { bottom: max(8px, env(safe-area-inset-bottom)); }
+    }
+    @media (max-width: 520px) {
+      .shop-header { flex-direction: column; }
+      .shop-balance { width: 100%; }
+      .achievement-category-head h3 { font-size: 13px; }
+      .achievement-category-head p { font-size: 16px; }
+      .achievement-tier-grid { grid-template-columns: 1fr; }
+      .tier-heading strong { font-size: 10px; }
+      .tier-heading span { font-size: 8px; }
+      .tier-claim { min-height: 40px; }
+      .skin-card p, .trail-card p { font-size: 16px; }
+      .trail-card { grid-template-columns: 48px minmax(0, 1fr); padding: 11px; }
+      .trail-action { min-width: 76px; }
     }
     @media (max-width: 900px) and (pointer: coarse) and (orientation: landscape) {
       .topbar { left: max(14px, env(safe-area-inset-left)); right: max(14px, env(safe-area-inset-right)); }
@@ -913,44 +1026,42 @@
           <button class="primary-btn" id="startButton">Tap to Play <span class="button-arrow">↗</span></button>
           <button class="secondary-btn" id="restartButton" type="button" hidden>Restart run</button>
           <div class="secondary-actions">
-            <button class="secondary-btn" id="shopButton" type="button">Shop / Skins</button>
+            <button class="secondary-btn" id="shopButton" type="button">Rewards &amp; Skins</button>
           <button class="secondary-btn" id="settingsButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="settingsPanel">Settings</button>
           </div>
         </div>
         <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / W / ↑</b> change color</span><span class="mobile-hint">Tap to start · swipe to steer · tap to change color</span></div>
         <div class="small-note" id="dailyTokenNote" hidden></div>
-        <section class="shop-panel" id="shopPanel" aria-label="Player skins shop" hidden>
+        <section class="shop-panel" id="shopPanel" aria-label="Rewards and achievements" hidden>
           <div class="shop-header">
-            <div><div class="eyebrow">PLAYER LAB</div><h2 class="shop-title">Choose your form</h2></div>
+            <div><div class="eyebrow">PLAYER PROGRESSION</div><h2 class="shop-title">Rewards Hub</h2><p class="shop-intro">Every run moves you closer to a new tier, skin, or trail.</p></div>
             <div class="shop-balance">CRYSTAL BALANCE<br><strong id="shopBalance">00000</strong></div>
           </div>
-          <div class="skin-grid">
-            <article class="skin-card" data-skin-card="sphere">
-              <div class="skin-preview sphere" style="--skin-color:#38e6d3"></div>
-              <h3>Sphere</h3><p>Classic neon orb · Free</p>
-              <button class="secondary-btn skin-action" type="button" data-skin="sphere">Equipped</button>
-            </article>
-            <article class="skin-card" data-skin-card="diamond">
-              <div class="skin-preview diamond" style="--skin-color:#ffd25e"></div>
-              <h3>Diamond</h3><p>Cut-glass prism · 30 crystals</p>
-              <button class="secondary-btn skin-action" type="button" data-skin="diamond">Unlock · 30</button>
-            </article>
-            <article class="skin-card" data-skin-card="star">
-              <div class="skin-preview star" style="--skin-color:#ff58d6"></div>
-              <h3>Star</h3><p>Radiant 3D star · 60 crystals</p>
-              <button class="secondary-btn skin-action" type="button" data-skin="star">Unlock · 60</button>
-            </article>
+          <nav class="reward-tabs" role="tablist" aria-label="Rewards categories">
+            <button class="reward-tab active" type="button" role="tab" aria-selected="true" data-reward-tab="achievements">Milestones</button>
+            <button class="reward-tab" type="button" role="tab" aria-selected="false" data-reward-tab="skins">Ball Skins</button>
+            <button class="reward-tab" type="button" role="tab" aria-selected="false" data-reward-tab="trails">Glow Trails</button>
+          </nav>
+          <div class="reward-tab-panel" data-reward-panel="achievements" role="tabpanel">
+            <div class="shop-section-heading"><div><h3>Achievement Tracks</h3><p>Four tiers per discipline. Claim crystal rewards as soon as a milestone is complete.</p></div><span class="achievement-tier-key">BRONZE · SILVER · GOLD · DIAMOND</span></div>
+            <div class="achievement-list" id="achievementList"></div>
+            <div class="shop-section-label">Daily Bounties</div>
+            <div class="achievement-list daily-list" id="dailyBountyList"></div>
           </div>
-          <div class="shop-section-label">Achievements</div>
-          <div class="achievement-list" id="achievementList"></div>
-          <div class="shop-section-label">Daily Bounties</div>
-          <div class="achievement-list" id="dailyBountyList"></div>
+          <div class="reward-tab-panel" data-reward-panel="skins" role="tabpanel" hidden>
+            <div class="shop-section-heading"><div><h3>Player Skins</h3><p>Claim a form once, then equip it for future runs.</p></div><span class="achievement-tier-key">3D COSMETICS</span></div>
+            <div class="skin-grid" id="skinGrid"></div>
+          </div>
+          <div class="reward-tab-panel" data-reward-panel="trails" role="tabpanel" hidden>
+            <div class="shop-section-heading"><div><h3>Particle Trails</h3><p>Choose the glow that follows you through the tunnel.</p></div><span class="achievement-tier-key">RUN EFFECTS</span></div>
+            <div class="trail-grid" id="trailGrid"></div>
+          </div>
           <div class="shop-notice" id="shopNotice" role="status" aria-live="polite"></div>
           <div class="save-reset">
-            <p>Reset this device’s local save: high score, crystals, skins, achievements, daily rewards, and power-up tokens.</p>
+            <p>Progress, claimed rewards, owned cosmetics, and equipped styles are saved on this device.</p>
             <button class="secondary-btn reset-save-btn" id="resetLocalData" type="button">Reset local save</button>
           </div>
-          <button class="secondary-btn shop-back" id="shopBack" type="button">Back to game</button>
+          <button class="secondary-btn shop-back" id="shopBack" type="button">Back to home</button>
         </section>
         <section class="settings-panel" id="settingsPanel" aria-label="Settings" hidden>
           <div class="settings-header">
@@ -4713,14 +4824,67 @@ void main() {
         { name: "Yellow", key: "yellow", hex: 0xffd84a, css: "#ffd84a" }
       ];
       const PLAYER_SKINS = {
-        sphere: { name: "Sphere", cost: 0, accent: 0x68f2df, roughness: 0.2, metalness: 0.1, glow: 3.8 },
-        diamond: { name: "Diamond", cost: 30, accent: 0xffd25e, roughness: 0.13, metalness: 0.45, glow: 4.6 },
-        star: { name: "Star", cost: 60, accent: 0xff58d6, roughness: 0.16, metalness: 0.25, glow: 4.3 }
+        sphere: { name: "Sphere", description: "The original neon runner.", cost: 0, accent: 0x68f2df, roughness: 0.2, metalness: 0.1, glow: 3.8, shape: "sphere" },
+        diamond: { name: "Diamond", description: "A sharply cut prism.", cost: 30, accent: 0xffd25e, roughness: 0.13, metalness: 0.45, glow: 4.6, shape: "diamond" },
+        star: { name: "Star", description: "A radiant five-point core.", cost: 60, accent: 0xff58d6, roughness: 0.16, metalness: 0.25, glow: 4.3, shape: "star" },
+        plasmaOrb: { name: "Plasma Orb", description: "A charged orb wrapped in violet light.", cost: 50, accent: 0xa876ff, roughness: 0.12, metalness: 0.28, glow: 4.8, shape: "plasma" },
+        cyberShard: { name: "Cyber Shard", description: "A faceted shard tuned for speed.", cost: 85, accent: 0x54f4ff, roughness: 0.1, metalness: 0.5, glow: 4.9, shape: "shard" },
+        goldenSphere: { name: "Golden Sphere", description: "A polished core with solar trim.", cost: 125, accent: 0xffc74f, roughness: 0.12, metalness: 0.72, glow: 4.4, shape: "sphere" },
+        voidBlackhole: { name: "Void Blackhole", description: "A dark singularity edged in hot pink.", cost: 180, accent: 0xff58ca, roughness: 0.08, metalness: 0.58, glow: 5.1, shape: "void" }
+      };
+      const TRAIL_STYLES = {
+        none: { name: "No Trail", description: "A clean run with no particle trail.", cost: 0, color: 0x68f2df, secondary: 0x68f2df },
+        aurora: { name: "Aurora Wake", description: "Cool cyan particles with a violet edge.", cost: 20, color: 0x4fefff, secondary: 0x9d7bff },
+        ember: { name: "Solar Ember", description: "Warm gold sparks with a red core.", cost: 40, color: 0xffd057, secondary: 0xff5a63 },
+        prism: { name: "Prism Stream", description: "A bright shifting-spectrum particle wake.", cost: 65, color: 0xff5ac8, secondary: 0x5df5e8 },
+        singularity: { name: "Singularity Dust", description: "Violet motes pulled through the void.", cost: 95, color: 0x9f72ff, secondary: 0xf45dff }
       };
       const ACHIEVEMENTS = [
         { id: "distanceMaster", title: "Distance Master", description: "Reach 1,000 meters in one run." },
         { id: "crystalCollector", title: "Crystal Collector", description: "Collect 50 crystals across your runs." },
         { id: "gateRunner", title: "Gate Runner", description: "Clear 20 gates in one run." }
+      ];
+      const ACHIEVEMENT_CATEGORIES = [
+        {
+          id: "distanceRunner", title: "Distance Runner", description: "Set a new best distance in one run.",
+          metric: "bestDistance", unit: "M",
+          tiers: [
+            { id: "distance-bronze", name: "Bronze", target: 500, reward: 15 },
+            { id: "distance-silver", name: "Silver", target: 1500, reward: 30 },
+            { id: "distance-gold", name: "Gold", target: 3000, reward: 60 },
+            { id: "distance-diamond", name: "Diamond", target: 5000, reward: 120 }
+          ]
+        },
+        {
+          id: "crystalCollector", title: "Crystal Collector", description: "Earn crystals across all runs.",
+          metric: "lifetimeCrystals", unit: "CRYSTALS",
+          tiers: [
+            { id: "crystals-bronze", name: "Bronze", target: 50, reward: 15 },
+            { id: "crystals-silver", name: "Silver", target: 150, reward: 35 },
+            { id: "crystals-gold", name: "Gold", target: 350, reward: 70 },
+            { id: "crystals-diamond", name: "Diamond", target: 750, reward: 140 }
+          ]
+        },
+        {
+          id: "colorMaster", title: "Color Master", description: "Pass gates with the correct color.",
+          metric: "lifetimeGates", unit: "GATES",
+          tiers: [
+            { id: "color-bronze", name: "Bronze", target: 10, reward: 15 },
+            { id: "color-silver", name: "Silver", target: 50, reward: 35 },
+            { id: "color-gold", name: "Gold", target: 150, reward: 70 },
+            { id: "color-diamond", name: "Diamond", target: 400, reward: 140 }
+          ]
+        },
+        {
+          id: "laserSurvivor", title: "Laser Survivor", description: "Clear gates during Laser Pursuit runs.",
+          metric: "laserGates", unit: "LASER GATES",
+          tiers: [
+            { id: "laser-bronze", name: "Bronze", target: 3, reward: 20 },
+            { id: "laser-silver", name: "Silver", target: 10, reward: 40 },
+            { id: "laser-gold", name: "Gold", target: 25, reward: 80 },
+            { id: "laser-diamond", name: "Diamond", target: 60, reward: 160 }
+          ]
+        }
       ];
       const DAILY_BOUNTIES = [
         { id: "distance", title: "Daily Dash", description: "Reach 300m in one run.", target: 300, reward: 12 },
@@ -5124,8 +5288,11 @@ void main() {
       player.add(shadow);
 
       function createPlayerSkinGeometry(skinId) {
-        if (skinId === "diamond") return new THREE.OctahedronGeometry(PLAYER_RADIUS * 1.18, 0);
-        if (skinId === "star") {
+        const shapeType = PLAYER_SKINS[skinId]?.shape || "sphere";
+        if (shapeType === "diamond") return new THREE.OctahedronGeometry(PLAYER_RADIUS * 1.18, 0);
+        if (shapeType === "shard") return new THREE.IcosahedronGeometry(PLAYER_RADIUS * 1.12, 0);
+        if (shapeType === "void") return new THREE.DodecahedronGeometry(PLAYER_RADIUS * 1.1, 0);
+        if (shapeType === "star") {
           const shape = new THREE.Shape();
           for (let point = 0; point < 10; point++) {
             const angle = Math.PI / 2 + point * Math.PI / 5;
@@ -5155,6 +5322,12 @@ void main() {
         const oldGeometry = orb.geometry;
         orb.geometry = createPlayerSkinGeometry(safeSkinId);
         oldGeometry.dispose();
+        const oldAccentGeometry = skinAccent.geometry;
+        const accentRadius = safeSkinId === "plasmaOrb" ? 0.9 : safeSkinId === "voidBlackhole" ? 0.76 : 0.82;
+        skinAccent.geometry = new THREE.TorusGeometry(accentRadius, 0.026, 7, 48);
+        oldAccentGeometry.dispose();
+        skinAccent.rotation.set(0, safeSkinId === "cyberShard" ? Math.PI / 3 : Math.PI / 2, safeSkinId === "goldenSphere" ? Math.PI / 5 : 0);
+        skinAccent.material.opacity = safeSkinId === "voidBlackhole" ? 1 : 0.9;
         orbMat.roughness = skin.roughness;
         orbMat.metalness = skin.metalness;
         orbMat.emissiveIntensity = blackoutModeActive ? Math.max(2.2, skin.glow) : skin.glow;
@@ -5541,6 +5714,7 @@ void main() {
       }
 
       const impactParticleGeometry = new THREE.SphereGeometry(0.055, 6, 6);
+      const trailParticleGeometry = new THREE.SphereGeometry(0.055, 6, 6);
       function clearImpactBursts() {
         impactBursts.forEach(burst => {
           burst.particles.forEach(particle => gameScene.remove(particle.mesh));
@@ -5592,6 +5766,71 @@ void main() {
           return false;
         });
       }
+      function clearTrailParticles() {
+        trailParticles.forEach(particle => {
+          gameScene.remove(particle.mesh);
+          particle.material.dispose();
+        });
+        trailParticles = [];
+        trailEmitAccumulator = 0;
+      }
+      function emitTrailParticle() {
+        const style = TRAIL_STYLES[progression.activeTrail];
+        if (!style || progression.activeTrail === "none" || state !== "running") return;
+        if (trailParticles.length >= 30) {
+          const oldest = trailParticles.shift();
+          gameScene.remove(oldest.mesh);
+          oldest.material.dispose();
+        }
+        const useSecondary = Math.random() > 0.55;
+        const material = new THREE.MeshBasicMaterial({
+          color: useSecondary ? style.secondary : style.color,
+          transparent: true,
+          opacity: 0.86,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending
+        });
+        const mesh = new THREE.Mesh(trailParticleGeometry, material);
+        const size = 0.42 + Math.random() * 0.58;
+        mesh.scale.setScalar(size);
+        mesh.position.set(
+          player.position.x + (Math.random() - 0.5) * 0.42,
+          player.position.y + (Math.random() - 0.5) * 0.38,
+          player.position.z + 0.58 + Math.random() * 0.32
+        );
+        gameScene.add(mesh);
+        trailParticles.push({
+          mesh,
+          material,
+          age: 0,
+          life: 0.48 + Math.random() * 0.22,
+          vx: (Math.random() - 0.5) * 0.55,
+          vy: (Math.random() - 0.5) * 0.5,
+          vz: 1.1 + Math.random() * 0.75
+        });
+      }
+      function updateTrailParticles(dt) {
+        if (state === "running" && progression.activeTrail !== "none") {
+          trailEmitAccumulator += dt;
+          while (trailEmitAccumulator >= 0.075) {
+            trailEmitAccumulator -= 0.075;
+            emitTrailParticle();
+          }
+        }
+        trailParticles = trailParticles.filter(particle => {
+          particle.age += dt;
+          const fade = Math.max(0, 1 - particle.age / particle.life);
+          particle.material.opacity = fade * 0.86;
+          particle.mesh.position.x += particle.vx * dt;
+          particle.mesh.position.y += particle.vy * dt;
+          particle.mesh.position.z += particle.vz * dt;
+          particle.mesh.scale.setScalar((0.25 + fade * 0.75) * 0.75);
+          if (particle.age < particle.life) return true;
+          gameScene.remove(particle.mesh);
+          particle.material.dispose();
+          return false;
+        });
+      }
       function triggerImpactEffects(color, strength = 1) {
         cameraShakeTimer = Math.max(cameraShakeTimer, 0.38);
         cameraShakeIntensity = Math.max(cameraShakeIntensity, 0.12 * strength);
@@ -5631,6 +5870,8 @@ void main() {
       let pursuitGap = PURSUIT_START_GAP;
       let pursuitDangerActive = false;
       let impactBursts = [];
+      let trailParticles = [];
+      let trailEmitAccumulator = 0;
       let currentColor = 0;
       let autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
       let currentLane = 1;
@@ -5726,13 +5967,23 @@ void main() {
           lifetimeCrystals: 0,
           ownedSkins: ["sphere"],
           activeSkin: "sphere",
+          ownedTrails: ["none"],
+          activeTrail: "none",
           achievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, false])),
+          unlockedAchievementTiers: Object.fromEntries(
+            ACHIEVEMENT_CATEGORIES.flatMap(category => category.tiers).map(tier => [tier.id, false])
+          ),
+          claimedAchievementRewards: Object.fromEntries(
+            ACHIEVEMENT_CATEGORIES.flatMap(category => category.tiers).map(tier => [tier.id, false])
+          ),
+          stats: { bestDistance: 0, lifetimeGates: 0, laserGates: 0 },
           daily: createDailyProgress(),
           dailySpinAt: 0,
           powerTokens: { prism: 0, warp: 0, booster: 0 }
         };
       }
       let progression = createFreshProgression();
+      let activeRewardsTab = "achievements";
       let runCoins = 0;
       let achievementQueue = [];
       let achievementNoticeTimer = 0;
@@ -6003,7 +6254,7 @@ void main() {
           safeStoredCount(localStorage.getItem(COINS_KEY))
         );
         const stored = JSON.parse(localStorage.getItem(PROGRESSION_KEY) || localStorage.getItem(LEGACY_PROGRESSION_KEY) || "null");
-        if (stored && (stored.version === 1 || stored.version === 2)) {
+        if (stored && (stored.version === 1 || stored.version === 2 || stored.version === 3)) {
           progression.crystals = safeStoredCount(stored.crystals ?? legacyBalance);
           progression.lifetimeCrystals = Math.max(progression.crystals, safeStoredCount(stored.lifetimeCrystals));
           const validOwned = Array.isArray(stored.ownedSkins)
@@ -6014,9 +6265,29 @@ void main() {
             progression.ownedSkins.includes(stored.activeSkin) && hasOwn(PLAYER_SKINS, stored.activeSkin)
               ? stored.activeSkin
               : "sphere";
+          const validTrails = Array.isArray(stored.ownedTrails)
+            ? stored.ownedTrails.filter(id => hasOwn(TRAIL_STYLES, id))
+            : [];
+          progression.ownedTrails = Array.from(new Set(["none", ...validTrails]));
+          progression.activeTrail =
+            progression.ownedTrails.includes(stored.activeTrail) && hasOwn(TRAIL_STYLES, stored.activeTrail)
+              ? stored.activeTrail
+              : "none";
           progression.achievements = Object.fromEntries(
             ACHIEVEMENTS.map(item => [item.id, stored.achievements?.[item.id] === true])
           );
+          const achievementTierIds = ACHIEVEMENT_CATEGORIES.flatMap(category => category.tiers).map(tier => tier.id);
+          progression.unlockedAchievementTiers = Object.fromEntries(
+            achievementTierIds.map(id => [id, stored.unlockedAchievementTiers?.[id] === true])
+          );
+          progression.claimedAchievementRewards = Object.fromEntries(
+            achievementTierIds.map(id => [id, stored.claimedAchievementRewards?.[id] === true])
+          );
+          progression.stats = {
+            bestDistance: safeStoredCount(stored.stats?.bestDistance),
+            lifetimeGates: safeStoredCount(stored.stats?.lifetimeGates),
+            laserGates: safeStoredCount(stored.stats?.laserGates)
+          };
           progression.daily = normalizeDailyProgress(stored.daily);
           progression.dailySpinAt = safeStoredTimestamp(stored.dailySpinAt);
           progression.powerTokens = Object.fromEntries(
@@ -6041,12 +6312,31 @@ void main() {
       function saveProgression() {
         progression.daily = normalizeDailyProgress(progression.daily);
         const payload = {
-          version: 2,
+          version: 3,
           crystals: safeStoredCount(progression.crystals),
           lifetimeCrystals: safeStoredCount(progression.lifetimeCrystals),
           ownedSkins: progression.ownedSkins.filter(id => hasOwn(PLAYER_SKINS, id)),
           activeSkin: hasOwn(PLAYER_SKINS, progression.activeSkin) ? progression.activeSkin : "sphere",
+          ownedTrails: progression.ownedTrails.filter(id => hasOwn(TRAIL_STYLES, id)),
+          activeTrail: hasOwn(TRAIL_STYLES, progression.activeTrail) ? progression.activeTrail : "none",
           achievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, progression.achievements[item.id] === true])),
+          unlockedAchievementTiers: Object.fromEntries(
+            ACHIEVEMENT_CATEGORIES.flatMap(category => category.tiers).map(tier => [
+              tier.id,
+              progression.unlockedAchievementTiers[tier.id] === true
+            ])
+          ),
+          claimedAchievementRewards: Object.fromEntries(
+            ACHIEVEMENT_CATEGORIES.flatMap(category => category.tiers).map(tier => [
+              tier.id,
+              progression.claimedAchievementRewards[tier.id] === true
+            ])
+          ),
+          stats: {
+            bestDistance: safeStoredCount(progression.stats.bestDistance),
+            lifetimeGates: safeStoredCount(progression.stats.lifetimeGates),
+            laserGates: safeStoredCount(progression.stats.laserGates)
+          },
           daily: {
             date: progression.daily.date,
             crystalsCollected: safeStoredCount(progression.daily.crystalsCollected),
@@ -6074,8 +6364,38 @@ void main() {
         el("crystalHud").textContent = displayValue;
         el("shopBalance").textContent = displayValue;
       }
+      function achievementMetric(category) {
+        return category.metric === "lifetimeCrystals"
+          ? progression.lifetimeCrystals
+          : safeStoredCount(progression.stats[category.metric]);
+      }
+      function syncAchievementTierUnlocks(announce = false) {
+        let changed = false;
+        ACHIEVEMENT_CATEGORIES.forEach(category => {
+          const value = achievementMetric(category);
+          category.tiers.forEach(tier => {
+            if (value < tier.target || progression.unlockedAchievementTiers[tier.id]) return;
+            progression.unlockedAchievementTiers[tier.id] = true;
+            changed = true;
+            if (announce) {
+              queueProgressionNotice(
+                { title: category.title + " · " + tier.name, description: "Milestone unlocked. Claim +" + tier.reward + " crystals." },
+                "ACHIEVEMENT TIER UNLOCKED"
+              );
+            }
+          });
+        });
+        return changed;
+      }
+      function renderCosmeticButtonState(owned, active, affordable, cost) {
+        if (active) return { label: "EQUIPPED", disabled: true };
+        if (owned) return { label: "EQUIP", disabled: false };
+        if (affordable) return { label: "CLAIM", disabled: false };
+        return { label: "LOCKED · " + cost, disabled: true };
+      }
       function renderProgressionUI() {
         progression.daily = normalizeDailyProgress(progression.daily);
+        const milestonesChanged = syncAchievementTierUnlocks(state === "running");
         updateCoinDisplay();
         const powerLabels = { prism: "Shield", warp: "Time Warp", booster: "Score Boost" };
         const readyPowerups = Object.entries(progression.powerTokens)
@@ -6083,27 +6403,50 @@ void main() {
           .map(([type, count]) => powerLabels[type] + " ×" + count);
         el("dailyTokenNote").hidden = readyPowerups.length === 0;
         el("dailyTokenNote").textContent = readyPowerups.length ? "NEXT RUN BOOSTS · " + readyPowerups.join(" · ") : "";
-        document.querySelectorAll(".skin-action").forEach(button => {
-          const skinId = button.dataset.skin;
-          const skin = PLAYER_SKINS[skinId];
-          if (!skin) return;
+        el("skinGrid").innerHTML = Object.entries(PLAYER_SKINS).map(([skinId, skin], index) => {
           const owned = progression.ownedSkins.includes(skinId);
           const active = progression.activeSkin === skinId;
           const affordable = progression.crystals >= skin.cost;
-          button.textContent = active ? "Equipped" : owned ? "Equip" : "Unlock · " + skin.cost;
-          button.disabled = active || (!owned && !affordable);
-          button.closest(".skin-card")?.classList.toggle("active", active);
-        });
-        el("achievementList").innerHTML = ACHIEVEMENTS.map(item => {
-          const unlocked = progression.achievements[item.id] === true;
-          const progressText = item.id === "distanceMaster"
-            ? Math.min(1000, Math.floor(distance)) + " / 1,000 M THIS RUN"
-            : item.id === "crystalCollector"
-              ? Math.min(50, progression.lifetimeCrystals) + " / 50 TOTAL"
-              : Math.min(20, passed) + " / 20 THIS RUN";
-          return '<div class="achievement-row' + (unlocked ? " unlocked" : "") + '">' +
-            '<div><strong>' + item.title + '</strong><small>' + item.description + ' · ' + progressText + '</small></div>' +
-            '<span class="achievement-state">' + (unlocked ? "UNLOCKED" : "IN PROGRESS") + '</span></div>';
+          const buttonState = renderCosmeticButtonState(owned, active, affordable, skin.cost);
+          return '<article class="skin-card' + (active ? " active" : "") + '" data-skin-card="' + skinId + '">' +
+            '<div class="skin-preview ' + skin.shape + '" style="--skin-color:#' + skin.accent.toString(16).padStart(6, "0") + '" aria-hidden="true"><span></span></div>' +
+            '<h3>' + skin.name + '</h3><p>' + skin.description + '</p>' +
+            '<div class="cosmetic-cost">' + (owned ? active ? "EQUIPPED" : "CLAIMED" : '<span class="crystal-mark" aria-hidden="true"></span>' + skin.cost + " CRYSTALS") + '</div>' +
+            '<button class="secondary-btn skin-action" type="button" data-skin="' + skinId + '" ' + (buttonState.disabled ? "disabled" : "") + '>' + buttonState.label + '</button>' +
+            '</article>';
+        }).join("");
+        el("trailGrid").innerHTML = Object.entries(TRAIL_STYLES).map(([trailId, trail]) => {
+          const owned = progression.ownedTrails.includes(trailId);
+          const active = progression.activeTrail === trailId;
+          const affordable = progression.crystals >= trail.cost;
+          const buttonState = renderCosmeticButtonState(owned, active, affordable, trail.cost);
+          const color = "#" + trail.color.toString(16).padStart(6, "0");
+          const secondary = "#" + trail.secondary.toString(16).padStart(6, "0");
+          return '<article class="trail-card' + (active ? " active" : "") + '">' +
+            '<div class="trail-sample" style="--trail-color:' + color + ';--trail-secondary:' + secondary + '" aria-hidden="true"><i></i><i></i><i></i></div>' +
+            '<div class="trail-copy"><h3>' + trail.name + '</h3><p>' + trail.description + '</p></div>' +
+            '<div class="trail-footer"><span>' + (owned ? active ? "EQUIPPED" : "CLAIMED" : '<span class="crystal-mark" aria-hidden="true"></span>' + trail.cost + " CRYSTALS") + '</span>' +
+            '<button class="secondary-btn trail-action" type="button" data-trail="' + trailId + '" ' + (buttonState.disabled ? "disabled" : "") + '>' + buttonState.label + '</button></div>' +
+            '</article>';
+        }).join("");
+        el("achievementList").innerHTML = ACHIEVEMENT_CATEGORIES.map(category => {
+          const value = achievementMetric(category);
+          const safeValue = safeStoredCount(value);
+          return '<article class="achievement-category">' +
+            '<header class="achievement-category-head"><div><h3>' + category.title + '</h3><p>' + category.description + '</p></div>' +
+            '<span class="achievement-category-count">' + category.tiers.filter(tier => progression.unlockedAchievementTiers[tier.id]).length + '<small> / 4</small></span></header>' +
+            '<div class="achievement-tier-grid">' + category.tiers.map(tier => {
+              const unlocked = progression.unlockedAchievementTiers[tier.id] === true || safeValue >= tier.target;
+              const claimed = progression.claimedAchievementRewards[tier.id] === true;
+              const percent = Math.min(100, Math.round((safeValue / tier.target) * 100));
+              const label = claimed ? "CLAIMED" : unlocked ? "CLAIM" : "LOCKED";
+              return '<div class="achievement-tier ' + (unlocked ? "unlocked" : "") + (claimed ? " claimed" : "") + '">' +
+                '<div class="tier-heading"><strong>' + tier.name + '</strong><span>' + (unlocked ? "COMPLETE" : tier.target.toLocaleString() + " " + category.unit) + '</span></div>' +
+                '<div class="tier-progress" role="progressbar" aria-label="' + category.title + " " + tier.name + ' progress" aria-valuemin="0" aria-valuemax="' + tier.target + '" aria-valuenow="' + Math.min(safeValue, tier.target) + '"><span style="width:' + percent + '%"></span></div>' +
+                '<div class="tier-footer"><span class="tier-reward"><span class="crystal-mark" aria-hidden="true"></span>+' + tier.reward + '</span>' +
+                '<button class="secondary-btn tier-claim" type="button" data-tier="' + tier.id + '" ' + (!unlocked || claimed ? "disabled" : "") + '>' + label + '</button></div>' +
+                '</div>';
+            }).join("") + '</div></article>';
         }).join("");
         el("dailyBountyList").innerHTML = DAILY_BOUNTIES.map(item => {
           const claimed = item.id === "distance" ? progression.daily.distanceClaimed : progression.daily.crystalsClaimed;
@@ -6115,6 +6458,7 @@ void main() {
             '<div><strong>' + item.title + '</strong><small>' + item.description + ' · ' + progress + ' / ' + item.target + ' ' + unit + '</small></div>' +
             '<span class="achievement-state">' + (claimed ? "CLAIMED" : "+" + item.reward + " ◆") + '</span></div>';
         }).join("");
+        if (milestonesChanged) saveProgression();
       }
       applyPlayerSkin(progression.activeSkin);
       renderProgressionUI();
@@ -6346,11 +6690,25 @@ void main() {
         el("card").classList.add("shop-open");
         el("shopPanel").hidden = false;
         el("shopNotice").textContent = "";
+        setRewardsTab(activeRewardsTab);
         renderProgressionUI();
       }
       function closeShop() {
         el("card").classList.remove("shop-open");
         el("shopPanel").hidden = true;
+      }
+      function setRewardsTab(tab) {
+        const validTabs = ["achievements", "skins", "trails"];
+        if (!validTabs.includes(tab)) return;
+        activeRewardsTab = tab;
+        document.querySelectorAll("[data-reward-tab]").forEach(button => {
+          const selected = button.dataset.rewardTab === tab;
+          button.classList.toggle("active", selected);
+          button.setAttribute("aria-selected", String(selected));
+        });
+        document.querySelectorAll("[data-reward-panel]").forEach(panel => {
+          panel.hidden = panel.dataset.rewardPanel !== tab;
+        });
       }
       function openSettings() {
         if (state === "running") return;
@@ -6367,7 +6725,7 @@ void main() {
       }
       function resetLocalProgress() {
         const confirmed = window.confirm(
-          "Reset this device's local game save? This clears the high score, crystals, unlocked skins, achievements, daily rewards, and power-up tokens."
+          "Reset this device's local game save? This clears the high score, crystals, skins, trails, claimed rewards, achievements, daily rewards, and power-up tokens."
         );
         if (!confirmed) return;
         try {
@@ -6387,6 +6745,7 @@ void main() {
           // The reset still applies for the current session when storage is unavailable.
         }
         progression = createFreshProgression();
+        clearTrailParticles();
         best = 0;
         score = 0;
         distance = 0;
@@ -6419,7 +6778,7 @@ void main() {
         saveProgression();
         renderProgressionUI();
         updateHUD();
-        el("shopNotice").textContent = "Local save reset. High score, crystals, and unlocked skins were cleared.";
+        el("shopNotice").textContent = "Local save reset. Scores, crystals, cosmetics, and reward claims were cleared.";
       }
       function chooseSkin(skinId) {
         const skin = PLAYER_SKINS[skinId];
@@ -6431,7 +6790,11 @@ void main() {
           }
           progression.crystals -= skin.cost;
           progression.ownedSkins.push(skinId);
-          el("shopNotice").textContent = skin.name + " unlocked and equipped.";
+          el("shopNotice").textContent = skin.name + " claimed. Equip it when you are ready.";
+          saveProgression();
+          renderProgressionUI();
+          playCue("power");
+          return;
         } else {
           el("shopNotice").textContent = skin.name + " equipped.";
         }
@@ -6441,6 +6804,39 @@ void main() {
         renderProgressionUI();
         unlockAudio();
         playCue("power");
+      }
+      function chooseTrail(trailId) {
+        const trail = TRAIL_STYLES[trailId];
+        if (!trail || state === "running") return;
+        if (!progression.ownedTrails.includes(trailId)) {
+          if (progression.crystals < trail.cost) {
+            el("shopNotice").textContent = "Collect " + (trail.cost - progression.crystals) + " more crystals to claim " + trail.name + ".";
+            return;
+          }
+          progression.crystals -= trail.cost;
+          progression.ownedTrails.push(trailId);
+          el("shopNotice").textContent = trail.name + " claimed. Equip it to leave a trail in your next run.";
+          saveProgression();
+          renderProgressionUI();
+          playCue("power");
+          return;
+        }
+        progression.activeTrail = trailId;
+        el("shopNotice").textContent = trail.name === "No Trail" ? "Particle trail disabled." : trail.name + " equipped.";
+        saveProgression();
+        renderProgressionUI();
+        unlockAudio();
+        playCue("power");
+      }
+      function claimAchievementReward(tierId) {
+        const tier = ACHIEVEMENT_CATEGORIES.flatMap(category => category.tiers).find(item => item.id === tierId);
+        if (!tier || !progression.unlockedAchievementTiers[tierId] || progression.claimedAchievementRewards[tierId]) return;
+        progression.claimedAchievementRewards[tierId] = true;
+        progression.crystals = safeStoredCount(progression.crystals + tier.reward);
+        el("shopNotice").textContent = tier.name + " reward claimed · +" + tier.reward + " crystals.";
+        saveProgression();
+        renderProgressionUI();
+        playCue("coin");
       }
       function setOrbColor(index) {
         currentColor = (index + COLORS.length) % COLORS.length;
@@ -6762,6 +7158,7 @@ void main() {
         window.clearTimeout(impactShakeTimer);
         el("game").classList.remove("impact-shake");
         clearImpactBursts();
+        clearTrailParticles();
         cameraShakeTimer = 0;
         cameraShakeIntensity = 0;
         cameraBlendFromPosition.copy(camera.position);
@@ -6891,6 +7288,12 @@ void main() {
       }
       function awardGatePass(message) {
         passed++;
+        progression.stats.lifetimeGates = safeStoredCount(progression.stats.lifetimeGates + 1);
+        if (laserPursuitModeActive) {
+          progression.stats.laserGates = safeStoredCount(progression.stats.laserGates + 1);
+        }
+        syncAchievementTierUnlocks(true);
+        saveProgression();
         checkRunAchievements();
         playCue("gate");
         createImpactBurst(COLORS[currentColor].hex, 0.7, 12);
@@ -7023,6 +7426,9 @@ void main() {
         if (state !== "running") return;
         captureGhostSample(true);
         if (Math.floor(score) > ghostBestAtRunStart) ghostRecordCandidate = true;
+        progression.stats.bestDistance = Math.max(progression.stats.bestDistance, safeStoredCount(distance));
+        syncAchievementTierUnlocks(true);
+        saveProgression();
         window.clearTimeout(statusTimer);
         window.clearTimeout(environmentNoticeTimer);
         environmentNoticeToken++;
@@ -7445,16 +7851,27 @@ void main() {
         const orbDrawY = orbY + Math.sin(t * (state === "running" ? 5 : 1.15)) * (menuScene ? 9 : 4);
         const skinAccentColor = "#" + PLAYER_SKINS[progression.activeSkin].accent.toString(16).padStart(6, "0");
         ctx.beginPath();
-        if (progression.activeSkin === "diamond") {
+        const activeSkinShape = PLAYER_SKINS[progression.activeSkin].shape;
+        if (activeSkinShape === "diamond") {
           ctx.moveTo(orbX, orbDrawY - orbRadius * 1.18);
           ctx.lineTo(orbX + orbRadius * 0.88, orbDrawY);
           ctx.lineTo(orbX, orbDrawY + orbRadius * 1.18);
           ctx.lineTo(orbX - orbRadius * 0.88, orbDrawY);
           ctx.closePath();
-        } else if (progression.activeSkin === "star") {
+        } else if (activeSkinShape === "star") {
           for (let point = 0; point < 10; point++) {
             const angle = -Math.PI / 2 + point * Math.PI / 5;
             const radius = orbRadius * (point % 2 === 0 ? 1.16 : 0.52);
+            const x = orbX + Math.cos(angle) * radius;
+            const y = orbDrawY + Math.sin(angle) * radius;
+            if (point === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+        } else if (activeSkinShape === "shard") {
+          for (let point = 0; point < 6; point++) {
+            const angle = -Math.PI / 2 + point * Math.PI / 3;
+            const radius = orbRadius * (point % 2 === 0 ? 1.12 : 0.72);
             const x = orbX + Math.cos(angle) * radius;
             const y = orbDrawY + Math.sin(angle) * radius;
             if (point === 0) ctx.moveTo(x, y);
@@ -7473,6 +7890,16 @@ void main() {
         ctx.globalAlpha = 0.92 + menuPulse * 0.08;
         ctx.fill();
         ctx.globalAlpha = 1;
+        if (activeSkinShape === "void") {
+          ctx.beginPath();
+          ctx.arc(orbX, orbDrawY, orbRadius * 0.52, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(3,5,12,.72)";
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(orbX, orbDrawY, orbRadius * 0.22, 0, Math.PI * 2);
+          ctx.fillStyle = skinAccentColor;
+          ctx.fill();
+        }
         ctx.strokeStyle = skinAccentColor;
         ctx.lineWidth = 2;
         ctx.shadowColor = skinAccentColor;
@@ -7538,6 +7965,7 @@ void main() {
         } else {
           player.position.y = THREE.MathUtils.damp(player.position.y, RUNNER_Y, 3.2, dt);
         }
+        updateTrailParticles(dt);
         const cameraEase = 1 - Math.exp(-dt * 3.2);
         if (state === "ready") {
           menuCameraPosition.set(
@@ -7795,14 +8223,26 @@ void main() {
       el("dailyContinueButton").addEventListener("click", closeDailyReward);
       el("shopButton").addEventListener("click", openShop);
       el("shopBack").addEventListener("click", closeShop);
+       document.querySelectorAll("[data-reward-tab]").forEach(button => {
+         button.addEventListener("click", () => setRewardsTab(button.dataset.rewardTab));
+       });
+       el("skinGrid").addEventListener("click", event => {
+         const button = event.target.closest("[data-skin]");
+         if (button) chooseSkin(button.dataset.skin);
+       });
+       el("trailGrid").addEventListener("click", event => {
+         const button = event.target.closest("[data-trail]");
+         if (button) chooseTrail(button.dataset.trail);
+       });
+       el("achievementList").addEventListener("click", event => {
+         const button = event.target.closest("[data-tier]");
+         if (button) claimAchievementReward(button.dataset.tier);
+       });
       el("settingsButton").addEventListener("click", openSettings);
       el("settingsBack").addEventListener("click", closeSettings);
       el("pauseButton").addEventListener("click", pauseGame);
       el("restartButton").addEventListener("click", () => startGame(true));
       el("resetLocalData").addEventListener("click", resetLocalProgress);
-      document.querySelectorAll(".skin-action").forEach(button => {
-        button.addEventListener("click", () => chooseSkin(button.dataset.skin));
-      });
       const toggleSound = () => {
         soundEnabled = !soundEnabled;
         if (soundEnabled) unlockAudio();

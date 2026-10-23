@@ -1,0 +1,23 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap");
+
+.color-shift-rewards-preview {
+  --ink: #f5f2e9;
+  --muted: #858b98;
+  --cyan: #38eaff;
+  --lime: #c5ff4a;
+  --accent: #68f2df;
+  min-height: 100vh;
+  color: var(--ink);
+  background: #090c13;
+  font-family: ui-monospace, monospace;
+}
+
+.color-shift-rewards-preview *,
+.color-shift-rewards-preview *::before,
+.color-shift-rewards-preview *::after {
+  box-sizing: border-box;
+}
+
+.color-shift-rewards-preview button {
+  font: inherit;
+}
