@@ -8631,7 +8631,9 @@ void main() {
       const LOCAL_INTEGRITY_KEY = "colorShiftLocalIntegrityV2";
       const LOCAL_INTEGRITY_SEED = "ColorShift-NeonRush3D-client-check-v1";
       const REFERRAL_PLAYER_ID_KEY = "colorShiftPlayerId";
+      const DEVICE_UUID_KEY = "device_uuid";
       const REFERRAL_WELCOME_KEY = "colorShiftReferralWelcomeClaimed";
+      const REFERRAL_REDEEMED_KEY = "hasRedeemedReferral";
       const REFERRAL_SHARE_ACTIONS_KEY = "colorShiftReferralShareActions";
       const REFERRAL_WELCOME_CRYSTALS = 150;
       const MAX_SCORE_RATE_PER_SECOND = 3200;
@@ -8673,6 +8675,34 @@ void main() {
         }
         return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
       }
+      function createDeviceUuid() {
+        try {
+          if (typeof window.crypto?.randomUUID === "function") {
+            return window.crypto.randomUUID().toLowerCase();
+          }
+        } catch {}
+        const hex = createReferralPlayerId();
+        return [
+          hex.slice(0, 8),
+          hex.slice(8, 12),
+          "4" + hex.slice(13, 16),
+          ((parseInt(hex[16], 16) & 3) | 8).toString(16) + hex.slice(17, 20),
+          hex.slice(20, 32)
+        ].join("-");
+      }
+      function getOrCreateDeviceUuid() {
+        try {
+          const storedId = localStorage.getItem(DEVICE_UUID_KEY) || "";
+          if (/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(storedId)) {
+            return storedId.toLowerCase();
+          }
+          const newId = createDeviceUuid();
+          localStorage.setItem(DEVICE_UUID_KEY, newId);
+          return newId;
+        } catch {
+          return createDeviceUuid();
+        }
+      }
       function getOrCreateReferralPlayerId() {
         try {
           const storedId = localStorage.getItem(REFERRAL_PLAYER_ID_KEY) || "";
@@ -8684,6 +8714,8 @@ void main() {
           return createReferralPlayerId();
         }
       }
+      const deviceUuid = getOrCreateDeviceUuid();
+      const DEVICE_REFERRAL_REDEEMED_KEY = "colorShiftReferralRedeemed:" + deviceUuid;
       const referralPlayerId = getOrCreateReferralPlayerId();
       function makeReferralLink() {
         const inviteUrl = new URL(window.location.pathname, window.location.origin);
@@ -8721,6 +8753,26 @@ void main() {
           // Keep the app running if URL history updates are restricted.
         }
       }
+      function referralAlreadyRedeemed() {
+        if (progression.referralWelcomeClaimed === true) return true;
+        try {
+          return ["1", "true"].includes(String(localStorage.getItem(DEVICE_REFERRAL_REDEEMED_KEY) || "").toLowerCase()) ||
+            ["1", "true"].includes(String(localStorage.getItem(REFERRAL_REDEEMED_KEY) || "").toLowerCase()) ||
+            ["1", "true"].includes(String(localStorage.getItem(REFERRAL_WELCOME_KEY) || "").toLowerCase());
+        } catch {
+          return false;
+        }
+      }
+      function persistReferralRedemption() {
+        progression.referralWelcomeClaimed = true;
+        try {
+          localStorage.setItem(DEVICE_REFERRAL_REDEEMED_KEY, "true");
+          localStorage.setItem(REFERRAL_REDEEMED_KEY, "true");
+          localStorage.setItem(REFERRAL_WELCOME_KEY, "1");
+        } catch {
+          // The in-memory progression flag still blocks another claim this session.
+        }
+      }
       function processIncomingReferral() {
         let referralId = "";
         try { referralId = new URLSearchParams(window.location.search).get("ref") || ""; } catch {}
@@ -8736,26 +8788,24 @@ void main() {
           return false;
         }
         if (normalizedReferralId === referralPlayerId) {
-          el("referralStatus").textContent = "This is your own invite link; self-referrals do not receive a bonus.";
+          el("referralStatus").textContent = "Cannot redeem your own invite link on the same device! ⚠️";
           clearReferralQueryParameter();
           updateReferralUI();
           return false;
         }
-        let priorClaim = false;
-        try { priorClaim = localStorage.getItem(REFERRAL_WELCOME_KEY) === "1"; } catch {}
-        if (priorClaim || progression.referralWelcomeClaimed) {
-          progression.referralWelcomeClaimed = true;
-          try { localStorage.setItem(REFERRAL_WELCOME_KEY, "1"); } catch {}
-          el("referralStatus").textContent = "The one-time welcome bonus has already been claimed on this browser.";
+        if (referralAlreadyRedeemed()) {
+          persistReferralRedemption();
+          el("referralStatus").textContent = "Cannot redeem your own invite link on the same device! ⚠️";
           clearReferralQueryParameter();
           updateReferralUI();
           return false;
         }
-        progression.referralWelcomeClaimed = true;
+        // Mark redemption before crediting the wallet so a repeated startup cannot
+        // award the same welcome bonus twice if saving progression is interrupted.
+        persistReferralRedemption();
         progression.crystals = safeStoredCount(progression.crystals + REFERRAL_WELCOME_CRYSTALS);
         progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + REFERRAL_WELCOME_CRYSTALS);
         saveProgression();
-        try { localStorage.setItem(REFERRAL_WELCOME_KEY, "1"); } catch {}
         el("referralStatus").textContent = "Welcome bonus claimed: +150 Neon Crystals.";
         window.setTimeout(() => showShareRewardToast("🎉 Bonus! Invited by a friend: +150 Crystals added!", 5200), 1800);
         clearReferralQueryParameter();
