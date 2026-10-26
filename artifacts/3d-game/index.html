@@ -388,8 +388,8 @@
       background:
         radial-gradient(ellipse at 50% 38%, rgba(48, 10, 39, .62), rgba(4, 6, 13, .96) 72%),
         rgba(3, 4, 10, .92);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       pointer-events: auto;
       touch-action: pan-y;
       overscroll-behavior: contain;
@@ -416,10 +416,10 @@
       margin: auto;
       padding: clamp(25px, 6vw, 42px);
       overflow: hidden;
-      border: 1px solid rgba(255, 67, 131, .76);
+      border: 1px solid rgba(255, 43, 78, .82);
       border-radius: 22px;
       background: linear-gradient(145deg, rgba(20, 13, 25, .96), rgba(6, 11, 21, .95) 60%, rgba(9, 17, 28, .96));
-      box-shadow: 0 0 24px rgba(255, 53, 111, .2), 0 0 55px rgba(48, 231, 255, .13), 0 0 52px rgba(255, 42, 184, .13), inset 0 0 24px rgba(255, 50, 120, .05);
+      box-shadow: 0 0 24px rgba(255, 43, 78, .25), 0 0 55px rgba(48, 231, 255, .13), 0 0 52px rgba(255, 42, 184, .16), inset 0 0 24px rgba(255, 50, 95, .07);
       text-align: center;
       animation: sessionPanelIn .45s cubic-bezier(.2,.8,.2,1) both, sessionBorderPulse 2.3s ease-in-out infinite alternate;
     }
@@ -505,7 +505,7 @@
       gap: 5px 12px;
       margin: 0 auto 15px;
       padding: 12px 14px;
-      border: 1px solid rgba(255, 67, 131, .32);
+      border: 1px solid rgba(255, 55, 91, .38);
       border-radius: 12px;
       background: linear-gradient(100deg, rgba(36, 10, 30, .66), rgba(7, 18, 30, .72));
       text-align: left;
@@ -561,6 +561,13 @@
       animation: none;
     }
     .session-countdown.is-restored .session-countdown-progress { background: #63f2dc; }
+    .session-countdown.is-ad-loading .session-countdown-value {
+      border-color: rgba(255, 204, 101, .7);
+      color: #ffe7b2;
+      text-shadow: 0 0 14px rgba(255, 193, 77, .6);
+      animation: none;
+    }
+    .session-countdown.is-ad-loading .session-countdown-progress { background: linear-gradient(90deg, #ffd36d, #ff6cae); }
     .session-save-badge {
       display: flex;
       align-items: center;
@@ -598,7 +605,16 @@
     .session-action:hover { transform: scale(1.025); border-color: #fff; box-shadow: 0 0 22px rgba(56, 234, 255, .22); }
     .session-action:active { transform: scale(.975); }
     .session-action:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-    .session-action.home { border-color: rgba(255, 79, 184, .52); background: rgba(10, 13, 23, .9); color: #f5deef; }
+    .session-action.primary { border-color: rgba(56, 234, 255, .88); background: linear-gradient(100deg, rgba(56, 234, 255, .24), rgba(255, 79, 184, .17)); box-shadow: inset 0 0 20px rgba(56, 234, 255, .08), 0 0 18px rgba(56, 234, 255, .1); }
+    .session-action.home { border-color: rgba(190, 207, 224, .25); background: rgba(10, 13, 23, .9); color: #d8e2ec; }
+    .session-action.ad {
+      border-color: rgba(255, 195, 86, .72);
+      background: linear-gradient(105deg, rgba(255, 183, 61, .17), rgba(255, 79, 184, .18), rgba(79, 106, 255, .16));
+      color: #fff3d3;
+      text-shadow: 0 0 12px rgba(255, 191, 82, .44);
+    }
+    .session-action.ad:hover:not(:disabled) { box-shadow: 0 0 22px rgba(255, 194, 84, .22), 0 0 28px rgba(255, 79, 184, .12); }
+    .session-action:disabled { cursor: wait; opacity: .62; transform: none; }
     @keyframes sessionPanelIn { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
     @keyframes sessionBorderPulse { from { box-shadow: 0 0 18px rgba(255, 53, 111, .15), 0 0 42px rgba(48, 231, 255, .1), inset 0 0 20px rgba(255, 50, 130, .035); } to { box-shadow: 0 0 30px rgba(255, 53, 143, .29), 0 0 62px rgba(48, 231, 255, .18), inset 0 0 28px rgba(255, 50, 140, .08); } }
     @keyframes sessionSignalBlink { 50% { opacity: .38; } }
@@ -621,6 +637,7 @@
       .session-countdown-value { width: 42px; }
       .session-save-badge { margin-bottom: 12px; padding: 8px; }
       .session-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .session-action.home { grid-column: 1 / -1; }
       .session-action { min-height: 48px; padding: 9px; font-size: .9rem; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -3075,6 +3092,197 @@
       .ad-slot { min-height: 40px; margin-top: 5px; }
       .rewarded-ad-button { min-height: 44px; margin: 7px auto; padding: 8px 12px; }
     }
+    /* Rewards progression dashboard */
+    #rewards-screen {
+      z-index: 1000;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    #rewards-achievements-screen {
+      position: fixed;
+      z-index: 1000;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: inherit;
+      background:
+        radial-gradient(ellipse at 12% 8%, rgba(32,198,218,.11), transparent 38%),
+        radial-gradient(ellipse at 88% 92%, rgba(232,62,173,.12), transparent 42%),
+        rgba(3,5,12,.18);
+      pointer-events: auto;
+      touch-action: pan-y;
+    }
+    #rewards-screen .shop-panel {
+      width: min(100%, 1180px);
+      border: 1px solid rgba(87, 241, 228, .42);
+      background:
+        linear-gradient(rgba(53, 225, 227, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(53, 225, 227, .025) 1px, transparent 1px),
+        radial-gradient(ellipse at 88% 0%, rgba(255, 69, 172, .11), transparent 36%),
+        linear-gradient(148deg, rgba(9, 17, 29, .985), rgba(7, 11, 20, .99));
+      background-size: 32px 32px, 32px 32px, auto, auto;
+      box-shadow: 0 28px 100px rgba(0,0,0,.66), 0 0 54px rgba(56,230,211,.12);
+    }
+    #rewards-screen .shop-scroll { padding: clamp(18px, 3vw, 38px); }
+    #rewards-screen .shop-header { margin-bottom: 22px; }
+    #rewards-screen .eyebrow, #rewards-screen .panel-kicker {
+      color: #72f4e4; font: 700 11px/1.4 "Orbitron", sans-serif; letter-spacing: .16em;
+    }
+    #rewards-screen .shop-title { font-size: clamp(25px, 3.7vw, 44px); letter-spacing: -.045em; }
+    #rewards-screen .shop-intro { color: #b4c2d0; font-size: 16px; }
+    #rewards-screen .shop-balance { border-color: rgba(255,211,106,.38); background: rgba(255,211,106,.07); }
+    #rewards-screen .reward-tabs {
+      position: sticky; top: -1px; z-index: 5;
+      grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px;
+      padding: 7px; margin: 0 -1px 22px; border-color: rgba(99,230,224,.19);
+      background: rgba(6,11,19,.96); backdrop-filter: blur(14px);
+    }
+    #rewards-screen .reward-tab {
+      display: flex; min-height: 54px; align-items: center; justify-content: center; gap: 9px;
+      border-radius: 5px; color: #a5b4c4; font-size: clamp(11px, 1.15vw, 14px);
+      line-height: 1.2; letter-spacing: .035em;
+    }
+    #rewards-screen .reward-tab > span { color: #6cebdc; font-size: 17px; }
+    #rewards-screen .reward-tab.active {
+      border-color: rgba(94,240,225,.46);
+      background: linear-gradient(110deg, rgba(51,219,216,.15), rgba(206,75,176,.10));
+      color: #e9fffb; box-shadow: inset 0 -2px #58eadc;
+    }
+    #rewards-screen .shop-live-preview { margin-bottom: 22px; }
+    #rewards-screen .progress-hero {
+      position: relative; display: flex; min-height: 150px; justify-content: space-between; align-items: center; gap: 18px;
+      overflow: hidden; margin: 0 0 24px; padding: clamp(20px, 3vw, 32px);
+      border: 1px solid rgba(88,225,222,.24);
+      background: linear-gradient(105deg, rgba(12,29,40,.92), rgba(14,17,31,.82) 70%, rgba(44,17,44,.7));
+    }
+    #rewards-screen .progress-hero::after {
+      position: absolute; content: ""; right: -45px; top: -95px; width: 270px; height: 270px;
+      border: 1px solid rgba(94,240,225,.13); transform: rotate(45deg); box-shadow: 0 0 0 25px rgba(94,240,225,.025), 0 0 0 54px rgba(94,240,225,.018);
+      pointer-events: none;
+    }
+    #rewards-screen .progress-hero h3 {
+      margin: 9px 0 4px; color: #f3fbff; font: 800 clamp(24px, 3vw, 36px)/1.12 "Orbitron", sans-serif; letter-spacing: -.035em;
+    }
+    #rewards-screen .progress-hero p { max-width: 550px; margin: 0; color: #b0c0cf; font-size: 16px; line-height: 1.45; }
+    #rewards-screen .reset-clock { position: relative; z-index: 1; display: grid; min-width: 156px; gap: 5px; padding: 13px 15px; border-left: 1px solid rgba(255,255,255,.15); }
+    #rewards-screen .reset-clock span, #rewards-screen .reset-clock small { color: #94a6b7; font: 700 10px "Orbitron", sans-serif; letter-spacing: .1em; }
+    #rewards-screen .reset-clock strong { color: #ffdb77; font: 700 23px "Orbitron", sans-serif; letter-spacing: .04em; }
+    #rewards-screen .reset-clock small { font: 600 12px "Rajdhani", sans-serif; letter-spacing: .04em; }
+    #rewards-screen .shop-section-heading { margin: 4px 0 16px; }
+    #rewards-screen .shop-section-heading h3 { font-size: clamp(18px, 2vw, 24px); }
+    #rewards-screen .shop-section-heading p { font-size: 16px; }
+    #rewards-screen .achievement-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #rewards-screen .achievement-category { padding: 16px; border-color: rgba(103,209,216,.18); background: linear-gradient(135deg, rgba(16,29,43,.92), rgba(8,15,26,.92)); }
+    #rewards-screen .daily-list { grid-template-columns: 1fr; gap: 10px; }
+    #rewards-screen .daily-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #rewards-screen .quest-card {
+      display: grid;
+      min-width: 0;
+      grid-template-columns: 48px minmax(0, 1fr);
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid rgba(109,219,209,.2);
+      background: linear-gradient(145deg, rgba(11,24,35,.92), rgba(10,14,24,.93));
+      box-shadow: inset 0 1px rgba(255,255,255,.035);
+      transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+    #rewards-screen .quest-card.ready { border-color: rgba(69,245,218,.56); box-shadow: inset 0 0 22px rgba(60,236,216,.06), 0 0 20px rgba(55,228,213,.08); }
+    #rewards-screen .quest-card.claimed { border-color: rgba(137,168,174,.18); opacity: .78; }
+    #rewards-screen .quest-symbol { display: grid; width: 48px; height: 48px; place-items: center; border: 1px solid rgba(84,242,223,.35); background: rgba(67,229,214,.08); color: #8ffff2; font-size: 24px; text-shadow: 0 0 14px currentColor; }
+    #rewards-screen .quest-copy { min-width: 0; }
+    #rewards-screen .quest-topline { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    #rewards-screen .quest-topline h3 { margin: 0; color: #f1f8fc; font: 700 clamp(14px,1.3vw,17px)/1.3 "Orbitron", sans-serif; }
+    #rewards-screen .quest-reward { color: #ffda75; font: 700 11px "Orbitron", sans-serif; white-space: nowrap; }
+    #rewards-screen .quest-copy p { margin: 6px 0 10px; color: #b0bdcb; font-size: 16px; line-height: 1.4; }
+    #rewards-screen .quest-progress-track, #rewards-screen .badge-progress-track { height: 8px; overflow: hidden; border-radius: 99px; background: rgba(140,161,180,.17); }
+    #rewards-screen .quest-progress-track span, #rewards-screen .badge-progress-track span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#40efdb,#b267ed,#ff66ba); box-shadow: 0 0 13px rgba(63,235,219,.43); transition: width .36s ease; }
+    #rewards-screen .quest-progress-meta, #rewards-screen .badge-progress-meta { display: flex; justify-content: space-between; gap: 10px; margin-top: 6px; color: #8fa3b5; font: 600 11px "Orbitron", sans-serif; }
+    #rewards-screen .quest-action { grid-column: 1 / -1; min-height: 48px; border: 1px solid rgba(75,236,218,.38); background: rgba(54,218,204,.1); color: #b6fff4; cursor: pointer; font: 700 11px "Orbitron", sans-serif; letter-spacing: .045em; touch-action: manipulation; }
+    #rewards-screen .quest-action:not(:disabled):hover { transform: translateY(-1px); border-color: #91fff1; background: rgba(54,218,204,.2); box-shadow: 0 0 18px rgba(54,218,204,.17); }
+    #rewards-screen .quest-action:disabled { border-color: rgba(132,150,167,.12); background: rgba(132,150,167,.04); color: #8391a0; cursor: not-allowed; }
+    #rewards-screen .quest-note { display: flex; align-items: center; gap: 12px; margin-top: 17px; padding: 15px 17px; border-left: 2px solid #e86abd; background: rgba(219,81,177,.06); color: #c2ced8; }
+    #rewards-screen .quest-note span { color: #ff7dcf; font-size: 20px; }
+    #rewards-screen .quest-note p { margin: 0; font-size: 16px; }
+    #rewards-screen .milestone-subnav { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,.1); }
+    #rewards-screen .milestone-radio { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    #rewards-screen .milestone-subtab { display: inline-flex; min-height: 48px; align-items: center; padding: 0 17px; border: 1px solid rgba(255,255,255,.13); color: #9eafbf; cursor: pointer; font: 700 12px "Orbitron", sans-serif; letter-spacing: .04em; }
+    #rewards-screen .milestone-radio:checked + .milestone-subtab { border-color: rgba(84,242,223,.45); background: rgba(84,242,223,.1); color: #bafff5; }
+    #rewards-screen .milestone-radio:focus-visible + .milestone-subtab { outline: 2px solid #fff; outline-offset: 3px; }
+    #rewards-screen .milestone-content { display: none; }
+    #rewards-screen #milestoneRun:checked ~ .milestone-run-panel,
+    #rewards-screen #milestoneCosmetics:checked ~ .milestone-cosmetics-panel,
+    #rewards-screen #milestonePower:checked ~ .milestone-power-panel { display: block; }
+    #rewards-screen .milestone-content .shop-section-label { font-size: 12px; }
+    #rewards-screen .badge-hero { min-height: 130px; background: linear-gradient(110deg, rgba(37,22,49,.88), rgba(12,26,39,.92)); }
+    #rewards-screen .badge-emblem, #rewards-screen .hero-crystal, #rewards-screen .spin-orb { position: relative; z-index: 1; color: #ff8dd5; font-size: 56px; text-shadow: 0 0 25px rgba(255,79,184,.35); }
+    #rewards-screen .badge-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin: 0 0 25px; }
+    #rewards-screen .badge-card { display: grid; min-width: 0; grid-template-columns: 48px minmax(0,1fr); gap: 12px; padding: 16px; border: 1px solid rgba(214,224,234,.13); background: linear-gradient(145deg,rgba(12,20,32,.9),rgba(9,14,25,.92)); }
+    #rewards-screen .badge-card.unlocked { border-color: rgba(105,235,217,.35); background: linear-gradient(110deg, rgba(52,210,190,.08), rgba(12,20,32,.82)); }
+    #rewards-screen .badge-symbol { display: grid; flex: 0 0 48px; width: 48px; height: 48px; place-items: center; border: 1px solid rgba(255,112,210,.35); color: #ff8ed5; font-size: 25px; }
+    #rewards-screen .badge-card.unlocked .badge-symbol { border-color: rgba(100,246,224,.55); color: #91fff1; }
+    #rewards-screen .badge-copy { min-width: 0; }
+    #rewards-screen .badge-card strong { color: #f3f8fc; font: 700 14px "Orbitron", sans-serif; }
+    #rewards-screen .badge-card p { margin: 5px 0 10px; color: #a9b7c6; font-size: 16px; line-height: 1.35; }
+    #rewards-screen .badge-actions { display: flex; grid-column: 1 / -1; align-items: center; justify-content: space-between; gap: 10px; }
+    #rewards-screen .badge-reward { color: #ffda75; font: 700 11px "Orbitron", sans-serif; }
+    #rewards-screen .badge-claim { min-width: 132px; min-height: 48px; padding: 9px 12px; border: 1px solid rgba(76,235,219,.4); background: rgba(54,218,204,.1); color: #b6fff4; cursor: pointer; font: 700 10px "Orbitron", sans-serif; touch-action: manipulation; }
+    #rewards-screen .badge-claim:not(:disabled):hover { transform: translateY(-1px); border-color: #91fff1; background: rgba(54,218,204,.2); }
+    #rewards-screen .badge-claim:disabled { background: rgba(132,150,167,.04); border-color: rgba(132,150,167,.12); color: #8391a0; cursor: not-allowed; }
+    #rewards-screen .tier-claim { min-height: 48px; }
+    #rewards-screen .milestone-invite-panel { display: none; }
+    #rewards-screen #milestoneInvite:checked ~ .milestone-invite-panel { display: block; }
+    #rewards-screen .spin-hero { background: linear-gradient(110deg, rgba(46,25,56,.85), rgba(11,23,39,.92)); }
+    #rewards-screen .spin-orb { display: grid; width: 76px; height: 76px; place-items: center; border: 1px solid rgba(255,100,207,.5); border-radius: 50%; color: #ffc86d; box-shadow: inset 0 0 25px rgba(248,78,189,.12), 0 0 28px rgba(248,78,189,.16); }
+    #rewards-screen .spin-feature { display: grid; grid-template-columns: 72px minmax(0,1fr) auto; align-items: center; gap: 20px; padding: clamp(18px,3vw,30px); border: 1px solid rgba(246,105,203,.28); background: radial-gradient(ellipse at 12% 50%, rgba(238,75,180,.12), transparent 42%), rgba(14,18,31,.86); }
+    #rewards-screen .spin-wheel-mark { display: grid; width: 65px; height: 65px; place-items: center; border: 1px solid rgba(248,185,102,.5); border-radius: 50%; color: #ffd476; font-size: 31px; box-shadow: 0 0 25px rgba(255,194,92,.12); }
+    #rewards-screen .spin-feature h4 { margin: 6px 0; color: #fff4fd; font: 700 clamp(17px,2vw,24px) "Orbitron", sans-serif; }
+    #rewards-screen .spin-feature p { margin: 0; color: #b0bdcb; font-size: 16px; }
+    #rewards-screen .rewards-spin-cta { min-height: 54px; padding: 12px 20px; border: 1px solid rgba(255,123,213,.55); background: linear-gradient(110deg, rgba(235,69,178,.29), rgba(104,96,209,.22)); color: #fff; cursor: pointer; font: 700 12px "Orbitron", sans-serif; letter-spacing: .08em; }
+    #rewards-screen .spin-prizes { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 25px; }
+    #rewards-screen .spin-prizes span { min-height: 40px; display: inline-flex; align-items: center; padding: 8px 12px; border: 1px solid rgba(255,255,255,.11); color: #becbd6; font: 700 10px "Orbitron", sans-serif; }
+    #rewards-screen .shop-footer { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+    #rewards-screen .shop-back { width: min(100%, 420px); }
+    #rewards-screen .reward-tab:focus-visible, #rewards-screen button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    #rewards-screen .milestone-content[hidden] { display: none !important; }
+    #dailyModal:not([hidden]) { z-index: 1100; }
+    #rewards-screen .claim-celebrate { animation: rewardClaimBurst .48s ease-out; }
+    @keyframes rewardClaimBurst {
+      0% { box-shadow: 0 0 0 rgba(78,241,220,0); transform: scale(1); }
+      42% { box-shadow: 0 0 35px rgba(78,241,220,.44), 0 0 52px rgba(235,91,192,.18); transform: scale(1.015); }
+      100% { box-shadow: 0 0 0 rgba(78,241,220,0); transform: scale(1); }
+    }
+    @media (max-width: 650px) {
+      #rewards-screen { padding: max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left)); }
+      #rewards-screen .shop-panel { width: 100%; border-radius: 12px; }
+      #rewards-screen .shop-scroll { padding: 15px; }
+      #rewards-screen .reward-tabs { grid-template-columns: repeat(2,minmax(0,1fr)); margin-bottom: 16px; }
+      #rewards-screen .reward-tab { min-height: 52px; font-size: 11px; }
+      #rewards-screen .progress-hero { min-height: 132px; padding: 18px; }
+      #rewards-screen .reset-clock { min-width: 116px; padding-left: 10px; }
+      #rewards-screen .reset-clock strong { font-size: 18px; }
+      #rewards-screen .achievement-list, #rewards-screen .badge-grid, #rewards-screen .daily-list { grid-template-columns: 1fr; }
+      #rewards-screen .spin-feature { grid-template-columns: 54px minmax(0,1fr); gap: 14px; }
+      #rewards-screen .spin-wheel-mark { width: 52px; height: 52px; }
+      #rewards-screen .rewards-spin-cta { grid-column: 1 / -1; width: 100%; }
+      #rewards-screen .shop-balance { min-width: 112px; padding: 9px; font-size: 9px; }
+    }
+    @media (max-width: 390px) {
+      #rewards-screen .shop-header { align-items: flex-start; }
+      #rewards-screen .shop-balance { min-width: 92px; }
+      #rewards-screen .shop-title { font-size: 23px; }
+      #rewards-screen .milestone-subtab { padding: 0 11px; font-size: 10px; }
+      #rewards-screen .reset-clock { min-width: 95px; }
+    }
+    @media (max-width: 900px) and (orientation: landscape) {
+      #rewards-screen { align-items: stretch; padding: max(6px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left)); }
+      #rewards-screen .shop-panel { height: calc(100dvh - 12px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); max-height: none; }
+      #rewards-screen .shop-scroll { padding: 14px 20px; }
+      #rewards-screen .shop-header { margin-bottom: 12px; }
+      #rewards-screen .progress-hero { min-height: 108px; margin-bottom: 14px; }
+      #rewards-screen .reward-tabs { margin-bottom: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -3306,10 +3514,11 @@
           <span class="session-countdown-track" aria-hidden="true"><i class="session-countdown-progress" id="sessionCountdownProgress"></i></span>
         </div>
         <p class="session-connection-status" id="sessionConnectionStatus" role="status" aria-live="polite">LOCAL SESSION PRESERVED · RECONNECTING</p>
-        <div class="session-save-badge"><span aria-hidden="true">🛡️</span><span>Crystal Wallet &amp; High Scores safely saved to local storage.</span></div>
+        <div class="session-save-badge"><span aria-hidden="true">🛡️</span><span>Crystal Wallet &amp; High Scores are securely saved in local storage on this device.</span></div>
         <div class="session-actions">
-          <button class="session-action" id="sessionReconnectButton" type="button">🔄 RECONNECT NOW · CLAIM +25 💎</button>
-          <button class="session-action home" id="sessionHomeButton" type="button">🏠 EXIT TO MAIN MENU</button>
+          <button class="session-action primary" id="sessionReconnectButton" type="button">🔄 RECONNECT / RETRY · CLAIM +25 💎</button>
+          <button class="session-action ad" id="sessionRewardedReviveButton" type="button">🎁 WATCH AD FOR REVIVE / +50 💎 BONUS</button>
+          <button class="session-action home" id="sessionHomeButton" type="button">🏠 RETURN TO MAIN MENU</button>
         </div>
       </div>
     </section>
@@ -3403,19 +3612,18 @@
       </div>
     </section>
     <section class="rewards-screen" id="rewards-screen" role="dialog" aria-modal="true" aria-labelledby="rewardsTitle" hidden>
+      <div id="rewards-achievements-screen" class="rewards-dashboard-surface">
       <div class="shop-panel" id="shop-screen">
         <div class="shop-scroll" id="shopScroll">
           <div class="shop-header">
             <div><div class="eyebrow">PLAYER PROGRESSION</div><h2 class="shop-title" id="rewardsTitle">Rewards &amp; Achievements</h2><p class="shop-intro">Earn milestones, collect crystals, and customize your next run.</p></div>
             <div class="shop-balance"><span>💎 NEON CRYSTALS</span><strong id="shopBalance">00000</strong></div>
           </div>
-          <nav class="reward-tabs" role="tablist" aria-label="Rewards categories">
-            <button class="reward-tab active" id="rewardTabSkins" type="button" role="tab" aria-selected="true" aria-controls="rewardPanelSkins" tabindex="0" data-reward-tab="skins">Spheres</button>
-            <button class="reward-tab" id="rewardTabTrails" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelTrails" tabindex="-1" data-reward-tab="trails">Trails</button>
-            <button class="reward-tab" id="rewardTabAuras" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelAuras" tabindex="-1" data-reward-tab="auras">Auras</button>
-            <button class="reward-tab" id="rewardTabBoosters" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelBoosters" tabindex="-1" data-reward-tab="boosters">Boosters</button>
-            <button class="reward-tab" id="rewardTabAchievements" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelAchievements" tabindex="-1" data-reward-tab="achievements">Milestones</button>
-            <button class="reward-tab" id="rewardTabReferral" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelReferral" tabindex="-1" data-reward-tab="referral">Invite &amp; Earn</button>
+          <nav class="reward-tabs" role="tablist" aria-label="Player progression" aria-orientation="horizontal">
+            <button class="reward-tab active" id="rewardTabAchievements" type="button" role="tab" aria-selected="true" aria-controls="rewardPanelAchievements" tabindex="0" data-reward-tab="daily"><span aria-hidden="true">◷</span> Daily Quests</button>
+            <button class="reward-tab" id="rewardTabReferral" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelReferral" tabindex="-1" data-reward-tab="achievements"><span aria-hidden="true">✧</span> Achievements &amp; Badges</button>
+            <button class="reward-tab" id="rewardTabSkins" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelSkins" tabindex="-1" data-reward-tab="milestones"><span aria-hidden="true">◆</span> Milestone Rewards</button>
+            <button class="reward-tab" id="rewardTabBoosters" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelBoosters" tabindex="-1" data-reward-tab="lucky"><span aria-hidden="true">◎</span> Lucky Spin</button>
           </nav>
           <aside class="shop-live-preview" id="shopPreview" aria-live="polite" aria-atomic="true">
             <div class="shop-live-swatch" id="shopPreviewSwatch" aria-hidden="true">✦</div>
@@ -3426,49 +3634,54 @@
               <div class="shop-live-meta"><span class="rarity-tag common" id="shopPreviewRarity">COMMON</span><span class="shop-live-status" id="shopPreviewStatus">BROWSE ITEMS</span></div>
             </div>
           </aside>
-          <div class="reward-tab-panel" id="rewardPanelAchievements" data-reward-panel="achievements" role="tabpanel" aria-labelledby="rewardTabAchievements" tabindex="0">
-            <div class="shop-section-heading"><div><h3>Achievement Tracks</h3><p>Claim crystal rewards when a milestone is complete.</p></div><span class="achievement-tier-key">BRONZE · SILVER · GOLD · DIAMOND</span></div>
-            <div class="achievement-list" id="achievementList"></div>
-            <div class="shop-section-label">Daily Bounties</div>
+          <div class="reward-tab-panel" id="rewardPanelAchievements" data-reward-panel="daily" role="tabpanel" aria-labelledby="rewardTabAchievements" tabindex="0">
+            <section class="progress-hero quest-hero">
+              <div><span class="panel-kicker">TODAY’S RUN / ACTIVE CONTRACTS</span><h3>Daily Quests</h3><p>Every clean run brings you closer to your next crystal cache.</p></div>
+              <div class="reset-clock"><span>QUEST RESET</span><strong id="dailyResetTimer" aria-live="polite">23:59:59</strong><small>LOCAL TIME · MIDNIGHT</small></div>
+            </section>
+            <div class="shop-section-heading"><div><h3>Current bounties</h3><p>Complete objectives on the track to claim 💎 Neon Crystals.</p></div><span class="achievement-tier-key">DAILY CONTRACTS</span></div>
             <div class="achievement-list daily-list" id="dailyBountyList"></div>
+            <section class="quest-note"><span aria-hidden="true">✦</span><p>Keep your streak alive. New quests arrive with the next daily reset.</p></section>
           </div>
-          <div class="reward-tab-panel" id="rewardPanelSkins" data-reward-panel="skins" role="tabpanel" aria-labelledby="rewardTabSkins" tabindex="0" hidden>
-            <div class="shop-section-heading"><div><h3>Player Skins</h3><p>Unlock a 3D ball skin with crystals, then equip it for future runs.</p></div><span class="achievement-tier-key">3D COSMETICS</span></div>
-            <div class="skin-grid" id="skinGrid"></div>
+          <div class="reward-tab-panel" id="rewardPanelReferral" data-reward-panel="achievements" role="tabpanel" aria-labelledby="rewardTabReferral" tabindex="0" hidden>
+            <section class="progress-hero badge-hero"><div><span class="panel-kicker">YOUR LEGEND / COLLECTION</span><h3>Achievements &amp; Badges</h3><p>Every badge marks a run worth remembering.</p></div><div class="badge-emblem" aria-hidden="true">✧</div></section>
+            <div class="badge-grid" id="achievementBadgeList" aria-label="Individual achievement badges" aria-live="polite"></div>
           </div>
-          <div class="reward-tab-panel" id="rewardPanelTrails" data-reward-panel="trails" role="tabpanel" aria-labelledby="rewardTabTrails" tabindex="0" hidden>
-            <div class="shop-section-heading"><div><h3>Particle Trails</h3><p>Choose the glow that follows you through the tunnel.</p></div><span class="achievement-tier-key">COMMON · EPIC · LEGENDARY</span></div>
-            <div class="trail-grid" id="trailGrid"></div>
-          </div>
-          <div class="reward-tab-panel" id="rewardPanelAuras" data-reward-panel="auras" role="tabpanel" aria-labelledby="rewardTabAuras" tabindex="0" hidden>
-            <div class="shop-section-heading"><div><h3>Runner Auras</h3><p>Equip a signature halo around your player orb.</p></div><span class="achievement-tier-key">3D LIGHT FX</span></div>
-            <div class="aura-grid" id="auraGrid"></div>
-          </div>
-          <div class="reward-tab-panel" id="rewardPanelBoosters" data-reward-panel="boosters" role="tabpanel" aria-labelledby="rewardTabBoosters" tabindex="0" hidden>
-            <div class="shop-section-heading"><div><h3>Run Boosters</h3><p>Buy a token with crystals. One owned booster is used at random when a new run begins.</p></div><span class="achievement-tier-key">SINGLE-USE TOKENS</span></div>
-            <div class="booster-grid" id="boosterGrid"></div>
-          </div>
-          <div class="reward-tab-panel" id="rewardPanelReferral" data-reward-panel="referral" role="tabpanel" aria-labelledby="rewardTabReferral" tabindex="0" hidden>
-            <div class="referral-panel">
-              <header>
-                <div class="referral-kicker">NEON RUSH · FRIEND INVITES</div>
-                <h3 class="referral-heading">Bring a friend into the stream</h3>
-                <p class="referral-copy">Share your personal link. The first browser to open an invite from a different player receives a one-time welcome bonus of <strong>💎 150 Neon Crystals</strong>.</p>
-              </header>
-              <div>
-                <label class="referral-field-label" for="referralLink">YOUR PERSONAL INVITE LINK</label>
-                <div class="referral-link-row">
-                  <input class="referral-link-input" id="referralLink" type="url" readonly aria-label="Your unique referral link" />
-                  <button class="referral-action" id="copyReferralButton" type="button">📋 COPY INVITE LINK</button>
-                </div>
-              </div>
-              <div class="referral-action-row">
-                <button class="referral-action" id="whatsappReferralButton" type="button">🔗 SHARE VIA WHATSAPP</button>
-                <div class="referral-share-count"><span>Share actions on this device</span><strong id="referralShareCount">0</strong></div>
-              </div>
-              <p class="referral-status" id="referralStatus" role="status" aria-live="polite" aria-atomic="true"></p>
-              <p class="referral-disclaimer">Share actions are counted on this device; they do not confirm that a message was sent or an install occurred. This browser-only build cannot verify or pay inviter rewards across devices.</p>
+          <div class="reward-tab-panel" id="rewardPanelSkins" data-reward-panel="milestones" role="tabpanel" aria-labelledby="rewardTabSkins" tabindex="0" hidden>
+            <section class="progress-hero milestone-hero"><div><span class="panel-kicker">LONG GAME / REWARD TRACK</span><h3>Milestone Rewards</h3><p>Build your run record, unlock tiers, and claim your crystal haul.</p></div><span class="hero-crystal" aria-hidden="true">💎</span></section>
+            <div class="milestone-subnav" role="tablist" aria-label="Milestone reward categories">
+              <input class="milestone-radio" type="radio" name="milestoneCategory" id="milestoneRun" checked><label class="milestone-subtab" for="milestoneRun" role="tab">Run milestones</label>
+              <input class="milestone-radio" type="radio" name="milestoneCategory" id="milestoneCosmetics"><label class="milestone-subtab" for="milestoneCosmetics" role="tab">Cosmetics</label>
+              <input class="milestone-radio" type="radio" name="milestoneCategory" id="milestonePower"><label class="milestone-subtab" for="milestonePower" role="tab">Power-ups</label>
+              <input class="milestone-radio" type="radio" name="milestoneCategory" id="milestoneInvite"><label class="milestone-subtab" for="milestoneInvite" role="tab">Invite &amp; Earn</label>
             </div>
+            <section class="milestone-content milestone-run-panel" role="tabpanel" aria-label="Run milestones">
+              <div class="shop-section-heading"><div><h3>Achievement tracks</h3><p>Claim crystal rewards as your skills level up.</p></div><span class="achievement-tier-key">BRONZE · SILVER · GOLD · DIAMOND</span></div>
+              <div class="achievement-list" id="achievementList"></div>
+            </section>
+            <section class="milestone-content milestone-cosmetics-panel" role="tabpanel" aria-label="Cosmetic rewards">
+              <div class="shop-section-label">Sphere skins · make the stream yours</div><div class="skin-grid" id="skinGrid"></div>
+              <div class="shop-section-label">Particle trails</div><div class="trail-grid" id="trailGrid"></div>
+              <div class="shop-section-label">Runner auras</div><div class="aura-grid" id="auraGrid"></div>
+            </section>
+            <section class="milestone-content milestone-power-panel" role="tabpanel" aria-label="Power-up rewards">
+              <div class="shop-section-label">Run boosters · single-use tokens</div><div class="booster-grid" id="boosterGrid"></div>
+            </section>
+            <section class="milestone-content milestone-invite-panel" role="tabpanel" aria-label="Invite friends">
+              <div class="shop-section-label">Invite your crew</div>
+              <div class="referral-panel">
+                <header><div class="referral-kicker">NEON RUSH · FRIEND INVITES</div><h3 class="referral-heading">Bring a friend into the stream</h3><p class="referral-copy">Share your personal link. The first browser to open an invite from a different player receives a one-time welcome bonus of <strong>💎 150 Neon Crystals</strong>.</p></header>
+                <div><label class="referral-field-label" for="referralLink">YOUR PERSONAL INVITE LINK</label><div class="referral-link-row"><input class="referral-link-input" id="referralLink" type="url" readonly aria-label="Your unique referral link" /><button class="referral-action" id="copyReferralButton" type="button">📋 COPY INVITE LINK</button></div></div>
+                <div class="referral-action-row"><button class="referral-action" id="whatsappReferralButton" type="button">🔗 SHARE VIA WHATSAPP</button><div class="referral-share-count"><span>Share actions on this device</span><strong id="referralShareCount">0</strong></div></div>
+                <p class="referral-status" id="referralStatus" role="status" aria-live="polite" aria-atomic="true"></p>
+                <p class="referral-disclaimer">Share actions are counted on this device; they do not confirm that a message was sent or an install occurred. This browser-only build cannot verify or pay inviter rewards across devices.</p>
+              </div>
+            </section>
+          </div>
+          <div class="reward-tab-panel" id="rewardPanelBoosters" data-reward-panel="lucky" role="tabpanel" aria-labelledby="rewardTabBoosters" tabindex="0" hidden>
+            <section class="progress-hero spin-hero"><div><span class="panel-kicker">LUCK FAVORS THE BOLD</span><h3>Lucky Spin</h3><p>One spin can change your next run. Give the wheel a turn.</p></div><div class="spin-orb" aria-hidden="true">◎</div></section>
+            <div class="spin-feature"><div class="spin-wheel-mark" aria-hidden="true">✦</div><div><span class="panel-kicker">DAILY FREE SPIN</span><h4>Fortune is in motion</h4><p id="rewardsSpinStatus">Spin for 💎 crystals, boosters, and rare drops.</p></div><button class="primary-btn rewards-spin-cta" id="rewardsLuckySpinButton" type="button">SPIN THE WHEEL <span aria-hidden="true">↗</span></button></div>
+            <div class="spin-prizes" aria-label="Example spin rewards"><span>💎 CRYSTAL CACHE</span><span>✦ RARE SKIN</span><span>⚡ BOOSTER</span><span>◈ BONUS SPIN</span></div>
           </div>
           <div class="shop-notice" id="shopNotice" role="status" aria-live="polite"></div>
           <div class="save-reset">
@@ -3479,6 +3692,7 @@
         <div class="shop-footer">
           <button class="secondary-btn shop-back universal-menu-back" id="shopBack" type="button" aria-label="Return to the main menu">🏠 MAIN MENU</button>
         </div>
+      </div>
       </div>
     </section>
     <section class="daily-modal" id="dailyModal" role="dialog" aria-modal="true" aria-labelledby="dailyTitle" hidden>
@@ -7301,9 +7515,10 @@ void main() {
         booster: { name: "Score Surge", description: "A one-run token doubles score for ten seconds.", cost: 550, rarity: "Legendary", symbol: "2×" }
       };
       const ACHIEVEMENTS = [
-        { id: "distanceMaster", title: "Distance Master", description: "Reach 1,000 meters in one run." },
-        { id: "crystalCollector", title: "Crystal Collector", description: "Collect 50 crystals across your runs." },
-        { id: "gateRunner", title: "Gate Runner", description: "Clear 20 gates in one run." }
+        { id: "distanceMaster", title: "Distance Master", description: "Reach 1,000 meters in one run.", icon: "🏁", metric: "runDistance", target: 1000, reward: 150 },
+        { id: "crystalCollector", title: "Crystal Collector", description: "Collect 50 crystals across your runs.", icon: "💎", metric: "lifetimeCrystals", target: 50, reward: 150 },
+        { id: "gateRunner", title: "Gate Runner", description: "Clear 20 gates in one run.", icon: "◆", metric: "runGates", target: 20, reward: 150 },
+        { id: "laserWhisperer", title: "Laser Whisperer", description: "Pass 20 Laser Pursuit gates without a collision.", icon: "⚡", metric: "laserGates", target: 20, reward: 150 }
       ];
       const ACHIEVEMENT_CATEGORIES = [
         {
@@ -7348,8 +7563,9 @@ void main() {
         }
       ];
       const DAILY_BOUNTIES = [
-        { id: "distance", title: "Daily Dash", description: "Reach 300m in one run.", target: 300, reward: 12 },
-        { id: "crystals", title: "Crystal Run", description: "Collect 5 crystals today.", target: 5, reward: 12 }
+        { id: "distance", title: "Neon Commuter", description: "Travel 300m in a single run.", icon: "🏁", target: 300, reward: 12 },
+        { id: "crystals", title: "Crystal Run", description: "Collect 5 crystals today.", icon: "💎", target: 5, reward: 12 },
+        { id: "gates", title: "Color Sync", description: "Pass 5 gates today.", icon: "⚡", target: 5, reward: 15 }
       ];
       const LANE_X = [-2.42, 0, 2.42];
       const PLAYER_RADIUS = 0.56;
@@ -7459,6 +7675,8 @@ void main() {
       let sessionReconnectToken = 0;
       let sessionAutoResumeScheduled = false;
       let sessionRetryBonusClaimedThisRun = false;
+      let sessionAdReviveGrantedThisRun = false;
+      let sessionRewardedRevivePending = false;
       // Some mobile/private contexts throw while retrieving localStorage itself,
       // not only while reading or writing it. Shadow the browser global with a
       // guarded adapter so every existing persistence call fails closed.
@@ -8859,6 +9077,7 @@ void main() {
           ownedAuras: ["none"],
           activeAura: "none",
           achievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, false])),
+          claimedAchievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, false])),
           unlockedAchievementTiers: Object.fromEntries(
             ACHIEVEMENT_CATEGORIES.flatMap(category => category.tiers).map(tier => [tier.id, false])
           ),
@@ -8874,7 +9093,9 @@ void main() {
         };
       }
       let progression = createFreshProgression();
-      let activeRewardsTab = "skins";
+      let activeRewardsTab = "daily";
+      let activeMilestoneTab = "run";
+      let dailyQuestClockTimer = 0;
       let runCoins = 0;
       let achievementQueue = [];
       let achievementNoticeTimer = 0;
@@ -9556,37 +9777,34 @@ void main() {
           payload.message || ""
         );
       };
-      async function showRewardedCrystalAd() {
-        const button = el("rewardedAdButton");
-        const status = el("adRewardStatus");
-        const showMessage = message => { status.textContent = message; };
-        if (rewardedAdGrantedThisRun) {
-          showMessage("This run's video reward has already been claimed.");
-          return;
-        }
+      async function requestNativeRewardedAd({ button, placement, amount, showMessage, loadingMessage }) {
         if (!navigator.onLine) {
-          showMessage("You're offline. No ad or reward was started; your run remains unchanged.");
-          return;
+          showMessage("You're offline. No ad or reward was started.");
+          return { earned: false };
         }
-        if (pendingRewardedAd) return;
+        if (pendingRewardedAd) {
+          showMessage("A rewarded video is already in progress.");
+          return { earned: false };
+        }
         const bridgeKind = getNativeAdsBridgeKind();
         if (!bridgeKind) {
           showMessage("Rewarded video is available in the Android app after its AdMob bridge is configured.");
-          return;
+          return { earned: false };
         }
         const token = "reward-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9);
         const payload = {
           action: "showRewarded",
           token,
-          placement: "post-run-crystals",
+          placement,
           adUnitId: ADMOB_UNIT_IDS.rewarded,
-          reward: { type: "crystals", amount: REWARDED_CRYSTAL_AMOUNT }
+          reward: { type: "crystals", amount }
         };
         button.disabled = true;
-        showMessage("Loading a rewarded video…");
+        showMessage(loadingMessage || "Loading a rewarded video…");
         const response = await new Promise(resolve => {
           const request = {
             token,
+            placement,
             resolve,
             timeout: window.setTimeout(() => {
               finishRewardedAdRequest(token, false, "Ad request timed out. No crystals were added.");
@@ -9620,11 +9838,26 @@ void main() {
             finishRewardedAdRequest(token, false, "Ad unavailable. No reward was added.");
           }
         });
-        button.disabled = false;
-        if (!response.earned) {
-          showMessage(response.message || "The video was not completed. No crystals were added.");
+        if (button.isConnected) button.disabled = false;
+        if (!response.earned) showMessage(response.message || "The video was not completed. No crystals were added.");
+        return response;
+      }
+      async function showRewardedCrystalAd() {
+        const button = el("rewardedAdButton");
+        const status = el("adRewardStatus");
+        const showMessage = message => { status.textContent = message; };
+        if (rewardedAdGrantedThisRun) {
+          showMessage("This run's video reward has already been claimed.");
           return;
         }
+        const response = await requestNativeRewardedAd({
+          button,
+          placement: "post-run-crystals",
+          amount: REWARDED_CRYSTAL_AMOUNT,
+          showMessage,
+          loadingMessage: "Loading a rewarded video…"
+        });
+        if (!response.earned) return;
         rewardedAdGrantedThisRun = true;
         progression.crystals = safeStoredCount(progression.crystals + REWARDED_CRYSTAL_AMOUNT);
         progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + REWARDED_CRYSTAL_AMOUNT);
@@ -9843,7 +10076,7 @@ void main() {
         return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
       }
       function createDailyProgress() {
-        return { date: localDayKey(), crystalsCollected: 0, distanceClaimed: false, crystalsClaimed: false };
+        return { date: localDayKey(), crystalsCollected: 0, gatesCleared: 0, distanceClaimed: false, crystalsClaimed: false, gatesClaimed: false };
       }
       function normalizeDailyProgress(saved) {
         const today = localDayKey();
@@ -9851,8 +10084,10 @@ void main() {
         return {
           date: today,
           crystalsCollected: safeStoredCount(saved.crystalsCollected),
+          gatesCleared: safeStoredCount(saved.gatesCleared),
           distanceClaimed: saved.distanceClaimed === true,
-          crystalsClaimed: saved.crystalsClaimed === true
+          crystalsClaimed: saved.crystalsClaimed === true,
+          gatesClaimed: saved.gatesClaimed === true
         };
       }
       try {
@@ -9861,7 +10096,7 @@ void main() {
           safeStoredCount(localStorage.getItem(COINS_KEY))
         );
         const stored = JSON.parse(localStorage.getItem(PROGRESSION_KEY) || localStorage.getItem(LEGACY_PROGRESSION_KEY) || "null");
-        if (stored && [1, 2, 3, 4, 5, 6].includes(stored.version)) {
+        if (stored && [1, 2, 3, 4, 5, 6, 7].includes(stored.version)) {
           progression.crystals = safeStoredCount(stored.crystals ?? legacyBalance);
           progression.lifetimeCrystals = Math.max(progression.crystals, safeStoredCount(stored.lifetimeCrystals));
           const validOwned = Array.isArray(stored.ownedSkins)
@@ -9893,6 +10128,9 @@ void main() {
               : "none";
           progression.achievements = Object.fromEntries(
             ACHIEVEMENTS.map(item => [item.id, stored.achievements?.[item.id] === true])
+          );
+          progression.claimedAchievements = Object.fromEntries(
+            ACHIEVEMENTS.map(item => [item.id, stored.claimedAchievements?.[item.id] === true])
           );
           const achievementTierIds = ACHIEVEMENT_CATEGORIES.flatMap(category => category.tiers).map(tier => tier.id);
           progression.unlockedAchievementTiers = Object.fromEntries(
@@ -9936,7 +10174,7 @@ void main() {
       function saveProgression() {
         progression.daily = normalizeDailyProgress(progression.daily);
         const payload = {
-          version: 6,
+          version: 7,
           crystals: safeStoredCount(progression.crystals),
           lifetimeCrystals: safeStoredCount(progression.lifetimeCrystals),
           ownedSkins: progression.ownedSkins.filter(id => hasOwn(PLAYER_SKINS, id)),
@@ -9948,6 +10186,7 @@ void main() {
           ownedAuras: progression.ownedAuras.filter(id => hasOwn(AURA_STYLES, id)),
           activeAura: hasOwn(AURA_STYLES, progression.activeAura) ? progression.activeAura : "none",
           achievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, progression.achievements[item.id] === true])),
+          claimedAchievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, progression.claimedAchievements[item.id] === true])),
           unlockedAchievementTiers: Object.fromEntries(
             ACHIEVEMENT_CATEGORIES.flatMap(category => category.tiers).map(tier => [
               tier.id,
@@ -9968,8 +10207,10 @@ void main() {
           daily: {
             date: progression.daily.date,
             crystalsCollected: safeStoredCount(progression.daily.crystalsCollected),
+            gatesCleared: safeStoredCount(progression.daily.gatesCleared),
             distanceClaimed: progression.daily.distanceClaimed === true,
-            crystalsClaimed: progression.daily.crystalsClaimed === true
+            crystalsClaimed: progression.daily.crystalsClaimed === true,
+            gatesClaimed: progression.daily.gatesClaimed === true
           },
           dailySpinAt: safeStoredTimestamp(progression.dailySpinAt),
           dailySpinDate: /^\d{4}-\d{2}-\d{2}$/.test(progression.dailySpinDate || "") ? progression.dailySpinDate : "",
@@ -10560,7 +10801,23 @@ void main() {
         selectedShopItem = { type, id };
         updateShopPreview();
       }
+      function achievementBadgeValue(item) {
+        if (item.metric === "runDistance") {
+          return progression.achievements[item.id] ? item.target : Math.max(safeStoredCount(progression.stats.bestDistance), Math.floor(distance));
+        }
+        if (item.metric === "runGates") {
+          return progression.achievements[item.id] ? item.target : safeStoredCount(passed);
+        }
+        if (item.metric === "laserGates") return safeStoredCount(progression.stats.laserGates);
+        return safeStoredCount(progression.lifetimeCrystals);
+      }
+      function dailyBountyValue(item) {
+        if (item.id === "distance") return Math.max(0, Math.floor(distance));
+        if (item.id === "gates") return safeStoredCount(progression.daily.gatesCleared);
+        return safeStoredCount(progression.daily.crystalsCollected);
+      }
       function renderProgressionUI() {
+        const previousDailyDate = progression.daily?.date;
         progression.daily = normalizeDailyProgress(progression.daily);
         const milestonesChanged = syncAchievementTierUnlocks(state === "running");
         updateCoinDisplay();
@@ -10638,6 +10895,22 @@ void main() {
             '<button class="secondary-btn shop-action booster-action" type="button" data-booster="' + boosterId + '" ' + (atCapacity || !affordable ? "disabled" : "") + '>' + buttonLabel + '</button>' +
             '</article>';
         }).join("");
+        el("achievementBadgeList").innerHTML = ACHIEVEMENTS.map(item => {
+          const value = Math.min(item.target, achievementBadgeValue(item));
+          const unlocked = progression.achievements[item.id] === true || value >= item.target;
+          const claimed = progression.claimedAchievements[item.id] === true;
+          const percent = Math.min(100, Math.round((value / item.target) * 100));
+          const stateLabel = claimed ? "COMPLETED ✓" : unlocked ? "READY TO CLAIM" : "IN PROGRESS";
+          return '<article class="badge-card' + (unlocked ? " unlocked" : "") + (claimed ? " claimed" : "") + '" data-badge-card="' + item.id + '">' +
+            '<span class="badge-symbol" aria-hidden="true">' + item.icon + '</span>' +
+            '<div class="badge-copy"><strong>' + item.title + '</strong><p>' + item.description + '</p>' +
+              '<div class="badge-progress-track" role="progressbar" aria-label="' + item.title + ' progress" aria-valuemin="0" aria-valuemax="' + item.target + '" aria-valuenow="' + value + '"><span style="width:' + percent + '%"></span></div>' +
+              '<div class="badge-progress-meta"><span>' + value.toLocaleString() + ' / ' + item.target.toLocaleString() + '</span><span>' + stateLabel + '</span></div></div>' +
+            '<div class="badge-actions"><span class="badge-reward">REWARD · 💎 +' + item.reward + '</span>' +
+              '<button class="badge-claim" type="button" data-claim-badge="' + item.id + '" ' + (!unlocked || claimed ? "disabled" : "") + '>' +
+                (claimed ? "COMPLETED ✓" : unlocked ? "CLAIM 💎 +" + item.reward : "LOCKED 🔒") + '</button></div>' +
+            '</article>';
+        }).join("");
         el("achievementList").innerHTML = ACHIEVEMENT_CATEGORIES.map(category => {
           const value = achievementMetric(category);
           const safeValue = safeStoredCount(value);
@@ -10648,7 +10921,7 @@ void main() {
               const unlocked = progression.unlockedAchievementTiers[tier.id] === true || safeValue >= tier.target;
               const claimed = progression.claimedAchievementRewards[tier.id] === true;
               const percent = Math.min(100, Math.round((safeValue / tier.target) * 100));
-              const label = claimed ? "CLAIMED" : unlocked ? "CLAIM" : "LOCKED";
+              const label = claimed ? "COMPLETED ✓" : unlocked ? "CLAIM 💎 +" + tier.reward : "LOCKED 🔒";
               return '<div class="achievement-tier ' + (unlocked ? "unlocked" : "") + (claimed ? " claimed" : "") + '">' +
                 '<div class="tier-heading"><strong>' + tier.name + '</strong><span>' + (unlocked ? "COMPLETE" : tier.target.toLocaleString() + " " + category.unit) + '</span></div>' +
                 '<div class="tier-progress" role="progressbar" aria-label="' + category.title + " " + tier.name + ' progress" aria-valuemin="0" aria-valuemax="' + tier.target + '" aria-valuenow="' + Math.min(safeValue, tier.target) + '"><span style="width:' + percent + '%"></span></div>' +
@@ -10658,17 +10931,23 @@ void main() {
             }).join("") + '</div></article>';
         }).join("");
         el("dailyBountyList").innerHTML = DAILY_BOUNTIES.map(item => {
-          const claimed = item.id === "distance" ? progression.daily.distanceClaimed : progression.daily.crystalsClaimed;
-          const progress = item.id === "distance"
-            ? Math.min(item.target, Math.floor(distance))
-            : Math.min(item.target, progression.daily.crystalsCollected);
-          const unit = item.id === "distance" ? "M" : "CRYSTALS";
-          return '<div class="achievement-row' + (claimed ? " unlocked" : "") + '">' +
-            '<div><strong>' + item.title + '</strong><small>' + item.description + ' · ' + progress + ' / ' + item.target + ' ' + unit + '</small></div>' +
-            '<span class="achievement-state">' + (claimed ? "CLAIMED" : "+" + item.reward + " ◆") + '</span></div>';
+          const claimed = progression.daily[item.id + "Claimed"] === true;
+          const progress = claimed ? item.target : Math.min(item.target, dailyBountyValue(item));
+          const ready = progress >= item.target;
+          const unit = item.id === "distance" ? "M" : item.id === "gates" ? "GATES" : "CRYSTALS";
+          const percent = Math.min(100, Math.round((progress / item.target) * 100));
+          return '<article class="quest-card' + (ready ? " ready" : "") + (claimed ? " claimed" : "") + '" data-daily-card="' + item.id + '">' +
+            '<span class="quest-symbol" aria-hidden="true">' + item.icon + '</span>' +
+            '<div class="quest-copy"><div class="quest-topline"><h3>' + item.title + '</h3><span class="quest-reward">💎 +' + item.reward + '</span></div>' +
+              '<p>' + item.description + '</p>' +
+              '<div class="quest-progress-track" role="progressbar" aria-label="' + item.title + ' progress" aria-valuemin="0" aria-valuemax="' + item.target + '" aria-valuenow="' + progress + '"><span style="width:' + percent + '%"></span></div>' +
+              '<div class="quest-progress-meta"><span>' + progress.toLocaleString() + ' / ' + item.target.toLocaleString() + ' ' + unit + '</span><span>' + (claimed ? "CLAIMED" : ready ? "COMPLETE" : "IN PROGRESS") + '</span></div></div>' +
+            '<button class="quest-action" type="button" data-claim-daily="' + item.id + '" ' + (!ready || claimed ? "disabled" : "") + '>' +
+              (claimed ? "COMPLETED ✓" : ready ? "CLAIM 💎 +" + item.reward : "LOCKED 🔒") + '</button></article>';
         }).join("");
         updateShopPreview();
-        if (milestonesChanged) saveProgression();
+        updateDailyQuestClock();
+        if (milestonesChanged || previousDailyDate !== progression.daily.date) saveProgression();
       }
       applyPlayerSkin(progression.activeSkin);
       applyPlayerAura(progression.activeAura);
@@ -10734,24 +11013,36 @@ void main() {
         queueProgressionNotice(item, "ACHIEVEMENT UNLOCKED");
       }
       function checkRunAchievements() {
-        if (distance >= 1000) unlockAchievement("distanceMaster");
-        if (passed >= 20) unlockAchievement("gateRunner");
-        if (progression.lifetimeCrystals >= 50) unlockAchievement("crystalCollector");
+        ACHIEVEMENTS.forEach(item => {
+          if (achievementBadgeValue(item) >= item.target) unlockAchievement(item.id);
+        });
       }
-      function completeDailyBounty(id) {
+      function claimAchievementBadge(id) {
+        const item = ACHIEVEMENTS.find(candidate => candidate.id === id);
+        if (!item || progression.claimedAchievements[id] === true || achievementBadgeValue(item) < item.target) return;
+        progression.achievements[id] = true;
+        progression.claimedAchievements[id] = true;
+        progression.crystals = safeStoredCount(progression.crystals + item.reward);
+        progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + item.reward);
+        saveProgression();
+        renderProgressionUI();
+        showShareRewardToast("🏆 " + item.title + " claimed · + " + item.reward + " crystals");
+        playCue("crystal");
+        checkRunAchievements();
+      }
+      function claimDailyBounty(id) {
         const item = DAILY_BOUNTIES.find(candidate => candidate.id === id);
         if (!item) return;
-        const claimedKey = id === "distance" ? "distanceClaimed" : "crystalsClaimed";
-        if (progression.daily[claimedKey]) return;
+        progression.daily = normalizeDailyProgress(progression.daily);
+        const claimedKey = id + "Claimed";
+        if (progression.daily[claimedKey] || dailyBountyValue(item) < item.target) return;
         progression.daily[claimedKey] = true;
         progression.crystals = safeStoredCount(progression.crystals + item.reward);
         progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + item.reward);
         saveProgression();
         renderProgressionUI();
-        queueProgressionNotice(
-          { title: item.title + " complete", description: "Daily reward · +" + item.reward + " crystals." },
-          "DAILY BOUNTY COMPLETE"
-        );
+        showShareRewardToast("✨ " + item.title + " claimed · + " + item.reward + " crystals");
+        playCue("crystal");
         checkRunAchievements();
       }
       function checkDailyBounties() {
@@ -10760,8 +11051,28 @@ void main() {
           saveProgression();
           renderProgressionUI();
         }
-        if (distance >= DAILY_BOUNTIES[0].target) completeDailyBounty("distance");
-        if (progression.daily.crystalsCollected >= DAILY_BOUNTIES[1].target) completeDailyBounty("crystals");
+      }
+      function updateDailyQuestClock() {
+        const timer = el("dailyResetTimer");
+        if (!timer) return;
+        const today = localDayKey();
+        if (progression.daily?.date !== today) {
+          progression.daily = createDailyProgress();
+          saveProgression();
+          renderProgressionUI();
+        }
+        const now = new Date();
+        const reset = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        const remaining = Math.max(0, Math.floor((reset.getTime() - now.getTime()) / 1000));
+        const hours = String(Math.floor(remaining / 3600)).padStart(2, "0");
+        const minutes = String(Math.floor((remaining % 3600) / 60)).padStart(2, "0");
+        const seconds = String(remaining % 60).padStart(2, "0");
+        timer.textContent = hours + ":" + minutes + ":" + seconds;
+      }
+      function startDailyQuestClock() {
+        window.clearInterval(dailyQuestClockTimer);
+        updateDailyQuestClock();
+        dailyQuestClockTimer = window.setInterval(updateDailyQuestClock, 1000);
       }
       function hasFreeLuckySpinToday() {
         return progression.dailySpinDate !== localDayKey();
@@ -10788,6 +11099,14 @@ void main() {
             : "🎡 LUCKY SPIN · SHARE FOR EXTRA";
         el("luckySpinHomeButton").textContent = entryText;
         el("luckySpinGameOverButton").textContent = entryText;
+        const rewardsSpinStatus = el("rewardsSpinStatus");
+        if (rewardsSpinStatus) {
+          rewardsSpinStatus.textContent = freeReady
+            ? "Your free daily spin is ready. Spin for 💎 crystals, boosters, and rare drops."
+            : bonusCount > 0
+              ? "You used today's free spin. " + bonusCount + " bonus spin" + (bonusCount === 1 ? " is" : "s are") + " ready."
+              : "Today's free spin is used. Share from the wheel to unlock one extra spin.";
+        }
       }
       function openLuckySpin() {
         if (state === "running" || spinInProgress) return;
@@ -11065,22 +11384,38 @@ void main() {
           control.setAttribute("aria-label", "Manually cycle player color now");
         }
       }
-      function openShop(initialTab = activeRewardsTab) {
+      function openShop(initialTab = activeRewardsTab, milestoneTab = activeMilestoneTab) {
         if (state !== "ready") return;
         closeSettings();
+        const legacyMilestoneTab = { skins: "run", trails: "cosmetics", auras: "cosmetics", boosters: "power" };
+        if (initialTab === "referral") {
+          initialTab = "milestones";
+          milestoneTab = "invite";
+        } else if (hasOwn(legacyMilestoneTab, initialTab)) {
+          milestoneTab = legacyMilestoneTab[initialTab];
+          initialTab = "milestones";
+        }
         el("rewards-screen").hidden = false;
         el("shopScroll").scrollTop = 0;
         el("shopNotice").textContent = "";
+        if (["run", "cosmetics", "power", "invite"].includes(milestoneTab)) {
+          activeMilestoneTab = milestoneTab;
+          setMilestoneCategory(milestoneTab);
+        }
         setRewardsTab(initialTab);
         renderProgressionUI();
+        refreshLuckySpinUI();
         updateReferralUI();
+        startDailyQuestClock();
         document.querySelector('[data-reward-tab="' + activeRewardsTab + '"]')?.focus({ preventScroll: true });
       }
       function closeShop() {
         el("rewards-screen").hidden = true;
+        window.clearInterval(dailyQuestClockTimer);
+        dailyQuestClockTimer = 0;
       }
       function setRewardsTab(tab) {
-        const validTabs = ["skins", "trails", "auras", "boosters", "achievements", "referral"];
+        const validTabs = ["daily", "achievements", "milestones", "lucky"];
         if (!validTabs.includes(tab)) return;
         activeRewardsTab = tab;
         document.querySelectorAll("[data-reward-tab]").forEach(button => {
@@ -11092,19 +11427,25 @@ void main() {
         document.querySelectorAll("[data-reward-panel]").forEach(panel => {
           panel.hidden = panel.dataset.rewardPanel !== tab;
         });
-        const previewType = { skins: "skin", trails: "trail", auras: "aura", boosters: "booster" }[tab];
-        el("shopPreview").hidden = !previewType;
-        if (previewType && selectedShopItem.type !== previewType) {
-          const firstItemId = Object.keys(
-            previewType === "skin" ? PLAYER_SKINS :
-            previewType === "trail" ? TRAIL_STYLES :
-            previewType === "aura" ? AURA_STYLES : BOOSTER_ITEMS
-          )[0];
-          selectShopItem(previewType, firstItemId);
-        } else if (previewType) {
+        if (tab === "milestones") setMilestoneCategory(activeMilestoneTab);
+        else el("shopPreview").hidden = true;
+        el("shopScroll").scrollTop = 0;
+      }
+      function setMilestoneCategory(tab) {
+        if (!["run", "cosmetics", "power", "invite"].includes(tab)) return;
+        activeMilestoneTab = tab;
+        const radio = el("milestone" + tab[0].toUpperCase() + tab.slice(1));
+        if (radio) radio.checked = true;
+        const type = tab === "power" ? "booster" : tab === "cosmetics" ? "skin" : null;
+        const showPreview = activeRewardsTab === "milestones" && Boolean(type);
+        el("shopPreview").hidden = !showPreview;
+        if (!showPreview) return;
+        const typeCollection = type === "booster" ? BOOSTER_ITEMS : PLAYER_SKINS;
+        if (selectedShopItem.type !== type || !shopItemRecord(selectedShopItem.type, selectedShopItem.id)) {
+          selectShopItem(type, Object.keys(typeCollection)[0]);
+        } else {
           updateShopPreview();
         }
-        el("shopScroll").scrollTop = 0;
       }
       let settingsReturnToPause = false;
       function openSettings() {
@@ -11308,10 +11649,13 @@ void main() {
         if (!tier || !progression.unlockedAchievementTiers[tierId] || progression.claimedAchievementRewards[tierId]) return;
         progression.claimedAchievementRewards[tierId] = true;
         progression.crystals = safeStoredCount(progression.crystals + tier.reward);
+        progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + tier.reward);
         el("shopNotice").textContent = tier.name + " reward claimed · +" + tier.reward + " crystals.";
         saveProgression();
         renderProgressionUI();
+        showShareRewardToast("✨ " + tier.name + " claimed · + " + tier.reward + " crystals");
         playCue("coin");
+        checkRunAchievements();
       }
       function setOrbColor(index) {
         currentColor = (index + COLORS.length) % COLORS.length;
@@ -11818,6 +12162,8 @@ void main() {
         }
         stopSessionReconnectCountdown(false);
         sessionRetryBonusClaimedThisRun = false;
+        sessionAdReviveGrantedThisRun = false;
+        sessionRewardedRevivePending = false;
         if (isCoarsePointer()) void requestPortraitOrientationLock();
         closeSettings(false);
         closeShop();
@@ -11995,8 +12341,8 @@ void main() {
       function updateSessionReconnectAction(canClaim = true) {
         const button = el("sessionReconnectButton");
         const label = canClaim && !sessionRetryBonusClaimedThisRun
-          ? "🔄 RECONNECT NOW · CLAIM +" + SESSION_RETRY_BONUS + " 💎"
-          : "🔄 RECONNECT NOW";
+          ? "🔄 RECONNECT / RETRY · CLAIM +" + SESSION_RETRY_BONUS + " 💎"
+          : "🔄 RECONNECT / RETRY";
         if (button.textContent !== label) button.textContent = label;
       }
       function updateSessionReconnectCountdown(token) {
@@ -12058,6 +12404,10 @@ void main() {
       }
       function reconnectSessionNow() {
         if (state !== "paused" || el("session-terminated-screen").hidden) return;
+        if (pendingRewardedAd?.placement === "session-revive") {
+          el("sessionConnectionStatus").textContent = "REWARDED CHECKPOINT IN PROGRESS · EXIT OR WAIT";
+          return;
+        }
         const remainingMs = sessionReconnectDeadline
           ? Math.max(0, sessionReconnectDeadline - Date.now())
           : sessionReconnectRemainingMs;
@@ -12078,6 +12428,62 @@ void main() {
           playCue("power");
         }
       }
+      async function showSessionRewardedRevive() {
+        const screen = el("session-terminated-screen");
+        const button = el("sessionRewardedReviveButton");
+        if (state !== "paused" || screen.hidden) return;
+        if (sessionAdReviveGrantedThisRun) {
+          el("sessionConnectionStatus").textContent = "REVIVE REWARD ALREADY CLAIMED THIS RUN";
+          return;
+        }
+        if (pendingRewardedAd) {
+          el("sessionConnectionStatus").textContent = "A REWARDED VIDEO IS ALREADY IN PROGRESS";
+          return;
+        }
+
+        stopSessionReconnectCountdown(true);
+        el("sessionReconnectButton").disabled = true;
+        el("sessionReconnectCountdown").classList.add("is-ad-loading");
+        el("sessionCountdownText").textContent = "Reward checkpoint in progress · your run stays paused.";
+        el("sessionConnectionStatus").textContent = "REWARDED CHECKPOINT · RUN PAUSED SAFELY";
+        const response = await requestNativeRewardedAd({
+          button,
+          placement: "session-revive",
+          amount: 50,
+          showMessage: message => { el("sessionConnectionStatus").textContent = message; },
+          loadingMessage: "Loading rewarded checkpoint…"
+        });
+        el("sessionReconnectCountdown").classList.remove("is-ad-loading");
+        if (!response.earned) {
+          el("sessionReconnectButton").disabled = false;
+          if (state === "paused" && !screen.hidden && !document.hidden) {
+            el("sessionCountdownText").textContent = "Re-establishing neural connection when you're ready...";
+            startSessionReconnectCountdown(false);
+          }
+          return;
+        }
+        if (state !== "paused" || screen.hidden) return;
+
+        sessionAdReviveGrantedThisRun = true;
+        button.disabled = true;
+        button.textContent = "✓ REVIVE USED THIS RUN";
+        progression.crystals = safeStoredCount(progression.crystals + 50);
+        progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + 50);
+        saveProgression();
+        renderProgressionUI();
+        updateCoinDisplay();
+        updateHUD();
+        sessionConnectionStatus.textContent = "REWARD CONFIRMED · +50 CRYSTALS · REVIVE READY";
+        stopSessionReconnectCountdown(false);
+
+        if (document.hidden) {
+          sessionRewardedRevivePending = true;
+          return;
+        }
+        resumeGame();
+        showRunStatus("AD REVIVE · +50 CRYSTALS", 1800);
+        playCue("power");
+      }
       function showSessionTerminatedScreen(awayDurationMs) {
         if (state !== "paused") return;
         stopSessionReconnectCountdown(false);
@@ -12088,6 +12494,11 @@ void main() {
         el("sessionConnectionStatus").textContent = "LOCAL SESSION PRESERVED · AUTO-RECONNECT STARTING";
         el("session-terminated-screen").hidden = false;
         el("sessionReconnectCountdown").classList.remove("is-restored");
+        el("sessionReconnectButton").disabled = false;
+        el("sessionRewardedReviveButton").disabled = sessionAdReviveGrantedThisRun;
+        el("sessionRewardedReviveButton").textContent = sessionAdReviveGrantedThisRun
+          ? "✓ REVIVE USED THIS RUN"
+          : "🎁 WATCH AD FOR REVIVE / +50 💎 BONUS";
         updateSessionReconnectAction(true);
         startSessionReconnectCountdown(true);
         el("sessionReconnectButton").focus({ preventScroll: true });
@@ -12115,6 +12526,8 @@ void main() {
       }
       function awardGatePass(message) {
         passed++;
+        progression.daily = normalizeDailyProgress(progression.daily);
+        progression.daily.gatesCleared = safeStoredCount(progression.daily.gatesCleared + 1);
         progression.stats.lifetimeGates = safeStoredCount(progression.stats.lifetimeGates + 1);
         if (laserPursuitModeActive) {
           progression.stats.laserGates = safeStoredCount(progression.stats.laserGates + 1);
@@ -12122,6 +12535,7 @@ void main() {
         syncAchievementTierUnlocks(true);
         saveProgression();
         checkRunAchievements();
+        checkDailyBounties();
         playCue("gate");
         combo++;
         maxCombo = Math.max(maxCombo, combo);
@@ -12291,6 +12705,7 @@ void main() {
       }
       function returnToHome() {
         stopSessionReconnectCountdown(false);
+        sessionRewardedRevivePending = false;
         closeSettings(false);
         closeShop();
         clearFlexCardPreview();
@@ -13355,13 +13770,19 @@ void main() {
         el("dailySpinButton").focus({ preventScroll: true });
       });
        el("shopButton").addEventListener("click", () => openShop());
-       el("inviteButton").addEventListener("click", () => openShop("referral"));
+       el("inviteButton").addEventListener("click", () => openShop("milestones", "invite"));
        el("copyReferralButton").addEventListener("click", copyReferralInviteLink);
        el("whatsappReferralButton").addEventListener("click", shareReferralViaWhatsApp);
        el("shopBack").addEventListener("click", returnToHome);
        document.querySelectorAll("[data-reward-tab]").forEach(button => {
          button.addEventListener("click", () => setRewardsTab(button.dataset.rewardTab));
        });
+       document.querySelectorAll('input[name="milestoneCategory"]').forEach(radio => {
+         radio.addEventListener("change", () => {
+           if (radio.checked) setMilestoneCategory(radio.id.replace(/^milestone/, "").toLowerCase());
+         });
+       });
+       el("rewardsLuckySpinButton").addEventListener("click", openLuckySpin);
          el("shop-screen").querySelector(".reward-tabs").addEventListener("keydown", event => {
            const tabs = Array.from(el("shop-screen").querySelectorAll("[data-reward-tab]"));
           const currentIndex = tabs.indexOf(event.target.closest("[data-reward-tab]"));
@@ -13413,6 +13834,28 @@ void main() {
          const button = event.target.closest("[data-tier]");
          if (button) claimAchievementReward(button.dataset.tier);
        });
+       el("achievementBadgeList").addEventListener("click", event => {
+         const button = event.target.closest("[data-claim-badge]");
+         if (!button) return;
+         const card = button.closest(".badge-card");
+         if (card) {
+           card.classList.remove("claim-celebrate");
+           void card.offsetWidth;
+           card.classList.add("claim-celebrate");
+         }
+         claimAchievementBadge(button.dataset.claimBadge);
+       });
+       el("dailyBountyList").addEventListener("click", event => {
+         const button = event.target.closest("[data-claim-daily]");
+         if (!button) return;
+         const card = button.closest(".quest-card");
+         if (card) {
+           card.classList.remove("claim-celebrate");
+           void card.offsetWidth;
+           card.classList.add("claim-celebrate");
+         }
+         claimDailyBounty(button.dataset.claimDaily);
+       });
       el("settingsButton").addEventListener("click", openSettings);
         el("settingsBack").addEventListener("click", () => {
           saveSettings();
@@ -13426,12 +13869,13 @@ void main() {
         el("rewardedAdButton").addEventListener("click", showRewardedCrystalAd);
        el("flexCardShareButton").addEventListener("click", generateAndShareFlexCard);
        el("downloadFlexCardButton").addEventListener("click", downloadFlexCardPng);
-        el("dailyMainMenuButton").addEventListener("click", returnToHome);
+         el("dailyMainMenuButton").addEventListener("click", returnToHome);
        el("pauseResumeButton").addEventListener("click", resumeGame);
        el("pauseRestartButton").addEventListener("click", () => startGame(true));
        el("pauseSettingsButton").addEventListener("click", openSettings);
        el("pauseHomeButton").addEventListener("click", returnToHome);
         el("sessionReconnectButton").addEventListener("click", reconnectSessionNow);
+        el("sessionRewardedReviveButton").addEventListener("click", showSessionRewardedRevive);
         el("sessionHomeButton").addEventListener("click", returnToHome);
        el("activeShieldButton").addEventListener("click", () => buyActivePower("shield"));
        el("activeMagnetButton").addEventListener("click", () => buyActivePower("magnet"));
@@ -13685,7 +14129,16 @@ void main() {
       };
       const restoreBackgroundSession = () => {
         if (state === "paused" && !el("session-terminated-screen").hidden) {
-          if (!document.hidden) startSessionReconnectCountdown(false);
+          if (!document.hidden && sessionRewardedRevivePending) {
+            sessionRewardedRevivePending = false;
+            resumeGame();
+            showRunStatus("AD REVIVE · +50 CRYSTALS", 1800);
+            playCue("power");
+            return;
+          }
+          if (!document.hidden && pendingRewardedAd?.placement !== "session-revive") {
+            startSessionReconnectCountdown(false);
+          }
           return;
         }
         if (backgroundPausedAt) {
