@@ -311,6 +311,7 @@
       align-items: center;
       justify-content: center;
       overflow-y: auto;
+      overflow-x: hidden;
       padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
       background: radial-gradient(ellipse at 50% 35%, rgba(24, 30, 54, .72), rgba(3, 5, 12, .94) 72%), rgba(3, 5, 12, .78);
       backdrop-filter: blur(10px);
@@ -379,43 +380,70 @@
       position: fixed;
       z-index: 120;
       inset: 0;
+      isolation: isolate;
       display: grid;
       place-items: center;
       overflow-y: auto;
       padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
       background:
-        radial-gradient(ellipse at 50% 38%, rgba(34, 12, 29, .68), rgba(4, 6, 13, .94) 70%),
-        rgba(4, 6, 13, .88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+        radial-gradient(ellipse at 50% 38%, rgba(48, 10, 39, .62), rgba(4, 6, 13, .96) 72%),
+        rgba(3, 4, 10, .92);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
       pointer-events: auto;
       touch-action: pan-y;
       overscroll-behavior: contain;
     }
     .session-terminated-screen[hidden] { display: none !important; }
+    .session-terminated-screen::before {
+      position: absolute;
+      z-index: 0;
+      inset: -24%;
+      background:
+        conic-gradient(from 0deg at 50% 50%, transparent 0deg 306deg, rgba(255, 52, 112, .12) 342deg, transparent 360deg),
+        repeating-radial-gradient(circle at 50% 50%, transparent 0 48px, rgba(255, 73, 132, .075) 49px 50px, transparent 51px 86px),
+        radial-gradient(circle at 50% 50%, rgba(15, 25, 42, .06), transparent 58%);
+      content: "";
+      opacity: .6;
+      pointer-events: none;
+      animation: sessionRadarSweep 14s linear infinite;
+    }
     .session-panel {
       position: relative;
+      z-index: 1;
       isolation: isolate;
       width: min(100%, 520px);
       margin: auto;
       padding: clamp(25px, 6vw, 42px);
       overflow: hidden;
-      border: 1px solid rgba(255, 67, 101, .72);
+      border: 1px solid rgba(255, 67, 131, .76);
       border-radius: 22px;
       background: linear-gradient(145deg, rgba(20, 13, 25, .96), rgba(6, 11, 21, .95) 60%, rgba(9, 17, 28, .96));
-      box-shadow: 0 0 24px rgba(255, 53, 93, .18), 0 0 55px rgba(48, 231, 255, .13), inset 0 0 24px rgba(255, 50, 90, .04);
+      box-shadow: 0 0 24px rgba(255, 53, 111, .2), 0 0 55px rgba(48, 231, 255, .13), 0 0 52px rgba(255, 42, 184, .13), inset 0 0 24px rgba(255, 50, 120, .05);
       text-align: center;
       animation: sessionPanelIn .45s cubic-bezier(.2,.8,.2,1) both, sessionBorderPulse 2.3s ease-in-out infinite alternate;
     }
     .session-panel::before {
       position: absolute;
-      z-index: -1;
+      z-index: 0;
       inset: 0;
       background: repeating-linear-gradient(0deg, transparent 0 5px, rgba(111, 232, 255, .035) 6px, transparent 7px 10px);
       content: "";
       opacity: .48;
       pointer-events: none;
     }
+    .session-panel::after {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(transparent 0 42%, rgba(255, 45, 126, .09) 43% 45%, transparent 46% 100%);
+      content: "";
+      opacity: 0;
+      pointer-events: none;
+      animation: sessionGlitchFlash 6.4s steps(1, end) infinite;
+    }
+    .session-panel > * { position: relative; z-index: 1; }
     .session-signal {
       display: inline-flex;
       min-height: 34px;
@@ -426,29 +454,29 @@
       padding: 7px 12px;
       border: 1px solid rgba(255, 75, 103, .42);
       border-radius: 999px;
-      background: rgba(36, 10, 23, .62);
-      color: #ff9aaa;
+      background: rgba(42, 9, 31, .72);
+      color: #ff9fca;
       font: 800 10px/1.2 "Orbitron", system-ui, sans-serif;
       letter-spacing: .15em;
       text-transform: uppercase;
-      box-shadow: 0 0 20px rgba(255, 53, 93, .11);
+      box-shadow: 0 0 20px rgba(255, 53, 143, .16);
     }
     .session-signal::before {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #ff4968;
-      box-shadow: 0 0 12px #ff4968;
+      background: #ff4a8f;
+      box-shadow: 0 0 12px #ff4a8f;
       content: "";
       animation: sessionSignalBlink 1s steps(2, jump-none) infinite;
     }
     .session-title {
       margin: 0;
-      color: #fff5f7;
-      font: 950 clamp(1.7rem, 8vw, 3.15rem)/1.05 "Orbitron", system-ui, sans-serif;
+      color: #fff5fb;
+      font: 950 clamp(1.45rem, 7.6vw, 2.85rem)/1.08 "Orbitron", system-ui, sans-serif;
       letter-spacing: .025em;
       overflow-wrap: anywhere;
-      text-shadow: 2px 0 rgba(255, 54, 101, .65), -2px 0 rgba(56, 234, 255, .52), 0 0 17px rgba(255, 54, 101, .46), 0 0 38px rgba(56, 234, 255, .18);
+      text-shadow: 2px 0 rgba(255, 54, 138, .72), -2px 0 rgba(56, 234, 255, .58), 0 0 17px rgba(255, 54, 138, .52), 0 0 38px rgba(56, 234, 255, .2);
       animation: sessionTitleGlitch 4.8s steps(1, end) infinite;
     }
     .session-description {
@@ -470,6 +498,69 @@
       letter-spacing: .035em;
       overflow-wrap: anywhere;
     }
+    .session-countdown {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 5px 12px;
+      margin: 0 auto 15px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 67, 131, .32);
+      border-radius: 12px;
+      background: linear-gradient(100deg, rgba(36, 10, 30, .66), rgba(7, 18, 30, .72));
+      text-align: left;
+      box-shadow: inset 0 0 20px rgba(255, 44, 131, .05), 0 0 18px rgba(255, 42, 156, .08);
+    }
+    .session-countdown-label {
+      color: #ffb2d3;
+      font: 800 clamp(10px, 2.8vw, 12px)/1.35 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .session-countdown-text {
+      color: #c6d4e3;
+      font: 600 clamp(14px, 3.5vw, 16px)/1.35 "Rajdhani", system-ui, sans-serif;
+    }
+    .session-countdown-value {
+      grid-column: 2;
+      grid-row: 1 / 3;
+      display: grid;
+      width: clamp(44px, 12vw, 58px);
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1px solid rgba(255, 84, 148, .62);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 45, 132, .2), rgba(12, 15, 29, .9) 70%);
+      color: #fff;
+      font: 900 clamp(20px, 5.4vw, 28px)/1 "Orbitron", system-ui, sans-serif;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 14px rgba(255, 62, 141, .7);
+      box-shadow: 0 0 18px rgba(255, 53, 127, .24), inset 0 0 14px rgba(255, 53, 127, .1);
+      animation: sessionCountPulse 1s ease-in-out infinite alternate;
+    }
+    .session-countdown-track {
+      grid-column: 1 / -1;
+      height: 4px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: rgba(255,255,255,.1);
+    }
+    .session-countdown-progress {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #ff4d9c, #ff525d 52%, #63f2dc);
+      box-shadow: 0 0 12px rgba(255, 68, 146, .65);
+      transition: width .18s linear;
+    }
+    .session-countdown.is-restored .session-countdown-value {
+      border-color: rgba(80, 232, 188, .65);
+      color: #c2ffea;
+      text-shadow: 0 0 14px rgba(80, 232, 188, .68);
+      animation: none;
+    }
+    .session-countdown.is-restored .session-countdown-progress { background: #63f2dc; }
     .session-save-badge {
       display: flex;
       align-items: center;
@@ -509,9 +600,16 @@
     .session-action:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
     .session-action.home { border-color: rgba(255, 79, 184, .52); background: rgba(10, 13, 23, .9); color: #f5deef; }
     @keyframes sessionPanelIn { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    @keyframes sessionBorderPulse { from { box-shadow: 0 0 18px rgba(255, 53, 93, .13), 0 0 42px rgba(48, 231, 255, .1), inset 0 0 20px rgba(255, 50, 90, .025); } to { box-shadow: 0 0 30px rgba(255, 53, 93, .26), 0 0 62px rgba(48, 231, 255, .18), inset 0 0 28px rgba(255, 50, 90, .06); } }
+    @keyframes sessionBorderPulse { from { box-shadow: 0 0 18px rgba(255, 53, 111, .15), 0 0 42px rgba(48, 231, 255, .1), inset 0 0 20px rgba(255, 50, 130, .035); } to { box-shadow: 0 0 30px rgba(255, 53, 143, .29), 0 0 62px rgba(48, 231, 255, .18), inset 0 0 28px rgba(255, 50, 140, .08); } }
     @keyframes sessionSignalBlink { 50% { opacity: .38; } }
     @keyframes sessionTitleGlitch { 0%, 94%, 100% { transform: none; } 95% { transform: translateX(2px); } 96% { transform: translateX(-2px); } 97% { transform: none; } }
+    @keyframes sessionRadarSweep { to { transform: rotate(360deg); } }
+    @keyframes sessionGlitchFlash { 0%, 88%, 100% { opacity: 0; transform: translateX(0); } 89% { opacity: .4; transform: translateX(2px); } 90% { opacity: .12; transform: translateX(-2px); } 91% { opacity: 0; transform: none; } }
+    @keyframes sessionCountPulse { to { transform: scale(1.05); filter: brightness(1.25); } }
+    @media (prefers-reduced-motion: reduce) {
+      .session-terminated-screen::before, .session-panel, .session-panel::after, .session-signal::before, .session-title, .session-countdown-value { animation: none !important; }
+      .session-countdown-progress { transition: none; }
+    }
     @media (max-height: 520px) and (orientation: landscape) {
       .session-terminated-screen { place-items: start center; padding-top: 8px; padding-bottom: 8px; }
       .session-panel { width: min(100%, 760px); padding: 16px 22px; border-radius: 16px; }
@@ -519,6 +617,8 @@
       .session-title { font-size: clamp(1.35rem, 6vh, 2.1rem); }
       .session-description { margin: 7px auto 9px; font-size: 14px; }
       .session-connection-status { min-height: 34px; margin-bottom: 10px; padding: 7px 10px; }
+      .session-countdown { margin-bottom: 9px; padding: 8px 10px; }
+      .session-countdown-value { width: 42px; }
       .session-save-badge { margin-bottom: 12px; padding: 8px; }
       .session-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
       .session-action { min-height: 48px; padding: 9px; font-size: .9rem; }
@@ -3196,14 +3296,20 @@
     </section>
     <section class="session-terminated-screen" id="session-terminated-screen" role="dialog" aria-modal="true" aria-labelledby="sessionTerminatedTitle" aria-describedby="sessionTerminatedDescription" hidden>
       <div class="session-panel">
-        <div class="session-signal">RUN INTERRUPTED · SAVE PRESERVED</div>
-        <h2 class="session-title" id="sessionTerminatedTitle">SESSION TERMINATED</h2>
+        <div class="session-signal">NEURAL LINK INTERRUPTED · RUN STATE PRESERVED</div>
+        <h2 class="session-title" id="sessionTerminatedTitle">⚠️ NEURAL LINK TERMINATED</h2>
         <p class="session-description" id="sessionTerminatedDescription">Your run was paused after the game stayed in the background. Your current score and run state are still here.</p>
-        <p class="session-connection-status" id="sessionConnectionStatus" role="status" aria-live="polite">LOCAL SESSION PRESERVED · RETRY WHEN READY</p>
-        <div class="session-save-badge"><span aria-hidden="true">🛡️</span><span>Your crystals and high scores are saved on this device.</span></div>
+        <div class="session-countdown" id="sessionReconnectCountdown" role="timer" aria-live="polite" aria-atomic="true">
+          <span class="session-countdown-label">AUTO-RECONNECT SEQUENCE</span>
+          <strong class="session-countdown-value" id="sessionCountdownValue">05</strong>
+          <span class="session-countdown-text" id="sessionCountdownText">Re-establishing neural connection in 5...</span>
+          <span class="session-countdown-track" aria-hidden="true"><i class="session-countdown-progress" id="sessionCountdownProgress"></i></span>
+        </div>
+        <p class="session-connection-status" id="sessionConnectionStatus" role="status" aria-live="polite">LOCAL SESSION PRESERVED · RECONNECTING</p>
+        <div class="session-save-badge"><span aria-hidden="true">🛡️</span><span>Crystal Wallet &amp; High Scores safely saved to local storage.</span></div>
         <div class="session-actions">
-          <button class="session-action" id="sessionReconnectButton" type="button">🔄 RECONNECT / RETRY</button>
-          <button class="session-action home" id="sessionHomeButton" type="button">🏠 RETURN TO HOME</button>
+          <button class="session-action" id="sessionReconnectButton" type="button">🔄 RECONNECT NOW · CLAIM +25 💎</button>
+          <button class="session-action home" id="sessionHomeButton" type="button">🏠 EXIT TO MAIN MENU</button>
         </div>
       </div>
     </section>
@@ -7343,7 +7449,16 @@ void main() {
       let environmentNoticeToken = 0;
       let state = "ready";
       const BACKGROUND_SESSION_TIMEOUT_MS = 60 * 1000;
+      const SESSION_RECONNECT_SECONDS = 5;
+      const SESSION_RETRY_BONUS = 25;
       let backgroundPausedAt = 0;
+      let sessionReconnectInterval = 0;
+      let sessionReconnectTimeout = 0;
+      let sessionReconnectDeadline = 0;
+      let sessionReconnectRemainingMs = SESSION_RECONNECT_SECONDS * 1000;
+      let sessionReconnectToken = 0;
+      let sessionAutoResumeScheduled = false;
+      let sessionRetryBonusClaimedThisRun = false;
       // Some mobile/private contexts throw while retrieving localStorage itself,
       // not only while reading or writing it. Shadow the browser global with a
       // guarded adapter so every existing persistence call fails closed.
@@ -11701,6 +11816,8 @@ void main() {
           maybeShowDailyReward();
           return;
         }
+        stopSessionReconnectCountdown(false);
+        sessionRetryBonusClaimedThisRun = false;
         if (isCoarsePointer()) void requestPortraitOrientationLock();
         closeSettings(false);
         closeShop();
@@ -11827,6 +11944,9 @@ void main() {
       function pauseGame(reason = "manual") {
         if (state !== "running") return;
         state = "paused";
+        if (audioContext && audioContext.state === "running") {
+          try { void audioContext.suspend().catch(() => {}); } catch {}
+        }
         saveProgression();
         updatePursuitWarning();
         lastTime = performance.now();
@@ -11858,22 +11978,128 @@ void main() {
         const seconds = totalSeconds % 60;
         return minutes + "m " + String(seconds).padStart(2, "0") + "s";
       }
+      function stopSessionReconnectCountdown(preserveRemaining = true) {
+        sessionAutoResumeScheduled = false;
+        if (preserveRemaining && sessionReconnectDeadline) {
+          sessionReconnectRemainingMs = Math.max(0, sessionReconnectDeadline - Date.now());
+        } else if (!preserveRemaining) {
+          sessionReconnectRemainingMs = 0;
+        }
+        window.clearInterval(sessionReconnectInterval);
+        window.clearTimeout(sessionReconnectTimeout);
+        sessionReconnectInterval = 0;
+        sessionReconnectTimeout = 0;
+        sessionReconnectDeadline = 0;
+        sessionReconnectToken++;
+      }
+      function updateSessionReconnectAction(canClaim = true) {
+        const button = el("sessionReconnectButton");
+        const label = canClaim && !sessionRetryBonusClaimedThisRun
+          ? "🔄 RECONNECT NOW · CLAIM +" + SESSION_RETRY_BONUS + " 💎"
+          : "🔄 RECONNECT NOW";
+        if (button.textContent !== label) button.textContent = label;
+      }
+      function updateSessionReconnectCountdown(token) {
+        if (token !== sessionReconnectToken) return;
+        const sessionScreen = el("session-terminated-screen");
+        if (state !== "paused" || sessionScreen.hidden) {
+          stopSessionReconnectCountdown(false);
+          return;
+        }
+        if (document.hidden) {
+          stopSessionReconnectCountdown(true);
+          return;
+        }
+        const remainingMs = Math.max(0, sessionReconnectDeadline - Date.now());
+        sessionReconnectRemainingMs = remainingMs;
+        const seconds = Math.ceil(remainingMs / 1000);
+        updateSessionReconnectAction(remainingMs > 0);
+        const countdown = el("sessionReconnectCountdown");
+        const valueText = String(seconds).padStart(2, "0");
+        const countdownText = remainingMs > 0
+          ? "Re-establishing neural connection in " + seconds + "..."
+          : "Neural link restored · resuming your run...";
+        if (el("sessionCountdownValue").textContent !== valueText) {
+          el("sessionCountdownValue").textContent = valueText;
+        }
+        if (el("sessionCountdownText").textContent !== countdownText) {
+          el("sessionCountdownText").textContent = countdownText;
+        }
+        el("sessionCountdownProgress").style.width =
+          Math.max(0, Math.min(100, remainingMs / (SESSION_RECONNECT_SECONDS * 1000) * 100)) + "%";
+        countdown.classList.toggle("is-restored", remainingMs <= 0);
+        if (remainingMs > 0) return;
+
+        window.clearInterval(sessionReconnectInterval);
+        sessionReconnectInterval = 0;
+        sessionReconnectDeadline = 0;
+        el("sessionConnectionStatus").textContent = "NEURAL LINK STABLE · RESTORING LOCAL RUN";
+        sessionAutoResumeScheduled = true;
+        sessionReconnectTimeout = window.setTimeout(() => {
+          sessionReconnectTimeout = 0;
+          if (token === sessionReconnectToken && state === "paused" && !sessionScreen.hidden && !document.hidden) {
+            resumeGame(true);
+          }
+        }, 450);
+      }
+      function startSessionReconnectCountdown(reset = false) {
+        if (!reset && sessionAutoResumeScheduled) return;
+        const preservedRemainingMs = sessionReconnectRemainingMs;
+        stopSessionReconnectCountdown(false);
+        if (reset || preservedRemainingMs <= 0) {
+          sessionReconnectRemainingMs = SESSION_RECONNECT_SECONDS * 1000;
+        } else {
+          sessionReconnectRemainingMs = preservedRemainingMs;
+        }
+        sessionReconnectDeadline = Date.now() + sessionReconnectRemainingMs;
+        const token = sessionReconnectToken;
+        sessionReconnectInterval = window.setInterval(() => updateSessionReconnectCountdown(token), 150);
+        updateSessionReconnectCountdown(token);
+      }
+      function reconnectSessionNow() {
+        if (state !== "paused" || el("session-terminated-screen").hidden) return;
+        const remainingMs = sessionReconnectDeadline
+          ? Math.max(0, sessionReconnectDeadline - Date.now())
+          : sessionReconnectRemainingMs;
+        const earnsLuckyRetry = remainingMs > 0 && !sessionRetryBonusClaimedThisRun;
+        if (earnsLuckyRetry) {
+          sessionRetryBonusClaimedThisRun = true;
+          progression.crystals = safeStoredCount(progression.crystals + SESSION_RETRY_BONUS);
+          progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + SESSION_RETRY_BONUS);
+          saveProgression();
+          updateCoinDisplay();
+          updateHUD();
+          renderProgressionUI();
+        }
+        stopSessionReconnectCountdown(false);
+        resumeGame();
+        if (earnsLuckyRetry) {
+          showRunStatus("LUCKY RETRY · +" + SESSION_RETRY_BONUS + " CRYSTALS", 1800);
+          playCue("power");
+        }
+      }
       function showSessionTerminatedScreen(awayDurationMs) {
         if (state !== "paused") return;
+        stopSessionReconnectCountdown(false);
         el("pause-screen").hidden = true;
         el("sessionTerminatedDescription").textContent =
           "Your run was paused after " + formatBackgroundDuration(awayDurationMs) +
           " in the background. Your score, lane, and current run state are still here.";
-        el("sessionConnectionStatus").textContent = "LOCAL SESSION PRESERVED · READY TO RESUME OFFLINE";
+        el("sessionConnectionStatus").textContent = "LOCAL SESSION PRESERVED · AUTO-RECONNECT STARTING";
         el("session-terminated-screen").hidden = false;
+        el("sessionReconnectCountdown").classList.remove("is-restored");
+        updateSessionReconnectAction(true);
+        startSessionReconnectCountdown(true);
         el("sessionReconnectButton").focus({ preventScroll: true });
       }
-      function resumeGame() {
+      function resumeGame(automatic = false) {
         if (state !== "paused") return;
+        stopSessionReconnectCountdown(false);
         backgroundPausedAt = 0;
         state = "running";
         updatePursuitWarning();
         lastTime = performance.now();
+        void unlockAudio();
         el("game").classList.remove("is-paused");
         el("pause-screen").hidden = true;
         el("session-terminated-screen").hidden = true;
@@ -11884,6 +12110,7 @@ void main() {
         updateGravityIndicator();
         updateAutoColorIndicator();
         updatePowerHUD();
+        if (automatic) showRunStatus("NEURAL LINK RESTORED · RUN RESUMED", 1800);
         el("pauseButton").focus({ preventScroll: true });
       }
       function awardGatePass(message) {
@@ -12063,6 +12290,7 @@ void main() {
         resultTickerFrame = requestAnimationFrame(tick);
       }
       function returnToHome() {
+        stopSessionReconnectCountdown(false);
         closeSettings(false);
         closeShop();
         clearFlexCardPreview();
@@ -12187,6 +12415,7 @@ void main() {
       }
       function endGame(reason = "collision") {
         if (state !== "running") return;
+        stopSessionReconnectCountdown(false);
         const scoreVerified = auditRunScore(performance.now());
         captureGhostSample(true);
         if (scoreVerified && Math.floor(score) > ghostBestAtRunStart) ghostRecordCandidate = true;
@@ -13202,7 +13431,7 @@ void main() {
        el("pauseRestartButton").addEventListener("click", () => startGame(true));
        el("pauseSettingsButton").addEventListener("click", openSettings);
        el("pauseHomeButton").addEventListener("click", returnToHome);
-        el("sessionReconnectButton").addEventListener("click", resumeGame);
+        el("sessionReconnectButton").addEventListener("click", reconnectSessionNow);
         el("sessionHomeButton").addEventListener("click", returnToHome);
        el("activeShieldButton").addEventListener("click", () => buyActivePower("shield"));
        el("activeMagnetButton").addEventListener("click", () => buyActivePower("magnet"));
@@ -13328,7 +13557,12 @@ void main() {
         }
         if (event.code === "Escape" && !el("session-terminated-screen").hidden) {
           event.preventDefault();
-          resumeGame();
+          reconnectSessionNow();
+          return;
+        }
+        if (event.code === "KeyP" && !el("session-terminated-screen").hidden) {
+          event.preventDefault();
+          reconnectSessionNow();
           return;
         }
         if (event.code === "Escape" && !el("dailyModal").hidden) {
@@ -13441,11 +13675,19 @@ void main() {
       setGameMode("endless");
       maybeShowDailyReward();
       const pauseForBackground = () => {
+        if (state === "paused" && !el("session-terminated-screen").hidden) {
+          stopSessionReconnectCountdown(true);
+          return;
+        }
         if (state !== "running") return;
         if (!backgroundPausedAt) backgroundPausedAt = Date.now();
         pauseGame("background");
       };
       const restoreBackgroundSession = () => {
+        if (state === "paused" && !el("session-terminated-screen").hidden) {
+          if (!document.hidden) startSessionReconnectCountdown(false);
+          return;
+        }
         if (backgroundPausedAt) {
           const awayDurationMs = Math.max(0, Date.now() - backgroundPausedAt);
           backgroundPausedAt = 0;
