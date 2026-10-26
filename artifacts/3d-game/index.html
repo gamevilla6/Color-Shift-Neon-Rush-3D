@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#090c13" />
   <meta name="description" content="Color Shift: Neon Rush 3D — shift through neon gates, build your combo, and chase your best run." />
   <meta name="keywords" content="neon arcade, 3D color match, endless cyberpunk game, reflex runner, arcade runner" />
@@ -59,6 +59,36 @@
     button { font: inherit; }
     [hidden] { display: none !important; }
     #game { position: relative; width: 100%; height: 100vh; height: 100dvh; min-height: 100vh; min-height: 100svh; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; background: radial-gradient(ellipse at 50% 34%, #18202b 0%, #0b1018 55%, #080b11 100%); }
+    #game.is-running:not(.is-paused) { touch-action: none; }
+    .orientation-warning {
+      position: fixed;
+      z-index: 80;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: max(22px, env(safe-area-inset-top)) max(22px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(22px, env(safe-area-inset-left));
+      background: radial-gradient(ellipse at center, rgba(8,14,24,.86), rgba(3,5,11,.94));
+      pointer-events: none;
+      text-align: center;
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
+    }
+    .orientation-warning[hidden] { display: none !important; }
+    .orientation-warning-card {
+      width: min(100%, 480px);
+      padding: clamp(22px, 5vw, 34px);
+      border: 1px solid rgba(56,234,255,.45);
+      border-radius: 16px;
+      background: linear-gradient(145deg, rgba(13,22,36,.88), rgba(12,10,25,.92));
+      box-shadow: inset 0 1px rgba(255,255,255,.08), 0 0 35px rgba(56,234,255,.14), 0 0 40px rgba(255,79,184,.1);
+    }
+    .orientation-warning-icon { display: block; margin-bottom: 12px; font-size: clamp(34px, 8vw, 48px); filter: drop-shadow(0 0 14px rgba(56,234,255,.65)); }
+    .orientation-warning-title { margin: 0; color: #e8ffff; font: 800 clamp(17px, 3.8vw, 23px)/1.4 "Orbitron", system-ui, sans-serif; text-shadow: 0 0 18px rgba(56,234,255,.38); }
+    .orientation-warning-copy { margin: 10px 0 0; color: #aab9c9; font-size: clamp(15px, 2.4vw, 18px); line-height: 1.5; }
+    @media (orientation: landscape) and (max-width: 900px) and (pointer: coarse) {
+      .orientation-warning { padding-inline: max(26px, env(safe-area-inset-left)) max(26px, env(safe-area-inset-right)); }
+      .orientation-warning-card { width: min(92vw, 520px); }
+    }
     #splash-screen {
       position: fixed;
       z-index: 9999;
@@ -165,14 +195,26 @@
     .hud { position: absolute; z-index: 5; top: 94px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: clamp(14px, 4vw, 48px); opacity: 0; transition: opacity .55s ease; pointer-events: none; }
     .hud.visible { opacity: 1; }
     #game.is-running .topbar { opacity: 0; visibility: hidden; }
-    #game.is-running .hud { top: 0; left: 0; right: 0; width: 100%; max-width: none; height: 0; transform: none; display: block; }
+    #game.is-running .hud {
+      top: max(8px, env(safe-area-inset-top));
+      left: max(12px, env(safe-area-inset-left));
+      right: max(12px, env(safe-area-inset-right));
+      width: auto;
+      max-width: none;
+      height: auto;
+      transform: none;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr);
+      align-items: start;
+      gap: 6px;
+    }
     #game.is-running .hud .stat:not(:first-child):not(:last-child) { display: none; }
     #game.is-running .hud .stat:first-child,
-    #game.is-running .hud .stat:last-child { position: absolute; top: max(17px, env(safe-area-inset-top)); min-width: 0; text-align: left; }
-    #game.is-running .hud .stat:first-child { left: max(18px, env(safe-area-inset-left)); }
-    #game.is-running .hud .stat:last-child { right: max(18px, env(safe-area-inset-right)); text-align: right; }
-    #game.is-running .hud .stat-value { color: #f4f7fb; font-size: clamp(21px, 5vw, 27px); line-height: 1; text-shadow: 0 0 16px rgba(56,234,255,.18); }
-    #game.is-running .hud .stat-label { margin-top: 5px; color: rgba(220,228,236,.58); font-size: 7px; letter-spacing: .16em; }
+    #game.is-running .hud .stat:last-child { position: relative; top: auto; min-width: 0; text-align: left; }
+    #game.is-running .hud .stat:first-child { grid-column: 1; grid-row: 1; left: auto; }
+    #game.is-running .hud .stat:last-child { grid-column: 3; grid-row: 1; right: auto; text-align: right; }
+    #game.is-running .hud .stat-value { color: #f4f7fb; font-size: clamp(19px, 5.5vw, 27px); line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 0 16px rgba(56,234,255,.18); }
+    #game.is-running .hud .stat-label { margin-top: 5px; color: rgba(220,228,236,.72); font-size: clamp(8px, 1.8vw, 10px); letter-spacing: .1em; }
     #game.is-running .run-status,
     #game.is-running .power-status,
     #game.is-running .boost-banner,
@@ -333,6 +375,158 @@
       .pause-action { min-height: 48px; padding: 8px 12px; font-size: clamp(.9rem, 2.7vw, 1rem); }
     }
     @media (prefers-reduced-motion: reduce) { .pause-action { transition: none; } }
+    .session-terminated-screen {
+      position: fixed;
+      z-index: 120;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      overflow-y: auto;
+      padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      background:
+        radial-gradient(ellipse at 50% 38%, rgba(34, 12, 29, .68), rgba(4, 6, 13, .94) 70%),
+        rgba(4, 6, 13, .88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      pointer-events: auto;
+      touch-action: pan-y;
+      overscroll-behavior: contain;
+    }
+    .session-terminated-screen[hidden] { display: none !important; }
+    .session-panel {
+      position: relative;
+      isolation: isolate;
+      width: min(100%, 520px);
+      margin: auto;
+      padding: clamp(25px, 6vw, 42px);
+      overflow: hidden;
+      border: 1px solid rgba(255, 67, 101, .72);
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(20, 13, 25, .96), rgba(6, 11, 21, .95) 60%, rgba(9, 17, 28, .96));
+      box-shadow: 0 0 24px rgba(255, 53, 93, .18), 0 0 55px rgba(48, 231, 255, .13), inset 0 0 24px rgba(255, 50, 90, .04);
+      text-align: center;
+      animation: sessionPanelIn .45s cubic-bezier(.2,.8,.2,1) both, sessionBorderPulse 2.3s ease-in-out infinite alternate;
+    }
+    .session-panel::before {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent 0 5px, rgba(111, 232, 255, .035) 6px, transparent 7px 10px);
+      content: "";
+      opacity: .48;
+      pointer-events: none;
+    }
+    .session-signal {
+      display: inline-flex;
+      min-height: 34px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      margin: 0 auto 17px;
+      padding: 7px 12px;
+      border: 1px solid rgba(255, 75, 103, .42);
+      border-radius: 999px;
+      background: rgba(36, 10, 23, .62);
+      color: #ff9aaa;
+      font: 800 10px/1.2 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      box-shadow: 0 0 20px rgba(255, 53, 93, .11);
+    }
+    .session-signal::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ff4968;
+      box-shadow: 0 0 12px #ff4968;
+      content: "";
+      animation: sessionSignalBlink 1s steps(2, jump-none) infinite;
+    }
+    .session-title {
+      margin: 0;
+      color: #fff5f7;
+      font: 950 clamp(1.7rem, 8vw, 3.15rem)/1.05 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .025em;
+      overflow-wrap: anywhere;
+      text-shadow: 2px 0 rgba(255, 54, 101, .65), -2px 0 rgba(56, 234, 255, .52), 0 0 17px rgba(255, 54, 101, .46), 0 0 38px rgba(56, 234, 255, .18);
+      animation: sessionTitleGlitch 4.8s steps(1, end) infinite;
+    }
+    .session-description {
+      max-width: 40ch;
+      margin: 14px auto 18px;
+      color: rgba(227, 235, 245, .82);
+      font: 600 clamp(16px, 4vw, 18px)/1.55 "Rajdhani", system-ui, sans-serif;
+      overflow-wrap: anywhere;
+    }
+    .session-connection-status {
+      min-height: 42px;
+      margin: 0 auto 18px;
+      padding: 11px 12px;
+      border: 1px solid rgba(71, 213, 230, .22);
+      border-radius: 10px;
+      background: rgba(3, 12, 21, .6);
+      color: #95f5ed;
+      font: 700 clamp(12px, 3.5vw, 14px)/1.45 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .035em;
+      overflow-wrap: anywhere;
+    }
+    .session-save-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      margin: 0 0 22px;
+      padding: 12px;
+      border: 1px solid rgba(80, 232, 188, .27);
+      border-radius: 10px;
+      background: rgba(10, 34, 32, .5);
+      color: #c2ffea;
+      font: 700 clamp(14px, 3.6vw, 16px)/1.35 "Rajdhani", system-ui, sans-serif;
+    }
+    .session-actions { display: grid; grid-template-columns: 1fr; gap: 11px; }
+    .session-action {
+      display: flex;
+      width: 100%;
+      min-height: 54px;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 15px;
+      border: 1px solid rgba(56, 234, 255, .68);
+      border-radius: 12px;
+      background: linear-gradient(100deg, rgba(56, 234, 255, .2), rgba(255, 79, 184, .15));
+      color: #f4fcff;
+      cursor: pointer;
+      touch-action: manipulation;
+      pointer-events: auto;
+      font: 800 clamp(.95rem, 3.8vw, 1.08rem)/1.25 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .06em;
+      text-align: center;
+      text-shadow: 0 0 10px rgba(56, 234, 255, .4);
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+    .session-action:hover { transform: scale(1.025); border-color: #fff; box-shadow: 0 0 22px rgba(56, 234, 255, .22); }
+    .session-action:active { transform: scale(.975); }
+    .session-action:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    .session-action.home { border-color: rgba(255, 79, 184, .52); background: rgba(10, 13, 23, .9); color: #f5deef; }
+    @keyframes sessionPanelIn { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes sessionBorderPulse { from { box-shadow: 0 0 18px rgba(255, 53, 93, .13), 0 0 42px rgba(48, 231, 255, .1), inset 0 0 20px rgba(255, 50, 90, .025); } to { box-shadow: 0 0 30px rgba(255, 53, 93, .26), 0 0 62px rgba(48, 231, 255, .18), inset 0 0 28px rgba(255, 50, 90, .06); } }
+    @keyframes sessionSignalBlink { 50% { opacity: .38; } }
+    @keyframes sessionTitleGlitch { 0%, 94%, 100% { transform: none; } 95% { transform: translateX(2px); } 96% { transform: translateX(-2px); } 97% { transform: none; } }
+    @media (max-height: 520px) and (orientation: landscape) {
+      .session-terminated-screen { place-items: start center; padding-top: 8px; padding-bottom: 8px; }
+      .session-panel { width: min(100%, 760px); padding: 16px 22px; border-radius: 16px; }
+      .session-signal { min-height: 28px; margin-bottom: 9px; }
+      .session-title { font-size: clamp(1.35rem, 6vh, 2.1rem); }
+      .session-description { margin: 7px auto 9px; font-size: 14px; }
+      .session-connection-status { min-height: 34px; margin-bottom: 10px; padding: 7px 10px; }
+      .session-save-badge { margin-bottom: 12px; padding: 8px; }
+      .session-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .session-action { min-height: 48px; padding: 9px; font-size: .9rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .session-panel, .session-signal::before, .session-title { animation: none; }
+      .session-action { transition: none; }
+    }
     .eyebrow { display: inline-flex; align-items: center; gap: 9px; margin-bottom: 14px; color: var(--accent); font-size: 9px; letter-spacing: .23em; text-transform: uppercase; }
     .eyebrow::before, .eyebrow::after { content: ""; width: 22px; height: 1px; background: currentColor; opacity: .7; }
     h1 { margin: 0; font-family: system-ui, sans-serif; font-size: clamp(42px, 5.5vw, 66px); font-weight: 900; line-height: .88; letter-spacing: -.045em; text-transform: uppercase; }
@@ -406,12 +600,78 @@
     .shop-intro { margin: 9px 0 0; color: #a7b4c3; font-size: clamp(16px, 1.4vw, 17px); line-height: 1.35; }
     .shop-balance { min-width: 155px; padding: 12px 14px; border: 1px solid rgba(255,211,106,.26); background: rgba(255,211,106,.06); font-size: 11px; }
     .shop-balance strong { display: inline-block; margin-top: 4px; font: 700 clamp(20px, 2.6vw, 29px)/1 "Orbitron", system-ui, sans-serif; }
-    .reward-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 5px; margin: 0 0 21px; border: 1px solid rgba(233,241,246,.1); background: rgba(3,7,13,.52); }
-    .reward-tab { min-height: 48px; padding: 10px; border: 1px solid transparent; background: transparent; color: #9ca9b8; cursor: pointer; font: 700 12px "Orbitron", system-ui, sans-serif; letter-spacing: .08em; line-height: 1.2; overflow-wrap: anywhere; transition: color .18s, border-color .18s, background .18s, transform .18s; touch-action: manipulation; }
+    .reward-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; padding: 5px; margin: 0 0 16px; border: 1px solid rgba(233,241,246,.1); background: rgba(3,7,13,.52); }
+    .reward-tab { min-height: 52px; padding: 9px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #9ca9b8; cursor: pointer; font: 700 clamp(10px, 1vw, 12px) "Orbitron", system-ui, sans-serif; letter-spacing: .04em; line-height: 1.2; overflow-wrap: anywhere; transition: color .18s, border-color .18s, background .18s, transform .18s; touch-action: manipulation; }
     .reward-tab:hover { color: #fff; transform: translateY(-1px); }
     .reward-tab.active { border-color: rgba(84,242,223,.38); background: linear-gradient(100deg, rgba(84,242,223,.13), rgba(155,111,255,.1)); color: #c8fff8; box-shadow: inset 0 0 18px rgba(84,242,223,.05); }
     .reward-tab:focus-visible, .shop-panel button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
     .reward-tab-panel[hidden] { display: none !important; }
+    .shop-live-preview {
+      display: grid;
+      grid-template-columns: minmax(68px, 92px) minmax(0, 1fr);
+      align-items: center;
+      gap: 14px;
+      min-height: 104px;
+      margin: 0 0 18px;
+      padding: 12px;
+      border: 1px solid rgba(83, 227, 235, .25);
+      border-radius: 12px;
+      background: radial-gradient(ellipse at 8% 50%, rgba(56,234,255,.1), transparent 43%), linear-gradient(120deg, rgba(13,20,33,.92), rgba(7,11,20,.9));
+      box-shadow: inset 0 1px rgba(255,255,255,.035);
+    }
+    .shop-live-swatch {
+      display: grid;
+      min-height: 76px;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      background: radial-gradient(circle, color-mix(in srgb, var(--preview-color, #38eaff) 26%, transparent), rgba(5,9,18,.78) 72%);
+      color: var(--preview-color, #38eaff);
+      font: 900 30px/1 "Orbitron", system-ui, sans-serif;
+      text-shadow: 0 0 17px currentColor;
+      box-shadow: inset 0 0 19px color-mix(in srgb, var(--preview-color, #38eaff) 9%, transparent), 0 0 19px color-mix(in srgb, var(--preview-color, #38eaff) 12%, transparent);
+    }
+    .shop-live-copy { min-width: 0; }
+    .shop-live-kicker { margin: 0 0 4px; color: #82f5ed; font: 700 9px "Orbitron", system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+    .shop-live-copy h3 { margin: 0; color: #f4f7ff; font: 800 clamp(16px, 1.8vw, 21px)/1.25 "Orbitron", system-ui, sans-serif; overflow-wrap: anywhere; }
+    .shop-live-copy p { margin: 5px 0 0; color: #aebdca; font-size: 16px; line-height: 1.35; }
+    .shop-live-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 8px; }
+    .rarity-tag, .shop-live-status {
+      display: inline-flex;
+      min-height: 24px;
+      align-items: center;
+      padding: 4px 8px;
+      border: 1px solid rgba(56,234,255,.28);
+      border-radius: 999px;
+      background: rgba(5,13,22,.76);
+      color: #9cefff;
+      font: 700 9px/1.2 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .rarity-tag.epic, .shop-item-card.epic { --rarity-color: #b984ff; }
+    .rarity-tag.legendary, .shop-item-card.legendary { --rarity-color: #ffd36a; }
+    .rarity-tag.common, .shop-item-card.common { --rarity-color: #80e7d7; }
+    .rarity-tag { border-color: color-mix(in srgb, var(--rarity-color, #80e7d7) 48%, transparent); color: var(--rarity-color, #80e7d7); }
+    .shop-item-card { position: relative; cursor: pointer; border-color: rgba(233,241,246,.14); }
+    .shop-item-card::after { position: absolute; inset: 0; border: 1px solid transparent; content: ""; pointer-events: none; transition: border-color .18s, box-shadow .18s; }
+    .shop-item-card:hover::after, .shop-item-card.selected::after { border-color: color-mix(in srgb, var(--rarity-color, #38eaff) 75%, transparent); box-shadow: inset 0 0 18px color-mix(in srgb, var(--rarity-color, #38eaff) 9%, transparent), 0 0 20px color-mix(in srgb, var(--rarity-color, #38eaff) 14%, transparent); }
+    .shop-item-card.selected { transform: translateY(-1px); }
+    .shop-card-topline { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .shop-card-topline .rarity-tag { flex: 0 0 auto; }
+    .shop-card-status { color: #b8c5d0; font: 700 9px "Orbitron", system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; }
+    .shop-card-status.equipped { color: #93fff0; }
+    .shop-card-status.locked { color: #ffd36a; }
+    .shop-card-status.exclusive { color: #ff96db; }
+    .shop-action { width: 100%; min-height: 48px; margin-top: auto; padding: 9px; font-size: clamp(10px, 1vw, 12px); }
+    .shop-action:disabled { opacity: .76; cursor: not-allowed; }
+    .aura-grid, .booster-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .aura-card, .booster-card { display: flex; min-width: 0; min-height: 242px; flex-direction: column; padding: 14px; border: 1px solid rgba(233,241,246,.14); background: linear-gradient(150deg, rgba(17,26,42,.95), rgba(10,15,26,.95)); }
+    .aura-sample, .booster-sample { display: grid; min-height: 94px; place-items: center; margin: 0 0 12px; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; background: radial-gradient(circle, color-mix(in srgb, var(--sample-color) 18%, transparent), rgba(4,8,15,.7) 70%); color: var(--sample-color); font: 900 32px "Orbitron", system-ui, sans-serif; text-shadow: 0 0 16px currentColor; }
+    .aura-card h3, .booster-card h3 { margin: 0; color: #f4f7ff; font: 700 clamp(14px, 1.2vw, 16px)/1.25 "Orbitron", system-ui, sans-serif; overflow-wrap: anywhere; }
+    .aura-card p, .booster-card p { min-height: 44px; margin: 6px 0 10px; color: #a4b1c0; font-size: 16px; line-height: 1.35; }
+    .booster-inventory { margin: 6px 0 10px; color: #9caebe; font-size: 15px; }
+    .booster-inventory strong { color: #d9fff5; font-family: "Orbitron", system-ui, sans-serif; }
     .referral-panel {
       display: grid;
       gap: clamp(15px, 2.4vw, 24px);
@@ -509,12 +769,14 @@
     .skin-preview.plasma::before { background: radial-gradient(circle at 30% 25%, #fff, #a876ff 23%, #1c183b 72%); border: 1px solid #d1b5ff; }
     .skin-preview.shard::before { clip-path: polygon(50% 0, 100% 36%, 76% 100%, 22% 91%, 0 34%); transform: rotate(12deg); }
     .skin-preview.void::before { background: radial-gradient(circle at 32% 28%, #ffe7ff, #ff58ca 12%, #24102b 46%, #05060b 74%); border: 1px solid #ff98e0; }
+    .skin-preview.wireframe::before { background: transparent; border: 2px dashed var(--skin-color); box-shadow: 0 0 14px var(--skin-color), inset 0 0 10px var(--skin-color); }
+    .skin-preview.glass::before { background: radial-gradient(circle at 28% 24%, rgba(255,255,255,.95), color-mix(in srgb, var(--skin-color) 50%, transparent) 28%, rgba(12,22,43,.18) 72%); border: 1px solid rgba(209,243,255,.9); box-shadow: inset -7px -5px 14px rgba(56,234,255,.35), 0 0 14px var(--skin-color); }
     .skin-card h3, .trail-card h3 { margin: 0; color: #f4f7ff; font: 700 clamp(14px, 1.2vw, 16px) "Orbitron", system-ui, sans-serif; }
     .skin-card p, .trail-card p { min-height: 42px; margin: 6px 0 10px; color: #a4b1c0; font-size: 16px; line-height: 1.35; }
-    .cosmetic-cost, .trail-footer > span { display: flex; align-items: center; gap: 6px; margin-top: auto; color: #d8bd76; font: 600 clamp(8px, .8vw, 10px) "Orbitron", system-ui, sans-serif; white-space: nowrap; }
-    .skin-purchase-row { display: flex; align-items: center; gap: 6px; min-width: 0; margin-top: auto; }
-    .skin-purchase-row .cosmetic-cost { margin-top: 0; }
-    .skin-purchase-row .skin-action { flex: 1; width: auto; min-width: 76px; min-height: 44px; margin-top: 0; padding-inline: 5px; font-size: 10px; }
+    .cosmetic-cost, .trail-footer > span { display: flex; align-items: center; gap: 6px; margin-top: auto; color: #d8bd76; font: 600 clamp(9px, .8vw, 11px)/1.35 "Orbitron", system-ui, sans-serif; white-space: normal; overflow-wrap: anywhere; }
+    .skin-purchase-row { display: flex; flex-direction: column; align-items: stretch; gap: 7px; min-width: 0; margin-top: auto; }
+    .skin-purchase-row .cosmetic-cost { min-height: 27px; margin-top: 0; }
+    .skin-purchase-row .skin-action { flex: 0 0 auto; width: 100%; min-width: 0; min-height: 48px; margin-top: 0; padding-inline: 5px; font-size: 10px; }
     .skin-action:disabled, .trail-action:disabled { opacity: .75; cursor: not-allowed; }
     .trail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .trail-card { display: grid; grid-template-columns: 62px minmax(0, 1fr); column-gap: 12px; min-width: 0; padding: 14px; border: 1px solid rgba(211,222,231,.12); background: linear-gradient(135deg, rgba(17,26,40,.9), rgba(10,15,24,.94)); }
@@ -526,7 +788,7 @@
     .trail-copy { min-width: 0; }
     .trail-copy p { min-height: 0; margin: 5px 0 8px; }
     .trail-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; grid-column: 2; }
-    .trail-action { min-width: 88px; min-height: 40px; font-size: 10px; }
+    .trail-action { min-width: 88px; min-height: 48px; font-size: 10px; }
     .shop-notice { min-height: 26px; margin: 15px 0 8px; color: #a4fff2; font-size: 16px; line-height: 1.4; letter-spacing: .02em; }
     .save-reset { margin-top: 12px; padding-top: 13px; }
     .save-reset p { font-size: 16px; }
@@ -995,12 +1257,14 @@
       --powerbar-bottom: max(22px, env(safe-area-inset-bottom));
       position: absolute;
       z-index: 8;
-      left: 50%;
+      left: max(16px, env(safe-area-inset-left));
+      right: max(16px, env(safe-area-inset-right));
       bottom: var(--powerbar-bottom);
       display: flex;
-      width: min(570px, calc(100vw - 32px));
+      width: auto;
+      max-width: 570px;
+      margin-inline: auto;
       gap: 9px;
-      transform: translateX(-50%);
       visibility: hidden;
       opacity: 0;
       pointer-events: none;
@@ -1013,12 +1277,14 @@
       position: relative;
       display: grid;
       grid-template-columns: auto 1fr;
-      grid-template-rows: 1fr auto;
+      grid-template-rows: auto auto auto;
       align-items: center;
+      align-content: center;
       column-gap: 7px;
+      row-gap: 3px;
       flex: 1 1 0;
-      min-width: 0;
-      min-height: 58px;
+      min-width: 48px;
+      min-height: 64px;
       padding: 7px 10px;
       border: 1px solid rgba(84,242,223,.34);
       border-radius: 9px;
@@ -1032,16 +1298,16 @@
       transition: transform .15s ease, border-color .15s ease, background .15s ease, opacity .15s ease;
     }
     .active-power-button:hover:not(:disabled) { transform: translateY(-2px); border-color: rgba(56,234,255,.8); background-color: rgba(20,33,47,.95); }
-    .active-power-button:active:not(:disabled) { transform: scale(.96); }
+    .active-power-button:active:not(:disabled) { transform: scale(.96); filter: brightness(1.28); box-shadow: inset 0 0 20px rgba(56,234,255,.2), 0 0 20px rgba(56,234,255,.2); }
     .active-power-button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
     .active-power-button:disabled { opacity: .78; cursor: default; }
     .active-power-button.active { border-color: rgba(197,255,74,.72); box-shadow: inset 0 0 16px rgba(197,255,74,.08), 0 0 18px rgba(197,255,74,.12); }
     .active-power-button.unaffordable .active-power-cost { color: #ffb5c6; }
     .active-power-button.bomb { border-color: rgba(255,79,184,.4); }
-    .active-power-icon { grid-row: 1 / 3; font-size: 21px; line-height: 1; }
-    .active-power-name { min-width: 0; overflow: hidden; color: #ecf8ff; font: 750 clamp(8px, 1.5vw, 11px)/1.1 "Orbitron", system-ui, sans-serif; letter-spacing: .05em; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
-    .active-power-cost { color: #ffe28c; font: 700 10px/1.1 "Orbitron", system-ui, sans-serif; text-align: left; }
-    .active-power-remaining { grid-column: 1 / -1; color: #c8ff83; font: 700 10px/1 "Orbitron", system-ui, sans-serif; }
+    .active-power-icon { grid-column: 1; grid-row: 1 / 4; font-size: 21px; line-height: 1; }
+    .active-power-name { grid-column: 2; grid-row: 1; min-width: 0; overflow: hidden; color: #ecf8ff; font: 750 clamp(8px, 1.5vw, 11px)/1.1 "Orbitron", system-ui, sans-serif; letter-spacing: .05em; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+    .active-power-cost { grid-column: 2; grid-row: 2; color: #ffe28c; font: 700 10px/1.1 "Orbitron", system-ui, sans-serif; text-align: left; white-space: nowrap; }
+    .active-power-remaining { grid-column: 2; grid-row: 3; color: #c8ff83; font: 700 9px/1 "Orbitron", system-ui, sans-serif; text-align: left; white-space: nowrap; }
     .active-power-remaining[hidden] { display: none !important; }
     .power-purchase-notice {
       position: absolute;
@@ -1082,12 +1348,9 @@
       .brand-name { font-size: 15px; }
       .brand-sub { font-size: 8px; }
       .hud { top: max(70px, calc(env(safe-area-inset-top) + 54px)); width: calc(100% - 24px); max-width: 500px; justify-content: space-between; gap: clamp(3px, 1.4vw, 8px); }
-      #game.is-running .hud .stat:first-child,
-      #game.is-running .hud .stat:last-child { top: max(14px, env(safe-area-inset-top)); }
-      #game.is-running .hud .stat:first-child { left: max(14px, env(safe-area-inset-left)); }
-      #game.is-running .hud .stat:last-child { right: max(14px, env(safe-area-inset-right)); }
-      #game.is-running .hud .stat-value { font-size: clamp(20px, 6vw, 25px); }
-      .pause-button { top: max(10px, env(safe-area-inset-top)); width: 48px; height: 48px; }
+      #game.is-running .hud { top: max(8px, env(safe-area-inset-top)); }
+      #game.is-running .hud .stat-value { font-size: clamp(19px, 6vw, 25px); }
+      .pause-button { top: max(8px, env(safe-area-inset-top)); width: 48px; height: 48px; }
       .stat { flex: 1 1 0; min-width: 0; }
       .stat-value { font-size: clamp(22px, 7vw, 28px); }
       .stat-label { margin-top: 6px; font-size: 6px; letter-spacing: .1em; }
@@ -1104,10 +1367,12 @@
       .mobile-controls { display: flex; }
       .active-power-toolbar {
         --powerbar-bottom: max(82px, calc(env(safe-area-inset-bottom) + 72px));
-        width: calc(100vw - 20px);
+        left: max(10px, env(safe-area-inset-left));
+        right: max(10px, env(safe-area-inset-right));
+        width: auto;
         gap: 5px;
       }
-      .active-power-button { min-height: 54px; padding: 6px 5px; column-gap: 4px; }
+      .active-power-button { min-width: 48px; min-height: 60px; padding: 6px 5px; column-gap: 4px; }
       .active-power-icon { font-size: 18px; }
       .active-power-name { font-size: clamp(7px, 2vw, 9px); letter-spacing: .025em; }
       .active-power-cost { font-size: 9px; }
@@ -1169,11 +1434,13 @@
       .color-panel { bottom: max(10px, env(safe-area-inset-bottom)); }
       .mobile-controls { bottom: max(8px, env(safe-area-inset-bottom)); }
       .active-power-toolbar {
-        --powerbar-bottom: max(64px, calc(env(safe-area-inset-bottom) + 58px));
-        width: calc(100vw - 16px);
+        --powerbar-bottom: max(76px, calc(env(safe-area-inset-bottom) + 68px));
+        left: max(8px, env(safe-area-inset-left));
+        right: max(8px, env(safe-area-inset-right));
+        width: auto;
         gap: 4px;
       }
-      .active-power-button { min-height: 48px; padding: 4px; }
+      .active-power-button { min-height: 52px; padding: 4px; }
       .active-power-icon { font-size: 16px; }
       .active-power-name { font-size: 7px; }
       .active-power-cost { font-size: 8px; }
@@ -1812,8 +2079,12 @@
         letter-spacing: .02em;
       }
       .tier-claim { min-width: 96px; min-height: 46px; font-size: 11px; }
-      .skin-action, .trail-action { min-height: 46px; font-size: 11px; }
+      .skin-action, .trail-action, .shop-action { min-height: 48px; font-size: 11px; }
       .shop-back { min-height: 56px; }
+      .reward-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .aura-grid, .booster-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .shop-live-preview { grid-template-columns: 62px minmax(0, 1fr); min-height: 90px; gap: 10px; }
+      .shop-live-swatch { min-height: 64px; font-size: 25px; }
     }
     @media (max-width: 900px) and (orientation: landscape) {
       #rewards-screen { padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
@@ -1828,6 +2099,8 @@
       #game .topbar .home-stat-icon { display: none; }
       #overlay.home-screen .home-card { padding-right: 13px; padding-left: 13px; }
       #overlay.home-screen h1 { font-size: 33px; }
+      #rewards-screen .aura-grid, #rewards-screen .booster-grid { grid-template-columns: 1fr; }
+      #rewards-screen .shop-live-copy p { font-size: 15px; }
       #overlay.home-screen .mode-btn {
         min-height: 64px;
         padding-right: 4px;
@@ -2706,6 +2979,13 @@
 </head>
 <body>
   <main id="game" aria-label="Color Shift: Neon Rush 3D game">
+    <div class="orientation-warning" id="orientation-warning" role="status" aria-live="polite" hidden>
+      <div class="orientation-warning-card">
+        <span class="orientation-warning-icon" aria-hidden="true">📱</span>
+        <h2 class="orientation-warning-title">Portrait mode recommended</h2>
+        <p class="orientation-warning-copy">Please rotate your device to Portrait mode for the best gaming experience! 📱</p>
+      </div>
+    </div>
     <div id="scene" aria-hidden="true"></div>
     <div class="grain"></div>
     <div class="fever-wash" id="feverWash"></div>
@@ -2914,6 +3194,19 @@
         </div>
       </div>
     </section>
+    <section class="session-terminated-screen" id="session-terminated-screen" role="dialog" aria-modal="true" aria-labelledby="sessionTerminatedTitle" aria-describedby="sessionTerminatedDescription" hidden>
+      <div class="session-panel">
+        <div class="session-signal">RUN INTERRUPTED · SAVE PRESERVED</div>
+        <h2 class="session-title" id="sessionTerminatedTitle">SESSION TERMINATED</h2>
+        <p class="session-description" id="sessionTerminatedDescription">Your run was paused after the game stayed in the background. Your current score and run state are still here.</p>
+        <p class="session-connection-status" id="sessionConnectionStatus" role="status" aria-live="polite">LOCAL SESSION PRESERVED · RETRY WHEN READY</p>
+        <div class="session-save-badge"><span aria-hidden="true">🛡️</span><span>Your crystals and high scores are saved on this device.</span></div>
+        <div class="session-actions">
+          <button class="session-action" id="sessionReconnectButton" type="button">🔄 RECONNECT / RETRY</button>
+          <button class="session-action home" id="sessionHomeButton" type="button">🏠 RETURN TO HOME</button>
+        </div>
+      </div>
+    </section>
     <section class="settings-screen" id="settings-screen" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
       <div class="settings-modal">
         <header class="settings-modal-header">
@@ -3004,18 +3297,29 @@
       </div>
     </section>
     <section class="rewards-screen" id="rewards-screen" role="dialog" aria-modal="true" aria-labelledby="rewardsTitle" hidden>
-      <div class="shop-panel" id="shopPanel">
+      <div class="shop-panel" id="shop-screen">
         <div class="shop-scroll" id="shopScroll">
           <div class="shop-header">
             <div><div class="eyebrow">PLAYER PROGRESSION</div><h2 class="shop-title" id="rewardsTitle">Rewards &amp; Achievements</h2><p class="shop-intro">Earn milestones, collect crystals, and customize your next run.</p></div>
             <div class="shop-balance"><span>💎 NEON CRYSTALS</span><strong id="shopBalance">00000</strong></div>
           </div>
           <nav class="reward-tabs" role="tablist" aria-label="Rewards categories">
-            <button class="reward-tab active" id="rewardTabAchievements" type="button" role="tab" aria-selected="true" aria-controls="rewardPanelAchievements" tabindex="0" data-reward-tab="achievements">Milestones</button>
-            <button class="reward-tab" id="rewardTabSkins" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelSkins" tabindex="-1" data-reward-tab="skins">Ball Skins</button>
-            <button class="reward-tab" id="rewardTabTrails" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelTrails" tabindex="-1" data-reward-tab="trails">Glow Trails</button>
+            <button class="reward-tab active" id="rewardTabSkins" type="button" role="tab" aria-selected="true" aria-controls="rewardPanelSkins" tabindex="0" data-reward-tab="skins">Spheres</button>
+            <button class="reward-tab" id="rewardTabTrails" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelTrails" tabindex="-1" data-reward-tab="trails">Trails</button>
+            <button class="reward-tab" id="rewardTabAuras" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelAuras" tabindex="-1" data-reward-tab="auras">Auras</button>
+            <button class="reward-tab" id="rewardTabBoosters" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelBoosters" tabindex="-1" data-reward-tab="boosters">Boosters</button>
+            <button class="reward-tab" id="rewardTabAchievements" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelAchievements" tabindex="-1" data-reward-tab="achievements">Milestones</button>
             <button class="reward-tab" id="rewardTabReferral" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelReferral" tabindex="-1" data-reward-tab="referral">Invite &amp; Earn</button>
           </nav>
+          <aside class="shop-live-preview" id="shopPreview" aria-live="polite" aria-atomic="true">
+            <div class="shop-live-swatch" id="shopPreviewSwatch" aria-hidden="true">✦</div>
+            <div class="shop-live-copy">
+              <div class="shop-live-kicker" id="shopPreviewKicker">LIVE ITEM PREVIEW</div>
+              <h3 id="shopPreviewTitle">Choose a cosmetic</h3>
+              <p id="shopPreviewDescription">Tap any sphere, trail, or aura card to inspect its look and rarity.</p>
+              <div class="shop-live-meta"><span class="rarity-tag common" id="shopPreviewRarity">COMMON</span><span class="shop-live-status" id="shopPreviewStatus">BROWSE ITEMS</span></div>
+            </div>
+          </aside>
           <div class="reward-tab-panel" id="rewardPanelAchievements" data-reward-panel="achievements" role="tabpanel" aria-labelledby="rewardTabAchievements" tabindex="0">
             <div class="shop-section-heading"><div><h3>Achievement Tracks</h3><p>Claim crystal rewards when a milestone is complete.</p></div><span class="achievement-tier-key">BRONZE · SILVER · GOLD · DIAMOND</span></div>
             <div class="achievement-list" id="achievementList"></div>
@@ -3027,8 +3331,16 @@
             <div class="skin-grid" id="skinGrid"></div>
           </div>
           <div class="reward-tab-panel" id="rewardPanelTrails" data-reward-panel="trails" role="tabpanel" aria-labelledby="rewardTabTrails" tabindex="0" hidden>
-            <div class="shop-section-heading"><div><h3>Particle Trails</h3><p>Choose the glow that follows you through the tunnel.</p></div><span class="achievement-tier-key">RUN EFFECTS</span></div>
+            <div class="shop-section-heading"><div><h3>Particle Trails</h3><p>Choose the glow that follows you through the tunnel.</p></div><span class="achievement-tier-key">COMMON · EPIC · LEGENDARY</span></div>
             <div class="trail-grid" id="trailGrid"></div>
+          </div>
+          <div class="reward-tab-panel" id="rewardPanelAuras" data-reward-panel="auras" role="tabpanel" aria-labelledby="rewardTabAuras" tabindex="0" hidden>
+            <div class="shop-section-heading"><div><h3>Runner Auras</h3><p>Equip a signature halo around your player orb.</p></div><span class="achievement-tier-key">3D LIGHT FX</span></div>
+            <div class="aura-grid" id="auraGrid"></div>
+          </div>
+          <div class="reward-tab-panel" id="rewardPanelBoosters" data-reward-panel="boosters" role="tabpanel" aria-labelledby="rewardTabBoosters" tabindex="0" hidden>
+            <div class="shop-section-heading"><div><h3>Run Boosters</h3><p>Buy a token with crystals. One owned booster is used at random when a new run begins.</p></div><span class="achievement-tier-key">SINGLE-USE TOKENS</span></div>
+            <div class="booster-grid" id="boosterGrid"></div>
           </div>
           <div class="reward-tab-panel" id="rewardPanelReferral" data-reward-panel="referral" role="tabpanel" aria-labelledby="rewardTabReferral" tabindex="0" hidden>
             <div class="referral-panel">
@@ -6853,22 +7165,34 @@ void main() {
         { name: "Yellow", key: "yellow", hex: 0xffd84a, css: "#ffd84a" }
       ];
       const PLAYER_SKINS = {
-        sphere: { name: "Sphere", description: "The original neon runner.", cost: 0, accent: 0x68f2df, roughness: 0.2, metalness: 0.1, glow: 3.8, shape: "sphere" },
-        diamond: { name: "Diamond", description: "A sharply cut prism.", cost: 50, accent: 0xffd25e, roughness: 0.13, metalness: 0.45, glow: 4.6, shape: "diamond" },
-        star: { name: "Star", description: "A radiant five-point core.", cost: 100, accent: 0xff58d6, roughness: 0.16, metalness: 0.25, glow: 4.3, shape: "star" },
-        plasmaOrb: { name: "Plasma Orb", description: "A charged orb wrapped in violet light.", cost: 150, accent: 0xa876ff, roughness: 0.12, metalness: 0.28, glow: 4.8, shape: "plasma" },
-        cyberShard: { name: "Cyber Shard", description: "A faceted shard tuned for speed.", cost: 250, accent: 0x54f4ff, roughness: 0.1, metalness: 0.5, glow: 4.9, shape: "shard" },
-        goldenSphere: { name: "Golden Sphere", description: "A polished core with solar trim.", cost: 500, accent: 0xffc74f, roughness: 0.12, metalness: 0.72, glow: 4.4, shape: "sphere" },
-        voidBlackhole: { name: "Void Blackhole", description: "A dark singularity edged in hot pink.", cost: 1000, accent: 0xff58ca, roughness: 0.08, metalness: 0.58, glow: 5.1, shape: "void" },
-        goldenImperial: { name: "Golden Imperial", description: "A share-exclusive core with a radiant imperial finish.", cost: 1000000000, accent: 0xffdc78, roughness: 0.08, metalness: 0.82, glow: 5.3, shape: "sphere" }
+        sphere: { name: "Classic Neon", description: "The original runner, charged with a cyan core.", cost: 0, accent: 0x68f2df, roughness: 0.2, metalness: 0.1, glow: 3.8, shape: "sphere", rarity: "Common" },
+        diamond: { name: "Prism Diamond", description: "A sharply cut prism with bright gold facets.", cost: 100, accent: 0xffd25e, roughness: 0.13, metalness: 0.45, glow: 4.6, shape: "diamond", rarity: "Common" },
+        star: { name: "Nova Star", description: "A radiant five-point core with a magenta wake.", cost: 180, accent: 0xff58d6, roughness: 0.16, metalness: 0.25, glow: 4.3, shape: "star", rarity: "Epic" },
+        plasmaOrb: { name: "Plasma Orb", description: "A charged orb wrapped in violet light.", cost: 250, accent: 0xa876ff, roughness: 0.12, metalness: 0.28, glow: 4.8, shape: "plasma", rarity: "Epic" },
+        cyberShard: { name: "Cyber Shard", description: "A faceted shard tuned for speed.", cost: 350, accent: 0x54f4ff, roughness: 0.1, metalness: 0.5, glow: 4.9, shape: "shard", rarity: "Epic" },
+        cyberWireframe: { name: "Cyber Wireframe", description: "A luminous geometric frame with a pulse-lit core.", cost: 450, accent: 0x46ffca, roughness: 0.18, metalness: 0.32, glow: 5, shape: "shard", wireframe: true, rarity: "Epic" },
+        holographicGlass: { name: "Holographic Glass", description: "A translucent prism that refracts the tunnel glow.", cost: 700, accent: 0x77c8ff, roughness: 0.08, metalness: 0.36, glow: 4.7, shape: "sphere", transparent: true, opacity: 0.72, rarity: "Legendary" },
+        goldenSphere: { name: "Golden Sphere", description: "A polished core with solar trim.", cost: 850, accent: 0xffc74f, roughness: 0.12, metalness: 0.72, glow: 4.4, shape: "sphere", rarity: "Legendary" },
+        voidBlackhole: { name: "Void Blackhole", description: "A dark singularity edged in hot pink.", cost: 1200, accent: 0xff58ca, roughness: 0.08, metalness: 0.58, glow: 5.1, shape: "void", rarity: "Legendary" },
+        goldenImperial: { name: "Golden Imperial", description: "A share-exclusive core with a radiant imperial finish.", cost: 1000000000, accent: 0xffdc78, roughness: 0.08, metalness: 0.82, glow: 5.3, shape: "sphere", rarity: "Legendary" }
       };
       const SHARE_REWARD_SKIN = "goldenImperial";
       const TRAIL_STYLES = {
-        none: { name: "No Trail", description: "A clean run with no particle trail.", cost: 0, color: 0x68f2df, secondary: 0x68f2df },
-        aurora: { name: "Aurora Wake", description: "Cool cyan particles with a violet edge.", cost: 200, color: 0x4fefff, secondary: 0x9d7bff },
-        ember: { name: "Solar Ember", description: "Warm gold sparks with a red core.", cost: 300, color: 0xffd057, secondary: 0xff5a63 },
-        prism: { name: "Prism Stream", description: "A bright shifting-spectrum particle wake.", cost: 400, color: 0xff5ac8, secondary: 0x5df5e8 },
-        singularity: { name: "Singularity Dust", description: "Violet motes pulled through the void.", cost: 500, color: 0x9f72ff, secondary: 0xf45dff }
+        none: { name: "No Trail", description: "A clean run with no particle trail.", cost: 0, color: 0x68f2df, secondary: 0x68f2df, rarity: "Common" },
+        aurora: { name: "Electric Blue Aura", description: "A crisp electric-blue streak with a cyan core.", cost: 250, color: 0x287dff, secondary: 0x5df5ff, rarity: "Common" },
+        ember: { name: "Fire Spark", description: "Hot amber sparks with a red-orange tail.", cost: 400, color: 0xff7a35, secondary: 0xffd057, rarity: "Epic" },
+        prism: { name: "Rainbow Flow", description: "A bright shifting-spectrum particle wake.", cost: 600, color: 0xff5ac8, secondary: 0x5df5e8, rarity: "Epic" },
+        singularity: { name: "Matrix Digital Rain", description: "Green data motes stream behind your orb.", cost: 800, color: 0x45ff85, secondary: 0x9dff48, rarity: "Legendary" }
+      };
+      const AURA_STYLES = {
+        none: { name: "No Aura", description: "Keep the runner's original color halo.", cost: 0, color: 0x68f2df, secondary: 0x68f2df, rarity: "Common", symbol: "◌" },
+        pulsingGlow: { name: "Pulsing Neon Glow", description: "Two orbiting cyan rings pulse around the orb.", cost: 350, color: 0x38eaff, secondary: 0xff4fb8, rarity: "Epic", symbol: "✦" },
+        quantumShockwave: { name: "Quantum Shockwave", description: "A violet double-ring ripple marks every run.", cost: 900, color: 0x9f72ff, secondary: 0x55f5ff, rarity: "Legendary", symbol: "◎" }
+      };
+      const BOOSTER_ITEMS = {
+        prism: { name: "Neon Shield", description: "A one-run shield token blocks one collision.", cost: 300, rarity: "Common", symbol: "⬡" },
+        warp: { name: "Time Warp", description: "A one-run token slows obstacles for five seconds.", cost: 450, rarity: "Epic", symbol: "◷" },
+        booster: { name: "Score Surge", description: "A one-run token doubles score for ten seconds.", cost: 550, rarity: "Legendary", symbol: "2×" }
       };
       const ACHIEVEMENTS = [
         { id: "distanceMaster", title: "Distance Master", description: "Reach 1,000 meters in one run." },
@@ -7018,6 +7342,8 @@ void main() {
       let environmentNoticeTimer = 0;
       let environmentNoticeToken = 0;
       let state = "ready";
+      const BACKGROUND_SESSION_TIMEOUT_MS = 60 * 1000;
+      let backgroundPausedAt = 0;
       // Some mobile/private contexts throw while retrieving localStorage itself,
       // not only while reading or writing it. Shadow the browser global with a
       // guarded adapter so every existing persistence call fails closed.
@@ -7193,6 +7519,34 @@ void main() {
       let fallbackContext = null;
       const isCoarsePointer = () => window.matchMedia?.("(pointer: coarse)").matches ?? false;
       const isMobileViewport = () => window.innerWidth < 650 || isCoarsePointer();
+      function isLandscapeOnMobile() {
+        const landscape = window.matchMedia?.("(orientation: landscape)").matches ??
+          window.innerWidth > window.innerHeight;
+        return Boolean(isCoarsePointer() && landscape);
+      }
+      function updateOrientationWarning() {
+        const warning = el("orientation-warning");
+        if (warning) warning.hidden = !isLandscapeOnMobile();
+      }
+      function requestPortraitOrientationLock() {
+        const screenApi = window.screen;
+        try {
+          if (screenApi?.orientation && typeof screenApi.orientation.lock === "function") {
+            return Promise.resolve(screenApi.orientation.lock("portrait"))
+              .then(() => true)
+              .catch(() => false);
+          }
+          const legacyLock = screenApi?.lockOrientation ||
+            screenApi?.mozLockOrientation ||
+            screenApi?.msLockOrientation;
+          if (typeof legacyLock === "function") {
+            return Promise.resolve(legacyLock.call(screenApi, "portrait") !== false);
+          }
+        } catch {
+          return Promise.resolve(false);
+        }
+        return Promise.resolve(false);
+      }
       const getPixelRatio = () => Math.min(
         window.devicePixelRatio || 1,
         isMobileViewport() ? 1.5 : 2
@@ -7540,6 +7894,20 @@ void main() {
       );
       skinAccent.rotation.y = Math.PI / 2;
       player.add(skinAccent);
+      const auraEffectGroup = new THREE.Group();
+      const auraRingPrimary = new THREE.Mesh(
+        new THREE.TorusGeometry(0.94, 0.024, 6, 48),
+        new THREE.MeshBasicMaterial({ color: 0x38eaff, transparent: true, opacity: 0.82, depthWrite: false })
+      );
+      const auraRingSecondary = new THREE.Mesh(
+        new THREE.TorusGeometry(1.08, 0.016, 6, 48),
+        new THREE.MeshBasicMaterial({ color: 0xff4fb8, transparent: true, opacity: 0.72, depthWrite: false })
+      );
+      auraRingPrimary.rotation.x = Math.PI / 2;
+      auraRingSecondary.rotation.y = Math.PI / 2;
+      auraEffectGroup.add(auraRingPrimary, auraRingSecondary);
+      auraEffectGroup.visible = false;
+      player.add(auraEffectGroup);
       const shieldBubble = new THREE.Mesh(
         new THREE.SphereGeometry(0.79, 18, 14),
         new THREE.MeshBasicMaterial({ color: 0x38e6d3, transparent: true, opacity: 0.13, wireframe: true, depthWrite: false })
@@ -7610,9 +7978,36 @@ void main() {
         skinAccent.material.opacity = safeSkinId === "voidBlackhole" ? 1 : 0.9;
         orbMat.roughness = skin.roughness;
         orbMat.metalness = skin.metalness;
+        orbMat.wireframe = skin.wireframe === true;
+        orbMat.transparent = skin.transparent === true;
+        orbMat.opacity = skin.transparent ? skin.opacity : 1;
+        orbMat.depthWrite = skin.transparent !== true;
+        orbMat.needsUpdate = true;
         orbMat.emissiveIntensity = (blackoutModeActive ? Math.max(2.2, skin.glow) : skin.glow) * getGlowScale();
         skinAccent.material.color.setHex(skin.accent);
         player.userData.skin = safeSkinId;
+      }
+      function applyPlayerAura(auraId) {
+        const safeAuraId = AURA_STYLES[auraId] ? auraId : "none";
+        const aura = AURA_STYLES[safeAuraId];
+        progression.activeAura = safeAuraId;
+        player.userData.aura = safeAuraId;
+        auraEffectGroup.visible = safeAuraId !== "none";
+        auraRingPrimary.material.color.setHex(aura.color);
+        auraRingSecondary.material.color.setHex(aura.secondary);
+        auraRingPrimary.material.opacity = safeAuraId === "quantumShockwave" ? 0.94 : 0.78;
+        auraRingSecondary.material.opacity = safeAuraId === "quantumShockwave" ? 0.84 : 0.58;
+        auraRingPrimary.scale.setScalar(1);
+        auraRingSecondary.scale.setScalar(1);
+      }
+      function animatePlayerAura(dt, time) {
+        if (!auraEffectGroup.visible) return;
+        const pulse = 1 + Math.sin(time * 4.2) * 0.06;
+        const quantum = progression.activeAura === "quantumShockwave";
+        auraRingPrimary.scale.setScalar(pulse + (quantum ? Math.sin(time * 2.4) * 0.08 : 0));
+        auraRingSecondary.scale.setScalar(quantum ? 0.92 + Math.sin(time * 2.4 + Math.PI) * 0.12 : 0.94 + Math.sin(time * 3.2) * 0.03);
+        auraRingPrimary.rotation.z += dt * (quantum ? 1.1 : 0.45);
+        auraRingSecondary.rotation.x += dt * (quantum ? -0.72 : 0.32);
       }
       function applyVisualPreferences() {
         const glowScale = getGlowScale();
@@ -8346,6 +8741,8 @@ void main() {
           referralWelcomeClaimed: false,
           ownedTrails: ["none"],
           activeTrail: "none",
+          ownedAuras: ["none"],
+          activeAura: "none",
           achievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, false])),
           unlockedAchievementTiers: Object.fromEntries(
             ACHIEVEMENT_CATEGORIES.flatMap(category => category.tiers).map(tier => [tier.id, false])
@@ -8362,7 +8759,7 @@ void main() {
         };
       }
       let progression = createFreshProgression();
-      let activeRewardsTab = "achievements";
+      let activeRewardsTab = "skins";
       let runCoins = 0;
       let achievementQueue = [];
       let achievementNoticeTimer = 0;
@@ -8380,6 +8777,38 @@ void main() {
       let statusTimer = 0;
       let flashTimer = 0;
       const ACTIVE_POWER_COSTS = Object.freeze({ shield: 30, magnet: 20, bomb: 50 });
+      let shieldUses = 0;
+      let magnetUses = 0;
+      let bombUses = 0;
+      function getActivePowerUseCount(type) {
+        if (type === "shield") return shieldUses;
+        if (type === "magnet") return magnetUses;
+        if (type === "bomb") return bombUses;
+        return 0;
+      }
+      function getActivePowerCost(type) {
+        const baseCost = ACTIVE_POWER_COSTS[type];
+        if (!Number.isFinite(baseCost)) return Number.MAX_SAFE_INTEGER;
+        const rawCost = baseCost * Math.pow(1.5, getActivePowerUseCount(type));
+        return Number.isFinite(rawCost)
+          ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(baseCost, Math.round(rawCost)))
+          : Number.MAX_SAFE_INTEGER;
+      }
+      function formatActivePowerDisplayCost(cost) {
+        return cost < 10000
+          ? cost.toLocaleString("en-US")
+          : new Intl.NumberFormat("en-US", { notation: "compact", maximumSignificantDigits: 3 }).format(cost);
+      }
+      function incrementActivePowerUse(type) {
+        if (type === "shield") shieldUses++;
+        else if (type === "magnet") magnetUses++;
+        else if (type === "bomb") bombUses++;
+      }
+      function resetActivePowerUseCounters() {
+        shieldUses = 0;
+        magnetUses = 0;
+        bombUses = 0;
+      }
       let dailySpinTimer = 0;
       let spinInProgress = false;
       let spinSharePending = false;
@@ -9317,7 +9746,7 @@ void main() {
           safeStoredCount(localStorage.getItem(COINS_KEY))
         );
         const stored = JSON.parse(localStorage.getItem(PROGRESSION_KEY) || localStorage.getItem(LEGACY_PROGRESSION_KEY) || "null");
-        if (stored && [1, 2, 3, 4, 5].includes(stored.version)) {
+        if (stored && [1, 2, 3, 4, 5, 6].includes(stored.version)) {
           progression.crystals = safeStoredCount(stored.crystals ?? legacyBalance);
           progression.lifetimeCrystals = Math.max(progression.crystals, safeStoredCount(stored.lifetimeCrystals));
           const validOwned = Array.isArray(stored.ownedSkins)
@@ -9338,6 +9767,14 @@ void main() {
           progression.activeTrail =
             progression.ownedTrails.includes(stored.activeTrail) && hasOwn(TRAIL_STYLES, stored.activeTrail)
               ? stored.activeTrail
+              : "none";
+          const validOwnedAuras = Array.isArray(stored.ownedAuras)
+            ? stored.ownedAuras.filter(id => hasOwn(AURA_STYLES, id))
+            : [];
+          progression.ownedAuras = Array.from(new Set(["none", ...validOwnedAuras]));
+          progression.activeAura =
+            progression.ownedAuras.includes(stored.activeAura) && hasOwn(AURA_STYLES, stored.activeAura)
+              ? stored.activeAura
               : "none";
           progression.achievements = Object.fromEntries(
             ACHIEVEMENTS.map(item => [item.id, stored.achievements?.[item.id] === true])
@@ -9384,7 +9821,7 @@ void main() {
       function saveProgression() {
         progression.daily = normalizeDailyProgress(progression.daily);
         const payload = {
-          version: 5,
+          version: 6,
           crystals: safeStoredCount(progression.crystals),
           lifetimeCrystals: safeStoredCount(progression.lifetimeCrystals),
           ownedSkins: progression.ownedSkins.filter(id => hasOwn(PLAYER_SKINS, id)),
@@ -9393,6 +9830,8 @@ void main() {
           referralWelcomeClaimed: progression.referralWelcomeClaimed === true,
           ownedTrails: progression.ownedTrails.filter(id => hasOwn(TRAIL_STYLES, id)),
           activeTrail: hasOwn(TRAIL_STYLES, progression.activeTrail) ? progression.activeTrail : "none",
+          ownedAuras: progression.ownedAuras.filter(id => hasOwn(AURA_STYLES, id)),
+          activeAura: hasOwn(AURA_STYLES, progression.activeAura) ? progression.activeAura : "none",
           achievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, progression.achievements[item.id] === true])),
           unlockedAchievementTiers: Object.fromEntries(
             ACHIEVEMENT_CATEGORIES.flatMap(category => category.tiers).map(tier => [
@@ -9941,6 +10380,71 @@ void main() {
         clearFlexCardPreview();
         void prepareFlexCardPreview(false);
       }
+      let selectedShopItem = { type: "skin", id: "sphere" };
+      function shopRarityClass(rarity) {
+        return String(rarity || "Common").toLowerCase();
+      }
+      function shopItemRecord(type, id) {
+        if (type === "skin") return PLAYER_SKINS[id] ? { ...PLAYER_SKINS[id], type, id } : null;
+        if (type === "trail") return TRAIL_STYLES[id] ? { ...TRAIL_STYLES[id], type, id } : null;
+        if (type === "aura") return AURA_STYLES[id] ? { ...AURA_STYLES[id], type, id } : null;
+        if (type === "booster") return BOOSTER_ITEMS[id] ? { ...BOOSTER_ITEMS[id], type, id } : null;
+        return null;
+      }
+      function shopItemState(item) {
+        if (item.type === "skin") {
+          const owned = progression.ownedSkins.includes(item.id);
+          const equipped = progression.activeSkin === item.id;
+          if (item.id === SHARE_REWARD_SKIN && !owned) return "🔗 SHARE TO UNLOCK";
+          if (equipped) return "EQUIPPED";
+          if (owned) return "SELECT / EQUIP";
+          return "🔒 LOCKED · 💎 " + item.cost;
+        }
+        if (item.type === "trail") {
+          const owned = progression.ownedTrails.includes(item.id);
+          const equipped = progression.activeTrail === item.id;
+          if (equipped) return "EQUIPPED";
+          if (owned) return "SELECT / EQUIP";
+          return "🔒 LOCKED · 💎 " + item.cost;
+        }
+        if (item.type === "aura") {
+          const owned = progression.ownedAuras.includes(item.id);
+          const equipped = progression.activeAura === item.id;
+          if (equipped) return "EQUIPPED";
+          if (owned) return "SELECT / EQUIP";
+          return "🔒 LOCKED · 💎 " + item.cost;
+        }
+        const count = safeStoredCount(progression.powerTokens[item.id]);
+        return count ? "OWNED · " + count + " TOKEN" + (count === 1 ? "" : "S") : "🔒 LOCKED · 💎 " + item.cost;
+      }
+      function updateShopPreview() {
+        const item = shopItemRecord(selectedShopItem.type, selectedShopItem.id) || shopItemRecord("skin", "sphere");
+        if (!item) return;
+        const colorValue = item.type === "booster"
+          ? item.id === "prism" ? 0x68fff0 : item.id === "warp" ? 0x73aaff : 0xffd36a
+          : item.accent ?? item.color ?? 0x38eaff;
+        const color = "#" + colorValue.toString(16).padStart(6, "0");
+        const stateLabel = shopItemState(item);
+        el("shopPreviewTitle").textContent = item.name;
+        el("shopPreviewDescription").textContent = item.description;
+        el("shopPreviewSwatch").style.setProperty("--preview-color", color);
+        el("shopPreviewSwatch").textContent = item.symbol || (item.type === "skin" ? "◉" : item.type === "trail" ? "〰" : "✦");
+        el("shopPreviewKicker").textContent = item.type === "booster" ? "BOOSTER INVENTORY PREVIEW" : "LIVE ITEM PREVIEW · " + item.type.toUpperCase();
+        el("shopPreviewRarity").textContent = String(item.rarity || "Common").toUpperCase();
+        el("shopPreviewRarity").className = "rarity-tag " + shopRarityClass(item.rarity);
+        el("shopPreviewStatus").textContent = stateLabel;
+        document.querySelectorAll("[data-shop-item]").forEach(card => {
+          const selected = card.dataset.itemType === item.type && card.dataset.itemId === item.id;
+          card.classList.toggle("selected", selected);
+          if (selected) card.setAttribute("aria-current", "true");
+          else card.removeAttribute("aria-current");
+        });
+      }
+      function selectShopItem(type, id) {
+        if (!shopItemRecord(type, id)) return;
+        selectedShopItem = { type, id };
+        updateShopPreview();
+      }
       function renderProgressionUI() {
         progression.daily = normalizeDailyProgress(progression.daily);
         const milestonesChanged = syncAchievementTierUnlocks(state === "running");
@@ -9952,7 +10456,7 @@ void main() {
         el("dailyTokenNote").hidden = readyPowerups.length === 0;
         el("dailyTokenNote").textContent = readyPowerups.length ? "NEXT RUN BOOSTS · " + readyPowerups.join(" · ") : "";
         updateShareRewardButton();
-        el("skinGrid").innerHTML = Object.entries(PLAYER_SKINS).map(([skinId, skin], index) => {
+        el("skinGrid").innerHTML = Object.entries(PLAYER_SKINS).map(([skinId, skin]) => {
           const owned = progression.ownedSkins.includes(skinId);
           const active = progression.activeSkin === skinId;
           const affordable = progression.crystals >= skin.cost;
@@ -9960,13 +10464,12 @@ void main() {
           const buttonState = shareExclusive
             ? { label: "SHARE TO UNLOCK", disabled: true }
             : renderCosmeticButtonState(owned, active, affordable, skin.cost);
-          const costLabel = shareExclusive
-            ? "SHARE EXCLUSIVE"
-            : owned
-              ? active ? "EQUIPPED" : "OWNED"
-              : '<span class="crystal-mark" aria-hidden="true"></span>' + skin.cost + " CRYSTALS";
-          return '<article class="skin-card' + (active ? " active" : "") + '" data-skin-card="' + skinId + '">' +
-            '<div class="skin-preview ' + skin.shape + '" style="--skin-color:#' + skin.accent.toString(16).padStart(6, "0") + '" aria-hidden="true"><span></span></div>' +
+          const costLabel = shareExclusive ? "🔗 SHARE TO UNLOCK" : owned ? active ? "EQUIPPED" : "OWNED · SELECT TO EQUIP" : "🔒 LOCKED · 💎 " + skin.cost;
+          const rarity = shopRarityClass(skin.rarity);
+          const selected = selectedShopItem.type === "skin" && selectedShopItem.id === skinId;
+          return '<article class="skin-card shop-item-card ' + rarity + (active ? " active" : "") + (selected ? " selected" : "") + '" data-shop-item data-item-type="skin" data-item-id="' + skinId + '" data-skin-card="' + skinId + '">' +
+            '<div class="shop-card-topline"><span class="rarity-tag ' + rarity + '">' + skin.rarity + '</span><span class="shop-card-status ' + (active ? "equipped" : shareExclusive ? "exclusive" : owned ? "" : "locked") + '">' + (active ? "EQUIPPED" : shareExclusive ? "🔗 SHARE TO UNLOCK" : owned ? "SELECT / EQUIP" : "🔒 LOCKED") + '</span></div>' +
+            '<div class="skin-preview ' + skin.shape + (skin.wireframe ? " wireframe" : "") + (skin.transparent ? " glass" : "") + '" style="--skin-color:#' + skin.accent.toString(16).padStart(6, "0") + '" aria-hidden="true"><span></span></div>' +
             '<h3>' + skin.name + '</h3><p>' + skin.description + '</p>' +
             '<div class="skin-purchase-row">' +
               '<div class="cosmetic-cost">' + costLabel + '</div>' +
@@ -9981,11 +10484,43 @@ void main() {
           const buttonState = renderCosmeticButtonState(owned, active, affordable, trail.cost);
           const color = "#" + trail.color.toString(16).padStart(6, "0");
           const secondary = "#" + trail.secondary.toString(16).padStart(6, "0");
-          return '<article class="trail-card' + (active ? " active" : "") + '">' +
+          const rarity = shopRarityClass(trail.rarity);
+          const selected = selectedShopItem.type === "trail" && selectedShopItem.id === trailId;
+          return '<article class="trail-card shop-item-card ' + rarity + (active ? " active" : "") + (selected ? " selected" : "") + '" data-shop-item data-item-type="trail" data-item-id="' + trailId + '">' +
             '<div class="trail-sample" style="--trail-color:' + color + ';--trail-secondary:' + secondary + '" aria-hidden="true"><i></i><i></i><i></i></div>' +
-            '<div class="trail-copy"><h3>' + trail.name + '</h3><p>' + trail.description + '</p></div>' +
-            '<div class="trail-footer"><span>' + (owned ? active ? "EQUIPPED" : "CLAIMED" : '<span class="crystal-mark" aria-hidden="true"></span>' + trail.cost + " CRYSTALS") + '</span>' +
-            '<button class="secondary-btn trail-action" type="button" data-trail="' + trailId + '" ' + (buttonState.disabled ? "disabled" : "") + '>' + buttonState.label + '</button></div>' +
+            '<div class="trail-copy"><div class="shop-card-topline"><span class="rarity-tag ' + rarity + '">' + trail.rarity + '</span><span class="shop-card-status ' + (active ? "equipped" : owned ? "" : "locked") + '">' + (active ? "EQUIPPED" : owned ? "SELECT / EQUIP" : "🔒 LOCKED") + '</span></div><h3>' + trail.name + '</h3><p>' + trail.description + '</p><div class="trail-footer"><span>' + (owned ? active ? "EQUIPPED" : "OWNED · SELECT" : "🔒 LOCKED · 💎 " + trail.cost) + '</span>' +
+            '<button class="secondary-btn trail-action" type="button" data-trail="' + trailId + '" ' + (buttonState.disabled ? "disabled" : "") + '>' + buttonState.label + '</button></div></div>' +
+            '</article>';
+        }).join("");
+        el("auraGrid").innerHTML = Object.entries(AURA_STYLES).map(([auraId, aura]) => {
+          const owned = progression.ownedAuras.includes(auraId);
+          const active = progression.activeAura === auraId;
+          const affordable = progression.crystals >= aura.cost;
+          const buttonState = renderCosmeticButtonState(owned, active, affordable, aura.cost);
+          const color = "#" + aura.color.toString(16).padStart(6, "0");
+          const rarity = shopRarityClass(aura.rarity);
+          const selected = selectedShopItem.type === "aura" && selectedShopItem.id === auraId;
+          return '<article class="aura-card shop-item-card ' + rarity + (active ? " active" : "") + (selected ? " selected" : "") + '" data-shop-item data-item-type="aura" data-item-id="' + auraId + '">' +
+            '<div class="shop-card-topline"><span class="rarity-tag ' + rarity + '">' + aura.rarity + '</span><span class="shop-card-status ' + (active ? "equipped" : owned ? "" : "locked") + '">' + (active ? "EQUIPPED" : owned ? "SELECT / EQUIP" : "🔒 LOCKED") + '</span></div>' +
+            '<div class="aura-sample" style="--sample-color:' + color + '" aria-hidden="true">' + aura.symbol + '</div>' +
+            '<h3>' + aura.name + '</h3><p>' + aura.description + '</p>' +
+            '<div class="cosmetic-cost">' + (owned ? active ? "EQUIPPED" : "OWNED · SELECT TO EQUIP" : "🔒 LOCKED · 💎 " + aura.cost) + '</div>' +
+            '<button class="secondary-btn shop-action aura-action" type="button" data-aura="' + auraId + '" ' + (buttonState.disabled ? "disabled" : "") + '>' + buttonState.label + '</button>' +
+            '</article>';
+        }).join("");
+        el("boosterGrid").innerHTML = Object.entries(BOOSTER_ITEMS).map(([boosterId, booster]) => {
+          const count = safeStoredCount(progression.powerTokens[boosterId]);
+          const affordable = progression.crystals >= booster.cost;
+          const atCapacity = count >= 99;
+          const rarity = shopRarityClass(booster.rarity);
+          const selected = selectedShopItem.type === "booster" && selectedShopItem.id === boosterId;
+          const buttonLabel = atCapacity ? "MAX STOCK" : "BUY · 💎 " + booster.cost;
+          return '<article class="booster-card shop-item-card ' + rarity + (selected ? " selected" : "") + '" data-shop-item data-item-type="booster" data-item-id="' + boosterId + '">' +
+            '<div class="shop-card-topline"><span class="rarity-tag ' + rarity + '">' + booster.rarity + '</span><span class="shop-card-status ' + (count ? "equipped" : "locked") + '">' + (count ? "OWNED · " + count : "SINGLE USE") + '</span></div>' +
+            '<div class="booster-sample" style="--sample-color:' + (boosterId === "prism" ? "#68fff0" : boosterId === "warp" ? "#73aaff" : "#ffd36a") + '" aria-hidden="true">' + booster.symbol + '</div>' +
+            '<h3>' + booster.name + '</h3><p>' + booster.description + '</p>' +
+            '<div class="booster-inventory">INVENTORY <strong>×' + count + '</strong></div>' +
+            '<button class="secondary-btn shop-action booster-action" type="button" data-booster="' + boosterId + '" ' + (atCapacity || !affordable ? "disabled" : "") + '>' + buttonLabel + '</button>' +
             '</article>';
         }).join("");
         el("achievementList").innerHTML = ACHIEVEMENT_CATEGORIES.map(category => {
@@ -10017,9 +10552,11 @@ void main() {
             '<div><strong>' + item.title + '</strong><small>' + item.description + ' · ' + progress + ' / ' + item.target + ' ' + unit + '</small></div>' +
             '<span class="achievement-state">' + (claimed ? "CLAIMED" : "+" + item.reward + " ◆") + '</span></div>';
         }).join("");
+        updateShopPreview();
         if (milestonesChanged) saveProgression();
       }
       applyPlayerSkin(progression.activeSkin);
+      applyPlayerAura(progression.activeAura);
       verifyLocalIntegritySnapshot();
       try {
         if (localStorage.getItem(REFERRAL_WELCOME_KEY) === "1") progression.referralWelcomeClaimed = true;
@@ -10428,7 +10965,7 @@ void main() {
         el("rewards-screen").hidden = true;
       }
       function setRewardsTab(tab) {
-        const validTabs = ["achievements", "skins", "trails", "referral"];
+        const validTabs = ["skins", "trails", "auras", "boosters", "achievements", "referral"];
         if (!validTabs.includes(tab)) return;
         activeRewardsTab = tab;
         document.querySelectorAll("[data-reward-tab]").forEach(button => {
@@ -10440,6 +10977,18 @@ void main() {
         document.querySelectorAll("[data-reward-panel]").forEach(panel => {
           panel.hidden = panel.dataset.rewardPanel !== tab;
         });
+        const previewType = { skins: "skin", trails: "trail", auras: "aura", boosters: "booster" }[tab];
+        el("shopPreview").hidden = !previewType;
+        if (previewType && selectedShopItem.type !== previewType) {
+          const firstItemId = Object.keys(
+            previewType === "skin" ? PLAYER_SKINS :
+            previewType === "trail" ? TRAIL_STYLES :
+            previewType === "aura" ? AURA_STYLES : BOOSTER_ITEMS
+          )[0];
+          selectShopItem(previewType, firstItemId);
+        } else if (previewType) {
+          updateShopPreview();
+        }
         el("shopScroll").scrollTop = 0;
       }
       let settingsReturnToPause = false;
@@ -10497,6 +11046,8 @@ void main() {
         el("integrityNotice").hidden = true;
         el("integrityNotice").textContent = "";
         clearTrailParticles();
+        applyPlayerSkin("sphere");
+        applyPlayerAura("none");
         best = 0;
         score = 0;
         distance = 0;
@@ -10585,6 +11136,53 @@ void main() {
         }
         progression.activeTrail = trailId;
         el("shopNotice").textContent = trail.name === "No Trail" ? "Particle trail disabled." : trail.name + " equipped.";
+        saveProgression();
+        renderProgressionUI();
+        unlockAudio();
+        playCue("power");
+      }
+      function chooseAura(auraId) {
+        const aura = AURA_STYLES[auraId];
+        if (!aura || state === "running") return;
+        if (!progression.ownedAuras.includes(auraId)) {
+          if (progression.crystals < aura.cost) {
+            el("shopNotice").textContent = "Collect " + (aura.cost - progression.crystals) + " more crystals to unlock " + aura.name + ".";
+            return;
+          }
+          progression.crystals = safeStoredCount(progression.crystals - aura.cost);
+          progression.ownedAuras.push(auraId);
+          progression.activeAura = auraId;
+          applyPlayerAura(auraId);
+          el("shopNotice").textContent = aura.name + " unlocked and equipped.";
+          saveProgression();
+          renderProgressionUI();
+          unlockAudio();
+          playCue("power");
+          return;
+        }
+        progression.activeAura = auraId;
+        applyPlayerAura(auraId);
+        el("shopNotice").textContent = auraId === "none" ? "Runner aura disabled." : aura.name + " equipped.";
+        saveProgression();
+        renderProgressionUI();
+        unlockAudio();
+        playCue("power");
+      }
+      function buyBooster(boosterId) {
+        const booster = BOOSTER_ITEMS[boosterId];
+        if (!booster || state === "running") return;
+        const count = safeStoredCount(progression.powerTokens[boosterId]);
+        if (count >= 99) {
+          el("shopNotice").textContent = booster.name + " inventory is full.";
+          return;
+        }
+        if (progression.crystals < booster.cost) {
+          el("shopNotice").textContent = "Collect " + (booster.cost - progression.crystals) + " more crystals to buy " + booster.name + ".";
+          return;
+        }
+        progression.crystals = safeStoredCount(progression.crystals - booster.cost);
+        progression.powerTokens[boosterId] = count + 1;
+        el("shopNotice").textContent = booster.name + " token added · it will be used on a future run.";
         saveProgression();
         renderProgressionUI();
         unlockAudio();
@@ -10865,7 +11463,7 @@ void main() {
         const labels = { shield: "Neon Shield", magnet: "Crystal Magnet", bomb: "Laser Cleaver" };
         document.querySelectorAll("[data-active-power]").forEach(button => {
           const type = button.dataset.activePower;
-          const cost = ACTIVE_POWER_COSTS[type];
+          const cost = getActivePowerCost(type);
           const remaining = effects[type] || 0;
           const costLabel = button.querySelector(".active-power-cost");
           const timerLabel = button.querySelector("[data-power-remaining]");
@@ -10874,9 +11472,12 @@ void main() {
           button.classList.toggle("unaffordable", progression.crystals < cost);
           button.disabled = state !== "running" || active;
           button.setAttribute("aria-label", active
-            ? labels[type] + " active for " + Math.max(1, Math.ceil(remaining)) + " seconds"
-            : "Buy " + labels[type] + " for " + cost + " crystals");
-          if (costLabel) costLabel.hidden = active;
+            ? labels[type] + " active for " + Math.max(1, Math.ceil(remaining)) + " seconds; next use costs " + cost.toLocaleString("en-US") + " crystals"
+            : "Buy " + labels[type] + " for " + cost.toLocaleString("en-US") + " crystals");
+          if (costLabel) {
+            costLabel.hidden = false;
+            costLabel.textContent = "💎 " + formatActivePowerDisplayCost(cost);
+          }
           if (timerLabel) {
             timerLabel.hidden = !active;
             timerLabel.textContent = active ? Math.max(1, Math.ceil(remaining)) + "s ACTIVE" : "";
@@ -10928,7 +11529,7 @@ void main() {
       }
       function buyActivePower(type) {
         if (state !== "running" || !Object.prototype.hasOwnProperty.call(ACTIVE_POWER_COSTS, type)) return false;
-        const cost = ACTIVE_POWER_COSTS[type];
+        const cost = getActivePowerCost(type);
         const activeTimer = type === "shield" ? activeShieldTimer : type === "magnet" ? crystalMagnetTimer : 0;
         if (activeTimer > 0) {
           showPowerPurchaseNotice("Already active · " + Math.ceil(activeTimer) + "s left");
@@ -10941,6 +11542,7 @@ void main() {
         }
 
         progression.crystals = safeStoredCount(progression.crystals - cost);
+        incrementActivePowerUse(type);
         saveProgression();
         updateCoinDisplay();
         updateHUD();
@@ -11099,6 +11701,7 @@ void main() {
           maybeShowDailyReward();
           return;
         }
+        if (isCoarsePointer()) void requestPortraitOrientationLock();
         closeSettings(false);
         closeShop();
         clearFlexCardPreview();
@@ -11167,6 +11770,7 @@ void main() {
         shieldCharges = 0;
         activeShieldTimer = 0;
         crystalMagnetTimer = 0;
+        resetActivePowerUseCounters();
         shieldPursuitRepelled = false;
         timeWarpTimer = 0;
         scoreBoosterTimer = 0;
@@ -11203,6 +11807,8 @@ void main() {
         updateHUD();
         updateGravityIndicator();
         el("pause-screen").hidden = true;
+        el("session-terminated-screen").hidden = true;
+        backgroundPausedAt = 0;
         el("overlay").classList.add("hidden");
         el("hud").classList.add("visible");
         el("runStatus").classList.add("visible");
@@ -11221,6 +11827,7 @@ void main() {
       function pauseGame(reason = "manual") {
         if (state !== "running") return;
         state = "paused";
+        saveProgression();
         updatePursuitWarning();
         lastTime = performance.now();
         window.clearTimeout(statusTimer);
@@ -11240,16 +11847,36 @@ void main() {
           ? "Your run paused when you left the game. Resume it or restart whenever you're ready."
           : "Your progress is safe. Resume when you're ready.";
         el("overlay").classList.add("hidden");
+        el("session-terminated-screen").hidden = true;
         el("pause-screen").hidden = false;
         el("pauseResumeButton").focus({ preventScroll: true });
       }
+      function formatBackgroundDuration(durationMs) {
+        const totalSeconds = Math.max(1, Math.floor(durationMs / 1000));
+        if (totalSeconds < 60) return totalSeconds + "s";
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return minutes + "m " + String(seconds).padStart(2, "0") + "s";
+      }
+      function showSessionTerminatedScreen(awayDurationMs) {
+        if (state !== "paused") return;
+        el("pause-screen").hidden = true;
+        el("sessionTerminatedDescription").textContent =
+          "Your run was paused after " + formatBackgroundDuration(awayDurationMs) +
+          " in the background. Your score, lane, and current run state are still here.";
+        el("sessionConnectionStatus").textContent = "LOCAL SESSION PRESERVED · READY TO RESUME OFFLINE";
+        el("session-terminated-screen").hidden = false;
+        el("sessionReconnectButton").focus({ preventScroll: true });
+      }
       function resumeGame() {
         if (state !== "paused") return;
+        backgroundPausedAt = 0;
         state = "running";
         updatePursuitWarning();
         lastTime = performance.now();
         el("game").classList.remove("is-paused");
         el("pause-screen").hidden = true;
+        el("session-terminated-screen").hidden = true;
         el("pauseButton").hidden = false;
         el("overlay").classList.add("hidden");
         el("hud").classList.add("visible");
@@ -11447,6 +12074,7 @@ void main() {
         window.clearTimeout(statusTimer);
         window.clearTimeout(environmentNoticeTimer);
         environmentNoticeToken++;
+        backgroundPausedAt = 0;
         window.clearTimeout(impactShakeTimer);
         window.clearTimeout(flashTimer);
         window.clearTimeout(powerPurchaseNoticeTimer);
@@ -11486,6 +12114,7 @@ void main() {
         shieldCharges = 0;
         activeShieldTimer = 0;
         crystalMagnetTimer = 0;
+        resetActivePowerUseCounters();
         shieldPursuitRepelled = false;
         timeWarpTimer = 0;
         scoreBoosterTimer = 0;
@@ -11523,6 +12152,7 @@ void main() {
         el("game").classList.remove("is-running", "is-paused", "game-over-active", "impact-shake", "fever-active", "laser-danger");
         el("pauseButton").hidden = true;
         el("pause-screen").hidden = true;
+        el("session-terminated-screen").hidden = true;
         el("hud").classList.remove("visible");
         el("runStatus").classList.remove("visible");
         el("ghostStatus").classList.remove("visible");
@@ -11584,12 +12214,14 @@ void main() {
         feverTimer = 0;
         activeShieldTimer = 0;
         crystalMagnetTimer = 0;
+        resetActivePowerUseCounters();
         shieldPursuitRepelled = false;
         triggerImpactEffects(COLORS[currentColor].hex, 1.4);
         playCue("gameOver");
         el("flash").classList.add("on");
         window.clearTimeout(flashTimer);
         flashTimer = window.setTimeout(() => el("flash").classList.remove("on"), 120);
+        updateActivePowerToolbar();
         updateHUD();
         const final = Number.isFinite(score) ? Math.max(0, Math.floor(score)) : 0;
         best = loadModeHighScore(selectedMode);
@@ -12134,6 +12766,7 @@ void main() {
         orbHalo.material.color.lerp(selectedOrbColor, colorLerp);
         orbLight.color.lerp(selectedOrbColor, colorLerp);
         skinAccent.rotation.z += dt * 0.38;
+        animatePlayerAura(dt, t);
         const beaconDirection = antiGravityModeActive && gravitySide === "ceiling" ? -1 : 1;
         colorBeacon.position.y = beaconDirection * (0.9 + Math.sin(t * 3.2) * 0.045);
         colorBeacon.rotation.y += dt * 1.5;
@@ -12443,13 +13076,30 @@ void main() {
           activateFallbackRenderer();
           resizeFallback();
         }
+        updateOrientationWarning();
+      }
+      let viewportResizeFrameId = 0;
+      function scheduleViewportResize() {
+        if (viewportResizeFrameId) return;
+        viewportResizeFrameId = requestAnimationFrame(() => {
+          viewportResizeFrameId = 0;
+          resize();
+        });
       }
       resize();
-      window.addEventListener("resize", resize, { passive: true });
-      window.addEventListener("orientationchange", () => requestAnimationFrame(resize), { passive: true });
-      window.visualViewport?.addEventListener("resize", resize, { passive: true });
+      window.addEventListener("resize", scheduleViewportResize, { passive: true });
+      window.addEventListener("orientationchange", scheduleViewportResize, { passive: true });
+      window.visualViewport?.addEventListener("resize", scheduleViewportResize, { passive: true });
+      window.screen.orientation?.addEventListener?.("change", scheduleViewportResize);
+      const landscapeMediaQuery = window.matchMedia?.("(orientation: landscape)");
+      if (landscapeMediaQuery?.addEventListener) landscapeMediaQuery.addEventListener("change", scheduleViewportResize);
+      else landscapeMediaQuery?.addListener?.(scheduleViewportResize);
+      document.addEventListener("fullscreenchange", () => {
+        updateOrientationWarning();
+        if (document.fullscreenElement && isCoarsePointer()) void requestPortraitOrientationLock();
+      });
       if (window.ResizeObserver) {
-        const sceneResizeObserver = new ResizeObserver(resize);
+        const sceneResizeObserver = new ResizeObserver(scheduleViewportResize);
         sceneResizeObserver.observe(sceneRoot);
       }
       initializeNativeAds();
@@ -12483,8 +13133,8 @@ void main() {
        document.querySelectorAll("[data-reward-tab]").forEach(button => {
          button.addEventListener("click", () => setRewardsTab(button.dataset.rewardTab));
        });
-        el("shopPanel").querySelector(".reward-tabs").addEventListener("keydown", event => {
-          const tabs = Array.from(el("shopPanel").querySelectorAll("[data-reward-tab]"));
+         el("shop-screen").querySelector(".reward-tabs").addEventListener("keydown", event => {
+           const tabs = Array.from(el("shop-screen").querySelectorAll("[data-reward-tab]"));
           const currentIndex = tabs.indexOf(event.target.closest("[data-reward-tab]"));
           if (currentIndex < 0) return;
           let nextIndex = currentIndex;
@@ -12499,11 +13149,36 @@ void main() {
         });
        el("skinGrid").addEventListener("click", event => {
          const button = event.target.closest("[data-skin]");
-         if (button) chooseSkin(button.dataset.skin);
+          if (button) {
+            selectShopItem("skin", button.dataset.skin);
+            chooseSkin(button.dataset.skin);
+          }
        });
        el("trailGrid").addEventListener("click", event => {
          const button = event.target.closest("[data-trail]");
-         if (button) chooseTrail(button.dataset.trail);
+          if (button) {
+            selectShopItem("trail", button.dataset.trail);
+            chooseTrail(button.dataset.trail);
+          }
+        });
+        el("auraGrid").addEventListener("click", event => {
+          const button = event.target.closest("[data-aura]");
+          if (button) {
+            selectShopItem("aura", button.dataset.aura);
+            chooseAura(button.dataset.aura);
+          }
+        });
+        el("boosterGrid").addEventListener("click", event => {
+          const button = event.target.closest("[data-booster]");
+          if (button) {
+            selectShopItem("booster", button.dataset.booster);
+            buyBooster(button.dataset.booster);
+          }
+        });
+        el("shop-screen").addEventListener("click", event => {
+          if (event.target.closest("button")) return;
+          const card = event.target.closest("[data-shop-item]");
+          if (card) selectShopItem(card.dataset.itemType, card.dataset.itemId);
        });
        el("achievementList").addEventListener("click", event => {
          const button = event.target.closest("[data-tier]");
@@ -12527,6 +13202,8 @@ void main() {
        el("pauseRestartButton").addEventListener("click", () => startGame(true));
        el("pauseSettingsButton").addEventListener("click", openSettings);
        el("pauseHomeButton").addEventListener("click", returnToHome);
+        el("sessionReconnectButton").addEventListener("click", resumeGame);
+        el("sessionHomeButton").addEventListener("click", returnToHome);
        el("activeShieldButton").addEventListener("click", () => buyActivePower("shield"));
        el("activeMagnetButton").addEventListener("click", () => buyActivePower("magnet"));
        el("activeBombButton").addEventListener("click", () => buyActivePower("bomb"));
@@ -12617,6 +13294,19 @@ void main() {
           }
           return;
         }
+        if (!el("session-terminated-screen").hidden && event.key === "Tab") {
+          const focusable = Array.from(el("session-terminated-screen").querySelectorAll("button:not([disabled])"));
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last?.focus();
+          } else if (!event.shiftKey && (document.activeElement === last || !el("session-terminated-screen").contains(document.activeElement))) {
+            event.preventDefault();
+            first?.focus();
+          }
+          return;
+        }
         if (state === "paused" && !el("pause-screen").hidden && event.key === "Tab") {
           const focusable = Array.from(el("pause-screen").querySelectorAll("button:not([disabled])"));
           const first = focusable[0];
@@ -12634,6 +13324,11 @@ void main() {
           event.preventDefault();
           if (state === "paused") closeSettings();
           else returnToHome();
+          return;
+        }
+        if (event.code === "Escape" && !el("session-terminated-screen").hidden) {
+          event.preventDefault();
+          resumeGame();
           return;
         }
         if (event.code === "Escape" && !el("dailyModal").hidden) {
@@ -12694,7 +13389,7 @@ void main() {
         if (state !== "running" && el("dailyModal").hidden && el("rewards-screen").hidden && el("settings-screen").hidden) startGame();
       };
       game.addEventListener("pointerdown", event => {
-        if (event.pointerType === "touch" || event.button !== 0 || (event.target instanceof Element && event.target.closest("button, #overlay .card, #pause-screen, #rewards-screen, #settings-screen, #dailyModal"))) return;
+        if (event.pointerType === "touch" || event.button !== 0 || (event.target instanceof Element && event.target.closest("button, #overlay .card, #pause-screen, #session-terminated-screen, #rewards-screen, #settings-screen, #dailyModal"))) return;
         gestureStart = { id: event.pointerId, source: "pointer", x: event.clientX, y: event.clientY, swiped: false };
         try { game.setPointerCapture(event.pointerId); } catch {}
       }, { passive: true });
@@ -12708,7 +13403,8 @@ void main() {
         if (gestureStart?.source === "pointer" && gestureStart.id === event.pointerId) gestureStart = null;
       }, { passive: true });
       game.addEventListener("touchstart", event => {
-        if (event.target instanceof Element && event.target.closest("button, #overlay .card, #pause-screen, #rewards-screen, #settings-screen, #dailyModal")) return;
+        if (event.target instanceof Element && event.target.closest("button, #overlay .card, #pause-screen, #session-terminated-screen, #rewards-screen, #settings-screen, #dailyModal")) return;
+        if (state === "running" && event.cancelable) event.preventDefault();
         if (event.touches.length > 1) {
           gestureStart = null;
           return;
@@ -12716,7 +13412,7 @@ void main() {
         const touch = event.changedTouches[0];
         if (!touch) return;
         gestureStart = { id: touch.identifier, source: "touch", x: touch.clientX, y: touch.clientY, swiped: false };
-      }, { passive: true });
+      }, { passive: false });
       game.addEventListener("touchmove", event => {
         if (gestureStart?.source !== "touch") return;
         const touch = Array.from(event.changedTouches).find(item => item.identifier === gestureStart.id);
@@ -12744,15 +13440,39 @@ void main() {
       window.addEventListener("contextmenu", event => event.preventDefault());
       setGameMode("endless");
       maybeShowDailyReward();
-      const pauseForBackground = () => pauseGame("background");
+      const pauseForBackground = () => {
+        if (state !== "running") return;
+        if (!backgroundPausedAt) backgroundPausedAt = Date.now();
+        pauseGame("background");
+      };
+      const restoreBackgroundSession = () => {
+        if (backgroundPausedAt) {
+          const awayDurationMs = Math.max(0, Date.now() - backgroundPausedAt);
+          backgroundPausedAt = 0;
+          if (state === "paused" && awayDurationMs >= BACKGROUND_SESSION_TIMEOUT_MS) {
+            showSessionTerminatedScreen(awayDurationMs);
+            return;
+          }
+        }
+        if (state !== "paused") maybeShowDailyReward();
+      };
       window.addEventListener("blur", pauseForBackground);
       window.addEventListener("pagehide", pauseForBackground);
-      window.addEventListener("focus", () => {
-        if (state !== "paused") maybeShowDailyReward();
-      });
+      window.addEventListener("focus", restoreBackgroundSession);
+      window.addEventListener("pageshow", restoreBackgroundSession);
       document.addEventListener("visibilitychange", () => {
         if (document.hidden) pauseForBackground();
-        else if (state !== "paused") maybeShowDailyReward();
+        else restoreBackgroundSession();
+      });
+      window.addEventListener("offline", () => {
+        if (!el("session-terminated-screen").hidden) {
+          el("sessionConnectionStatus").textContent = "OFFLINE · YOUR LOCAL RUN IS SAFE TO RESUME";
+        }
+      });
+      window.addEventListener("online", () => {
+        if (!el("session-terminated-screen").hidden) {
+          el("sessionConnectionStatus").textContent = "LOCAL SESSION PRESERVED · READY TO RESUME";
+        }
       });
       setSplashProgress(94, "Warming up the first frame");
     })();
