@@ -5,6 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#090c13" />
   <meta name="description" content="Color Shift: Neon Rush 3D — shift through neon gates, build your combo, and chase your best run." />
+  <meta name="keywords" content="neon arcade, 3D color match, endless cyberpunk game, reflex runner, arcade runner" />
+  <meta name="application-name" content="Color Shift: Neon Rush 3D" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Color Shift: Neon Rush 3D" />
+  <meta property="og:title" content="Color Shift: Neon Rush 3D — Neon Arcade" />
+  <meta property="og:description" content="Match glowing colors, steer through neon gates, and chase your best run in a fast 3D arcade runner." />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Color Shift: Neon Rush 3D" />
+  <meta name="twitter:description" content="A 3D color-match reflex runner in a neon cyberpunk tunnel." />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <!--
+    GOOGLE PLAY CONSOLE LISTING DRAFT — edit for the actual release:
+    App title (30 chars max): Color Shift: Neon Rush 3D
+    Short description (80 chars max): Match neon gates in a fast 3D cyberpunk arcade run.
+    Long description: Switch colors, steer across three lanes, and survive an endless neon tunnel.
+    Build streak multipliers, collect crystals, unlock original skins, and challenge Laser Pursuit,
+    Time Attack, Anti-Gravity, Blackout, and Mirror Matrix modes.
+    Feature tags: Neon Arcade · 3D Color Match · Endless Cyberpunk Game · Offline Arcade
+    Prepare a real 512x512 Play icon, feature graphic, screenshots, privacy policy, data-safety
+    answers, and age rating in Play Console before submitting.
+
+    WEB APP MANIFEST TEMPLATE (the Capacitor Android build packages local game assets for offline play):
+    {"name":"Color Shift: Neon Rush 3D","short_name":"Color Shift","description":"Match neon gates in a 3D cyberpunk arcade runner.","start_url":".","display":"standalone","orientation":"portrait","background_color":"#090c13","theme_color":"#090c13","icons":[{"src":"REPLACE_WITH_192PX_ICON.png","sizes":"192x192","type":"image/png"},{"src":"REPLACE_WITH_512PX_ICON.png","sizes":"512x512","type":"image/png"}]}
+
+    Native AdMob setup: initialize the Google Mobile Ads SDK in the Android host, use test ad units
+    during development, configure consent/UMP and production unit IDs before release, and never
+    reward a user until the native SDK confirms its earned-reward callback.
+  -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -167,6 +196,8 @@
       35% { color: var(--lime); transform: scale(1.22); text-shadow: 0 0 20px rgba(197,255,74,.75); }
     }
     .stat.combo-hot .stat-value { color: var(--lime); text-shadow: 0 0 18px rgba(197,255,74,.65); transform: scale(1.08); }
+    .streak-bonus { margin-top: 2px; color: #ffe39a; font: 800 8px/1 "Orbitron", sans-serif; letter-spacing: .08em; text-shadow: 0 0 9px rgba(255,207,95,.62); }
+    .streak-bonus[hidden] { display: none !important; }
     .stat-value { transition: color .2s, text-shadow .2s, transform .2s; }
     #score.score-pop { animation: scorePop .44s cubic-bezier(.2,.8,.2,1); }
     @keyframes scorePop {
@@ -375,12 +406,68 @@
     .shop-intro { margin: 9px 0 0; color: #a7b4c3; font-size: clamp(16px, 1.4vw, 17px); line-height: 1.35; }
     .shop-balance { min-width: 155px; padding: 12px 14px; border: 1px solid rgba(255,211,106,.26); background: rgba(255,211,106,.06); font-size: 11px; }
     .shop-balance strong { display: inline-block; margin-top: 4px; font: 700 clamp(20px, 2.6vw, 29px)/1 "Orbitron", system-ui, sans-serif; }
-    .reward-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 5px; margin: 0 0 21px; border: 1px solid rgba(233,241,246,.1); background: rgba(3,7,13,.52); }
-    .reward-tab { min-height: 48px; padding: 10px; border: 1px solid transparent; background: transparent; color: #9ca9b8; cursor: pointer; font: 700 12px "Orbitron", system-ui, sans-serif; letter-spacing: .08em; transition: color .18s, border-color .18s, background .18s, transform .18s; touch-action: manipulation; }
+    .reward-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 5px; margin: 0 0 21px; border: 1px solid rgba(233,241,246,.1); background: rgba(3,7,13,.52); }
+    .reward-tab { min-height: 48px; padding: 10px; border: 1px solid transparent; background: transparent; color: #9ca9b8; cursor: pointer; font: 700 12px "Orbitron", system-ui, sans-serif; letter-spacing: .08em; line-height: 1.2; overflow-wrap: anywhere; transition: color .18s, border-color .18s, background .18s, transform .18s; touch-action: manipulation; }
     .reward-tab:hover { color: #fff; transform: translateY(-1px); }
     .reward-tab.active { border-color: rgba(84,242,223,.38); background: linear-gradient(100deg, rgba(84,242,223,.13), rgba(155,111,255,.1)); color: #c8fff8; box-shadow: inset 0 0 18px rgba(84,242,223,.05); }
     .reward-tab:focus-visible, .shop-panel button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
     .reward-tab-panel[hidden] { display: none !important; }
+    .referral-panel {
+      display: grid;
+      gap: clamp(15px, 2.4vw, 24px);
+      max-width: 850px;
+      margin: 0 auto;
+      padding: clamp(18px, 3.4vw, 34px);
+      border: 1px solid rgba(84, 242, 223, .27);
+      border-radius: 14px;
+      background:
+        radial-gradient(ellipse at 92% 4%, rgba(255, 79, 184, .12), transparent 42%),
+        radial-gradient(ellipse at 8% 95%, rgba(56, 234, 255, .1), transparent 45%),
+        linear-gradient(145deg, rgba(14, 23, 37, .9), rgba(7, 11, 20, .94));
+      box-shadow: inset 0 1px rgba(255,255,255,.05), 0 0 28px rgba(56,234,255,.06);
+    }
+    .referral-kicker { color: #91fff0; font: 700 11px "Orbitron", system-ui, sans-serif; letter-spacing: .18em; }
+    .referral-heading { margin: 8px 0 0; color: #f2f6fb; font: 800 clamp(22px, 3vw, 32px)/1.2 "Orbitron", system-ui, sans-serif; }
+    .referral-copy { max-width: 680px; margin: 9px 0 0; color: #b5c1cf; font-size: clamp(16px, 1.7vw, 18px); line-height: 1.5; }
+    .referral-field-label { display: block; margin: 0 0 8px; color: #9aabba; font: 700 11px "Orbitron", system-ui, sans-serif; letter-spacing: .12em; }
+    .referral-link-row { display: flex; gap: 10px; min-width: 0; }
+    .referral-link-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 52px;
+      padding: 12px 14px;
+      border: 1px solid rgba(91,225,234,.32);
+      border-radius: 7px;
+      outline: none;
+      background: rgba(3,7,14,.78);
+      color: #d5ffff;
+      font: 600 14px/1.35 "Rajdhani", system-ui, sans-serif;
+      letter-spacing: .02em;
+      user-select: text;
+    }
+    .referral-link-input:focus-visible { border-color: #5af5e3; box-shadow: 0 0 0 2px rgba(90,245,227,.2); }
+    .referral-action-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .referral-action {
+      min-width: 0;
+      min-height: 52px;
+      border: 1px solid rgba(84,242,223,.42);
+      border-radius: 7px;
+      background: linear-gradient(110deg, rgba(56,234,255,.13), rgba(155,111,255,.1) 56%, rgba(255,79,184,.1));
+      color: #eaffff;
+      cursor: pointer;
+      font: 750 clamp(11px, 1.5vw, 14px) "Orbitron", system-ui, sans-serif;
+      letter-spacing: .055em;
+      text-align: center;
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+      touch-action: manipulation;
+    }
+    .referral-action:hover { transform: translateY(-1px); border-color: rgba(255,79,184,.7); box-shadow: 0 0 20px rgba(56,234,255,.13); }
+    .referral-action:active { transform: scale(.97); }
+    .referral-action:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    .referral-share-count { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid rgba(255,255,255,.1); background: rgba(4,8,15,.48); color: #aab8c7; font-size: 16px; }
+    .referral-share-count strong { color: #ffe68c; font: 700 18px "Orbitron", system-ui, sans-serif; }
+    .referral-status { min-height: 26px; margin: -8px 0 0; color: #8fffee; font-size: 16px; line-height: 1.45; text-align: center; }
+    .referral-disclaimer { margin: 0; color: #8795a5; font-size: 14px; line-height: 1.55; }
     .shop-section-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; margin: 4px 0 14px; }
     .shop-section-heading h3 { margin: 0; color: #f4f7ff; font: 700 clamp(20px, 2.2vw, 27px)/1.15 "Orbitron", system-ui, sans-serif; }
     .shop-section-heading p { margin: 6px 0 0; color: #a6b1c0; font-size: 16px; line-height: 1.4; }
@@ -610,6 +697,108 @@
       letter-spacing: .12em;
       text-align: center;
     }
+    .share-unlock-btn {
+      display: block;
+      width: min(100%, 530px);
+      min-height: 58px;
+      margin: 10px auto 12px;
+      padding: 12px clamp(12px, 3vw, 22px);
+      border: 1px solid rgba(120, 248, 255, .8);
+      border-radius: 5px;
+      background: linear-gradient(105deg, rgba(0, 209, 230, .24), rgba(255, 57, 187, .24));
+      color: #f2ffff;
+      cursor: pointer;
+      font: 900 clamp(10px, 2.1vw, 13px)/1.4 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .08em;
+      text-align: center;
+      text-shadow: 0 0 12px rgba(56, 234, 255, .55);
+      box-shadow: 0 0 22px rgba(56, 234, 255, .16), 0 0 26px rgba(255, 79, 184, .12), inset 0 0 16px rgba(255, 255, 255, .04);
+      transition: transform .18s ease, filter .18s ease, border-color .18s ease, opacity .18s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .share-unlock-btn:hover:not(:disabled) { transform: scale(1.025); filter: brightness(1.18); border-color: #fff; }
+    .share-unlock-btn:active:not(:disabled) { transform: scale(.975); }
+    .share-unlock-btn:disabled { cursor: default; opacity: .78; }
+    .share-unlock-btn[hidden] { display: none !important; }
+    .flex-card-share-btn {
+      display: block;
+      width: min(100%, 530px);
+      min-height: 60px;
+      margin: 12px auto;
+      padding: 13px clamp(12px, 3vw, 22px);
+      border: 1px solid rgba(255, 92, 220, .78);
+      border-radius: 5px;
+      background: linear-gradient(105deg, rgba(255, 54, 180, .88), rgba(124, 74, 255, .9) 52%, rgba(31, 209, 231, .88));
+      color: #fff;
+      cursor: pointer;
+      font: 900 clamp(10px, 2.1vw, 13px)/1.4 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .09em;
+      text-align: center;
+      text-shadow: 0 0 12px rgba(255, 255, 255, .4);
+      box-shadow: 0 0 24px rgba(255, 52, 187, .24), 0 0 28px rgba(36, 215, 255, .16), inset 0 1px rgba(255, 255, 255, .28);
+      transition: transform .18s ease, filter .18s ease, opacity .18s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .flex-card-share-btn:hover:not(:disabled) { transform: scale(1.025); filter: brightness(1.12); }
+    .flex-card-share-btn:active:not(:disabled) { transform: scale(.975); }
+    .flex-card-share-btn:disabled { opacity: .65; cursor: wait; }
+    .flex-card-preview {
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      width: min(100%, 350px);
+      margin: 12px auto;
+      padding: 12px;
+      border: 1px solid rgba(77, 237, 255, .26);
+      border-radius: 8px;
+      background: linear-gradient(145deg, rgba(9, 18, 30, .86), rgba(22, 9, 29, .86));
+      box-shadow: inset 0 0 22px rgba(56, 234, 255, .05), 0 0 22px rgba(255, 79, 184, .08);
+    }
+    .flex-card-preview[hidden] { display: none !important; }
+    .flex-card-preview img {
+      display: block;
+      width: auto;
+      max-width: 100%;
+      height: min(44vh, 420px);
+      aspect-ratio: 9 / 16;
+      object-fit: contain;
+      border: 1px solid rgba(111, 245, 255, .5);
+      background: #080a14;
+      box-shadow: 0 0 18px rgba(56, 234, 255, .18), 0 0 26px rgba(255, 79, 184, .12);
+    }
+    .flex-card-preview p { margin: 0; color: #a8bacd; font: 600 14px/1.4 "Rajdhani", system-ui, sans-serif; text-align: center; }
+    .flex-card-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; }
+    .flex-card-actions .secondary-btn { min-height: 48px; width: min(100%, 220px); font-size: 10px; }
+    .flex-card-status { min-height: 20px; margin: 5px auto 0; color: #a8fff1; font: 700 12px/1.4 "Rajdhani", system-ui, sans-serif; text-align: center; }
+    .flex-card-status:empty { display: none; }
+    .share-reward-toast {
+      position: fixed;
+      z-index: 10050;
+      top: max(16px, env(safe-area-inset-top));
+      left: 50%;
+      width: min(calc(100vw - 28px), 480px);
+      padding: 14px 18px;
+      border: 1px solid rgba(103, 255, 226, .76);
+      border-radius: 8px;
+      background: linear-gradient(110deg, rgba(7, 30, 37, .97), rgba(35, 12, 42, .97));
+      color: #eafffa;
+      font: 800 clamp(12px, 3.2vw, 15px)/1.45 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .035em;
+      text-align: center;
+      text-wrap: balance;
+      box-shadow: 0 0 28px rgba(0, 255, 218, .22), 0 0 34px rgba(255, 0, 207, .18);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translate(-50%, -14px) scale(.98);
+      transition: opacity .24s ease, transform .24s ease, visibility .24s ease;
+    }
+    .share-reward-toast.visible { opacity: 1; visibility: visible; transform: translate(-50%, 0) scale(1); }
+    @media (prefers-reduced-motion: reduce) {
+      .share-reward-toast, .share-unlock-btn { transition-duration: .01ms !important; }
+    }
     .new-record-badge {
       position: relative;
       display: flex;
@@ -760,18 +949,41 @@
     #game.laser-pursuit-mode .ghost-status { top: max(132px, calc(env(safe-area-inset-top) + 120px)); }
     .pursuit-warning[hidden] { display: none !important; }
     #game.quantum-mode .gravity-indicator { border-color: rgba(185,138,255,.72); background: rgba(17,9,42,.84); }
-    .daily-modal { position: absolute; z-index: 20; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: max(20px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom)); background: rgba(4,7,13,.82); backdrop-filter: blur(10px); }
+    .daily-modal { position: absolute; z-index: 20; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: max(20px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom)); background: rgba(4,7,13,.82); backdrop-filter: blur(10px); touch-action: pan-y; }
     .daily-modal[hidden] { display: none !important; }
-    .daily-card { width: min(100%, 360px); padding: 22px 20px 18px; border: 1px solid rgba(255,205,74,.42); background: radial-gradient(circle at 50% 0, rgba(255,205,74,.12), transparent 55%), rgba(8,12,19,.96); text-align: center; box-shadow: 0 0 38px rgba(255,205,74,.14); }
+    .daily-card { position: relative; width: min(100%, 390px); max-height: min(92dvh, 780px); overflow-y: auto; overscroll-behavior: contain; padding: 22px 20px 18px; border: 1px solid rgba(255,205,74,.42); border-radius: 16px; background: radial-gradient(circle at 50% 0, rgba(255,205,74,.12), transparent 55%), rgba(8,12,19,.96); text-align: center; box-shadow: 0 0 38px rgba(255,205,74,.14); scrollbar-width: thin; scrollbar-color: rgba(255,205,74,.46) transparent; touch-action: pan-y; }
     .daily-card h2 { margin: 0; color: #fff4d1; font: 900 23px/1.05 system-ui, sans-serif; letter-spacing: .04em; text-transform: uppercase; }
-    .daily-card p { margin: 9px auto 16px; color: #a8afb8; font-size: 9px; line-height: 1.6; letter-spacing: .08em; }
+    .daily-card p { max-width: 330px; margin: 9px auto 12px; color: #a8afb8; font-size: clamp(14px, 3.6vw, 16px); line-height: 1.45; letter-spacing: .02em; }
+    .daily-wallet-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 0 auto 12px; }
+    .daily-wallet-pill { min-width: 120px; padding: 7px 12px; border: 1px solid rgba(56,234,255,.23); border-radius: 999px; background: rgba(6,15,24,.68); color: #b9d8df; font: 700 10px "Orbitron", sans-serif; letter-spacing: .07em; }
+    .daily-wallet-pill strong { color: #fff; }
     .wheel-frame { position: relative; width: 190px; height: 190px; margin: 0 auto 15px; padding: 9px; border: 1px solid rgba(255,255,255,.2); border-radius: 50%; box-shadow: 0 0 24px rgba(255,205,74,.15), inset 0 0 18px rgba(255,255,255,.08); }
-    .daily-wheel { position: relative; width: 100%; height: 100%; overflow: hidden; border: 3px solid rgba(255,255,255,.72); border-radius: 50%; background: conic-gradient(#ffd25e 0deg 45deg,#ff58d6 45deg 90deg,#38e6d3 90deg 135deg,#7c69ff 135deg 180deg,#ffd25e 180deg 225deg,#ff58d6 225deg 270deg,#38e6d3 270deg 315deg,#7c69ff 315deg 360deg); box-shadow: 0 0 18px rgba(255,255,255,.2); transition: transform 1.7s cubic-bezier(.12,.72,.11,1); }
-    .daily-wheel::before { content: "✦  ◆  ✦  ◆  ✦  ◆  ✦  ◆"; position: absolute; inset: 0; display: grid; place-items: center; color: rgba(8,12,19,.9); font-size: 13px; letter-spacing: .42em; text-align: center; text-shadow: 0 0 4px rgba(255,255,255,.4); transform: rotate(-18deg); }
+    .daily-wheel { position: relative; width: 100%; height: 100%; overflow: hidden; border: 3px solid rgba(255,255,255,.78); border-radius: 50%; background: conic-gradient(#ffca58 0deg 45deg,#45dff0 45deg 90deg,#ef58d1 90deg 135deg,#8b76ff 135deg 180deg,#b8f34c 180deg 225deg,#ff765d 225deg 270deg,#4fafff 270deg 315deg,#d785ff 315deg 360deg); box-shadow: 0 0 22px rgba(255,255,255,.22), inset 0 0 24px rgba(6,10,18,.28); transition: transform 2.8s cubic-bezier(.12,.72,.11,1); }
+    .daily-wheel::before { content: ""; position: absolute; z-index: 1; inset: 0; border-radius: inherit; background: repeating-conic-gradient(from 0deg, transparent 0deg 43.8deg, rgba(5,10,17,.88) 43.8deg 45deg); }
+    .wheel-mark { position: absolute; z-index: 2; top: 50%; left: 50%; width: 44px; color: #07111a; font: 900 9px/1 "Orbitron", sans-serif; text-align: center; text-shadow: 0 1px rgba(255,255,255,.35); transform: translate(-50%,-50%) rotate(calc(var(--wheel-index) * 45deg)) translateY(-68px); transform-origin: center; }
     .wheel-center { position: absolute; z-index: 2; inset: 50% auto auto 50%; display: grid; place-items: center; width: 54px; height: 54px; border: 2px solid rgba(255,255,255,.82); border-radius: 50%; background: #111a24; color: #fff; font: 900 8px system-ui, sans-serif; letter-spacing: .1em; transform: translate(-50%,-50%); box-shadow: 0 0 18px rgba(255,255,255,.35); pointer-events: none; }
     .wheel-pointer { position: absolute; z-index: 3; top: -7px; left: 50%; color: #fff2c5; font-size: 24px; text-shadow: 0 0 10px #ffd25e; transform: translateX(-50%); }
-    .daily-result { min-height: 18px; margin: 0 0 10px; color: #ffe29a; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-    .daily-modal .primary-btn, .daily-modal .secondary-btn { width: min(100%, 250px); }
+    .wheel-reward-key { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin: 0 auto 12px; text-align: left; }
+    .wheel-reward-key span { min-width: 0; padding: 6px 7px; border: 1px solid rgba(197,218,230,.1); border-radius: 6px; background: rgba(255,255,255,.025); color: #c1cbd4; font: 600 12px/1.2 "Rajdhani", sans-serif; }
+    .wheel-reward-key b { color: #ffe29a; }
+    .daily-result { min-height: 22px; margin: 0 0 8px; color: #ffe29a; font-size: clamp(14px, 3.5vw, 16px); font-weight: 800; letter-spacing: .04em; }
+    .daily-modal .primary-btn, .daily-modal .secondary-btn { width: min(100%, 290px); min-height: 50px; }
+    .extra-spin-prompt { position: absolute; z-index: 8; inset: 0; display: grid; place-items: center; padding: 16px; border-radius: inherit; background: rgba(3,7,14,.91); backdrop-filter: blur(8px); }
+    .extra-spin-prompt[hidden] { display: none !important; }
+    .extra-spin-panel { width: min(100%, 310px); padding: 22px 17px 16px; border: 1px solid rgba(56,234,255,.45); border-radius: 14px; background: linear-gradient(145deg, rgba(18,31,46,.98), rgba(11,10,28,.98)); box-shadow: 0 0 30px rgba(56,234,255,.13), 0 0 32px rgba(255,79,184,.1); }
+    .extra-spin-panel h3 { margin: 0 0 10px; color: #f8e9ff; font: 800 clamp(15px, 4vw, 19px) "Orbitron", sans-serif; }
+    .extra-spin-panel p { margin: 0 auto 15px; color: #c4d1da; font: 600 15px/1.4 "Rajdhani", sans-serif; }
+    .extra-spin-actions { display: grid; gap: 8px; }
+    .extra-spin-actions button { width: 100%; min-height: 50px; }
+    @media (prefers-reduced-motion: reduce) {
+      .daily-wheel { transition: none !important; }
+    }
+    @media (max-width: 430px) {
+      .daily-card { padding: 18px 14px 14px; }
+      .wheel-frame { width: 180px; height: 180px; }
+      .wheel-mark { transform: translate(-50%,-50%) rotate(calc(var(--wheel-index) * 45deg)) translateY(-63px); }
+      .wheel-reward-key span { font-size: 11px; }
+    }
     .mobile-controls { display: none; position: absolute; z-index: 6; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); gap: 8px; }
     .tap-control { width: 54px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; border: 1px solid rgba(224,235,240,.42); border-radius: 12px; background: rgba(8,13,20,.82); color: #f3f1e9; backdrop-filter: blur(8px); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; font-family: system-ui, sans-serif; font-size: 20px; transition: background .15s, transform .15s; }
     .tap-control small { color: rgba(243,241,233,.8); font-size: 6px; font-weight: 800; letter-spacing: .1em; }
@@ -779,6 +991,81 @@
     .tap-control:disabled { opacity: .68; cursor: default; }
     .tap-control:disabled:active { background: rgba(8,13,20,.82); transform: none; }
     .tap-control:active { background: rgba(56,234,255,.25); transform: scale(.94); }
+    .active-power-toolbar {
+      --powerbar-bottom: max(22px, env(safe-area-inset-bottom));
+      position: absolute;
+      z-index: 8;
+      left: 50%;
+      bottom: var(--powerbar-bottom);
+      display: flex;
+      width: min(570px, calc(100vw - 32px));
+      gap: 9px;
+      transform: translateX(-50%);
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, visibility .18s ease;
+    }
+    #game.is-running:not(.is-paused) .active-power-toolbar { visibility: visible; opacity: 1; pointer-events: auto; }
+    #game:not(.is-running) .active-power-toolbar,
+    #game.is-paused .active-power-toolbar { visibility: hidden; opacity: 0; pointer-events: none; }
+    .active-power-button {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      grid-template-rows: 1fr auto;
+      align-items: center;
+      column-gap: 7px;
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 58px;
+      padding: 7px 10px;
+      border: 1px solid rgba(84,242,223,.34);
+      border-radius: 9px;
+      background: linear-gradient(135deg, rgba(6,15,25,.92), rgba(10,13,25,.92) 65%, rgba(34,13,33,.89));
+      color: #e7fbff;
+      cursor: pointer;
+      box-shadow: inset 0 1px rgba(255,255,255,.06), 0 6px 22px rgba(0,0,0,.26), 0 0 18px rgba(56,234,255,.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      touch-action: manipulation;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease, opacity .15s ease;
+    }
+    .active-power-button:hover:not(:disabled) { transform: translateY(-2px); border-color: rgba(56,234,255,.8); background-color: rgba(20,33,47,.95); }
+    .active-power-button:active:not(:disabled) { transform: scale(.96); }
+    .active-power-button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    .active-power-button:disabled { opacity: .78; cursor: default; }
+    .active-power-button.active { border-color: rgba(197,255,74,.72); box-shadow: inset 0 0 16px rgba(197,255,74,.08), 0 0 18px rgba(197,255,74,.12); }
+    .active-power-button.unaffordable .active-power-cost { color: #ffb5c6; }
+    .active-power-button.bomb { border-color: rgba(255,79,184,.4); }
+    .active-power-icon { grid-row: 1 / 3; font-size: 21px; line-height: 1; }
+    .active-power-name { min-width: 0; overflow: hidden; color: #ecf8ff; font: 750 clamp(8px, 1.5vw, 11px)/1.1 "Orbitron", system-ui, sans-serif; letter-spacing: .05em; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+    .active-power-cost { color: #ffe28c; font: 700 10px/1.1 "Orbitron", system-ui, sans-serif; text-align: left; }
+    .active-power-remaining { grid-column: 1 / -1; color: #c8ff83; font: 700 10px/1 "Orbitron", system-ui, sans-serif; }
+    .active-power-remaining[hidden] { display: none !important; }
+    .power-purchase-notice {
+      position: absolute;
+      z-index: 9;
+      left: 50%;
+      bottom: calc(max(22px, env(safe-area-inset-bottom)) + 68px);
+      max-width: min(92vw, 460px);
+      padding: 11px 16px;
+      border: 1px solid rgba(255,211,106,.52);
+      border-radius: 999px;
+      background: rgba(8,12,20,.92);
+      color: #ffeab0;
+      font: 700 clamp(12px, 2.2vw, 15px)/1.25 "Orbitron", system-ui, sans-serif;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255,211,106,.14);
+      transform: translate(-50%, 8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .16s ease, transform .16s ease;
+    }
+    .power-purchase-notice.visible { transform: translate(-50%, 0); opacity: 1; }
+    .power-purchase-notice[hidden] { display: none !important; }
+    .power-purchase-notice.warning { border-color: rgba(255,101,141,.7); color: #ffd2dc; box-shadow: 0 0 23px rgba(255,60,115,.2); }
+    #game:not(.is-running) .power-purchase-notice { display: none !important; }
     .flash { position: absolute; z-index: 4; inset: 0; pointer-events: none; background: rgba(255,79,184,.1); opacity: 0; transition: opacity .08s; }
     .flash.on { opacity: 1; }
     #game.impact-shake { animation: impactShake .32s linear; }
@@ -815,6 +1102,19 @@
       .color-panel { left: max(16px, env(safe-area-inset-left)); bottom: max(20px, env(safe-area-inset-bottom)); gap: 9px; }
       .controls-hint { display: none; }
       .mobile-controls { display: flex; }
+      .active-power-toolbar {
+        --powerbar-bottom: max(82px, calc(env(safe-area-inset-bottom) + 72px));
+        width: calc(100vw - 20px);
+        gap: 5px;
+      }
+      .active-power-button { min-height: 54px; padding: 6px 5px; column-gap: 4px; }
+      .active-power-icon { font-size: 18px; }
+      .active-power-name { font-size: clamp(7px, 2vw, 9px); letter-spacing: .025em; }
+      .active-power-cost { font-size: 9px; }
+      .power-purchase-notice {
+        bottom: calc(max(82px, calc(env(safe-area-inset-bottom) + 72px)) + 64px);
+        padding: 9px 13px;
+      }
       .run-status { transform: translate(-50%, 84px); }
       .overlay { padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
       .card { width: min(100%, 430px); }
@@ -828,7 +1128,7 @@
       .shop-header { align-items: flex-start; }
       .shop-balance { min-width: 118px; padding: 9px; font-size: 9px; }
       .reward-tabs { gap: 4px; margin-bottom: 16px; }
-      .reward-tab { min-height: 46px; padding: 8px 4px; font-size: 9px; letter-spacing: .04em; }
+      .reward-tab { min-height: 46px; padding: 8px 3px; font-size: clamp(8px, 2.1vw, 10px); letter-spacing: .015em; }
       .achievement-list, .trail-grid { grid-template-columns: 1fr; }
       .skin-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
       .skin-card { min-height: 212px; padding: 11px; }
@@ -868,6 +1168,19 @@
       .best-callout { margin: 8px 0 10px; }
       .color-panel { bottom: max(10px, env(safe-area-inset-bottom)); }
       .mobile-controls { bottom: max(8px, env(safe-area-inset-bottom)); }
+      .active-power-toolbar {
+        --powerbar-bottom: max(64px, calc(env(safe-area-inset-bottom) + 58px));
+        width: calc(100vw - 16px);
+        gap: 4px;
+      }
+      .active-power-button { min-height: 48px; padding: 4px; }
+      .active-power-icon { font-size: 16px; }
+      .active-power-name { font-size: 7px; }
+      .active-power-cost { font-size: 8px; }
+      .power-purchase-notice {
+        bottom: calc(max(64px, calc(env(safe-area-inset-bottom) + 58px)) + 54px);
+        padding: 7px 11px;
+      }
     }
     @media (max-width: 520px) {
       .skin-grid { grid-template-columns: 1fr; }
@@ -1119,6 +1432,37 @@
       color: #fff;
     }
     #overlay.home-screen .secondary-actions .secondary-btn:active { transform: scale(.97); }
+    #overlay.home-screen .secondary-actions .lucky-spin-entry {
+      grid-column: 1 / -1;
+      min-height: 50px;
+      border-color: rgba(255, 206, 95, .56);
+      background: linear-gradient(110deg, rgba(255, 190, 56, .12), rgba(255, 79, 184, .1) 54%, rgba(56, 234, 255, .09));
+      color: #ffe8a7;
+      box-shadow: inset 0 1px rgba(255,255,255,.08), 0 0 18px rgba(255,205,74,.08);
+    }
+    #overlay.home-screen .secondary-actions .lucky-spin-entry:hover {
+      border-color: rgba(255, 221, 119, .9);
+      box-shadow: 0 0 22px rgba(255,205,74,.18), 0 0 24px rgba(255,79,184,.08);
+      color: #fff8de;
+    }
+    .gameover-lucky-spin {
+      display: block;
+      width: min(100%, 480px);
+      min-height: 50px;
+      margin: 8px auto 12px;
+      border: 1px solid rgba(255, 206, 95, .65);
+      border-radius: 8px;
+      background: linear-gradient(110deg, rgba(255, 190, 56, .14), rgba(255, 79, 184, .1) 54%, rgba(56, 234, 255, .1));
+      color: #fff0bc;
+      box-shadow: 0 0 18px rgba(255,205,74,.1), inset 0 1px rgba(255,255,255,.09);
+      cursor: pointer;
+      font: 800 10px "Orbitron", sans-serif;
+      letter-spacing: .12em;
+      touch-action: manipulation;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .gameover-lucky-spin:hover { transform: scale(1.025); border-color: #ffe07a; box-shadow: 0 0 26px rgba(255,205,74,.22); }
+    .gameover-lucky-spin:active { transform: scale(.97); }
     #overlay.home-screen .startHint,
     #overlay.home-screen .dailyTokenNote {
       color: #8297a1;
@@ -1445,6 +1789,10 @@
       #overlay.home-screen .mode-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       #overlay.home-screen .home-actions .primary-btn { min-height: 58px; font-size: 13px; }
       #overlay.home-screen .secondary-actions .secondary-btn { min-height: 44px; font-size: 8px; }
+      #rewards-screen .referral-link-row { flex-direction: column; }
+      #rewards-screen .referral-link-input { width: 100%; min-height: 50px; }
+      #rewards-screen .referral-action-row { grid-template-columns: 1fr; }
+      #rewards-screen .referral-action { min-height: 52px; }
       #overlay.home-screen .universal-menu-back,
       #overlay:not(.home-screen) .universal-menu-back,
       #dailyModal .universal-menu-back { min-height: 56px; font-size: 9px; }
@@ -2287,6 +2635,73 @@
       white-space: normal;
       overflow-wrap: anywhere;
     }
+    .ad-slot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: min(100%, 520px);
+      min-height: 48px;
+      margin: 9px auto 0;
+      padding: 6px 12px;
+      border: 1px dashed rgba(112, 166, 187, .34);
+      border-radius: 7px;
+      background: rgba(4, 10, 17, .46);
+      color: #8498a8;
+      text-align: left;
+      pointer-events: auto;
+    }
+    .ad-slot-label {
+      display: grid;
+      flex: 0 0 25px;
+      width: 25px;
+      height: 25px;
+      place-items: center;
+      border: 1px solid rgba(110, 147, 165, .44);
+      border-radius: 4px;
+      color: #a7bac7;
+      font: 800 9px/1 "Orbitron", sans-serif;
+    }
+    .ad-slot strong,
+    .ad-slot small { display: block; }
+    .ad-slot strong { color: #b2c3d0; font: 700 9px/1.3 "Orbitron", sans-serif; letter-spacing: .09em; }
+    .ad-slot small { margin-top: 3px; color: #7f91a1; font: 600 12px/1.2 "Rajdhani", sans-serif; }
+    .rewarded-ad-button {
+      display: block;
+      width: min(100%, 530px);
+      min-height: 50px;
+      margin: 12px auto;
+      padding: 11px 14px;
+      border: 1px solid rgba(255, 216, 116, .62);
+      border-radius: 6px;
+      background: linear-gradient(100deg, rgba(255, 191, 66, .2), rgba(67, 224, 255, .13));
+      color: #fff1c3;
+      cursor: pointer;
+      font: 800 clamp(10px, 2.2vw, 13px)/1.35 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .055em;
+      text-align: center;
+      text-shadow: 0 0 12px rgba(255, 206, 90, .27);
+      box-shadow: 0 0 18px rgba(255, 193, 74, .09), inset 0 0 16px rgba(255, 255, 255, .035);
+      touch-action: manipulation;
+    }
+    .rewarded-ad-button:hover:not(:disabled) { transform: scale(1.02); border-color: #ffe8aa; }
+    .rewarded-ad-button:active:not(:disabled) { transform: scale(.975); }
+    .rewarded-ad-button:disabled { cursor: default; opacity: .58; }
+    .ad-reward-status,
+    .integrity-note {
+      width: min(100%, 530px);
+      margin: 4px auto;
+      color: #a6c7d4;
+      font: 600 13px/1.4 "Rajdhani", sans-serif;
+      text-align: center;
+    }
+    .integrity-note { padding: 8px 10px; border: 1px solid rgba(255, 190, 80, .34); border-radius: 6px; background: rgba(75, 49, 12, .2); color: #ffdda0; }
+    .integrity-note[hidden],
+    .ad-reward-status:empty { display: none !important; }
+    @media (max-height: 520px) and (orientation: landscape) {
+      .ad-slot { min-height: 40px; margin-top: 5px; }
+      .rewarded-ad-button { min-height: 44px; margin: 7px auto; padding: 8px 12px; }
+    }
   </style>
 </head>
 <body>
@@ -2313,7 +2728,7 @@
     <div class="gravity-indicator" id="gravityIndicator" role="status" aria-live="polite" hidden><span class="gravity-arrow" id="gravityArrow">↓</span><span id="gravityLabel">Floor gravity</span></div>
     <section class="hud" id="hud" aria-live="polite">
       <div class="stat"><div class="stat-value" id="score">00000</div><div class="stat-label">Current score</div></div>
-      <div class="stat" id="comboStat"><div class="stat-value" id="combo">×0</div><div class="stat-label">Streak</div></div>
+      <div class="stat" id="comboStat"><div class="stat-value" id="combo">×0</div><div class="streak-bonus" id="streakBonus" hidden>2X BONUS</div><div class="stat-label">Streak</div></div>
       <div class="stat"><div class="stat-value" id="distance">000</div><div class="stat-label">Distance · m</div></div>
       <div class="stat"><div class="stat-value" id="gates">00</div><div class="stat-label">Gates</div></div>
       <div class="stat" id="paceStat"><div class="stat-value" id="pace">1.0<span style="font-size:.48em">×</span></div><div class="stat-label">Pace</div></div>
@@ -2361,6 +2776,21 @@
       <button class="tap-control color-switch" id="switchColor" type="button" aria-label="Manually cycle player color">✦<small>COLOR</small></button>
       <button class="tap-control" id="laneRight" type="button" aria-label="Shift lane right">→<small>LANE</small></button>
     </div>
+    <div class="active-power-toolbar" id="activePowerToolbar" role="group" aria-label="Crystal-powered active abilities">
+      <button class="active-power-button" id="activeShieldButton" type="button" data-active-power="shield" aria-label="Buy Neon Shield for 30 crystals">
+        <span class="active-power-icon" aria-hidden="true">🛡️</span><span class="active-power-name">NEON SHIELD</span>
+        <small class="active-power-cost">💎 30</small><b class="active-power-remaining" data-power-remaining="shield" hidden></b>
+      </button>
+      <button class="active-power-button" id="activeMagnetButton" type="button" data-active-power="magnet" aria-label="Buy Crystal Magnet for 20 crystals">
+        <span class="active-power-icon" aria-hidden="true">🧲</span><span class="active-power-name">CRYSTAL MAGNET</span>
+        <small class="active-power-cost">💎 20</small><b class="active-power-remaining" data-power-remaining="magnet" hidden></b>
+      </button>
+      <button class="active-power-button bomb" id="activeBombButton" type="button" data-active-power="bomb" aria-label="Buy Laser Cleaver for 50 crystals">
+        <span class="active-power-icon" aria-hidden="true">💣</span><span class="active-power-name">LASER CLEAVER</span>
+        <small class="active-power-cost">💎 50</small><b class="active-power-remaining" data-power-remaining="bomb" hidden></b>
+      </button>
+    </div>
+    <div class="power-purchase-notice" id="powerPurchaseNotice" role="status" aria-live="polite" aria-atomic="true" hidden></div>
     <section class="overlay home-screen" id="overlay">
       <div class="menu-atmosphere" aria-hidden="true">
         <span class="menu-dust dust-one"></span><span class="menu-dust dust-two"></span>
@@ -2428,20 +2858,47 @@
             <span class="crate-icon" aria-hidden="true">?</span>
             <span><strong>Mystery crate opened</strong><span id="crateReward">+0 crystals</span></span>
           </div>
+          <button class="share-unlock-btn" id="shareUnlockButton" type="button">
+            🔗 SHARE TO UNLOCK SKIN / 💎 +100 CRYSTALS
+          </button>
+          <button class="gameover-lucky-spin" id="luckySpinGameOverButton" type="button">🎡 LUCKY SPIN · DAILY REWARD</button>
+          <button class="flex-card-share-btn" id="flexCardShareButton" type="button">
+            📸 GENERATE &amp; SHARE FLEX CARD
+          </button>
+          <div class="flex-card-preview" id="flexCardPreview" hidden>
+            <img id="flexCardImage" alt="Your Color Shift: Neon Rush 3D cyberpunk score card, ready to share" />
+            <p>Story-ready 9:16 score card</p>
+            <div class="flex-card-actions">
+              <button class="secondary-btn" id="downloadFlexCardButton" type="button">DOWNLOAD PNG</button>
+            </div>
+          </div>
+          <p class="flex-card-status" id="flexCardStatus" role="status" aria-live="polite" aria-atomic="true"></p>
+          <button class="rewarded-ad-button" id="rewardedAdButton" type="button">▶ WATCH A VIDEO · EARN +200 CRYSTALS</button>
+          <p class="ad-reward-status" id="adRewardStatus" role="status" aria-live="polite" aria-atomic="true"></p>
         </div>
+        <p class="integrity-note" id="integrityNotice" role="status" aria-live="polite" hidden></p>
         <div class="actions home-actions">
           <button class="primary-btn" id="startButton">Tap to Play <span class="button-arrow">↗</span></button>
           <button class="secondary-btn" id="restartButton" type="button" hidden>Restart run</button>
           <button class="secondary-btn home-return-btn universal-menu-back" id="homeButton" type="button" aria-label="Return to the main menu" hidden>⌂ MAIN MENU</button>
           <div class="secondary-actions">
             <button class="secondary-btn" id="shopButton" type="button">Rewards &amp; Skins</button>
-          <button class="secondary-btn" id="settingsButton" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settings-screen">Settings</button>
+            <button class="secondary-btn" id="settingsButton" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settings-screen">Settings</button>
+            <button class="secondary-btn" id="inviteButton" type="button">Invite &amp; Earn 💎</button>
+            <button class="secondary-btn lucky-spin-entry" id="luckySpinHomeButton" type="button" aria-haspopup="dialog" aria-controls="dailyModal">🎡 Daily Lucky Spin</button>
           </div>
+        </div>
+        <div class="ad-slot" id="bannerAdSlot" role="complementary" aria-label="Reserved banner ad placement">
+          <span class="ad-slot-label" aria-hidden="true">AD</span>
+          <div><strong>MENU BANNER PLACEMENT</strong><small id="bannerAdStatus">Native AdMob bridge not configured</small></div>
         </div>
         <div class="small-note" id="startHint"><span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / W / ↑</b> change color</span><span class="mobile-hint">Tap to start · swipe to steer · tap to change color</span></div>
         <div class="small-note" id="dailyTokenNote" hidden></div>
       </div>
     </section>
+    <div class="share-reward-toast" id="shareRewardToast" role="status" aria-live="polite" aria-atomic="true" hidden>
+      🎉 Exclusive Skin Unlocked &amp; +100 Crystals Added!
+    </div>
     <section class="pause-screen" id="pause-screen" role="dialog" aria-modal="true" aria-labelledby="pauseTitle" aria-describedby="pauseDescription" hidden>
       <div class="pause-panel">
         <header>
@@ -2557,6 +3014,7 @@
             <button class="reward-tab active" id="rewardTabAchievements" type="button" role="tab" aria-selected="true" aria-controls="rewardPanelAchievements" tabindex="0" data-reward-tab="achievements">Milestones</button>
             <button class="reward-tab" id="rewardTabSkins" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelSkins" tabindex="-1" data-reward-tab="skins">Ball Skins</button>
             <button class="reward-tab" id="rewardTabTrails" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelTrails" tabindex="-1" data-reward-tab="trails">Glow Trails</button>
+            <button class="reward-tab" id="rewardTabReferral" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelReferral" tabindex="-1" data-reward-tab="referral">Invite &amp; Earn</button>
           </nav>
           <div class="reward-tab-panel" id="rewardPanelAchievements" data-reward-panel="achievements" role="tabpanel" aria-labelledby="rewardTabAchievements" tabindex="0">
             <div class="shop-section-heading"><div><h3>Achievement Tracks</h3><p>Claim crystal rewards when a milestone is complete.</p></div><span class="achievement-tier-key">BRONZE · SILVER · GOLD · DIAMOND</span></div>
@@ -2572,6 +3030,28 @@
             <div class="shop-section-heading"><div><h3>Particle Trails</h3><p>Choose the glow that follows you through the tunnel.</p></div><span class="achievement-tier-key">RUN EFFECTS</span></div>
             <div class="trail-grid" id="trailGrid"></div>
           </div>
+          <div class="reward-tab-panel" id="rewardPanelReferral" data-reward-panel="referral" role="tabpanel" aria-labelledby="rewardTabReferral" tabindex="0" hidden>
+            <div class="referral-panel">
+              <header>
+                <div class="referral-kicker">NEON RUSH · FRIEND INVITES</div>
+                <h3 class="referral-heading">Bring a friend into the stream</h3>
+                <p class="referral-copy">Share your personal link. The first browser to open an invite from a different player receives a one-time welcome bonus of <strong>💎 150 Neon Crystals</strong>.</p>
+              </header>
+              <div>
+                <label class="referral-field-label" for="referralLink">YOUR PERSONAL INVITE LINK</label>
+                <div class="referral-link-row">
+                  <input class="referral-link-input" id="referralLink" type="url" readonly aria-label="Your unique referral link" />
+                  <button class="referral-action" id="copyReferralButton" type="button">📋 COPY INVITE LINK</button>
+                </div>
+              </div>
+              <div class="referral-action-row">
+                <button class="referral-action" id="whatsappReferralButton" type="button">🔗 SHARE VIA WHATSAPP</button>
+                <div class="referral-share-count"><span>Share actions on this device</span><strong id="referralShareCount">0</strong></div>
+              </div>
+              <p class="referral-status" id="referralStatus" role="status" aria-live="polite" aria-atomic="true"></p>
+              <p class="referral-disclaimer">Share actions are counted on this device; they do not confirm that a message was sent or an install occurred. This browser-only build cannot verify or pay inviter rewards across devices.</p>
+            </div>
+          </div>
           <div class="shop-notice" id="shopNotice" role="status" aria-live="polite"></div>
           <div class="save-reset">
             <p>Progress, claimed rewards, owned cosmetics, and equipped styles are saved on this device.</p>
@@ -2585,18 +3065,48 @@
     </section>
     <section class="daily-modal" id="dailyModal" role="dialog" aria-modal="true" aria-labelledby="dailyTitle" hidden>
       <div class="daily-card">
-        <div class="eyebrow">A daily surprise</div>
+        <div class="eyebrow">Daily rewards · share for bonus spins</div>
         <h2 id="dailyTitle">Lucky Spin</h2>
-        <p>Spin once every 24 hours for crystals or a power-up to carry into your next run.</p>
+        <p>One free spin each calendar day. Earn extra spins by sharing with friends.</p>
+        <div class="daily-wallet-row">
+          <div class="daily-wallet-pill">💎 WALLET <strong id="dailyWallet">0</strong></div>
+          <div class="daily-wallet-pill">🎟 BONUS SPINS <strong id="dailyBonusSpins">0</strong></div>
+        </div>
         <div class="wheel-frame">
           <span class="wheel-pointer" aria-hidden="true">▼</span>
-          <div class="daily-wheel" id="dailyWheel" aria-hidden="true"></div>
+          <div class="daily-wheel" id="dailyWheel" aria-hidden="true">
+            <span class="wheel-mark" style="--wheel-index:0">💎<br>+50</span>
+            <span class="wheel-mark" style="--wheel-index:1">💎<br>+100</span>
+            <span class="wheel-mark" style="--wheel-index:2">💎<br>+200</span>
+            <span class="wheel-mark" style="--wheel-index:3">💎<br>+500</span>
+            <span class="wheel-mark" style="--wheel-index:4">🌟<br>SKIN</span>
+            <span class="wheel-mark" style="--wheel-index:5">✖️<br>2X</span>
+            <span class="wheel-mark" style="--wheel-index:6">🛡️<br>SHIELD</span>
+            <span class="wheel-mark" style="--wheel-index:7">✧<br>MISS</span>
+          </div>
           <div class="wheel-center" aria-hidden="true">LUCKY<br>SPIN</div>
         </div>
-        <div class="daily-result" id="dailyResult" role="status" aria-live="polite">Your reward is ready.</div>
-        <button class="primary-btn" id="dailySpinButton" type="button">Spin for reward</button>
+        <div class="wheel-reward-key" aria-label="Wheel rewards">
+          <span><b>💎 +50 / +100 / +200 / +500</b> crystals</span>
+          <span><b>🌟 Exclusive skin</b> Golden Imperial</span>
+          <span><b>✖️ 2X Boost</b> next run</span>
+          <span><b>🛡️ Prism Shield</b> next run</span>
+          <span><b>✧ Better luck</b> no reward this spin</span>
+        </div>
+        <div class="daily-result" id="dailyResult" role="status" aria-live="polite">Your free spin is ready.</div>
+        <button class="primary-btn" id="dailySpinButton" type="button">SPIN · FREE TODAY</button>
         <button class="secondary-btn" id="dailyContinueButton" type="button" hidden>Continue</button>
         <button class="secondary-btn universal-menu-back" id="dailyMainMenuButton" type="button" aria-label="Return to the main menu">⌂ MAIN MENU</button>
+        <div class="extra-spin-prompt" id="extraSpinPrompt" role="alertdialog" aria-modal="true" aria-labelledby="extraSpinTitle" hidden>
+          <div class="extra-spin-panel">
+            <h3 id="extraSpinTitle">🎟 BONUS SPIN</h3>
+            <p>Daily limit reached! Share to WhatsApp to get 1 Extra Spin! 🚀</p>
+            <div class="extra-spin-actions">
+              <button class="primary-btn" id="shareForSpinButton" type="button">SHARE · GET 1 SPIN</button>
+              <button class="secondary-btn" id="cancelExtraSpinButton" type="button">NOT NOW</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
     <section class="splash-screen" id="splash-screen" role="status" aria-label="Loading Color Shift: Neon Rush 3D">
@@ -6349,8 +6859,10 @@ void main() {
         plasmaOrb: { name: "Plasma Orb", description: "A charged orb wrapped in violet light.", cost: 150, accent: 0xa876ff, roughness: 0.12, metalness: 0.28, glow: 4.8, shape: "plasma" },
         cyberShard: { name: "Cyber Shard", description: "A faceted shard tuned for speed.", cost: 250, accent: 0x54f4ff, roughness: 0.1, metalness: 0.5, glow: 4.9, shape: "shard" },
         goldenSphere: { name: "Golden Sphere", description: "A polished core with solar trim.", cost: 500, accent: 0xffc74f, roughness: 0.12, metalness: 0.72, glow: 4.4, shape: "sphere" },
-        voidBlackhole: { name: "Void Blackhole", description: "A dark singularity edged in hot pink.", cost: 1000, accent: 0xff58ca, roughness: 0.08, metalness: 0.58, glow: 5.1, shape: "void" }
+        voidBlackhole: { name: "Void Blackhole", description: "A dark singularity edged in hot pink.", cost: 1000, accent: 0xff58ca, roughness: 0.08, metalness: 0.58, glow: 5.1, shape: "void" },
+        goldenImperial: { name: "Golden Imperial", description: "A share-exclusive core with a radiant imperial finish.", cost: 1000000000, accent: 0xffdc78, roughness: 0.08, metalness: 0.82, glow: 5.3, shape: "sphere" }
       };
+      const SHARE_REWARD_SKIN = "goldenImperial";
       const TRAIL_STYLES = {
         none: { name: "No Trail", description: "A clean run with no particle trail.", cost: 0, color: 0x68f2df, secondary: 0x68f2df },
         aurora: { name: "Aurora Wake", description: "Cool cyan particles with a violet edge.", cost: 200, color: 0x4fefff, secondary: 0x9d7bff },
@@ -6423,7 +6935,8 @@ void main() {
       const BASE_FORWARD_SPEED = 11.8;
       const PURSUIT_WALL_SPEED = BASE_FORWARD_SPEED * 0.72 + 2;
       const AUTO_COLOR_INTERVAL_SECONDS = 3.5;
-      const MIN_GATE_REACTION_SECONDS = 2.15;
+      const START_GATE_REACTION_SECONDS = 2.65;
+      const MIN_GATE_REACTION_SECONDS = 2.05;
       const ITEM_LEAD_SECONDS = 2.15;
       const MIN_ITEM_NOTICE_SECONDS = 2.1;
       const PLAYER_INPUT_COOLDOWN_MS = 120;
@@ -6505,6 +7018,52 @@ void main() {
       let environmentNoticeTimer = 0;
       let environmentNoticeToken = 0;
       let state = "ready";
+      // Some mobile/private contexts throw while retrieving localStorage itself,
+      // not only while reading or writing it. Shadow the browser global with a
+      // guarded adapter so every existing persistence call fails closed.
+      const localStorage = (() => {
+        const volatileStorage = new Map();
+        let storage = null;
+        try {
+          storage = window.localStorage;
+        } catch {
+          storage = null;
+        }
+        return Object.freeze({
+          getItem(key) {
+            const normalizedKey = String(key);
+            try {
+              const value = storage?.getItem(normalizedKey);
+              if (value !== null && value !== undefined) return value;
+            } catch {}
+            return volatileStorage.has(normalizedKey) ? volatileStorage.get(normalizedKey) : null;
+          },
+          setItem(key, value) {
+            const normalizedKey = String(key);
+            const normalizedValue = String(value);
+            volatileStorage.set(normalizedKey, normalizedValue);
+            try {
+              if (!storage) return false;
+              storage.setItem(normalizedKey, normalizedValue);
+              return true;
+            } catch {
+              return false;
+            }
+          },
+          removeItem(key) {
+            const normalizedKey = String(key);
+            volatileStorage.delete(normalizedKey);
+            try {
+              if (!storage) return false;
+              storage.removeItem(normalizedKey);
+              return true;
+            } catch {
+              return false;
+            }
+          },
+          get available() { return Boolean(storage); }
+        });
+      })();
       const SETTINGS_STORAGE_KEY = "colorShiftGameSettings";
       const DEFAULT_SETTINGS = {
         masterVolume: 78,
@@ -6603,7 +7162,7 @@ void main() {
         });
       }
       setSplashProgress(8, "Preparing the neon core");
-      const sceneRoot = el("scene");
+      const sceneRoot = el("scene") || document.body;
       const gameScene = new THREE.Scene();
       gameScene.background = new THREE.Color(ENVIRONMENTS[0].background);
       gameScene.fog = new THREE.FogExp2(
@@ -6625,6 +7184,7 @@ void main() {
       const menuCameraPosition = new THREE.Vector3();
       const menuCameraTarget = new THREE.Vector3();
       let cameraBlendProgress = 1;
+      let cameraLeanRoll = 0;
       let cameraShakeTimer = 0;
       let cameraShakeIntensity = 0;
       let impactShakeTimer = 0;
@@ -6638,7 +7198,7 @@ void main() {
         isMobileViewport() ? 1.5 : 2
       );
       const getSceneSize = () => {
-        const bounds = sceneRoot.getBoundingClientRect();
+        const bounds = sceneRoot?.getBoundingClientRect?.() || { width: 0, height: 0 };
         return {
           width: Math.max(1, Math.round(bounds.width || window.innerWidth)),
           height: Math.max(1, Math.round(bounds.height || window.innerHeight))
@@ -6652,8 +7212,32 @@ void main() {
         fallbackCanvas.height = Math.round(height * dpr);
         fallbackContext?.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
+      function activateFallbackRenderer() {
+        const failedRenderer = renderer;
+        renderer = null;
+        if (failedRenderer) {
+          try { failedRenderer.domElement.removeEventListener("webglcontextlost", handleWebGLContextLost); } catch {}
+          try { failedRenderer.dispose(); } catch {}
+          try { failedRenderer.domElement.remove(); } catch {}
+        }
+        if (!fallbackCanvas) {
+          fallbackCanvas = document.createElement("canvas");
+          fallbackCanvas.setAttribute("aria-hidden", "true");
+          fallbackCanvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none";
+          sceneRoot.appendChild(fallbackCanvas);
+        }
+        try { fallbackContext = fallbackCanvas.getContext("2d"); } catch { fallbackContext = null; }
+        resizeFallback();
+      }
+      function handleWebGLContextLost(event) {
+        event.preventDefault();
+        activateFallbackRenderer();
+      }
+      let candidateRenderer = null;
+      let webglContext = null;
+      let rendererCanvas = null;
       try {
-        const rendererCanvas = document.createElement("canvas");
+        rendererCanvas = document.createElement("canvas");
         const contextAttributes = {
           alpha: true,
           antialias: !isMobileViewport(),
@@ -6663,32 +7247,36 @@ void main() {
           preserveDrawingBuffer: false,
           powerPreference: isMobileViewport() ? "low-power" : "high-performance"
         };
-        const webglContext =
+        webglContext =
           rendererCanvas.getContext("webgl2", contextAttributes) ||
           rendererCanvas.getContext("webgl", contextAttributes);
         if (!webglContext) throw new Error("WebGL is unavailable; using the 2D fallback renderer.");
-        renderer = new THREE.WebGLRenderer({
+        candidateRenderer = new THREE.WebGLRenderer({
           canvas: rendererCanvas,
           context: webglContext,
           ...contextAttributes
         });
-        renderer.shadowMap.enabled = false;
-        renderer.shadowMap.autoUpdate = false;
-        renderer.domElement.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;z-index:1;display:block;touch-action:none";
-        renderer.setPixelRatio(getPixelRatio());
+        candidateRenderer.shadowMap.enabled = false;
+        candidateRenderer.shadowMap.autoUpdate = false;
+        candidateRenderer.domElement.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;z-index:1;display:block;touch-action:none";
+        candidateRenderer.setPixelRatio(getPixelRatio());
         const { width, height } = getSceneSize();
-        renderer.setSize(width, height, false);
-        renderer.outputColorSpace = THREE.SRGBColorSpace;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = gamePreferences.neonGlow ? 1.35 : 0.95;
-        sceneRoot.appendChild(renderer.domElement);
+        candidateRenderer.setSize(width, height, false);
+        candidateRenderer.outputColorSpace = THREE.SRGBColorSpace;
+        candidateRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+        candidateRenderer.toneMappingExposure = gamePreferences.neonGlow ? 1.35 : 0.95;
+        sceneRoot.appendChild(candidateRenderer.domElement);
+        renderer = candidateRenderer;
+        renderer.domElement.addEventListener("webglcontextlost", handleWebGLContextLost, { passive: false });
       } catch (error) {
-        fallbackCanvas = document.createElement("canvas");
-        fallbackCanvas.setAttribute("aria-hidden", "true");
-        fallbackCanvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none";
-        sceneRoot.appendChild(fallbackCanvas);
-        fallbackContext = fallbackCanvas.getContext("2d");
-        resizeFallback();
+        try { candidateRenderer?.dispose(); } catch {}
+        try { candidateRenderer?.forceContextLoss(); } catch {}
+        try { candidateRenderer?.domElement.remove(); } catch {}
+        if (!candidateRenderer) {
+          try { webglContext?.getExtension("WEBGL_lose_context")?.loseContext(); } catch {}
+        }
+        renderer = null;
+        activateFallbackRenderer();
       }
       setSplashProgress(42, "Building the procedural tunnel");
 
@@ -7161,18 +7749,25 @@ void main() {
           mechanics.frameMaterial.color.setHSL(prismHue, 0.96, 0.66);
         }
         const pulse = 0.5 + 0.5 * Math.sin(obstacleElapsed * (mechanics.colorChanging ? 11 : 4) + mechanics.flashPhase);
-        mechanics.frameMaterial.opacity = mechanics.colorChanging ? 0.62 + pulse * 0.34 : 0.76;
+        const approach = THREE.MathUtils.clamp((gate.position.z - FIRST_GATE_SPAWN_Z) / 34, 0, 1);
+        const telegraphPulse = 0.5 + 0.5 * Math.sin(obstacleElapsed * 7.5 + mechanics.flashPhase);
+        mechanics.frameMaterial.opacity = (mechanics.colorChanging ? 0.62 + pulse * 0.34 : 0.76) + approach * 0.08;
         for (let lane = 0; lane < mechanics.segmentMaterials.length; lane++) {
           const material = mechanics.segmentMaterials[lane];
           const active = lane === activeColorIndex;
+          mechanics.markerMaterials[lane].opacity = active
+            ? 0.76 + approach * (0.16 + telegraphPulse * 0.08)
+            : 0.36 + (approach * 0.08);
           material.opacity = active
-            ? mechanics.colorChanging ? 0.68 + pulse * 0.18 : 0.78
+            ? (mechanics.colorChanging ? 0.68 + pulse * 0.18 : 0.78) + approach * 0.07
             : mechanics.colorChanging ? 0.18 + pulse * 0.08 : 0.26;
           material.emissiveIntensity = (blackoutModeActive
             ? active ? (mechanics.colorChanging ? 2.4 + pulse * 0.55 : 2.7) : 1.55
             : active
               ? mechanics.colorChanging ? 2.0 + pulse * 0.65 : 2.35
-              : mirrorMatrixModeActive ? 1.05 : 0.72) * getGlowScale();
+              : mirrorMatrixModeActive ? 1.05 : 0.72)
+            * (1 + approach * (active ? 0.24 + telegraphPulse * 0.2 : 0.08))
+            * getGlowScale();
         }
         if (mechanics.phantom) {
           mechanics.phantomActive = Math.sin(obstacleElapsed * mechanics.phantomSpeed + mechanics.phantomPhase) > 0.12;
@@ -7284,7 +7879,7 @@ void main() {
         const group = new THREE.Group();
         group.position.set(LANE_X[lane], 0.12, z);
         group.visible = state === "running";
-        group.userData = { lane, phase: Math.random() * Math.PI * 2, collected: false };
+        group.userData = { lane, phase: Math.random() * Math.PI * 2, baseY: 0.12, collected: false };
         const crystalBase = antiGravityModeActive ? 0xb98aff : 0xffd25e;
         const crystalGlow = antiGravityModeActive ? 0x7d5bff : 0xffa91f;
         const gold = new THREE.MeshStandardMaterial({
@@ -7571,11 +8166,15 @@ void main() {
 
       function disposeGate(gate) {
         gameScene.remove(gate);
+        const geometries = new Set();
+        const materials = new Set();
         gate.traverse(child => {
-          child.geometry?.dispose();
-          if (Array.isArray(child.material)) child.material.forEach(material => material.dispose());
-          else child.material?.dispose();
+          if (child.geometry) geometries.add(child.geometry);
+          if (Array.isArray(child.material)) child.material.forEach(material => material && materials.add(material));
+          else if (child.material) materials.add(child.material);
         });
+        geometries.forEach(geometry => geometry.dispose());
+        materials.forEach(material => material.dispose());
       }
       function disposePowerUp(powerUp) {
         powerUp.userData.labelTexture?.dispose();
@@ -7615,16 +8214,29 @@ void main() {
       let currentColor = 0;
       let autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
       let currentLane = 1;
+      let laneVelocityX = 0;
       let gravitySide = "floor";
       let gravityHazardSerial = 0;
       let lastPlayerInputAt = -Infinity;
       let distance = 0;
       let passed = 0;
       let score = 0;
+      let runStartedAt = 0;
+      let scoreAuditAt = 0;
+      let scoreAuditValue = 0;
+      let runScoreIntegrityValid = true;
+      let rewardedAdGrantedThisRun = false;
       let combo = 0;
       let maxCombo = 0;
       let resultTickerFrame = 0;
       let resultTickerToken = 0;
+      let shareRewardToastTimer = 0;
+      let shareRewardToastToken = 0;
+      let flexCardBlob = null;
+      let flexCardObjectUrl = "";
+      let flexCardShareUrl = "";
+      let flexCardPreparation = null;
+      let flexCardToken = 0;
       let speed = BASE_FORWARD_SPEED;
       let lastTime = 0;
       let elapsed = 0;
@@ -7646,7 +8258,8 @@ void main() {
         const vignette = el("pursuitVignette");
         const warning = el("pursuitWarning");
         const distanceIntoWarning = Math.max(0, PURSUIT_WARNING_GAP - pursuitGap);
-        const active = laserPursuitModeActive && state === "running" && distanceIntoWarning > 0;
+        const active = laserPursuitModeActive && state === "running" &&
+          activeShieldTimer <= 0 && distanceIntoWarning > 0;
         pursuitDangerActive = active;
         el("game").classList.toggle("laser-danger", active);
         vignette.classList.toggle("active", active);
@@ -7682,8 +8295,20 @@ void main() {
         laserPursuitWall.userData.emitter.intensity = 12 + closing * 26;
         updatePursuitWarning();
         if (pursuitGap <= 0) {
-          laserPursuitWall.position.z = 0;
-          triggerGameOver("laser wall caught you");
+          if (activeShieldTimer > 0) {
+            pursuitGap = 4.2;
+            laserPursuitWall.position.z = pursuitGap;
+            if (!shieldPursuitRepelled) {
+              shieldPursuitRepelled = true;
+              showRunStatus("NEON SHIELD REPELLED THE PURSUIT WALL", 1000);
+              createImpactBurst(0x70fff0, 0.8, 16);
+              playCue("power");
+            }
+            updatePursuitWarning();
+          } else {
+            laserPursuitWall.position.z = 0;
+            triggerGameOver("laser wall caught you");
+          }
         }
       }
       function nextGravityHazardSide() {
@@ -7692,7 +8317,15 @@ void main() {
         return side;
       }
       function getGateSpawnSpacing() {
-        return Math.max(22, speed * MIN_GATE_REACTION_SECONDS);
+        const distancePressure = 1 - Math.exp(-Math.max(0, distance) / 2100);
+        const scorePressure = 1 - Math.exp(-Math.max(0, score) / 6000);
+        const pressure = 0.65 * distancePressure + 0.35 * scorePressure;
+        const reactionSeconds = THREE.MathUtils.lerp(
+          START_GATE_REACTION_SECONDS,
+          MIN_GATE_REACTION_SECONDS,
+          pressure
+        );
+        return Math.max(24, speed * reactionSeconds);
       }
       function getSafeItemSpawnZ() {
         const leadDistance = speed * ITEM_LEAD_SECONDS;
@@ -7709,6 +8342,8 @@ void main() {
           lifetimeCrystals: 0,
           ownedSkins: ["sphere"],
           activeSkin: "sphere",
+          shareRewardClaimed: false,
+          referralWelcomeClaimed: false,
           ownedTrails: ["none"],
           activeTrail: "none",
           achievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, false])),
@@ -7721,6 +8356,8 @@ void main() {
           stats: { bestDistance: 0, lifetimeGates: 0, laserGates: 0 },
           daily: createDailyProgress(),
           dailySpinAt: 0,
+          dailySpinDate: "",
+          bonusSpins: 0,
           powerTokens: { prism: 0, warp: 0, booster: 0 }
         };
       }
@@ -7731,6 +8368,10 @@ void main() {
       let achievementNoticeTimer = 0;
       let achievementNoticeToken = 0;
       let shieldCharges = 0;
+      let activeShieldTimer = 0;
+      let crystalMagnetTimer = 0;
+      let shieldPursuitRepelled = false;
+      let powerPurchaseNoticeTimer = 0;
       let timeWarpTimer = 0;
       let scoreBoosterTimer = 0;
       let obstacleElapsed = 0;
@@ -7738,7 +8379,11 @@ void main() {
       let graceTimer = 0;
       let statusTimer = 0;
       let flashTimer = 0;
+      const ACTIVE_POWER_COSTS = Object.freeze({ shield: 30, magnet: 20, bomb: 50 });
       let dailySpinTimer = 0;
+      let spinInProgress = false;
+      let spinSharePending = false;
+      let luckySpinReturnFocus = null;
       const SOUND_PREFERENCE_KEY = "colorShiftSoundEnabled";
       function loadSoundPreference() {
         try {
@@ -7983,6 +8628,16 @@ void main() {
       const BEST_KEY = "colorSwipeBestScore";
       const COINS_KEY = "colorShiftTotalCoins";
       const HIGH_SCORE_KEY = "highScore";
+      const LOCAL_INTEGRITY_KEY = "colorShiftLocalIntegrityV2";
+      const LOCAL_INTEGRITY_SEED = "ColorShift-NeonRush3D-client-check-v1";
+      const REFERRAL_PLAYER_ID_KEY = "colorShiftPlayerId";
+      const REFERRAL_WELCOME_KEY = "colorShiftReferralWelcomeClaimed";
+      const REFERRAL_SHARE_ACTIONS_KEY = "colorShiftReferralShareActions";
+      const REFERRAL_WELCOME_CRYSTALS = 150;
+      const MAX_SCORE_RATE_PER_SECOND = 3200;
+      const MAX_SCORE_EVENT_BURST = 10000;
+      const SCORE_START_ALLOWANCE = 12000;
+      let localStorageIntegrityWarning = false;
       const MODE_HIGH_SCORE_KEYS = Object.freeze({
         endless: "neonHighScore_classic",
         timeAttack: "neonHighScore_timeAttack",
@@ -8007,6 +8662,386 @@ void main() {
       function safeStoredCount(value) {
         const parsed = Number(value);
         return Number.isFinite(parsed) && parsed >= 0 ? Math.min(1000000000, Math.floor(parsed)) : 0;
+      }
+      function createReferralPlayerId() {
+        const bytes = new Uint8Array(16);
+        try {
+          if (window.crypto?.getRandomValues) window.crypto.getRandomValues(bytes);
+          else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+        } catch {
+          for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+        }
+        return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+      }
+      function getOrCreateReferralPlayerId() {
+        try {
+          const storedId = localStorage.getItem(REFERRAL_PLAYER_ID_KEY) || "";
+          if (/^[a-f0-9]{32}$/i.test(storedId)) return storedId.toLowerCase();
+          const newId = createReferralPlayerId();
+          localStorage.setItem(REFERRAL_PLAYER_ID_KEY, newId);
+          return newId;
+        } catch {
+          return createReferralPlayerId();
+        }
+      }
+      const referralPlayerId = getOrCreateReferralPlayerId();
+      function makeReferralLink() {
+        const inviteUrl = new URL(window.location.pathname, window.location.origin);
+        inviteUrl.searchParams.set("ref", referralPlayerId);
+        return inviteUrl.toString();
+      }
+      function recordReferralShareAction() {
+        let actions = 0;
+        try {
+          actions = safeStoredCount(localStorage.getItem(REFERRAL_SHARE_ACTIONS_KEY)) + 1;
+          localStorage.setItem(REFERRAL_SHARE_ACTIONS_KEY, String(actions));
+        } catch {
+          actions++;
+        }
+        if (el("referralShareCount")) el("referralShareCount").textContent = String(actions);
+        return actions;
+      }
+      function updateReferralUI() {
+        const input = el("referralLink");
+        if (input) input.value = makeReferralLink();
+        const count = el("referralShareCount");
+        if (count) {
+          let actions = 0;
+          try { actions = safeStoredCount(localStorage.getItem(REFERRAL_SHARE_ACTIONS_KEY)); } catch {}
+          count.textContent = actions.toLocaleString("en-US");
+        }
+      }
+      function clearReferralQueryParameter() {
+        try {
+          const url = new URL(window.location.href);
+          if (!url.searchParams.has("ref")) return;
+          url.searchParams.delete("ref");
+          history.replaceState(history.state, "", url.pathname + url.search + url.hash);
+        } catch {
+          // Keep the app running if URL history updates are restricted.
+        }
+      }
+      function processIncomingReferral() {
+        let referralId = "";
+        try { referralId = new URLSearchParams(window.location.search).get("ref") || ""; } catch {}
+        if (!referralId) {
+          updateReferralUI();
+          return false;
+        }
+        const normalizedReferralId = referralId.toLowerCase();
+        if (!/^[a-f0-9]{32}$/.test(normalizedReferralId)) {
+          el("referralStatus").textContent = "That invite link is invalid.";
+          clearReferralQueryParameter();
+          updateReferralUI();
+          return false;
+        }
+        if (normalizedReferralId === referralPlayerId) {
+          el("referralStatus").textContent = "This is your own invite link; self-referrals do not receive a bonus.";
+          clearReferralQueryParameter();
+          updateReferralUI();
+          return false;
+        }
+        let priorClaim = false;
+        try { priorClaim = localStorage.getItem(REFERRAL_WELCOME_KEY) === "1"; } catch {}
+        if (priorClaim || progression.referralWelcomeClaimed) {
+          progression.referralWelcomeClaimed = true;
+          try { localStorage.setItem(REFERRAL_WELCOME_KEY, "1"); } catch {}
+          el("referralStatus").textContent = "The one-time welcome bonus has already been claimed on this browser.";
+          clearReferralQueryParameter();
+          updateReferralUI();
+          return false;
+        }
+        progression.referralWelcomeClaimed = true;
+        progression.crystals = safeStoredCount(progression.crystals + REFERRAL_WELCOME_CRYSTALS);
+        progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + REFERRAL_WELCOME_CRYSTALS);
+        saveProgression();
+        try { localStorage.setItem(REFERRAL_WELCOME_KEY, "1"); } catch {}
+        el("referralStatus").textContent = "Welcome bonus claimed: +150 Neon Crystals.";
+        window.setTimeout(() => showShareRewardToast("🎉 Bonus! Invited by a friend: +150 Crystals added!", 5200), 1800);
+        clearReferralQueryParameter();
+        updateReferralUI();
+        return true;
+      }
+      async function copyReferralInviteLink() {
+        const copied = await copyShareText(makeReferralLink());
+        el("referralStatus").textContent = copied
+          ? "Invite link copied. Share it with a friend to get them started."
+          : "Could not copy automatically. Select and copy the invite link above.";
+      }
+      async function shareReferralViaWhatsApp() {
+        const button = el("whatsappReferralButton");
+        if (button.disabled) return;
+        const inviteLink = makeReferralLink();
+        const message = "Hey! Play Color Shift: Neon Rush 3D with me and grab bonus Neon Crystals! 🚀 Play here: " + inviteLink;
+        button.disabled = true;
+        try {
+          openWhatsAppShareIntent(message);
+          recordReferralShareAction();
+          const copied = await copyShareText(message);
+          el("referralStatus").textContent = copied
+            ? "WhatsApp share opened and the message was copied. Sending and installs are not verified."
+            : "WhatsApp share opened. Sending and installs are not verified.";
+        } catch (error) {
+          el("referralStatus").textContent = "Could not open the WhatsApp share link. You can copy your invite link instead.";
+        } finally {
+          button.disabled = false;
+        }
+      }
+      function checksumText(value) {
+        let hash = 0x811c9dc5;
+        for (let index = 0; index < value.length; index++) {
+          hash ^= value.charCodeAt(index);
+          hash = Math.imul(hash, 0x01000193);
+        }
+        return (hash >>> 0).toString(16).padStart(8, "0");
+      }
+      function getLocalIntegritySnapshot() {
+        const highScores = Object.fromEntries(
+          Object.entries(MODE_HIGH_SCORE_KEYS).map(([mode, key]) => {
+            let value = 0;
+            try { value = safeStoredCount(localStorage.getItem(key)); } catch {}
+            return [mode, value];
+          })
+        );
+        return {
+          version: 1,
+          wallet: safeStoredCount(progression.crystals),
+          referralWelcomeClaimed: progression.referralWelcomeClaimed === true,
+          highScores
+        };
+      }
+      function writeLocalIntegritySnapshot() {
+        try {
+          const snapshot = getLocalIntegritySnapshot();
+          const canonical = JSON.stringify(snapshot);
+          localStorage.setItem(LOCAL_INTEGRITY_KEY, JSON.stringify({
+            version: 2,
+            snapshot,
+            checksum: checksumText(LOCAL_INTEGRITY_SEED + "|" + canonical)
+          }));
+        } catch (error) {
+          // Local integrity markers are optional when browser storage is unavailable.
+        }
+      }
+      function verifyLocalIntegritySnapshot() {
+        let record;
+        try {
+          const raw = localStorage.getItem(LOCAL_INTEGRITY_KEY);
+          if (!raw) {
+            writeLocalIntegritySnapshot();
+            return true;
+          }
+          record = JSON.parse(raw);
+        } catch (error) {
+          localStorageIntegrityWarning = true;
+          return false;
+        }
+        if (!record || record.version !== 2 || !record.snapshot || typeof record.checksum !== "string") {
+          localStorageIntegrityWarning = true;
+          return false;
+        }
+        const canonical = JSON.stringify(record.snapshot);
+        if (checksumText(LOCAL_INTEGRITY_SEED + "|" + canonical) !== record.checksum) {
+          localStorageIntegrityWarning = true;
+          return false;
+        }
+        const saved = record.snapshot;
+        const current = getLocalIntegritySnapshot();
+        if (JSON.stringify(current) === canonical) return true;
+
+        // Restore a previously checksummed wallet and mode scores if only the
+        // ordinary localStorage values were edited or corrupted.
+        progression.crystals = safeStoredCount(saved.wallet);
+        progression.referralWelcomeClaimed = saved.referralWelcomeClaimed === true;
+        try {
+          for (const [mode, key] of Object.entries(MODE_HIGH_SCORE_KEYS)) {
+            localStorage.setItem(key, String(safeStoredCount(saved.highScores?.[mode])));
+          }
+          const overallBest = Math.max(
+            0,
+            ...Object.values(MODE_HIGH_SCORE_KEYS).map(key => safeStoredCount(localStorage.getItem(key)))
+          );
+          localStorage.setItem(HIGH_SCORE_KEY, String(overallBest));
+          localStorage.setItem(BEST_KEY, String(overallBest));
+          localStorage.setItem("colorSwipeBest", String(overallBest));
+          localStorage.setItem(NEON_CRYSTALS_KEY, String(progression.crystals));
+          localStorage.setItem(COINS_KEY, String(progression.crystals));
+        } catch (error) {
+          // Keep the restored in-memory values if storage writes are blocked.
+        }
+        best = loadModeHighScore(selectedMode);
+        localStorageIntegrityWarning = true;
+        writeLocalIntegritySnapshot();
+        return false;
+      }
+      const ADMOB_UNIT_IDS = Object.freeze({
+        banner: "REPLACE_WITH_PLAY_BANNER_AD_UNIT_ID",
+        rewarded: "REPLACE_WITH_PLAY_REWARDED_AD_UNIT_ID"
+      });
+      const REWARDED_CRYSTAL_AMOUNT = 200;
+      let pendingRewardedAd = null;
+      let activeBannerPlacement = "menu";
+      function getNativeAdsBridgeKind() {
+        if (window.ColorShiftNativeAds) return "custom";
+        if (window.AndroidAdMob) return "android";
+        if (window.webkit?.messageHandlers?.colorShiftAdMob) return "ios";
+        return "";
+      }
+      function initializeNativeAds() {
+        const bridgeKind = getNativeAdsBridgeKind();
+        if (!bridgeKind) return false;
+        const payload = {
+          action: "initialize",
+          provider: "google-mobile-ads",
+          adUnitIds: ADMOB_UNIT_IDS,
+          consentRequired: true,
+          testAdsDuringDevelopment: true
+        };
+        try {
+          if (bridgeKind === "custom" && typeof window.ColorShiftNativeAds.initialize === "function") {
+            window.ColorShiftNativeAds.initialize(payload);
+          } else if (bridgeKind === "android" && typeof window.AndroidAdMob.initialize === "function") {
+            window.AndroidAdMob.initialize(JSON.stringify(payload));
+          } else if (bridgeKind === "ios") {
+            window.webkit.messageHandlers.colorShiftAdMob.postMessage(payload);
+          } else {
+            return false;
+          }
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+      function setBannerAdPlacement(placement) {
+        activeBannerPlacement = placement;
+        const status = el("bannerAdStatus");
+        const bridgeKind = getNativeAdsBridgeKind();
+        if (!bridgeKind) {
+          if (status) status.textContent = navigator.onLine
+            ? "Placeholder only · configure the Android AdMob bridge"
+            : "Offline · banner ads unavailable";
+          return;
+        }
+        const payload = {
+          action: placement === "hidden" ? "hideBanner" : "showBanner",
+          placement,
+          adUnitId: ADMOB_UNIT_IDS.banner
+        };
+        try {
+          if (bridgeKind === "custom" && typeof window.ColorShiftNativeAds.setBanner === "function") {
+            window.ColorShiftNativeAds.setBanner(payload);
+          } else if (bridgeKind === "android" && typeof window.AndroidAdMob.setBannerAd === "function") {
+            window.AndroidAdMob.setBannerAd(JSON.stringify(payload));
+          } else if (bridgeKind === "ios") {
+            window.webkit.messageHandlers.colorShiftAdMob.postMessage(payload);
+          } else {
+            if (status) status.textContent = "Bridge detected · banner hook not configured";
+            return;
+          }
+          if (status) status.textContent = placement === "hidden" ? "Banner hidden during gameplay" : "Native banner request sent";
+        } catch (error) {
+          if (status) status.textContent = "Banner unavailable · gameplay continues normally";
+        }
+      }
+      function finishRewardedAdRequest(token, earned, message) {
+        if (!pendingRewardedAd || pendingRewardedAd.token !== token) return;
+        const request = pendingRewardedAd;
+        pendingRewardedAd = null;
+        window.clearTimeout(request.timeout);
+        request.resolve({ earned: earned === true, message: message || "" });
+      }
+      // Native host callback contract: call this only after the Google Mobile
+      // Ads SDK's earned-reward callback, never merely when an ad is opened.
+      window.ColorShiftAdMobResult = (token, result) => {
+        const payload = typeof result === "string"
+          ? (() => { try { return JSON.parse(result); } catch { return {}; } })()
+          : result || {};
+        finishRewardedAdRequest(
+          token,
+          payload.earned === true || payload.rewardEarned === true,
+          payload.message || ""
+        );
+      };
+      async function showRewardedCrystalAd() {
+        const button = el("rewardedAdButton");
+        const status = el("adRewardStatus");
+        const showMessage = message => { status.textContent = message; };
+        if (rewardedAdGrantedThisRun) {
+          showMessage("This run's video reward has already been claimed.");
+          return;
+        }
+        if (!navigator.onLine) {
+          showMessage("You're offline. No ad or reward was started; your run remains unchanged.");
+          return;
+        }
+        if (pendingRewardedAd) return;
+        const bridgeKind = getNativeAdsBridgeKind();
+        if (!bridgeKind) {
+          showMessage("Rewarded video is available in the Android app after its AdMob bridge is configured.");
+          return;
+        }
+        const token = "reward-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9);
+        const payload = {
+          action: "showRewarded",
+          token,
+          placement: "post-run-crystals",
+          adUnitId: ADMOB_UNIT_IDS.rewarded,
+          reward: { type: "crystals", amount: REWARDED_CRYSTAL_AMOUNT }
+        };
+        button.disabled = true;
+        showMessage("Loading a rewarded video…");
+        const response = await new Promise(resolve => {
+          const request = {
+            token,
+            resolve,
+            timeout: window.setTimeout(() => {
+              finishRewardedAdRequest(token, false, "Ad request timed out. No crystals were added.");
+            }, 45000)
+          };
+          pendingRewardedAd = request;
+          try {
+            let nativeResponse;
+            if (bridgeKind === "custom" && typeof window.ColorShiftNativeAds.showRewarded === "function") {
+              nativeResponse = window.ColorShiftNativeAds.showRewarded(payload);
+            } else if (bridgeKind === "android" && typeof window.AndroidAdMob.showRewardedAd === "function") {
+              nativeResponse = window.AndroidAdMob.showRewardedAd(JSON.stringify(payload));
+            } else if (bridgeKind === "ios") {
+              window.webkit.messageHandlers.colorShiftAdMob.postMessage(payload);
+            } else {
+              finishRewardedAdRequest(token, false, "Rewarded ads are not configured in this app build.");
+            }
+            if (nativeResponse && typeof nativeResponse.then === "function") {
+              nativeResponse.then(result => {
+                if (typeof result === "boolean") finishRewardedAdRequest(token, result);
+                else if (result && typeof result.earned === "boolean") {
+                  finishRewardedAdRequest(token, result.earned, result.message);
+                }
+              }).catch(() => finishRewardedAdRequest(token, false, "Ad unavailable. No reward was added."));
+            } else if (typeof nativeResponse === "boolean") {
+              finishRewardedAdRequest(token, nativeResponse);
+            } else if (nativeResponse && typeof nativeResponse.earned === "boolean") {
+              finishRewardedAdRequest(token, nativeResponse.earned, nativeResponse.message);
+            }
+          } catch (error) {
+            finishRewardedAdRequest(token, false, "Ad unavailable. No reward was added.");
+          }
+        });
+        button.disabled = false;
+        if (!response.earned) {
+          showMessage(response.message || "The video was not completed. No crystals were added.");
+          return;
+        }
+        rewardedAdGrantedThisRun = true;
+        progression.crystals = safeStoredCount(progression.crystals + REWARDED_CRYSTAL_AMOUNT);
+        progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + REWARDED_CRYSTAL_AMOUNT);
+        saveProgression();
+        renderProgressionUI();
+        updateCoinDisplay();
+        updateHUD();
+        if (state === "over") el("finalWallet").textContent = progression.crystals.toLocaleString("en-US");
+        button.textContent = "✓ REWARDED · +200 CRYSTALS";
+        button.disabled = true;
+        showMessage("Reward confirmed by the native ad SDK. +200 crystals added.");
       }
       function readLegacyHighScore() {
         try {
@@ -8061,6 +9096,7 @@ void main() {
         }
         if (mode === selectedMode) best = modeBest;
         syncLegacyHighScore();
+        writeLocalIntegritySnapshot();
         return modeBest;
       }
       function updateModeHighScoreDisplay() {
@@ -8209,6 +9245,9 @@ void main() {
         const today = new Date();
         return today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
       }
+      function localDayKeyForDate(date) {
+        return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+      }
       function createDailyProgress() {
         return { date: localDayKey(), crystalsCollected: 0, distanceClaimed: false, crystalsClaimed: false };
       }
@@ -8228,7 +9267,7 @@ void main() {
           safeStoredCount(localStorage.getItem(COINS_KEY))
         );
         const stored = JSON.parse(localStorage.getItem(PROGRESSION_KEY) || localStorage.getItem(LEGACY_PROGRESSION_KEY) || "null");
-        if (stored && (stored.version === 1 || stored.version === 2 || stored.version === 3)) {
+        if (stored && [1, 2, 3, 4, 5].includes(stored.version)) {
           progression.crystals = safeStoredCount(stored.crystals ?? legacyBalance);
           progression.lifetimeCrystals = Math.max(progression.crystals, safeStoredCount(stored.lifetimeCrystals));
           const validOwned = Array.isArray(stored.ownedSkins)
@@ -8239,6 +9278,9 @@ void main() {
             progression.ownedSkins.includes(stored.activeSkin) && hasOwn(PLAYER_SKINS, stored.activeSkin)
               ? stored.activeSkin
               : "sphere";
+          progression.shareRewardClaimed =
+            stored.shareRewardClaimed === true || progression.ownedSkins.includes(SHARE_REWARD_SKIN);
+          progression.referralWelcomeClaimed = stored.referralWelcomeClaimed === true;
           const validTrails = Array.isArray(stored.ownedTrails)
             ? stored.ownedTrails.filter(id => hasOwn(TRAIL_STYLES, id))
             : [];
@@ -8264,6 +9306,12 @@ void main() {
           };
           progression.daily = normalizeDailyProgress(stored.daily);
           progression.dailySpinAt = safeStoredTimestamp(stored.dailySpinAt);
+          progression.dailySpinDate = /^\d{4}-\d{2}-\d{2}$/.test(stored.dailySpinDate || "")
+            ? stored.dailySpinDate
+            : progression.dailySpinAt
+              ? localDayKeyForDate(new Date(progression.dailySpinAt))
+              : "";
+          progression.bonusSpins = Math.min(999, safeStoredCount(stored.bonusSpins));
           progression.powerTokens = Object.fromEntries(
             ["prism", "warp", "booster"].map(type => [type, Math.min(99, safeStoredCount(stored.powerTokens?.[type]))])
           );
@@ -8286,11 +9334,13 @@ void main() {
       function saveProgression() {
         progression.daily = normalizeDailyProgress(progression.daily);
         const payload = {
-          version: 3,
+          version: 5,
           crystals: safeStoredCount(progression.crystals),
           lifetimeCrystals: safeStoredCount(progression.lifetimeCrystals),
           ownedSkins: progression.ownedSkins.filter(id => hasOwn(PLAYER_SKINS, id)),
           activeSkin: hasOwn(PLAYER_SKINS, progression.activeSkin) ? progression.activeSkin : "sphere",
+          shareRewardClaimed: progression.shareRewardClaimed === true,
+          referralWelcomeClaimed: progression.referralWelcomeClaimed === true,
           ownedTrails: progression.ownedTrails.filter(id => hasOwn(TRAIL_STYLES, id)),
           activeTrail: hasOwn(TRAIL_STYLES, progression.activeTrail) ? progression.activeTrail : "none",
           achievements: Object.fromEntries(ACHIEVEMENTS.map(item => [item.id, progression.achievements[item.id] === true])),
@@ -8318,6 +9368,8 @@ void main() {
             crystalsClaimed: progression.daily.crystalsClaimed === true
           },
           dailySpinAt: safeStoredTimestamp(progression.dailySpinAt),
+          dailySpinDate: /^\d{4}-\d{2}-\d{2}$/.test(progression.dailySpinDate || "") ? progression.dailySpinDate : "",
+          bonusSpins: Math.min(999, safeStoredCount(progression.bonusSpins)),
           powerTokens: Object.fromEntries(
             ["prism", "warp", "booster"].map(type => [type, Math.min(99, safeStoredCount(progression.powerTokens[type]))])
           )
@@ -8330,6 +9382,7 @@ void main() {
         } catch (error) {
           // Progress remains usable for this visit if browser storage is blocked or full.
         }
+        writeLocalIntegritySnapshot();
       }
       updateModeHighScoreDisplay();
       function updateCoinDisplay() {
@@ -8337,6 +9390,8 @@ void main() {
         el("coinTotal").textContent = displayValue;
         el("crystalHud").textContent = displayValue;
         el("shopBalance").textContent = displayValue;
+        if (el("dailyWallet")) el("dailyWallet").textContent = progression.crystals.toLocaleString("en-US");
+        refreshLuckySpinUI();
       }
       function achievementMetric(category) {
         return category.metric === "lifetimeCrystals"
@@ -8367,6 +9422,475 @@ void main() {
         if (affordable) return { label: "BUY", disabled: false };
         return { label: "LOCKED · " + cost, disabled: true };
       }
+      function updateShareRewardButton() {
+        const button = el("shareUnlockButton");
+        if (!button) return;
+        const claimed = progression.shareRewardClaimed === true ||
+          progression.ownedSkins.includes(SHARE_REWARD_SKIN);
+        button.disabled = claimed;
+        button.textContent = claimed
+          ? "✓ EXCLUSIVE SKIN UNLOCKED"
+          : "🔗 SHARE TO UNLOCK SKIN / 💎 +100 CRYSTALS";
+        button.setAttribute("aria-label", claimed
+          ? "Share reward already claimed"
+          : "Share your score to unlock the Golden Imperial skin and receive 100 Neon Crystals");
+      }
+      function dismissShareRewardToast() {
+        shareRewardToastToken++;
+        window.clearTimeout(shareRewardToastTimer);
+        shareRewardToastTimer = 0;
+        const toast = el("shareRewardToast");
+        toast.classList.remove("visible");
+        toast.hidden = true;
+      }
+      function showShareRewardToast(message, duration = 3600) {
+        const toast = el("shareRewardToast");
+        const token = ++shareRewardToastToken;
+        window.clearTimeout(shareRewardToastTimer);
+        toast.textContent = message;
+        toast.hidden = false;
+        toast.classList.remove("visible");
+        requestAnimationFrame(() => {
+          if (token === shareRewardToastToken) toast.classList.add("visible");
+        });
+        shareRewardToastTimer = window.setTimeout(() => {
+          if (token !== shareRewardToastToken) return;
+          toast.classList.remove("visible");
+          shareRewardToastTimer = window.setTimeout(() => {
+            if (token === shareRewardToastToken) toast.hidden = true;
+          }, 260);
+        }, duration);
+      }
+      function grantShareReward() {
+        if (progression.shareRewardClaimed ||
+            progression.ownedSkins.includes(SHARE_REWARD_SKIN)) {
+          updateShareRewardButton();
+          return false;
+        }
+        progression.shareRewardClaimed = true;
+        progression.crystals = safeStoredCount(progression.crystals + 100);
+        progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + 100);
+        progression.ownedSkins.push(SHARE_REWARD_SKIN);
+        saveProgression();
+        renderProgressionUI();
+        showShareRewardToast("🎉 Exclusive Skin Unlocked & +100 Crystals Added!");
+        playCue("power");
+        return true;
+      }
+      async function copyShareText(text) {
+        if (navigator.clipboard?.writeText) {
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch (error) {
+            // Fall through to the textarea copy path for browsers with restricted clipboard access.
+          }
+        }
+        const field = document.createElement("textarea");
+        field.value = text;
+        field.setAttribute("readonly", "");
+        field.style.position = "fixed";
+        field.style.opacity = "0";
+        field.style.pointerEvents = "none";
+        document.body.appendChild(field);
+        field.select();
+        let copied = false;
+        try {
+          copied = document.execCommand("copy");
+        } catch (error) {
+          copied = false;
+        }
+        field.remove();
+        return copied;
+      }
+      function openWhatsAppShareIntent(text) {
+        const link = document.createElement("a");
+        link.href = "https://wa.me/?text=" + encodeURIComponent(text);
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.hidden = true;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+      async function shareRunReward() {
+        if (progression.shareRewardClaimed ||
+            progression.ownedSkins.includes(SHARE_REWARD_SKIN)) {
+          updateShareRewardButton();
+          return;
+        }
+        const button = el("shareUnlockButton");
+        button.disabled = true;
+        button.textContent = "OPENING SHARE…";
+        const finalScore = safeStoredCount(score);
+        const shareMessage = "I just scored " + finalScore.toLocaleString("en-US") +
+          " points in Color Shift: Neon Rush 3D! Can you beat my reflex? 🚀";
+        const shareUrl = window.location.href;
+        if (typeof navigator.share === "function") {
+          try {
+            await navigator.share({
+              title: "Color Shift: Neon Rush 3D",
+              text: shareMessage,
+              url: shareUrl
+            });
+            grantShareReward();
+            return;
+          } catch (error) {
+            if (error?.name === "AbortError") {
+              updateShareRewardButton();
+              return;
+            }
+          }
+        }
+        const fallbackMessage = shareMessage + " " + shareUrl;
+        try {
+          openWhatsAppShareIntent(fallbackMessage);
+          const copied = await copyShareText(fallbackMessage);
+          if (!copied) throw new Error("Clipboard copy was not available.");
+          grantShareReward();
+        } catch (error) {
+          button.disabled = false;
+          button.textContent = "🔗 SHARE TO UNLOCK SKIN / 💎 +100 CRYSTALS";
+          showShareRewardToast("Sharing could not be started. Please try again.", 2600);
+        }
+      }
+      function flexCardLines(context, text, maxWidth) {
+        const words = String(text).split(/\s+/);
+        const lines = [];
+        let line = "";
+        for (let word of words) {
+          if (context.measureText(word).width > maxWidth) {
+            if (line) {
+              lines.push(line);
+              line = "";
+            }
+            let segment = "";
+            for (const character of word) {
+              if (segment && context.measureText(segment + character).width > maxWidth) {
+                lines.push(segment);
+                segment = character;
+              } else {
+                segment += character;
+              }
+            }
+            word = segment;
+            if (word) {
+              line = word;
+            }
+            continue;
+          }
+          const candidate = line ? line + " " + word : word;
+          if (line && context.measureText(candidate).width > maxWidth) {
+            lines.push(line);
+            line = word;
+          } else {
+            line = candidate;
+          }
+        }
+        if (line) lines.push(line);
+        return lines;
+      }
+      function drawFlexCardCanvas() {
+        const canvas = document.createElement("canvas");
+        canvas.width = 1080;
+        canvas.height = 1920;
+        const context = canvas.getContext("2d");
+        if (!context) throw new Error("Canvas rendering is unavailable.");
+        const width = canvas.width;
+        const height = canvas.height;
+        const finalScore = Math.floor(score);
+        const modeLabel = selectedMode === "timeAttack" ? "TIME ATTACK"
+          : selectedMode === "antiGravity" ? "ANTI-GRAVITY"
+          : selectedMode === "blackout" ? "BLACKOUT"
+          : selectedMode === "mirrorMatrix" ? "MIRROR MATRIX"
+          : selectedMode === "laserPursuit" ? "LASER PURSUIT"
+          : "CLASSIC RUN";
+        const challengeUrl = new URL(window.location.href);
+        challengeUrl.searchParams.set("challenge", String(finalScore));
+        challengeUrl.searchParams.set("run", Date.now().toString(36).toUpperCase());
+        flexCardShareUrl = challengeUrl.href;
+        const background = context.createLinearGradient(0, 0, width, height);
+        background.addColorStop(0, "#080b18");
+        background.addColorStop(.48, "#101027");
+        background.addColorStop(1, "#080b12");
+        context.fillStyle = background;
+        context.fillRect(0, 0, width, height);
+        const cyanGlow = context.createRadialGradient(260, 360, 12, 260, 360, 620);
+        cyanGlow.addColorStop(0, "rgba(0, 239, 255, .22)");
+        cyanGlow.addColorStop(1, "rgba(0, 239, 255, 0)");
+        context.fillStyle = cyanGlow;
+        context.fillRect(0, 0, width, height);
+        const pinkGlow = context.createRadialGradient(900, 1160, 10, 900, 1160, 680);
+        pinkGlow.addColorStop(0, "rgba(255, 31, 197, .2)");
+        pinkGlow.addColorStop(1, "rgba(255, 31, 197, 0)");
+        context.fillStyle = pinkGlow;
+        context.fillRect(0, 0, width, height);
+
+        const roundedRect = (x, y, w, h, radius) => {
+          context.beginPath();
+          context.moveTo(x + radius, y);
+          context.lineTo(x + w - radius, y);
+          context.quadraticCurveTo(x + w, y, x + w, y + radius);
+          context.lineTo(x + w, y + h - radius);
+          context.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+          context.lineTo(x + radius, y + h);
+          context.quadraticCurveTo(x, y + h, x, y + h - radius);
+          context.lineTo(x, y + radius);
+          context.quadraticCurveTo(x, y, x + radius, y);
+          context.closePath();
+        };
+        const glowText = (text, x, y, size, color, glow, weight = 800) => {
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.font = weight + " " + size + 'px "Orbitron", "Rajdhani", Arial, sans-serif';
+          context.fillStyle = color;
+          context.shadowColor = glow;
+          context.shadowBlur = 22;
+          context.fillText(text, x, y);
+          context.shadowBlur = 0;
+        };
+
+        context.save();
+        context.strokeStyle = "rgba(87, 226, 255, .14)";
+        context.lineWidth = 2;
+        context.shadowColor = "#34dfff";
+        context.shadowBlur = 8;
+        const horizonY = 680;
+        for (let x = 0; x <= width; x += 90) {
+          context.beginPath();
+          context.moveTo(width / 2, horizonY);
+          context.lineTo(x, height);
+          context.stroke();
+        }
+        for (let row = 1; row <= 15; row++) {
+          const progress = row / 15;
+          const y = horizonY + Math.pow(progress, 1.8) * (height - horizonY);
+          context.globalAlpha = .2 + progress * .55;
+          context.beginPath();
+          context.moveTo(0, y);
+          context.lineTo(width, y);
+          context.stroke();
+        }
+        context.restore();
+        context.globalAlpha = 1;
+
+        context.lineWidth = 3;
+        context.strokeStyle = "rgba(100, 244, 255, .78)";
+        context.shadowColor = "#22dfff";
+        context.shadowBlur = 24;
+        roundedRect(34, 34, width - 68, height - 68, 26);
+        context.stroke();
+        context.shadowBlur = 0;
+        context.strokeStyle = "rgba(255, 72, 211, .35)";
+        context.lineWidth = 1;
+        roundedRect(54, 54, width - 108, height - 108, 20);
+        context.stroke();
+
+        glowText("COLOR SHIFT", width / 2, 165, 72, "#f4ffff", "#18eaff", 900);
+        glowText("NEON RUSH 3D", width / 2, 250, 38, "#ff8de9", "#ff37c8", 800);
+        context.fillStyle = "rgba(220, 238, 255, .74)";
+        context.font = '600 22px "Rajdhani", Arial, sans-serif';
+        context.textAlign = "center";
+        context.fillText("RUN COMPLETE  /  " + modeLabel, width / 2, 330);
+
+        const badgeGradient = context.createLinearGradient(150, 0, 930, 0);
+        badgeGradient.addColorStop(0, "rgba(255, 75, 190, .16)");
+        badgeGradient.addColorStop(.5, "rgba(31, 229, 255, .18)");
+        badgeGradient.addColorStop(1, "rgba(163, 105, 255, .2)");
+        context.fillStyle = badgeGradient;
+        context.strokeStyle = "rgba(118, 244, 255, .7)";
+        context.lineWidth = 2;
+        roundedRect(128, 420, 824, 106, 20);
+        context.fill();
+        context.stroke();
+        glowText("🔥  NEON REFLEX MASTER", width / 2, 474, 31, "#fff5dc", "#ffc967", 900);
+
+        context.fillStyle = "rgba(196, 219, 237, .72)";
+        context.font = '700 24px "Orbitron", Arial, sans-serif';
+        context.textAlign = "center";
+        context.fillText("FINAL SCORE", width / 2, 655);
+        glowText(finalScore.toLocaleString("en-US"), width / 2, 812, 142, "#ffffff", "#3deaff", 900);
+        context.fillStyle = "rgba(112, 231, 255, .86)";
+        context.fillRect(260, 930, 560, 3);
+
+        const bestScore = Math.max(best, finalScore);
+        const stats = [
+          { label: "HIGH SCORE", value: bestScore.toLocaleString("en-US"), color: "#8efaff" },
+          { label: "DISTANCE", value: Math.floor(distance).toLocaleString("en-US") + " m", color: "#d3baff" },
+          { label: "GATES CLEARED", value: passed.toLocaleString("en-US"), color: "#ff9de9" }
+        ];
+        const statTop = 1010;
+        const statGap = 18;
+        const statHeight = 134;
+        stats.forEach((stat, index) => {
+          const y = statTop + index * (statHeight + statGap);
+          context.fillStyle = "rgba(8, 15, 29, .78)";
+          context.strokeStyle = index === 0 ? "rgba(54, 229, 255, .52)" : "rgba(185, 131, 255, .34)";
+          context.lineWidth = 2;
+          roundedRect(126, y, 828, statHeight, 18);
+          context.fill();
+          context.stroke();
+          context.textAlign = "left";
+          context.textBaseline = "middle";
+          context.font = '700 21px "Orbitron", Arial, sans-serif';
+          context.fillStyle = "rgba(191, 209, 226, .68)";
+          context.fillText(stat.label, 164, y + 43);
+          context.textAlign = "right";
+          context.font = '800 40px "Rajdhani", Arial, sans-serif';
+          context.fillStyle = stat.color;
+          context.shadowColor = stat.color;
+          context.shadowBlur = 16;
+          context.fillText(stat.value, 916, y + 91);
+          context.shadowBlur = 0;
+        });
+
+        const message = "I scored " + finalScore.toLocaleString("en-US") +
+          " points in Color Shift: Neon Rush 3D! Can you beat my reflex? 🚀";
+        context.font = '600 33px "Rajdhani", Arial, sans-serif';
+        context.fillStyle = "#f4f6ff";
+        context.textAlign = "center";
+        const messageLines = flexCardLines(context, message, 820).slice(0, 3);
+        const messageTop = 1530;
+        messageLines.forEach((line, index) => {
+          context.fillText(line, width / 2, messageTop + index * 49);
+        });
+        context.fillStyle = "rgba(135, 246, 255, .84)";
+        context.font = '700 20px "Orbitron", Arial, sans-serif';
+        context.fillText("CHALLENGE LINK", width / 2, 1746);
+        context.fillStyle = "rgba(221, 229, 246, .74)";
+        context.font = '500 21px "Rajdhani", Arial, sans-serif';
+        const linkLines = flexCardLines(context, flexCardShareUrl, 850).slice(0, 2);
+        linkLines.forEach((line, index) => context.fillText(line, width / 2, 1792 + index * 30));
+        return canvas;
+      }
+      function canvasToPngBlob(canvas) {
+        return new Promise((resolve, reject) => {
+          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Could not export the score card.")), "image/png");
+        });
+      }
+      async function prepareFlexCardPreview(showPreview = true) {
+        if (flexCardBlob) {
+          if (showPreview) el("flexCardPreview").hidden = false;
+          return flexCardBlob;
+        }
+        if (flexCardPreparation) return flexCardPreparation;
+        const token = ++flexCardToken;
+        const button = el("flexCardShareButton");
+        button.disabled = true;
+        button.textContent = "PREPARING FLEX CARD…";
+        el("flexCardStatus").textContent = "Rendering your story-ready score card…";
+        flexCardPreparation = (async () => {
+          try {
+            if (document.fonts?.ready) {
+              await Promise.race([
+                document.fonts.ready,
+                new Promise(resolve => window.setTimeout(resolve, 900))
+              ]);
+            }
+            const canvas = drawFlexCardCanvas();
+            const blob = await canvasToPngBlob(canvas);
+            if (token !== flexCardToken) return null;
+            flexCardBlob = blob;
+            if (flexCardObjectUrl) URL.revokeObjectURL(flexCardObjectUrl);
+            flexCardObjectUrl = URL.createObjectURL(blob);
+            el("flexCardImage").src = flexCardObjectUrl;
+            el("flexCardPreview").hidden = !showPreview;
+            el("flexCardStatus").textContent = showPreview ? "Your 9:16 card is ready to share." : "";
+            button.disabled = false;
+            button.textContent = showPreview ? "📸 SHARE FLEX CARD" : "📸 GENERATE & SHARE FLEX CARD";
+            return blob;
+          } catch (error) {
+            if (token === flexCardToken) {
+              button.disabled = false;
+              button.textContent = "📸 TRY FLEX CARD AGAIN";
+              el("flexCardStatus").textContent = "Card export failed. Please try again.";
+            }
+            return null;
+          } finally {
+            if (token === flexCardToken) flexCardPreparation = null;
+          }
+        })();
+        return flexCardPreparation;
+      }
+      function clearFlexCardPreview() {
+        flexCardToken++;
+        flexCardPreparation = null;
+        flexCardBlob = null;
+        flexCardShareUrl = "";
+        if (flexCardObjectUrl) URL.revokeObjectURL(flexCardObjectUrl);
+        flexCardObjectUrl = "";
+        el("flexCardImage").removeAttribute("src");
+        el("flexCardPreview").hidden = true;
+        el("flexCardStatus").textContent = "";
+        const button = el("flexCardShareButton");
+        button.disabled = false;
+        button.textContent = "📸 GENERATE & SHARE FLEX CARD";
+      }
+      function downloadFlexCardPng() {
+        if (!flexCardBlob || !flexCardObjectUrl) return;
+        const link = document.createElement("a");
+        link.href = flexCardObjectUrl;
+        link.download = "color-shift-flex-card-" + Math.floor(score) + ".png";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        el("flexCardStatus").textContent = "PNG downloaded. Ready for your story or status.";
+      }
+      async function generateAndShareFlexCard() {
+        const button = el("flexCardShareButton");
+        button.disabled = true;
+        if (!flexCardBlob) {
+          const readyBlob = await prepareFlexCardPreview(true);
+          if (!readyBlob) return;
+        }
+        el("flexCardPreview").hidden = false;
+        el("flexCardStatus").textContent = "Your 9:16 card is ready to share.";
+        const shareText = "I scored " + Math.floor(score).toLocaleString("en-US") +
+          " points in Color Shift: Neon Rush 3D! Can you beat my reflex? 🚀";
+        try {
+          const file = new File([flexCardBlob], "color-shift-flex-card.png", { type: "image/png" });
+          if (typeof navigator.share === "function" &&
+              typeof navigator.canShare === "function" &&
+              navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: "Color Shift: Neon Rush 3D — Neon Reflex Master",
+              text: shareText + " " + flexCardShareUrl
+            });
+            el("flexCardStatus").textContent = "Flex card shared successfully.";
+            button.disabled = false;
+            button.textContent = "📸 SHARE FLEX CARD AGAIN";
+            return;
+          }
+        } catch (error) {
+          if (error?.name === "AbortError") {
+            el("flexCardStatus").textContent = "Share canceled. Your card is ready to download.";
+            button.disabled = false;
+            button.textContent = "📸 SHARE FLEX CARD AGAIN";
+            return;
+          }
+        }
+        try {
+          if (navigator.clipboard?.write && typeof ClipboardItem === "function") {
+            await navigator.clipboard.write([
+              new ClipboardItem({ "image/png": flexCardBlob })
+            ]);
+            el("flexCardStatus").textContent = "Flex card copied as an image. Paste it into your story or status.";
+            button.disabled = false;
+            button.textContent = "📸 SHARE FLEX CARD AGAIN";
+            return;
+          }
+        } catch (error) {
+          // Image clipboard is not supported here; download the PNG instead.
+        }
+        downloadFlexCardPng();
+        button.disabled = false;
+        button.textContent = "📸 SHARE FLEX CARD AGAIN";
+      }
+      function prepareFlexCardForGameOver() {
+        clearFlexCardPreview();
+        void prepareFlexCardPreview(false);
+      }
       function renderProgressionUI() {
         progression.daily = normalizeDailyProgress(progression.daily);
         const milestonesChanged = syncAchievementTierUnlocks(state === "running");
@@ -8377,16 +9901,25 @@ void main() {
           .map(([type, count]) => powerLabels[type] + " ×" + count);
         el("dailyTokenNote").hidden = readyPowerups.length === 0;
         el("dailyTokenNote").textContent = readyPowerups.length ? "NEXT RUN BOOSTS · " + readyPowerups.join(" · ") : "";
+        updateShareRewardButton();
         el("skinGrid").innerHTML = Object.entries(PLAYER_SKINS).map(([skinId, skin], index) => {
           const owned = progression.ownedSkins.includes(skinId);
           const active = progression.activeSkin === skinId;
           const affordable = progression.crystals >= skin.cost;
-          const buttonState = renderCosmeticButtonState(owned, active, affordable, skin.cost);
+          const shareExclusive = skinId === SHARE_REWARD_SKIN && !owned;
+          const buttonState = shareExclusive
+            ? { label: "SHARE TO UNLOCK", disabled: true }
+            : renderCosmeticButtonState(owned, active, affordable, skin.cost);
+          const costLabel = shareExclusive
+            ? "SHARE EXCLUSIVE"
+            : owned
+              ? active ? "EQUIPPED" : "OWNED"
+              : '<span class="crystal-mark" aria-hidden="true"></span>' + skin.cost + " CRYSTALS";
           return '<article class="skin-card' + (active ? " active" : "") + '" data-skin-card="' + skinId + '">' +
             '<div class="skin-preview ' + skin.shape + '" style="--skin-color:#' + skin.accent.toString(16).padStart(6, "0") + '" aria-hidden="true"><span></span></div>' +
             '<h3>' + skin.name + '</h3><p>' + skin.description + '</p>' +
             '<div class="skin-purchase-row">' +
-              '<div class="cosmetic-cost">' + (owned ? active ? "EQUIPPED" : "OWNED" : '<span class="crystal-mark" aria-hidden="true"></span>' + skin.cost + " CRYSTALS") + '</div>' +
+              '<div class="cosmetic-cost">' + costLabel + '</div>' +
               '<button class="secondary-btn skin-action" type="button" data-skin="' + skinId + '" ' + (buttonState.disabled ? "disabled" : "") + '>' + buttonState.label + '</button>' +
             '</div>' +
             '</article>';
@@ -8437,6 +9970,17 @@ void main() {
         if (milestonesChanged) saveProgression();
       }
       applyPlayerSkin(progression.activeSkin);
+      verifyLocalIntegritySnapshot();
+      try {
+        if (localStorage.getItem(REFERRAL_WELCOME_KEY) === "1") progression.referralWelcomeClaimed = true;
+      } catch {}
+      processIncomingReferral();
+      if (localStorageIntegrityWarning) {
+        el("integrityNotice").textContent = "Local save integrity check detected edited or corrupted data. The latest verifiable wallet and mode scores were restored where possible.";
+        el("integrityNotice").hidden = false;
+      }
+      best = loadModeHighScore(selectedMode);
+      updateModeHighScoreDisplay();
       renderProgressionUI();
       saveProgression();
       setSplashProgress(83, "Loading saved progress");
@@ -8517,61 +10061,197 @@ void main() {
         if (distance >= DAILY_BOUNTIES[0].target) completeDailyBounty("distance");
         if (progression.daily.crystalsCollected >= DAILY_BOUNTIES[1].target) completeDailyBounty("crystals");
       }
+      function hasFreeLuckySpinToday() {
+        return progression.dailySpinDate !== localDayKey();
+      }
       function dailySpinReady() {
-        return Date.now() - safeStoredTimestamp(progression.dailySpinAt) >= DAILY_COOLDOWN_MS;
+        return hasFreeLuckySpinToday();
+      }
+      function refreshLuckySpinUI() {
+        const freeReady = hasFreeLuckySpinToday();
+        const bonusCount = Math.min(999, safeStoredCount(progression.bonusSpins));
+        const spinButton = el("dailySpinButton");
+        if (!spinButton) return;
+        if (el("dailyWallet")) el("dailyWallet").textContent = progression.crystals.toLocaleString("en-US");
+        if (el("dailyBonusSpins")) el("dailyBonusSpins").textContent = String(bonusCount);
+        spinButton.textContent = freeReady
+          ? "SPIN · FREE TODAY"
+          : bonusCount > 0
+            ? "SPIN · BONUS ×" + bonusCount
+            : "SPIN AGAIN · SHARE FOR EXTRA";
+        const entryText = freeReady
+          ? "🎡 DAILY LUCKY SPIN · FREE"
+          : bonusCount > 0
+            ? "🎡 LUCKY SPIN · " + bonusCount + " BONUS"
+            : "🎡 LUCKY SPIN · SHARE FOR EXTRA";
+        el("luckySpinHomeButton").textContent = entryText;
+        el("luckySpinGameOverButton").textContent = entryText;
+      }
+      function openLuckySpin() {
+        if (state === "running" || spinInProgress) return;
+        luckySpinReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        const modal = el("dailyModal");
+        modal.hidden = false;
+        el("extraSpinPrompt").hidden = true;
+        const wheel = el("dailyWheel");
+        wheel.style.transition = "none";
+        wheel.style.transform = "rotate(0deg)";
+        void wheel.offsetWidth;
+        wheel.style.transition = "";
+        el("dailyContinueButton").hidden = true;
+        el("dailySpinButton").disabled = false;
+        el("dailyMainMenuButton").disabled = false;
+        el("dailyResult").textContent = hasFreeLuckySpinToday()
+          ? "Your free spin is ready."
+          : progression.bonusSpins > 0
+            ? "Bonus spins are ready. Good luck!"
+            : "Daily limit reached. Share to unlock an extra spin.";
+        refreshLuckySpinUI();
+        el("dailySpinButton").focus({ preventScroll: true });
       }
       function maybeShowDailyReward() {
         if (state !== "ready" || !dailySpinReady()) return;
         window.clearTimeout(dailySpinTimer);
         dailySpinTimer = 0;
-        el("dailyModal").hidden = false;
-        el("dailyWheel").style.transform = "rotate(0deg)";
-        el("dailyResult").textContent = "Your reward is ready.";
-        el("dailySpinButton").hidden = false;
-        el("dailySpinButton").disabled = false;
-        el("dailySpinButton").textContent = "Spin for reward";
-        el("dailyContinueButton").hidden = true;
+        openLuckySpin();
       }
-      function spinDailyReward() {
-        if (!dailySpinReady() || el("dailySpinButton").disabled) return;
-        const outcomes = [
-          { kind: "crystals", amount: 10, label: "10 crystals" },
-          { kind: "crystals", amount: 20, label: "20 crystals" },
-          { kind: "crystals", amount: 35, label: "35 crystals" },
-          { kind: "power", power: "prism", label: "Prism Shield for your next run" },
-          { kind: "power", power: "warp", label: "Time Warp for your next run" },
-          { kind: "power", power: "booster", label: "Score Boost for your next run" },
-          { kind: "crystals", amount: 15, label: "15 crystals" },
-          { kind: "power", power: "prism", label: "Prism Shield for your next run" }
-        ];
-        const resultIndex = Math.floor(Math.random() * outcomes.length);
-        const reward = outcomes[resultIndex];
-        progression.dailySpinAt = Date.now();
+      function openExtraSpinPrompt() {
+        if (spinInProgress || spinSharePending) return;
+        el("extraSpinPrompt").hidden = false;
+        el("shareForSpinButton").disabled = false;
+        el("shareForSpinButton").focus({ preventScroll: true });
+      }
+      function awardLuckySpinReward(reward) {
+        let message = reward.label;
         if (reward.kind === "crystals") {
           progression.crystals = safeStoredCount(progression.crystals + reward.amount);
           progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + reward.amount);
-        } else {
+        } else if (reward.kind === "skin") {
+          if (progression.ownedSkins.includes(reward.skin)) {
+            progression.crystals = safeStoredCount(progression.crystals + 100);
+            progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + 100);
+            message = "Golden Imperial already owned · +100 crystals";
+          } else {
+            progression.ownedSkins.push(reward.skin);
+            message = "Exclusive Golden Imperial skin unlocked!";
+          }
+        } else if (reward.kind === "power") {
           progression.powerTokens[reward.power] = Math.min(99, safeStoredCount(progression.powerTokens[reward.power] + 1));
         }
         saveProgression();
         renderProgressionUI();
         if (progression.lifetimeCrystals >= 50) unlockAchievement("crystalCollector");
+        return message;
+      }
+      function spinDailyReward() {
+        if (spinInProgress) return;
+        const useFreeSpin = hasFreeLuckySpinToday();
+        if (!useFreeSpin && progression.bonusSpins <= 0) {
+          el("dailyResult").textContent = "Daily limit reached. Share for an extra spin.";
+          openExtraSpinPrompt();
+          return;
+        }
+        const outcomes = [
+          { kind: "crystals", amount: 50, label: "💎 +50 crystals" },
+          { kind: "crystals", amount: 100, label: "💎 +100 crystals" },
+          { kind: "crystals", amount: 200, label: "💎 +200 crystals" },
+          { kind: "crystals", amount: 500, label: "💎 +500 Mega Crystal" },
+          { kind: "skin", skin: SHARE_REWARD_SKIN, label: "🌟 Exclusive Golden Imperial skin" },
+          { kind: "power", power: "booster", label: "✖️ 2X Score Boost for your next run" },
+          { kind: "power", power: "prism", label: "🛡️ Prism Shield for your next run" },
+          { kind: "miss", label: "✧ Better luck next time" }
+        ];
+        const resultIndex = Math.floor(Math.random() * outcomes.length);
+        const reward = outcomes[resultIndex];
+        const wheel = el("dailyWheel");
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        wheel.style.transition = reducedMotion ? "none" : "";
         unlockAudio();
         playCue("power");
+        spinInProgress = true;
         el("dailySpinButton").disabled = true;
+        el("dailyMainMenuButton").disabled = true;
+        el("dailyContinueButton").hidden = true;
+        el("extraSpinPrompt").hidden = true;
         el("dailyResult").textContent = "The wheel is spinning…";
-        const stopAngle = 360 * 5 + (360 - resultIndex * 45 - 22.5);
-        el("dailyWheel").style.transform = "rotate(" + stopAngle + "deg)";
+        const stopAngle = 360 * 6 + (360 - resultIndex * 45 - 22.5);
+        wheel.style.transform = "rotate(" + stopAngle + "deg)";
         window.clearTimeout(dailySpinTimer);
         dailySpinTimer = window.setTimeout(() => {
           dailySpinTimer = 0;
-          el("dailyResult").textContent = "You won " + reward.label + "!";
-          el("dailySpinButton").hidden = true;
+          if (useFreeSpin) {
+            progression.dailySpinDate = localDayKey();
+            progression.dailySpinAt = Date.now();
+          } else {
+            progression.bonusSpins = Math.max(0, safeStoredCount(progression.bonusSpins - 1));
+          }
+          const resultText = awardLuckySpinReward(reward);
+          spinInProgress = false;
+          el("dailySpinButton").disabled = false;
+          el("dailyMainMenuButton").disabled = false;
           el("dailyContinueButton").hidden = false;
-        }, 1750);
+          el("dailyResult").textContent = "You won: " + resultText;
+          refreshLuckySpinUI();
+          showShareRewardToast(reward.kind === "miss" ? "✧ Better luck next spin!" : "🎉 Lucky Spin reward: " + resultText);
+          playCue(reward.kind === "miss" ? "button" : "crystal");
+        }, reducedMotion ? 40 : 2850);
+      }
+      async function shareForExtraSpin() {
+        if (spinSharePending || spinInProgress) return;
+        spinSharePending = true;
+        const button = el("shareForSpinButton");
+        button.disabled = true;
+        button.textContent = "PREPARING SHARE…";
+        const text = "Join me in Color Shift: Neon Rush 3D! Try the Lucky Spin and see what you win: " + window.location.href;
+        let shareSucceeded = false;
+        try {
+          if (typeof navigator.share === "function") {
+            await navigator.share({
+              title: "Color Shift: Neon Rush 3D · Lucky Spin",
+              text,
+              url: window.location.href
+            });
+            shareSucceeded = true;
+          } else {
+            openWhatsAppShareIntent(text);
+            shareSucceeded = await copyShareText(text);
+          }
+        } catch (error) {
+          if (error?.name === "AbortError") {
+            el("dailyResult").textContent = "Share cancelled. Your spins are unchanged.";
+          } else {
+            try {
+              openWhatsAppShareIntent(text);
+              shareSucceeded = await copyShareText(text);
+            } catch {
+              shareSucceeded = false;
+            }
+          }
+        } finally {
+          spinSharePending = false;
+          button.disabled = false;
+          button.textContent = "SHARE · GET 1 SPIN";
+        }
+        if (!shareSucceeded) {
+          el("dailyResult").textContent = "Share setup did not complete. No bonus spin was added.";
+          return;
+        }
+        progression.bonusSpins = Math.min(999, safeStoredCount(progression.bonusSpins + 1));
+        saveProgression();
+        refreshLuckySpinUI();
+        el("extraSpinPrompt").hidden = true;
+        el("dailyResult").textContent = "🎟 1 bonus spin added. Ready when you are!";
+        showShareRewardToast("🎟 Bonus Spin added for sharing!");
+        playCue("power");
+        el("dailySpinButton").focus({ preventScroll: true });
       }
       function closeDailyReward() {
+        if (spinInProgress || spinSharePending) return;
+        el("extraSpinPrompt").hidden = true;
         el("dailyModal").hidden = true;
+        const returnFocus = luckySpinReturnFocus;
+        luckySpinReturnFocus = null;
+        if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
         if (achievementQueue.length && !achievementNoticeTimer) displayNextAchievement();
       }
       function setGameMode(mode) {
@@ -8683,21 +10363,22 @@ void main() {
           control.setAttribute("aria-label", "Manually cycle player color now");
         }
       }
-      function openShop() {
+      function openShop(initialTab = activeRewardsTab) {
         if (state !== "ready") return;
         closeSettings();
         el("rewards-screen").hidden = false;
         el("shopScroll").scrollTop = 0;
         el("shopNotice").textContent = "";
-        setRewardsTab(activeRewardsTab);
+        setRewardsTab(initialTab);
         renderProgressionUI();
+        updateReferralUI();
         document.querySelector('[data-reward-tab="' + activeRewardsTab + '"]')?.focus({ preventScroll: true });
       }
       function closeShop() {
         el("rewards-screen").hidden = true;
       }
       function setRewardsTab(tab) {
-        const validTabs = ["achievements", "skins", "trails"];
+        const validTabs = ["achievements", "skins", "trails", "referral"];
         if (!validTabs.includes(tab)) return;
         activeRewardsTab = tab;
         document.querySelectorAll("[data-reward-tab]").forEach(button => {
@@ -8735,9 +10416,10 @@ void main() {
       }
       function resetLocalProgress() {
         const confirmed = window.confirm(
-          "Reset this device's local game save? This clears the high score, crystals, skins, trails, claimed rewards, achievements, daily rewards, and power-up tokens."
+          "Reset this device's game save? Scores, crystals, skins, achievements, daily rewards, and share counts will clear. This browser's referral ID and one-time welcome claim will stay to prevent repeat invite bonuses."
         );
         if (!confirmed) return;
+        dismissShareRewardToast();
         try {
           [
             PROGRESSION_KEY,
@@ -8748,7 +10430,9 @@ void main() {
             ...Object.values(MODE_HIGH_SCORE_KEYS),
             COINS_KEY,
             NEON_CRYSTALS_KEY,
-            GHOST_RUN_KEY
+            GHOST_RUN_KEY,
+            LOCAL_INTEGRITY_KEY,
+            REFERRAL_SHARE_ACTIONS_KEY
           ].forEach(key => localStorage.removeItem(key));
           localStorage.setItem(HIGH_SCORE_KEY, "0");
           localStorage.setItem(NEON_CRYSTALS_KEY, "0");
@@ -8756,6 +10440,12 @@ void main() {
           // The reset still applies for the current session when storage is unavailable.
         }
         progression = createFreshProgression();
+        try {
+          progression.referralWelcomeClaimed = localStorage.getItem(REFERRAL_WELCOME_KEY) === "1";
+        } catch {}
+        localStorageIntegrityWarning = false;
+        el("integrityNotice").hidden = true;
+        el("integrityNotice").textContent = "";
         clearTrailParticles();
         best = 0;
         score = 0;
@@ -8773,6 +10463,7 @@ void main() {
         el("ghostStatus").classList.remove("visible");
         timeRemaining = TIME_ATTACK_START_SECONDS;
         currentLane = 1;
+        laneVelocityX = 0;
         lastPlayerInputAt = -Infinity;
         resetEnvironmentMilestones();
         setEnvironment(0, { announce: false, instant: true });
@@ -8796,6 +10487,10 @@ void main() {
       function chooseSkin(skinId) {
         const skin = PLAYER_SKINS[skinId];
         if (!skin || state === "running") return;
+        if (skinId === SHARE_REWARD_SKIN && !progression.shareRewardClaimed) {
+          el("shopNotice").textContent = "Golden Imperial is an exclusive share reward.";
+          return;
+        }
         if (!progression.ownedSkins.includes(skinId)) {
           if (progression.crystals < skin.cost) {
             el("shopNotice").textContent = "Collect " + (skin.cost - progression.crystals) + " more crystals to unlock " + skin.name + ".";
@@ -8984,6 +10679,9 @@ void main() {
         el("score").textContent = String(Math.floor(score)).padStart(5, "0");
         el("combo").textContent = "×" + combo;
         el("comboStat").classList.toggle("combo-hot", combo >= 3);
+        const streakMultiplier = getComboScoreMultiplier(combo);
+        el("streakBonus").hidden = streakMultiplier <= 1;
+        el("streakBonus").textContent = streakMultiplier + "X BONUS";
         el("distance").textContent = String(Math.floor(distance)).padStart(3, "0");
         el("gates").textContent = String(passed).padStart(2, "0");
         el("pace").innerHTML = (speed / BASE_FORWARD_SPEED).toFixed(1) + '<span style="font-size:.48em">×</span>';
@@ -9007,9 +10705,52 @@ void main() {
         scoreDisplay.classList.remove("score-pop");
         requestAnimationFrame(() => scoreDisplay.classList.add("score-pop"));
       }
+      function flashSuccessfulGate(colorHex, streak) {
+        const color = new THREE.Color(colorHex);
+        const red = Math.round(color.r * 255);
+        const green = Math.round(color.g * 255);
+        const blue = Math.round(color.b * 255);
+        const alpha = Math.min(0.15, 0.055 + streak * 0.007);
+        const flash = el("flash");
+        flash.style.background = `radial-gradient(ellipse at 50% 58%, rgba(${red},${green},${blue},${alpha}), transparent 72%)`;
+        flash.classList.add("on");
+        window.clearTimeout(flashTimer);
+        flashTimer = window.setTimeout(() => {
+          flash.classList.remove("on");
+          flash.style.background = "";
+        }, 125);
+      }
+      function getComboScoreMultiplier(streak = combo) {
+        if (streak >= 10) return 5;
+        if (streak >= 5) return 3;
+        if (streak >= 3) return 2;
+        return 1;
+      }
       function getScoreMultiplier() {
-        const activeMultiplier = feverTimer > 0 ? 3 : scoreBoosterTimer > 0 ? 2 : 1;
+        const activeMultiplier = Math.max(
+          getComboScoreMultiplier(),
+          feverTimer > 0 ? 3 : 1,
+          scoreBoosterTimer > 0 ? 2 : 1
+        );
         return activeMultiplier * (mirrorMatrixModeActive ? 2 : 1);
+      }
+      // Client-side pace guard only deters casual score injection. Because this
+      // code ships to the device, server-side signed run verification is needed
+      // before trusting leaderboard or competitive rewards.
+      function auditRunScore(now = performance.now()) {
+        const candidate = Number(score);
+        const elapsedSeconds = Math.max(0, (now - runStartedAt) / 1000);
+        const deltaSeconds = Math.max(0.001, (now - scoreAuditAt) / 1000);
+        const deltaScore = candidate - scoreAuditValue;
+        const cumulativeLimit = SCORE_START_ALLOWANCE + elapsedSeconds * MAX_SCORE_RATE_PER_SECOND;
+        const stepLimit = MAX_SCORE_EVENT_BURST + deltaSeconds * MAX_SCORE_RATE_PER_SECOND;
+        if (!Number.isFinite(candidate) || candidate < 0 || deltaScore < -0.5 ||
+            candidate > cumulativeLimit || deltaScore > stepLimit) {
+          runScoreIntegrityValid = false;
+        }
+        scoreAuditValue = Number.isFinite(candidate) ? candidate : scoreAuditValue;
+        scoreAuditAt = now;
+        return runScoreIntegrityValid;
       }
       function showEnvironmentBanner(index) {
         const banner = el("environmentBanner");
@@ -9037,7 +10778,7 @@ void main() {
         }, 2200);
       }
       function updatePowerHUD() {
-        const hasShield = shieldCharges > 0;
+        const hasShield = shieldCharges > 0 || activeShieldTimer > 0;
         const hasTimeWarp = timeWarpTimer > 0;
         const hasScoreBooster = scoreBoosterTimer > 0;
         const hasFever = feverTimer > 0;
@@ -9046,11 +10787,15 @@ void main() {
         el("scoreBoostStatus").hidden = !hasScoreBooster;
         el("feverStatus").hidden = !hasFever;
         el("powerStatus").hidden = !hasShield && !hasTimeWarp && !hasScoreBooster && !hasFever;
-        const scoreBoostMultiplier = mirrorMatrixModeActive ? 4 : 2;
-        const feverMultiplier = mirrorMatrixModeActive ? 6 : 3;
+        const scoreBoostMultiplier = getScoreMultiplier();
+        const feverMultiplier = getScoreMultiplier();
         el("scoreBoostMultiplier").textContent = scoreBoostMultiplier + "X";
         el("feverScoreMultiplier").textContent = feverMultiplier + "X SCORE";
-        if (hasShield) el("shieldStatus").textContent = "Prism Shield Active!" + (shieldCharges > 1 ? " ×" + shieldCharges : "");
+        if (hasShield) {
+          el("shieldStatus").textContent = activeShieldTimer > 0
+            ? "Neon Shield · " + Math.max(1, Math.ceil(activeShieldTimer)) + "s"
+            : "Prism Shield Active!" + (shieldCharges > 1 ? " ×" + shieldCharges : "");
+        }
         if (hasTimeWarp) el("timeWarpTime").textContent = Math.max(1, Math.ceil(timeWarpTimer));
         if (hasScoreBooster) el("scoreBoostTime").textContent = Math.max(1, Math.ceil(scoreBoosterTimer));
         if (hasFever) {
@@ -9063,6 +10808,116 @@ void main() {
         el("game").classList.toggle("fever-active", hasFever);
         el("speedBanner").hidden = speedBoostTimer <= 0;
         if (speedBoostTimer > 0) el("speedTime").textContent = Math.max(1, Math.ceil(speedBoostTimer));
+        updateActivePowerToolbar();
+      }
+      function updateActivePowerToolbar() {
+        const effects = { shield: activeShieldTimer, magnet: crystalMagnetTimer, bomb: 0 };
+        const labels = { shield: "Neon Shield", magnet: "Crystal Magnet", bomb: "Laser Cleaver" };
+        document.querySelectorAll("[data-active-power]").forEach(button => {
+          const type = button.dataset.activePower;
+          const cost = ACTIVE_POWER_COSTS[type];
+          const remaining = effects[type] || 0;
+          const costLabel = button.querySelector(".active-power-cost");
+          const timerLabel = button.querySelector("[data-power-remaining]");
+          const active = remaining > 0;
+          button.classList.toggle("active", active);
+          button.classList.toggle("unaffordable", progression.crystals < cost);
+          button.disabled = state !== "running" || active;
+          button.setAttribute("aria-label", active
+            ? labels[type] + " active for " + Math.max(1, Math.ceil(remaining)) + " seconds"
+            : "Buy " + labels[type] + " for " + cost + " crystals");
+          if (costLabel) costLabel.hidden = active;
+          if (timerLabel) {
+            timerLabel.hidden = !active;
+            timerLabel.textContent = active ? Math.max(1, Math.ceil(remaining)) + "s ACTIVE" : "";
+          }
+        });
+      }
+      function showPowerPurchaseNotice(message, warning = false) {
+        const notice = el("powerPurchaseNotice");
+        window.clearTimeout(powerPurchaseNoticeTimer);
+        notice.textContent = message;
+        notice.classList.toggle("warning", warning);
+        notice.hidden = false;
+        notice.classList.remove("visible");
+        requestAnimationFrame(() => notice.classList.add("visible"));
+        powerPurchaseNoticeTimer = window.setTimeout(() => {
+          notice.classList.remove("visible");
+          powerPurchaseNoticeTimer = window.setTimeout(() => { notice.hidden = true; }, 180);
+        }, 1450);
+      }
+      function flashPowerActivation(color = "#63f2dc") {
+        const flash = el("flash");
+        flash.style.background = `radial-gradient(ellipse at 50% 72%, ${color}40, transparent 68%)`;
+        flash.classList.add("on");
+        window.clearTimeout(flashTimer);
+        flashTimer = window.setTimeout(() => {
+          flash.classList.remove("on");
+          flash.style.background = "";
+        }, 190);
+      }
+      function clearIncomingObstaclesAhead() {
+        let cleared = 0;
+        for (let i = gates.length - 1; i >= 0; i--) {
+          const gate = gates[i];
+          if (gate.position.z < -0.55 && !gate.userData.checked) {
+            disposeGate(gate);
+            gates.splice(i, 1);
+            cleared++;
+          }
+        }
+        for (let i = lasers.length - 1; i >= 0; i--) {
+          const laser = lasers[i];
+          if (laser.position.z < -0.55 && !laser.userData.checked) {
+            disposeLaser(laser);
+            lasers.splice(i, 1);
+            cleared++;
+          }
+        }
+        return cleared;
+      }
+      function buyActivePower(type) {
+        if (state !== "running" || !Object.prototype.hasOwnProperty.call(ACTIVE_POWER_COSTS, type)) return false;
+        const cost = ACTIVE_POWER_COSTS[type];
+        const activeTimer = type === "shield" ? activeShieldTimer : type === "magnet" ? crystalMagnetTimer : 0;
+        if (activeTimer > 0) {
+          showPowerPurchaseNotice("Already active · " + Math.ceil(activeTimer) + "s left");
+          return false;
+        }
+        if (progression.crystals < cost) {
+          showPowerPurchaseNotice("Not enough crystals! 💎", true);
+          unlockAudio().then(unlocked => { if (unlocked) playCue("button"); });
+          return false;
+        }
+
+        progression.crystals = safeStoredCount(progression.crystals - cost);
+        saveProgression();
+        updateCoinDisplay();
+        updateHUD();
+        unlockAudio().then(unlocked => { if (unlocked) playCue("power"); });
+
+        if (type === "shield") {
+          activeShieldTimer = 5;
+          shieldPursuitRepelled = false;
+          showRunStatus("NEON SHIELD · INVINCIBLE FOR 5s", 1100);
+          flashPowerActivation("#70fff0");
+          createImpactBurst(0x70fff0, 0.58, 12);
+          showPowerPurchaseNotice("NEON SHIELD · 5 SECONDS");
+        } else if (type === "magnet") {
+          crystalMagnetTimer = 6;
+          showRunStatus("CRYSTAL MAGNET · 6 SECONDS", 1100);
+          flashPowerActivation("#80aaff");
+          createImpactBurst(0x80aaff, 0.58, 12);
+          showPowerPurchaseNotice("CRYSTAL MAGNET · 6 SECONDS");
+        } else {
+          const cleared = clearIncomingObstaclesAhead();
+          showRunStatus("LASER CLEAVER · " + cleared + " HAZARD" + (cleared === 1 ? "" : "S") + " CLEARED", 1250);
+          flashPowerActivation("#ff55ba");
+          createImpactBurst(0xff55ba, 0.72, 16);
+          showPowerPurchaseNotice("LASER CLEAVER · PATH CLEARED");
+        }
+        updatePowerHUD();
+        return true;
       }
       function showRunStatus(message, delay = 0) {
         window.clearTimeout(statusTimer);
@@ -9188,24 +11043,39 @@ void main() {
           resumeGame();
           return;
         }
-        if (state === "running" || !el("dailyModal").hidden || !el("settings-screen").hidden) return;
+        if (state === "running" || pendingRewardedAd ||
+            !el("dailyModal").hidden || !el("settings-screen").hidden) return;
         if (!restartPaused && dailySpinReady()) {
           maybeShowDailyReward();
           return;
         }
         closeSettings(false);
         closeShop();
+        clearFlexCardPreview();
+        dismissShareRewardToast();
+        el("adRewardStatus").textContent = "";
+        el("rewardedAdButton").textContent = "▶ WATCH A VIDEO · EARN +200 CRYSTALS";
+        el("rewardedAdButton").disabled = false;
+        el("integrityNotice").hidden = !localStorageIntegrityWarning;
+        if (localStorageIntegrityWarning && !el("integrityNotice").textContent) {
+          el("integrityNotice").textContent = "A local save integrity check needs attention.";
+        }
+        setBannerAdPlacement("hidden");
         unlockAudio();
         best = loadModeHighScore(selectedMode);
         updateModeHighScoreDisplay();
         window.clearTimeout(statusTimer);
         window.clearTimeout(flashTimer);
+        window.clearTimeout(powerPurchaseNoticeTimer);
+        powerPurchaseNoticeTimer = 0;
         window.clearTimeout(environmentNoticeTimer);
         environmentNoticeToken++;
         el("environmentBanner").classList.remove("visible");
         el("environmentBanner").hidden = true;
         el("flash").classList.remove("on");
         el("flash").style.background = "";
+        el("powerPurchaseNotice").classList.remove("visible", "warning");
+        el("powerPurchaseNotice").hidden = true;
         window.clearTimeout(impactShakeTimer);
         el("game").classList.remove("impact-shake");
         clearImpactBursts();
@@ -9222,6 +11092,11 @@ void main() {
         el("game").classList.remove("is-paused");
         el("pauseButton").hidden = false;
         distance = 0; passed = 0; score = 0; combo = 0; maxCombo = 0;
+        runStartedAt = performance.now();
+        scoreAuditAt = runStartedAt;
+        scoreAuditValue = 0;
+        runScoreIntegrityValid = true;
+        rewardedAdGrantedThisRun = false;
         timeRemaining = TIME_ATTACK_START_SECONDS;
         resetEnvironmentMilestones();
         feverTimer = 0;
@@ -9239,7 +11114,13 @@ void main() {
         autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
         lastPlayerInputAt = -Infinity;
         setEnvironment(0, { announce: false, instant: true });
-        shieldCharges = 0; timeWarpTimer = 0; scoreBoosterTimer = 0; speedBoostTimer = 0;
+        shieldCharges = 0;
+        activeShieldTimer = 0;
+        crystalMagnetTimer = 0;
+        shieldPursuitRepelled = false;
+        timeWarpTimer = 0;
+        scoreBoosterTimer = 0;
+        speedBoostTimer = 0;
         const dailyPowerName = consumeStoredPowerUp();
         if (dailyPowerName) renderProgressionUI();
         powerUpSpawnTimer = 7;
@@ -9253,6 +11134,7 @@ void main() {
         resetLaserPursuitWall();
         if (laserPursuitModeActive) laserPursuitWall = makeLaserPursuitWall();
         currentLane = 1;
+        laneVelocityX = 0;
         setOrbColor(mirrorMatrixModeActive ? COLORS.length - 1 : 1);
         player.userData.targetX = LANE_X[currentLane];
         updateLaneIndicator();
@@ -9337,25 +11219,41 @@ void main() {
         saveProgression();
         checkRunAchievements();
         playCue("gate");
-        createImpactBurst(COLORS[currentColor].hex, 0.7, 12);
         combo++;
         maxCombo = Math.max(maxCombo, combo);
         if (combo === 10) {
           feverTimer = 5;
           playCue("power");
-          showRunStatus("FEVER MODE · 3X SCORE", 1800);
         }
-        const gatePoints = combo * 100;
-        score += gatePoints * getScoreMultiplier();
+        const streakMultiplier = getComboScoreMultiplier(combo);
+        const gatePoints = 100 + Math.min(combo - 1, 9) * 30;
+        const earnedPoints = Math.floor(gatePoints * getScoreMultiplier());
+        score += earnedPoints;
+        createImpactBurst(
+          COLORS[currentColor].hex,
+          Math.min(1.55, 0.74 + combo * 0.055),
+          Math.min(30, 14 + combo)
+        );
+        flashSuccessfulGate(COLORS[currentColor].hex, combo);
         const timeBonus = addTimeAttackBonus(TIME_ATTACK_GATE_BONUS_SECONDS);
         advanceEnvironmentIfNeeded();
         updatePowerHUD();
         if (passed % 5 === 0) {
           speedBoostTimer = 5;
           updatePowerHUD();
-          showRunStatus("SPEED UP!" + (timeBonus ? " · +" + timeBonus + "s" : ""), 1400);
+          showRunStatus(
+            (combo === 10 ? "FEVER · " : "") + "SPEED UP! · " +
+            streakMultiplier + "X · +" + earnedPoints +
+            (timeBonus ? " · +" + timeBonus + "s" : ""),
+            1350
+          );
         } else {
-          showRunStatus(message + " · ×" + combo + (timeBonus ? " · +" + timeBonus + "s" : ""), 460);
+          showRunStatus(
+            (combo === 10 ? "FEVER MODE · " : message.toUpperCase() + " · ") +
+            "×" + combo + " · " + streakMultiplier + "X · +" + earnedPoints +
+            (timeBonus ? " · +" + timeBonus + "s" : ""),
+            combo >= 3 ? 1050 : 620
+          );
         }
         updateHUD();
         popScore();
@@ -9364,8 +11262,8 @@ void main() {
         combo = 0;
         updateHUD();
         triggerImpactEffects(color, 0.9);
-        if (shieldCharges > 0) {
-          shieldCharges--;
+        if (activeShieldTimer > 0 || shieldCharges > 0) {
+          if (activeShieldTimer <= 0) shieldCharges--;
           el("flash").style.background = "rgba(56,230,211,.18)";
           el("flash").classList.add("on");
           window.clearTimeout(flashTimer);
@@ -9374,7 +11272,7 @@ void main() {
             el("flash").style.background = "";
           }, 150);
           updatePowerHUD();
-          showRunStatus(message + " · shield blocked it", 850);
+          showRunStatus(message + (activeShieldTimer > 0 ? " · Neon Shield blocked it" : " · shield blocked it"), 850);
           return false;
         }
         endGame();
@@ -9422,7 +11320,7 @@ void main() {
           player.currentColorIndex === gate.userData.segmentColors[hitSegment] &&
           selectedOrbColor.getHex() === passingSegmentHex;
         if (!colorMatchesExactly) {
-          triggerGameOver("color mismatch");
+          handleObstacleImpact("Color mismatch", COLORS[currentColor].hex);
           return;
         }
         if (antiGravityModeActive && !isPlayerOnGravitySide(gate.userData.gravitySide)) {
@@ -9490,6 +11388,8 @@ void main() {
       function returnToHome() {
         closeSettings(false);
         closeShop();
+        clearFlexCardPreview();
+        dismissShareRewardToast();
         resultTickerToken++;
         achievementNoticeToken++;
         if (resultTickerFrame) cancelAnimationFrame(resultTickerFrame);
@@ -9499,22 +11399,30 @@ void main() {
         environmentNoticeToken++;
         window.clearTimeout(impactShakeTimer);
         window.clearTimeout(flashTimer);
+        window.clearTimeout(powerPurchaseNoticeTimer);
         window.clearTimeout(dailySpinTimer);
         window.clearTimeout(achievementNoticeTimer);
         statusTimer = 0;
         environmentNoticeTimer = 0;
         impactShakeTimer = 0;
         flashTimer = 0;
+        powerPurchaseNoticeTimer = 0;
         dailySpinTimer = 0;
         achievementNoticeTimer = 0;
         achievementQueue = [];
         el("achievementBanner").classList.remove("visible");
         el("achievementBanner").hidden = true;
+        el("extraSpinPrompt").hidden = true;
         el("dailyModal").hidden = true;
+        luckySpinReturnFocus = null;
         state = "ready";
         distance = 0;
         passed = 0;
         score = 0;
+        runStartedAt = 0;
+        scoreAuditAt = 0;
+        scoreAuditValue = 0;
+        runScoreIntegrityValid = true;
         combo = 0;
         maxCombo = 0;
         runCoins = 0;
@@ -9526,6 +11434,9 @@ void main() {
         feverTimer = 0;
         graceTimer = 0;
         shieldCharges = 0;
+        activeShieldTimer = 0;
+        crystalMagnetTimer = 0;
+        shieldPursuitRepelled = false;
         timeWarpTimer = 0;
         scoreBoosterTimer = 0;
         speedBoostTimer = 0;
@@ -9541,6 +11452,7 @@ void main() {
         ghostReplayCursor = 0;
         ghostBall.visible = false;
         currentLane = 1;
+        laneVelocityX = 0;
         lastPlayerInputAt = -Infinity;
         cameraShakeTimer = 0;
         cameraShakeIntensity = 0;
@@ -9568,6 +11480,8 @@ void main() {
         el("environmentBanner").hidden = true;
         el("flash").classList.remove("on");
         el("flash").style.background = "";
+        el("powerPurchaseNotice").classList.remove("visible", "warning");
+        el("powerPurchaseNotice").hidden = true;
         el("feverWash").classList.remove("active");
         el("pursuitWarning").hidden = true;
         el("pursuitVignette").classList.remove("active");
@@ -9585,6 +11499,7 @@ void main() {
         updateAutoColorIndicator();
         updateHUD();
         saveProgression();
+        setBannerAdPlacement("menu");
         el("startButton").focus({ preventScroll: true });
       }
       function triggerGameOver(reason = "collision") {
@@ -9592,8 +11507,9 @@ void main() {
       }
       function endGame(reason = "collision") {
         if (state !== "running") return;
+        const scoreVerified = auditRunScore(performance.now());
         captureGhostSample(true);
-        if (Math.floor(score) > ghostBestAtRunStart) ghostRecordCandidate = true;
+        if (scoreVerified && Math.floor(score) > ghostBestAtRunStart) ghostRecordCandidate = true;
         progression.stats.bestDistance = Math.max(progression.stats.bestDistance, safeStoredCount(distance));
         syncAchievementTierUnlocks(true);
         saveProgression();
@@ -9616,17 +11532,20 @@ void main() {
         updateGravityIndicator();
         updateAutoColorIndicator();
         feverTimer = 0;
+        activeShieldTimer = 0;
+        crystalMagnetTimer = 0;
+        shieldPursuitRepelled = false;
         triggerImpactEffects(COLORS[currentColor].hex, 1.4);
         playCue("gameOver");
         el("flash").classList.add("on");
         window.clearTimeout(flashTimer);
         flashTimer = window.setTimeout(() => el("flash").classList.remove("on"), 120);
         updateHUD();
-        const final = Math.floor(score);
+        const final = Number.isFinite(score) ? Math.max(0, Math.floor(score)) : 0;
         best = loadModeHighScore(selectedMode);
         updateModeHighScoreDisplay();
         const previousBest = best;
-        const isBest = final > best;
+        const isBest = scoreVerified && final > best;
         let crateReward = 0;
         if (isBest) {
           if (ghostRecordCandidate) persistGhostRunData(runGhostSamples);
@@ -9660,6 +11579,7 @@ void main() {
         el("startHint").hidden = true;
         el("modeSelector").hidden = true;
         el("results").hidden = false;
+        updateShareRewardButton();
         el("finalScore").textContent = "0";
         el("finalBest").textContent = best.toLocaleString("en-US");
         el("finalGates").textContent = passed.toLocaleString("en-US");
@@ -9679,12 +11599,25 @@ void main() {
             : (selectedMode === "timeAttack" ? "Time Attack" : "Endless") + " · Run summary";
         el("bestMessage").textContent = isBest
           ? "PREVIOUS BEST · " + previousBest.toLocaleString("en-US")
-          : "PERSONAL BEST · " + best.toLocaleString("en-US");
+          : scoreVerified
+            ? "PERSONAL BEST · " + best.toLocaleString("en-US")
+            : "UNVERIFIED SCORE · RECORD NOT SAVED";
+        if (!scoreVerified) {
+          localStorageIntegrityWarning = true;
+          el("integrityNotice").textContent = "This run exceeded the local score pace limit. Its score was not saved as a record.";
+          el("integrityNotice").hidden = false;
+        }
         el("newRecordBadge").hidden = !isBest;
         el("mysteryReward").hidden = !isBest;
         if (isBest) el("crateReward").textContent = "+" + crateReward + " crystals";
         el("homeButton").hidden = false;
         el("restartButton").hidden = true;
+        window.clearTimeout(powerPurchaseNoticeTimer);
+        powerPurchaseNoticeTimer = 0;
+        el("powerPurchaseNotice").classList.remove("visible", "warning");
+        el("powerPurchaseNotice").hidden = true;
+        activeShieldTimer = 0;
+        crystalMagnetTimer = 0;
         timeWarpTimer = 0;
         scoreBoosterTimer = 0;
         speedBoostTimer = 0;
@@ -9701,7 +11634,9 @@ void main() {
         el("card").classList.add("game-over-open");
         el("overlay").classList.add("home-screen", "game-over-screen");
         el("overlay").classList.remove("hidden");
+        setBannerAdPlacement("gameover");
         animateResultScoreTicker(final);
+        prepareFlexCardForGameOver();
       }
 
       const fallbackGateOrder = [];
@@ -10152,12 +12087,26 @@ void main() {
         const beaconDirection = antiGravityModeActive && gravitySide === "ceiling" ? -1 : 1;
         colorBeacon.position.y = beaconDirection * (0.9 + Math.sin(t * 3.2) * 0.045);
         colorBeacon.rotation.y += dt * 1.5;
-        const laneResponse = (environmentIndex >= 8 ? 3.8 : environmentIndex >= 4 ? 5.2 : 18) * getLaneResponseScale();
-        player.position.x = THREE.MathUtils.lerp(
+        const laneTargetX = LANE_X[currentLane];
+        const laneResponse = 17 * getLaneResponseScale();
+        const springTargetX = THREE.MathUtils.lerp(
           player.position.x,
-          LANE_X[currentLane],
+          laneTargetX,
           1 - Math.exp(-laneResponse * dt)
         );
+        const desiredLaneVelocity = (springTargetX - player.position.x) / Math.max(dt, 0.001);
+        laneVelocityX = THREE.MathUtils.lerp(
+          laneVelocityX,
+          desiredLaneVelocity,
+          1 - Math.exp(-dt * 24)
+        );
+        const nextLaneX = player.position.x + laneVelocityX * dt;
+        if ((laneTargetX - player.position.x) * (laneTargetX - nextLaneX) <= 0) {
+          player.position.x = laneTargetX;
+          laneVelocityX = 0;
+        } else {
+          player.position.x = nextLaneX;
+        }
         if (state === "ready") {
           player.position.y = RUNNER_Y + Math.sin(t * 1.45) * 0.16;
         } else if (state === "running" && antiGravityModeActive) {
@@ -10183,12 +12132,13 @@ void main() {
           camera.position.lerp(menuCameraPosition, cameraEase);
           cameraLookTarget.lerp(menuCameraTarget, cameraEase);
         } else {
+          const lateralLean = THREE.MathUtils.clamp(laneVelocityX * 0.035, -0.34, 0.34);
           cameraFollowPosition.set(
-            player.position.x,
+            player.position.x + lateralLean,
             CAMERA_BASE_Y + (antiGravityModeActive ? (player.position.y - RUNNER_Y) * 0.32 : 0),
             CAMERA_BASE_Z
           );
-          cameraFollowTarget.set(player.position.x, player.position.y, -18);
+          cameraFollowTarget.set(player.position.x + lateralLean * 0.28, player.position.y, -18);
           if (cameraBlendProgress < 1 && state === "running") {
             cameraBlendProgress = Math.min(1, cameraBlendProgress + dt / CAMERA_BLEND_SECONDS);
             const easedBlend = cameraBlendProgress * cameraBlendProgress * (3 - 2 * cameraBlendProgress);
@@ -10201,6 +12151,11 @@ void main() {
           }
         }
         camera.lookAt(cameraLookTarget);
+        const desiredCameraRoll = state === "running"
+          ? THREE.MathUtils.clamp(-laneVelocityX * 0.012, -0.1, 0.1)
+          : 0;
+        cameraLeanRoll = THREE.MathUtils.damp(cameraLeanRoll, desiredCameraRoll, 8, dt);
+        camera.rotateZ(cameraLeanRoll);
         if (cameraShakeTimer > 0) {
           const shakeFade = cameraShakeTimer / 0.38;
           camera.position.x += (Math.random() - 0.5) * cameraShakeIntensity * shakeFade;
@@ -10219,10 +12174,13 @@ void main() {
         orbLight.intensity = blackoutModeActive ? 0 : (state === "ready" ? 14 + menuPulse * 8 : 16) * getGlowScale();
         orb.rotation.y += dt * (state === "running" ? 1.2 : 0.44);
         orb.rotation.x += dt * (state === "running" ? 0.7 : 0.24);
-        shieldBubble.visible = shieldCharges > 0 || graceTimer > 0;
+        shieldBubble.visible = shieldCharges > 0 || activeShieldTimer > 0 || graceTimer > 0;
         if (graceTimer > 0) shieldBubble.material.color.setHex(0x68f2df);
+        else if (activeShieldTimer > 0) shieldBubble.material.color.setHex(0x70fff0);
         else shieldBubble.material.color.setHSL((t * 0.18) % 1, 0.9, 0.62);
-        shieldBubble.material.opacity = shieldCharges > 0
+        shieldBubble.material.opacity = activeShieldTimer > 0
+          ? 0.24 + (0.12 * (0.5 + Math.sin(t * 10) * 0.5))
+          : shieldCharges > 0
           ? 0.16 + (0.1 * (0.5 + Math.sin(t * 7) * 0.5))
           : 0.1 + (0.07 * (0.5 + Math.sin(t * 7) * 0.5));
         const boostPulse = speedBoostTimer > 0 ? 0.5 + Math.sin(t * 17) * 0.5 : 0;
@@ -10247,16 +12205,25 @@ void main() {
           const runScoreMultiplier = getScoreMultiplier();
           const obstacleTimeScale = timeWarpTimer > 0 ? 0.5 : 1;
           graceTimer = Math.max(0, graceTimer - dt);
+          if (activeShieldTimer > 0) {
+            activeShieldTimer = Math.max(0, activeShieldTimer - dt);
+            if (activeShieldTimer === 0) shieldPursuitRepelled = false;
+          }
+          crystalMagnetTimer = Math.max(0, crystalMagnetTimer - dt);
           timeWarpTimer = Math.max(0, timeWarpTimer - dt);
           scoreBoosterTimer = Math.max(0, scoreBoosterTimer - dt);
           feverTimer = Math.max(0, feverTimer - dt);
           speedBoostTimer = Math.max(0, speedBoostTimer - dt);
           obstacleElapsed += dt * obstacleTimeScale;
-          const runSpeed = BASE_FORWARD_SPEED + Math.min(4.5, elapsed * 0.045);
-          const lateZoneMultiplier = environmentIndex >= 8
-            ? Math.min(1.6, 1 + (environmentIndex - 7) * 0.12)
-            : 1;
-          speed = Math.min(22, runSpeed * lateZoneMultiplier) * (speedBoostTimer > 0 ? 1.25 : 1);
+          const timeRamp = 1 - Math.exp(-elapsed / 140);
+          const distanceRamp = 1 - Math.exp(-distance / 2200);
+          const scoreRamp = 1 - Math.exp(-Math.max(0, score) / 5000);
+          const runSpeed = BASE_FORWARD_SPEED * (1 + 0.22 * timeRamp + 0.15 * distanceRamp + 0.14 * scoreRamp);
+          const normalSpeed = Math.min(BASE_FORWARD_SPEED * 1.55, runSpeed);
+          speed = Math.min(
+            BASE_FORWARD_SPEED * 1.85,
+            normalSpeed * (speedBoostTimer > 0 ? 1.25 : 1)
+          );
           const obstacleDt = dt * obstacleTimeScale;
           const obstacleSpeed = speed * obstacleTimeScale;
           const distanceDelta = speed * dt * 0.72;
@@ -10301,13 +12268,24 @@ void main() {
             const coin = crystalCoins[i];
             if (coin.userData.collected) continue;
             const previousZ = coin.position.z;
-            coin.position.z += speed * dt;
+            const pickupPlane = -(PLAYER_RADIUS + 0.34);
+            let magnetSpeedScale = 1;
+            const distanceToPlayer = pickupPlane - previousZ;
+            const magnetizing = crystalMagnetTimer > 0 && previousZ < pickupPlane && distanceToPlayer <= 18;
+            if (!magnetizing) {
+              coin.position.y = coin.userData.baseY + Math.sin(t * 3 + coin.userData.phase) * 0.13;
+            }
+            if (magnetizing) {
+              const pull = Math.min(1, dt * (4 + (18 - distanceToPlayer) * 0.9));
+              coin.position.x += (player.position.x - coin.position.x) * pull;
+              coin.position.y += (player.position.y - coin.position.y) * pull;
+              magnetSpeedScale = 1 + Math.min(0.25, (18 - distanceToPlayer) * 0.014);
+            }
+            coin.position.z += speed * magnetSpeedScale * dt;
             if (blackoutModeActive) coin.visible = coin.position.z >= BLACKOUT_GATE_REVEAL_Z;
-            coin.position.y = 0.12 + Math.sin(t * 3 + coin.userData.phase) * 0.13;
             coin.rotation.y += dt * 2.4;
             coin.rotation.x += dt * 0.75;
             coin.userData.crystal.scale.setScalar(1 + Math.sin(t * 6 + coin.userData.phase) * 0.09);
-            const pickupPlane = -(PLAYER_RADIUS + 0.34);
             if (previousZ < pickupPlane && coin.position.z >= pickupPlane &&
                 Math.abs(player.position.x - coin.position.x) <= PLAYER_RADIUS + 0.34 &&
                 (!antiGravityModeActive || Math.abs(player.position.y - coin.position.y) <= 1.45)) {
@@ -10367,6 +12345,7 @@ void main() {
             }
             if (state === "running") updateLaserPursuit(dt, distanceDelta, t);
             updateHUD();
+            auditRunScore(performance.now());
           }
         } else {
           if (antiGravityModeActive) {
@@ -10382,23 +12361,36 @@ void main() {
           }
         }
         updateImpactBursts(dt);
-        if (renderer) renderer.render(gameScene, camera);
-        else drawFallback(t);
+        if (renderer) {
+          try {
+            renderer.render(gameScene, camera);
+          } catch {
+            activateFallbackRenderer();
+            drawFallback(t);
+          }
+        } else {
+          drawFallback(t);
+        }
         if (!splashCompletionStarted) completeSplash();
       }
       requestAnimationFrame(animate);
 
       function resize() {
-        const fallbackSize = getSceneSize();
-        const width = Math.max(1, Math.round(window.innerWidth || fallbackSize.width));
-        const height = Math.max(1, Math.round(window.innerHeight || fallbackSize.height));
-        if (renderer) {
-          camera.aspect = width / height;
-          camera.fov = isMobileViewport() ? 68 : 62;
-          camera.updateProjectionMatrix();
-          renderer.setPixelRatio(getPixelRatio());
-          renderer.setSize(width, height, false);
-        } else {
+        try {
+          const fallbackSize = getSceneSize();
+          const width = Math.max(1, Math.round(window.innerWidth || fallbackSize.width));
+          const height = Math.max(1, Math.round(window.innerHeight || fallbackSize.height));
+          if (renderer) {
+            camera.aspect = width / height;
+            camera.fov = isMobileViewport() ? 68 : 62;
+            camera.updateProjectionMatrix();
+            renderer.setPixelRatio(getPixelRatio());
+            renderer.setSize(width, height, false);
+          } else {
+            resizeFallback();
+          }
+        } catch {
+          activateFallbackRenderer();
           resizeFallback();
         }
       }
@@ -10410,6 +12402,12 @@ void main() {
         const sceneResizeObserver = new ResizeObserver(resize);
         sceneResizeObserver.observe(sceneRoot);
       }
+      initializeNativeAds();
+      setBannerAdPlacement("menu");
+      window.addEventListener("online", () => setBannerAdPlacement(activeBannerPlacement), { passive: true });
+      window.addEventListener("offline", () => {
+        if (el("bannerAdStatus")) el("bannerAdStatus").textContent = "Offline · ads unavailable; game remains playable";
+      }, { passive: true });
       el("startButton").addEventListener("click", startGame);
       el("endlessModeButton").addEventListener("click", () => setGameMode("endless"));
       el("timeAttackModeButton").addEventListener("click", () => setGameMode("timeAttack"));
@@ -10419,7 +12417,18 @@ void main() {
       el("laserPursuitModeButton").addEventListener("click", () => setGameMode("laserPursuit"));
       el("dailySpinButton").addEventListener("click", spinDailyReward);
       el("dailyContinueButton").addEventListener("click", closeDailyReward);
-      el("shopButton").addEventListener("click", openShop);
+      el("luckySpinHomeButton").addEventListener("click", openLuckySpin);
+      el("luckySpinGameOverButton").addEventListener("click", openLuckySpin);
+      el("shareForSpinButton").addEventListener("click", shareForExtraSpin);
+      el("cancelExtraSpinButton").addEventListener("click", () => {
+        if (spinSharePending) return;
+        el("extraSpinPrompt").hidden = true;
+        el("dailySpinButton").focus({ preventScroll: true });
+      });
+       el("shopButton").addEventListener("click", () => openShop());
+       el("inviteButton").addEventListener("click", () => openShop("referral"));
+       el("copyReferralButton").addEventListener("click", copyReferralInviteLink);
+       el("whatsappReferralButton").addEventListener("click", shareReferralViaWhatsApp);
        el("shopBack").addEventListener("click", returnToHome);
        document.querySelectorAll("[data-reward-tab]").forEach(button => {
          button.addEventListener("click", () => setRewardsTab(button.dataset.rewardTab));
@@ -10459,11 +12468,18 @@ void main() {
       el("pauseButton").addEventListener("click", pauseGame);
       el("restartButton").addEventListener("click", () => startGame(true));
         el("homeButton").addEventListener("click", returnToHome);
+       el("shareUnlockButton").addEventListener("click", shareRunReward);
+        el("rewardedAdButton").addEventListener("click", showRewardedCrystalAd);
+       el("flexCardShareButton").addEventListener("click", generateAndShareFlexCard);
+       el("downloadFlexCardButton").addEventListener("click", downloadFlexCardPng);
         el("dailyMainMenuButton").addEventListener("click", returnToHome);
        el("pauseResumeButton").addEventListener("click", resumeGame);
        el("pauseRestartButton").addEventListener("click", () => startGame(true));
        el("pauseSettingsButton").addEventListener("click", openSettings);
        el("pauseHomeButton").addEventListener("click", returnToHome);
+       el("activeShieldButton").addEventListener("click", () => buyActivePower("shield"));
+       el("activeMagnetButton").addEventListener("click", () => buyActivePower("magnet"));
+       el("activeBombButton").addEventListener("click", () => buyActivePower("bomb"));
       el("resetLocalData").addEventListener("click", resetLocalProgress);
       const toggleSound = () => {
         soundEnabled = !soundEnabled;
@@ -10523,6 +12539,21 @@ void main() {
       });
       window.addEventListener("keydown", event => {
         if (event.repeat && ["ArrowLeft", "ArrowRight", "ArrowUp", "KeyA", "KeyD", "KeyW", "Space", "Escape", "KeyP"].includes(event.code)) return;
+        if (!el("dailyModal").hidden && event.key === "Tab") {
+          const focusScope = !el("extraSpinPrompt").hidden ? el("extraSpinPrompt") : el("dailyModal");
+          const focusable = Array.from(focusScope.querySelectorAll('button:not([disabled]):not([hidden])'));
+          if (!focusable.length) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && (document.activeElement === first || !focusScope.contains(document.activeElement))) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && (document.activeElement === last || !focusScope.contains(document.activeElement))) {
+            event.preventDefault();
+            first.focus();
+          }
+          return;
+        }
         if (!el("settings-screen").hidden && event.key === "Tab") {
           const focusable = Array.from(el("settings-screen").querySelectorAll('button:not([disabled]), input:not([disabled])'));
           const first = focusable[0];
@@ -10555,8 +12586,18 @@ void main() {
           else returnToHome();
           return;
         }
-        if (event.code === "Escape" &&
-            (!el("dailyModal").hidden || !el("rewards-screen").hidden)) {
+        if (event.code === "Escape" && !el("dailyModal").hidden) {
+          event.preventDefault();
+          if (spinInProgress || spinSharePending) return;
+          if (!el("extraSpinPrompt").hidden) {
+            el("extraSpinPrompt").hidden = true;
+            el("dailySpinButton").focus({ preventScroll: true });
+          } else {
+            closeDailyReward();
+          }
+          return;
+        }
+        if (event.code === "Escape" && !el("rewards-screen").hidden) {
           event.preventDefault();
           returnToHome();
           return;

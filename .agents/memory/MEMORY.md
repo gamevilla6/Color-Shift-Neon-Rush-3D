@@ -2,3 +2,4 @@
 - [Achievement notice lifecycle](achievement-notice-races.md) — invalidate queued timers and animation frames when transitions clear achievement banners.
 - [Overlay hit testing](overlay-hit-testing.md) — hit-test menus above the canvas; separate long-panel scrolling from persistent navigation.
 - [Startup splash progress](startup-splash-progress.md) — tie loading progress to actual procedural setup and keep the splash until the first rendered frame.
+- [Share reward verification](share-reward-verification.md) — native shares can be confirmed by API resolution; social-app intent launches cannot confirm a completed send.
