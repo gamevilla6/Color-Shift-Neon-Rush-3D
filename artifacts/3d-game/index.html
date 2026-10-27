@@ -8463,7 +8463,7 @@ void main() {
       const CYBER_DUEL_WIN_CRYSTALS = 100;
       const CYBER_DUEL_BADGE_KEY = "neonCyberDuelChampionBadge";
       const CYBER_DUEL_PALETTE = [0x48f3ff, 0xff4fc8, 0xffdf58];
-      const CYBER_DUEL_POWERUPS = ["phase", "emp", "hyper", "vortex"];
+      const CYBER_DUEL_POWERUPS = ["phase", "emp", "hyper", "vortex", "shield"];
       const CYBER_DUEL_ROOM_API = "/api/cyber-duel/rooms";
       const CYBER_DUEL_ROOM_STORAGE_PREFIX = "neonCyberDuelRoomToken:";
       const CYBER_DUEL_ROOM_POLL_MS = 220;
@@ -9039,7 +9039,7 @@ void main() {
       ghostHalo.rotation.x = Math.PI / 2;
       ghostBall.add(ghostHalo);
       gameScene.add(ghostBall);
-      const orbMat = new THREE.MeshStandardMaterial({ color: COLORS[1].hex, emissive: COLORS[1].hex, emissiveIntensity: 3.8 * getGlowScale(), metalness: 0.1, roughness: 0.2 });
+      const orbMat = new THREE.MeshStandardMaterial({ color: COLORS[1].hex, emissive: COLORS[1].hex, emissiveIntensity: 3.8 * getGlowScale(), metalness: 0.1, roughness: 0.2, transparent: true, opacity: 1 });
       const orb = new THREE.Mesh(new THREE.SphereGeometry(PLAYER_RADIUS, 20, 16), orbMat);
       player.add(orb);
       const orbHalo = new THREE.Mesh(
@@ -9830,7 +9830,7 @@ void main() {
         const warning = el("pursuitWarning");
         const distanceIntoWarning = Math.max(0, PURSUIT_WARNING_GAP - pursuitGap);
         const active = laserPursuitModeActive && state === "running" &&
-          activeShieldTimer <= 0 && distanceIntoWarning > 0;
+          !activeRunPowerFlags.hasShield && distanceIntoWarning > 0;
         pursuitDangerActive = active;
         el("game").classList.toggle("laser-danger", active);
         vignette.classList.toggle("active", active);
@@ -9868,15 +9868,18 @@ void main() {
         laserPursuitWall.userData.emitter.intensity = 12 + closing * 26;
         updatePursuitWarning();
         if (pursuitGap <= 0) {
-          if (activeShieldTimer > 0) {
-            pursuitGap = 4.2;
-            laserPursuitWall.position.z = pursuitGap;
-            if (!shieldPursuitRepelled) {
+          if (activeRunPowerFlags.hasShield) {
+            if (activeShieldTimer <= 0 && shieldCharges > 0) {
+              absorbFatalObstacleImpact("Pursuit wall");
               shieldPursuitRepelled = true;
-              showRunStatus("NEON SHIELD REPELLED THE PURSUIT WALL", 1000);
+            } else if (!shieldPursuitRepelled) {
+              shieldPursuitRepelled = true;
+              showRunStatus("CYBER SHIELD · PURSUIT WALL REPELLED", 1000);
               createImpactBurst(0x70fff0, 0.8, 16);
               playCue("power");
             }
+            pursuitGap = 4.2;
+            laserPursuitWall.position.z = pursuitGap;
             updatePursuitWarning();
           } else {
             laserPursuitWall.position.z = 0;
@@ -9957,6 +9960,67 @@ void main() {
       let scoreBoosterTimer = 0;
       let obstacleElapsed = 0;
       let speedBoostTimer = 0;
+      let speedBoostScale = 1;
+      const activeRunPowerFlags = {
+        isQuantum: false,
+        isBoosted: false,
+        hasShield: false,
+        isMagnetActive: false,
+        isInvulnerable: false
+      };
+      function syncActiveRunPowerFlags() {
+        activeRunPowerFlags.isQuantum = quantumPhaseTimer > 0;
+        activeRunPowerFlags.isBoosted = speedBoostTimer > 0;
+        activeRunPowerFlags.hasShield = shieldCharges > 0 || activeShieldTimer > 0;
+        activeRunPowerFlags.isMagnetActive = crystalMagnetTimer > 0;
+        activeRunPowerFlags.isInvulnerable = activeShieldTimer > 0;
+      }
+      function activateRunPowerTimer(type, seconds) {
+        const duration = Math.max(0, Number(seconds) || 0);
+        if (type === "quantum") quantumPhaseTimer = Math.max(quantumPhaseTimer, duration);
+        else if (type === "magnet") crystalMagnetTimer = Math.max(crystalMagnetTimer, duration);
+        else if (type === "shield-invulnerability") activeShieldTimer = Math.max(activeShieldTimer, duration);
+        else if (type === "time-warp") timeWarpTimer = Math.max(timeWarpTimer, duration);
+        else if (type === "score-boost") scoreBoosterTimer = Math.max(scoreBoosterTimer, duration);
+        else if (type === "speed-boost") speedBoostTimer = Math.max(speedBoostTimer, duration);
+        syncActiveRunPowerFlags();
+      }
+      function updateActiveRunPowerTimers(dt) {
+        const hadShieldInvulnerability = activeShieldTimer > 0;
+        activeShieldTimer = Math.max(0, activeShieldTimer - dt);
+        crystalMagnetTimer = Math.max(0, crystalMagnetTimer - dt);
+        quantumPhaseTimer = Math.max(0, quantumPhaseTimer - dt);
+        timeWarpTimer = Math.max(0, timeWarpTimer - dt);
+        scoreBoosterTimer = Math.max(0, scoreBoosterTimer - dt);
+        speedBoostTimer = Math.max(0, speedBoostTimer - dt);
+        if (hadShieldInvulnerability && activeShieldTimer === 0) shieldPursuitRepelled = false;
+        syncActiveRunPowerFlags();
+        speedBoostScale = THREE.MathUtils.damp(
+          speedBoostScale,
+          activeRunPowerFlags.isBoosted ? 1.25 : 1,
+          9,
+          dt
+        );
+        orbMat.opacity = THREE.MathUtils.damp(
+          orbMat.opacity,
+          activeRunPowerFlags.isQuantum ? 0.4 : 1,
+          12,
+          dt
+        );
+      }
+      function resetActiveRunPowerState() {
+        shieldCharges = 0;
+        activeShieldTimer = 0;
+        crystalMagnetTimer = 0;
+        quantumPhaseTimer = 0;
+        timeWarpTimer = 0;
+        scoreBoosterTimer = 0;
+        speedBoostTimer = 0;
+        speedBoostScale = 1;
+        shieldPursuitRepelled = false;
+        syncActiveRunPowerFlags();
+        orbMat.opacity = 1;
+      }
       let graceTimer = 0;
       let statusTimer = 0;
       let flashTimer = 0;
@@ -13758,7 +13822,8 @@ void main() {
         }, 2200);
       }
       function updatePowerHUD() {
-        const hasShield = shieldCharges > 0 || activeShieldTimer > 0;
+        syncActiveRunPowerFlags();
+        const hasShield = activeRunPowerFlags.hasShield;
         const hasTimeWarp = timeWarpTimer > 0;
         const hasScoreBooster = scoreBoosterTimer > 0;
         const hasFever = feverTimer > 0;
@@ -13773,8 +13838,8 @@ void main() {
         el("feverScoreMultiplier").textContent = feverMultiplier + "X SCORE";
         if (hasShield) {
           el("shieldStatus").textContent = activeShieldTimer > 0
-            ? "Neon Shield · " + Math.max(1, Math.ceil(activeShieldTimer)) + "s"
-            : "Prism Shield Active!" + (shieldCharges > 1 ? " ×" + shieldCharges : "");
+            ? "Cyber Shield · " + Math.max(1, Math.ceil(activeShieldTimer)) + "s invulnerable"
+            : "Cyber Shield · " + shieldCharges + (shieldCharges === 1 ? " hit ready" : " hits ready");
         }
         if (hasTimeWarp) el("timeWarpTime").textContent = Math.max(1, Math.ceil(timeWarpTimer));
         if (hasScoreBooster) el("scoreBoostTime").textContent = Math.max(1, Math.ceil(scoreBoosterTimer));
@@ -13799,12 +13864,17 @@ void main() {
           const remaining = effects[type] || 0;
           const costLabel = button.querySelector(".active-power-cost");
           const timerLabel = button.querySelector("[data-power-remaining]");
-          const active = remaining > 0;
+          const shieldReady = type === "shield" && shieldCharges > 0;
+          const active = remaining > 0 || shieldReady;
+          const shieldAtCapacity = type === "shield" && shieldCharges >= 2;
           button.classList.toggle("active", active);
           button.classList.toggle("unaffordable", progression.crystals < cost);
-          button.disabled = state !== "running" || active;
+          button.disabled = state !== "running" ||
+            (type === "shield" ? activeShieldTimer > 0 || shieldAtCapacity : active);
           button.setAttribute("aria-label", active
-            ? labels[type] + " active for " + Math.max(1, Math.ceil(remaining)) + " seconds; next use costs " + cost.toLocaleString("en-US") + " crystals"
+            ? shieldReady
+              ? labels[type] + " ready with " + shieldCharges + " hit" + (shieldCharges === 1 ? "" : "s") + "; next use costs " + cost.toLocaleString("en-US") + " crystals"
+              : labels[type] + " active for " + Math.max(1, Math.ceil(remaining)) + " seconds; next use costs " + cost.toLocaleString("en-US") + " crystals"
             : "Buy " + labels[type] + " for " + cost.toLocaleString("en-US") + " crystals");
           if (costLabel) {
             costLabel.hidden = false;
@@ -13812,7 +13882,9 @@ void main() {
           }
           if (timerLabel) {
             timerLabel.hidden = !active;
-            timerLabel.textContent = active ? Math.max(1, Math.ceil(remaining)) + "s ACTIVE" : "";
+            timerLabel.textContent = !active ? "" : shieldReady
+              ? shieldCharges + (shieldCharges === 1 ? " HIT READY" : " HITS READY")
+              : Math.max(1, Math.ceil(remaining)) + "s ACTIVE";
           }
         });
       }
@@ -13890,6 +13962,10 @@ void main() {
         const activeTimer = type === "shield" ? activeShieldTimer
           : type === "magnet" ? crystalMagnetTimer
           : type === "phase" ? quantumPhaseTimer : 0;
+        if (type === "shield" && shieldCharges >= 2) {
+          showPowerPurchaseNotice("SHIELD CAPACITY REACHED", true);
+          return false;
+        }
         if (activeTimer > 0) {
           showPowerPurchaseNotice("Already active · " + Math.ceil(activeTimer) + "s left");
           return false;
@@ -13909,22 +13985,23 @@ void main() {
         triggerHapticFeedback("power");
 
         if (type === "shield") {
-          activeShieldTimer = 5;
+          shieldCharges = Math.min(2, shieldCharges + 1);
+          syncActiveRunPowerFlags();
           shieldPursuitRepelled = false;
-          showRunStatus("NEON SHIELD · INVINCIBLE FOR 5s", 1100);
+          showRunStatus("CYBER SHIELD · ONE HIT READY", 1100);
           flashPowerActivation("#70fff0");
           createImpactBurst(0x70fff0, 0.58, 12);
-          showPowerPurchaseNotice("NEON SHIELD · 5 SECONDS");
+          showPowerPurchaseNotice("CYBER SHIELD · ONE HIT");
           showArcadeFloat("−" + formatActivePowerDisplayCost(cost) + " 💎 · SHIELD ONLINE", "power");
         } else if (type === "magnet") {
-          crystalMagnetTimer = 6;
+          activateRunPowerTimer("magnet", 6);
           showRunStatus("CRYSTAL MAGNET · 6 SECONDS", 1100);
           flashPowerActivation("#80aaff");
           createImpactBurst(0x80aaff, 0.58, 12);
           showPowerPurchaseNotice("CRYSTAL MAGNET · 6 SECONDS");
           showArcadeFloat("−" + formatActivePowerDisplayCost(cost) + " 💎 · MAGNET ONLINE", "power");
         } else if (type === "phase") {
-          quantumPhaseTimer = 5;
+          activateRunPowerTimer("quantum", 5);
           showRunStatus("QUANTUM PHASE · PASS THROUGH HAZARDS FOR 5s", 1200);
           flashPowerActivation("#b184ff");
           createImpactBurst(0xb184ff, 0.7, 16);
@@ -14020,14 +14097,15 @@ void main() {
         triggerHapticFeedback("power");
         if (powerUp.userData.type === "prism") {
           shieldCharges = Math.min(2, shieldCharges + 1);
-          showRunStatus("Prism Shield acquired", 900);
-          showArcadeFloat("PRISM SHIELD ACQUIRED", "power");
+          syncActiveRunPowerFlags();
+          showRunStatus("Cyber Shield acquired · one hit ready", 900);
+          showArcadeFloat("CYBER SHIELD ACQUIRED", "power");
         } else if (powerUp.userData.type === "warp") {
-          timeWarpTimer = Math.max(timeWarpTimer, 5);
+          activateRunPowerTimer("time-warp", 5);
           showRunStatus("Time Warp · 5 seconds", 900);
           showArcadeFloat("TIME WARP ONLINE", "power");
         } else {
-          scoreBoosterTimer = Math.max(scoreBoosterTimer, 10);
+          activateRunPowerTimer("score-boost", 10);
           showRunStatus("Score Booster · 2X", 900);
           showArcadeFloat("2× SCORE BOOST", "power");
         }
@@ -14076,15 +14154,16 @@ void main() {
         progression.powerTokens[type] = count - 1;
         if (type === "prism") {
           shieldCharges = 1;
+          syncActiveRunPowerFlags();
           saveProgression();
           return "Prism Shield";
         }
         if (type === "warp") {
-          timeWarpTimer = 5;
+          activateRunPowerTimer("time-warp", 5);
           saveProgression();
           return "Time Warp";
         }
-        scoreBoosterTimer = 10;
+        activateRunPowerTimer("score-boost", 10);
         saveProgression();
         return "Score Boost";
       }
@@ -14178,15 +14257,8 @@ void main() {
         autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
         lastPlayerInputAt = -Infinity;
         setEnvironment(0, { announce: false, instant: true });
-        shieldCharges = 0;
-        activeShieldTimer = 0;
-        crystalMagnetTimer = 0;
-        quantumPhaseTimer = 0;
+        resetActiveRunPowerState();
         resetActivePowerUseCounters();
-        shieldPursuitRepelled = false;
-        timeWarpTimer = 0;
-        scoreBoosterTimer = 0;
-        speedBoostTimer = 0;
         const dailyPowerName = consumeStoredPowerUp();
         if (dailyPowerName) renderProgressionUI();
         powerUpSpawnTimer = 7;
@@ -14513,7 +14585,7 @@ void main() {
         advanceEnvironmentIfNeeded();
         updatePowerHUD();
         if (passed % 5 === 0) {
-          speedBoostTimer = 5;
+          activateRunPowerTimer("speed-boost", 5);
           updatePowerHUD();
           showRunStatus(
             (combo === 10 ? "FEVER · " : "") + "SPEED UP! · " +
@@ -14533,7 +14605,7 @@ void main() {
         popScore();
       }
       function handleObstacleImpact(message, color) {
-        if (quantumPhaseTimer > 0) {
+        if (activeRunPowerFlags.isQuantum) {
           showRunStatus("QUANTUM PHASE · " + message.toUpperCase() + " PHASED", 700);
           flashPowerActivation("#b184ff");
           return false;
@@ -14541,25 +14613,37 @@ void main() {
         combo = 0;
         updateHUD();
         triggerImpactEffects(color, 0.9);
-        if (activeShieldTimer > 0 || shieldCharges > 0) {
-          if (activeShieldTimer <= 0) shieldCharges--;
-          el("flash").style.background = "rgba(56,230,211,.18)";
-          el("flash").classList.add("on");
-          window.clearTimeout(flashTimer);
-          flashTimer = window.setTimeout(() => {
-            el("flash").classList.remove("on");
-            el("flash").style.background = "";
-          }, 150);
-          updatePowerHUD();
-          showRunStatus(message + (activeShieldTimer > 0 ? " · Neon Shield blocked it" : " · shield blocked it"), 850);
+        if (absorbFatalObstacleImpact(message)) {
           return false;
         }
         endGame();
         return true;
       }
+      function absorbFatalObstacleImpact(message) {
+        if (activeShieldTimer > 0) {
+          showRunStatus(message + " · shield flash absorbed it", 850);
+          return true;
+        }
+        if (shieldCharges <= 0) return false;
+        shieldCharges -= 1;
+        activateRunPowerTimer("shield-invulnerability", 1);
+        el("flash").style.background = "rgba(56,230,211,.22)";
+        el("flash").classList.add("on");
+        window.clearTimeout(flashTimer);
+        flashTimer = window.setTimeout(() => {
+          el("flash").classList.remove("on");
+          el("flash").style.background = "";
+        }, 150);
+        triggerHapticFeedback("power");
+        playCue("power");
+        createImpactBurst(0x70fff0, 0.7, 16);
+        updatePowerHUD();
+        showRunStatus(message + " · Cyber Shield absorbed it · 1s invulnerable", 1000);
+        return true;
+      }
       function resolveLaserCollision(laser) {
         laser.userData.checked = true;
-        if (graceTimer > 0 || quantumPhaseTimer > 0 || !laser.userData.active) return;
+        if (graceTimer > 0 || activeRunPowerFlags.isQuantum || !laser.userData.active) return;
         if (zeroGravityModeActive && !isPlayerOnGravitySide(laser.userData.gravitySide)) return;
         const laserX = laser.position.x + laser.userData.beam.position.x;
         if (Math.abs(player.position.x - laserX) <= LASER_HALF_WIDTH + PLAYER_RADIUS) {
@@ -14572,7 +14656,7 @@ void main() {
           showRunStatus("Start shield", 500);
           return;
         }
-        if (quantumPhaseTimer > 0) {
+        if (activeRunPowerFlags.isQuantum) {
           awardGatePass("Quantum phase");
           showRunStatus("QUANTUM PHASE · GATE PHASED", 700);
           return;
@@ -14739,15 +14823,8 @@ void main() {
         resetEnvironmentMilestones();
         feverTimer = 0;
         graceTimer = 0;
-        shieldCharges = 0;
-        activeShieldTimer = 0;
-        crystalMagnetTimer = 0;
-        quantumPhaseTimer = 0;
+        resetActiveRunPowerState();
         resetActivePowerUseCounters();
-        shieldPursuitRepelled = false;
-        timeWarpTimer = 0;
-        scoreBoosterTimer = 0;
-        speedBoostTimer = 0;
         autoColorTimer = AUTO_COLOR_INTERVAL_SECONDS;
         powerUpSpawnTimer = 7;
         crystalSpawnTimer = CRYSTAL_SPAWN_INITIAL_DELAY + Math.random() * CRYSTAL_SPAWN_INITIAL_JITTER;
@@ -14842,11 +14919,8 @@ void main() {
         updateGravityIndicator();
         updateAutoColorIndicator();
         feverTimer = 0;
-        activeShieldTimer = 0;
-        crystalMagnetTimer = 0;
-        quantumPhaseTimer = 0;
+        resetActiveRunPowerState();
         resetActivePowerUseCounters();
-        shieldPursuitRepelled = false;
         triggerImpactEffects(COLORS[currentColor].hex, 1.4);
         playCue("gameOver");
         triggerHapticFeedback("crash");
@@ -14941,13 +15015,6 @@ void main() {
         el("powerPurchaseNotice").classList.remove("visible", "warning");
         el("powerPurchaseNotice").hidden = true;
         clearArcadeFloat();
-        activeShieldTimer = 0;
-        crystalMagnetTimer = 0;
-        quantumPhaseTimer = 0;
-        timeWarpTimer = 0;
-        scoreBoosterTimer = 0;
-        speedBoostTimer = 0;
-        shieldCharges = 0;
         ghostBall.visible = false;
         el("ghostStatus").classList.remove("visible");
         updatePowerHUD();
@@ -15027,7 +15094,7 @@ void main() {
         const initialColor = CYBER_DUEL_PALETTE[index === 0 ? 0 : 1];
         const orbMaterial = new THREE.MeshStandardMaterial({
           color: initialColor, emissive: initialColor, emissiveIntensity: 1.55,
-          metalness: 0.16, roughness: 0.23, toneMapped: false
+          metalness: 0.16, roughness: 0.23, toneMapped: false, transparent: true, opacity: 1
         });
         const orb = new THREE.Mesh(new THREE.SphereGeometry(0.37, 20, 14), orbMaterial);
         runner.add(orb);
@@ -15038,6 +15105,12 @@ void main() {
         halo.rotation.x = Math.PI / 2;
         halo.position.y = -0.28;
         runner.add(halo);
+        const shieldShell = new THREE.Mesh(
+          new THREE.IcosahedronGeometry(0.61, 1),
+          new THREE.MeshBasicMaterial({ color: 0x8bfff1, transparent: true, opacity: 0.2, wireframe: true, depthWrite: false })
+        );
+        shieldShell.visible = false;
+        runner.add(shieldShell);
         const runnerLight = new THREE.PointLight(initialColor, 8, 8);
         runnerLight.position.set(0, 0.2, 0);
         runner.add(runnerLight);
@@ -15045,10 +15118,13 @@ void main() {
         scene.add(runner);
         return {
           index, name: index === 0 ? "PLAYER 1" : "PLAYER 2", scene, camera: laneCamera,
-          runner, orb, halo, runnerLight, lane: 1, targetX: 0,
+          runner, orb, halo, shieldShell, runnerLight, lane: 1, targetX: 0,
           colorIndex: index === 0 ? 0 : 1, distance: 0, survivalTime: 0, gatesPassed: 0,
           score: 0, crystalsCollected: 0, alive: true, finished: false, finishTime: Infinity, speed: 8.8,
-          phaseTimer: 0, hyperTimer: 0, vortexTimer: 0, empTimer: 0, powerLabel: "",
+          phaseTimer: 0, hyperTimer: 0, vortexTimer: 0, empTimer: 0,
+          shieldCharges: 0, invulnerabilityTimer: 0, speedMultiplier: 1,
+          isQuantum: false, isBoosted: false, hasShield: false, isMagnetActive: false, isInvulnerable: false, isEmpSlowed: false,
+          powerLabel: "",
           colorTimer: 4.2, gateTimer: 1.1 + index * 0.35, crystalTimer: 2.3 + index,
           crateTimer: 5.2 + index * 1.1, gates: [], crystals: [], crates: [],
           hudTimer: 0, bobPhase: Math.random() * Math.PI * 2
@@ -15160,7 +15236,7 @@ void main() {
       function makeDuelCrate(playerData, z, syncData = null) {
         const root = new THREE.Group();
         const type = syncData?.type || CYBER_DUEL_POWERUPS[Math.floor(Math.random() * CYBER_DUEL_POWERUPS.length)];
-        const colorMap = { phase: 0xa76bff, emp: 0xc5ff45, hyper: 0xff9b38, vortex: 0x43eaff };
+        const colorMap = { phase: 0xa76bff, emp: 0xc5ff45, hyper: 0xff9b38, vortex: 0x43eaff, shield: 0x70fff0 };
         const color = colorMap[type];
         const box = new THREE.Mesh(
           new THREE.BoxGeometry(0.62, 0.62, 0.62),
@@ -15218,16 +15294,75 @@ void main() {
         playerData.runner.position.y = 0.06 + Math.sin(t * 4.2 + playerData.bobPhase) * 0.075;
         playerData.orb.rotation.y += dt * 1.1;
         playerData.halo.rotation.z += dt * 0.75;
-        playerData.runnerLight.intensity = 4.4 + Math.sin(t * 5 + playerData.bobPhase) * 0.8;
+        playerData.runnerLight.intensity = (4.4 + Math.sin(t * 5 + playerData.bobPhase) * 0.8) *
+          (playerData.isBoosted ? 1.45 : 1) * (playerData.isEmpSlowed ? 0.72 : 1);
+        playerData.shieldShell.visible = playerData.hasShield || playerData.isInvulnerable;
+        playerData.shieldShell.rotation.y += dt * 1.8;
+        playerData.shieldShell.rotation.x += dt * 0.7;
+        playerData.shieldShell.material.opacity = playerData.isInvulnerable
+          ? 0.28 + Math.sin(t * 22) * 0.12
+          : playerData.hasShield ? 0.2 + Math.sin(t * 5) * 0.045 : 0;
         playerData.camera.position.x = THREE.MathUtils.damp(playerData.camera.position.x, playerData.runner.position.x * 0.14, 3.5, dt);
         playerData.camera.lookAt(playerData.runner.position.x * 0.07, 0.1, -18);
       }
+      function syncDuelPowerFlags(playerData) {
+        playerData.isQuantum = playerData.phaseTimer > 0;
+        playerData.isBoosted = playerData.hyperTimer > 0;
+        playerData.isMagnetActive = playerData.vortexTimer > 0;
+        playerData.isEmpSlowed = playerData.empTimer > 0;
+        playerData.isInvulnerable = playerData.invulnerabilityTimer > 0;
+        playerData.hasShield = playerData.shieldCharges > 0;
+      }
+      function resetDuelPowerState(playerData) {
+        if (!playerData) return;
+        playerData.phaseTimer = 0;
+        playerData.hyperTimer = 0;
+        playerData.vortexTimer = 0;
+        playerData.empTimer = 0;
+        playerData.shieldCharges = 0;
+        playerData.invulnerabilityTimer = 0;
+        playerData.speedMultiplier = 1;
+        playerData.powerLabel = "";
+        syncDuelPowerFlags(playerData);
+        if (playerData.orb?.material) playerData.orb.material.opacity = 1;
+        if (playerData.shieldShell) playerData.shieldShell.visible = false;
+      }
+      function updateDuelPowerState(playerData, dt) {
+        playerData.phaseTimer = Math.max(0, playerData.phaseTimer - dt);
+        playerData.hyperTimer = Math.max(0, playerData.hyperTimer - dt);
+        playerData.vortexTimer = Math.max(0, playerData.vortexTimer - dt);
+        playerData.empTimer = Math.max(0, playerData.empTimer - dt);
+        playerData.invulnerabilityTimer = Math.max(0, playerData.invulnerabilityTimer - dt);
+        syncDuelPowerFlags(playerData);
+        const targetSpeedMultiplier = (playerData.isBoosted ? 2 : 1) * (playerData.isEmpSlowed ? 0.7 : 1);
+        playerData.speedMultiplier = THREE.MathUtils.damp(
+          playerData.speedMultiplier,
+          targetSpeedMultiplier,
+          10,
+          dt
+        );
+        playerData.orb.material.opacity = THREE.MathUtils.damp(
+          playerData.orb.material.opacity,
+          playerData.isQuantum ? 0.4 : 1,
+          12,
+          dt
+        );
+      }
       function applyDuelPowerup(playerData, type) {
         const opponent = cyberDuelPlayers[1 - playerData.index];
-        if (type === "phase") { playerData.phaseTimer = 5; playerData.powerLabel = "PHASE"; }
-        if (type === "hyper") { playerData.hyperTimer = 4.5; playerData.powerLabel = "HYPER"; }
-        if (type === "vortex") { playerData.vortexTimer = 6; playerData.powerLabel = "VORTEX"; }
-        if (type === "emp" && opponent) { opponent.empTimer = 1; playerData.powerLabel = "EMP HIT"; }
+        if (type === "phase") { playerData.phaseTimer = Math.max(playerData.phaseTimer, 5); playerData.powerLabel = "PHASE"; }
+        if (type === "hyper") { playerData.hyperTimer = Math.max(playerData.hyperTimer, 4); playerData.powerLabel = "HYPER"; }
+        if (type === "vortex") { playerData.vortexTimer = Math.max(playerData.vortexTimer, 6); playerData.powerLabel = "VORTEX"; }
+        if (type === "shield") {
+          playerData.shieldCharges = Math.min(1, playerData.shieldCharges + 1);
+          playerData.powerLabel = "SHIELD";
+        }
+        if (type === "emp" && opponent) {
+          opponent.empTimer = Math.max(opponent.empTimer, 1);
+          syncDuelPowerFlags(opponent);
+          playerData.powerLabel = "EMP HIT";
+        }
+        syncDuelPowerFlags(playerData);
         playCue("power");
         triggerHapticFeedback("power");
       }
@@ -15245,17 +15380,15 @@ void main() {
       function updateDuelPlayer(playerData, dt, t) {
         if (!playerData.alive || playerData.finished) return;
         playerData.survivalTime += dt;
-        playerData.phaseTimer = Math.max(0, playerData.phaseTimer - dt);
-        playerData.hyperTimer = Math.max(0, playerData.hyperTimer - dt);
-        playerData.vortexTimer = Math.max(0, playerData.vortexTimer - dt);
-        playerData.empTimer = Math.max(0, playerData.empTimer - dt);
-        const speed = 8.8 * (playerData.hyperTimer > 0 ? 2 : 1);
+        updateDuelPowerState(playerData, dt);
+        const speed = 8.8 * playerData.speedMultiplier;
         playerData.speed = speed;
         const oldDistance = playerData.distance;
         playerData.distance = Math.min(CYBER_DUEL_FINISH_DISTANCE, oldDistance + speed * dt);
         if (playerData.distance >= CYBER_DUEL_FINISH_DISTANCE) {
           playerData.finished = true;
           playerData.finishTime = playerData.survivalTime - dt + Math.max(0, CYBER_DUEL_FINISH_DISTANCE - oldDistance) / speed;
+          resetDuelPowerState(playerData);
         }
         updateCyberDuelVisuals(playerData, dt, t);
         playerData.colorTimer -= dt;
@@ -15287,11 +15420,22 @@ void main() {
           if (!gate.userData.checked && previousZ < 0 && gate.position.z >= 0) {
             gate.userData.checked = true;
             const matched = gate.userData.laneColors[playerData.lane] === playerData.colorIndex;
-            if (!matched && playerData.phaseTimer <= 0) {
-              playerData.alive = false;
-              playCue("gameOver");
-              triggerHapticFeedback("crash");
-            } else {
+            if (!matched && !playerData.isQuantum && !playerData.isInvulnerable) {
+              if (playerData.hasShield) {
+                playerData.shieldCharges = 0;
+                playerData.invulnerabilityTimer = 1;
+                playerData.powerLabel = "SHIELD SAVE";
+                syncDuelPowerFlags(playerData);
+                playerData.shieldShell.visible = true;
+                playCue("power");
+                triggerHapticFeedback("power");
+              } else {
+                playerData.alive = false;
+                playCue("gameOver");
+                triggerHapticFeedback("crash");
+              }
+            }
+            if (playerData.alive) {
               playerData.gatesPassed += 1;
               playerData.score += 50 + Math.min(100, playerData.gatesPassed * 2);
               playCue("gate");
@@ -15302,14 +15446,24 @@ void main() {
         }
         if (!playerData.alive) return;
         for (const crystal of playerData.crystals) {
-          if (playerData.vortexTimer > 0 && crystal.position.z > -22 && crystal.position.z < 0) {
-            crystal.position.x = THREE.MathUtils.damp(crystal.position.x, playerData.targetX, 3.8, dt);
+          const dx = playerData.runner.position.x - crystal.position.x;
+          const dy = playerData.runner.position.y - crystal.position.y;
+          const dz = playerData.runner.position.z - crystal.position.z;
+          const distanceToRunner = Math.hypot(dx, dy, dz);
+          const magnetizing = playerData.isMagnetActive && distanceToRunner <= 6;
+          if (magnetizing) {
+            const pull = 1 - Math.exp(-8 * dt);
+            crystal.position.x += dx * pull;
+            crystal.position.y += dy * pull;
           }
           crystal.position.z += speed * dt;
           crystal.rotation.y += dt * 2.4;
           crystal.rotation.x += dt * 1.2;
-          if (crystal.position.z >= 0 && !crystal.userData.collected &&
-              Math.abs(playerData.runner.position.x - crystal.position.x) < 0.76) {
+          const magnetContact = magnetizing &&
+            Math.hypot(playerData.runner.position.x - crystal.position.x, playerData.runner.position.y - crystal.position.y, playerData.runner.position.z - crystal.position.z) <= 0.72;
+          const normalContact = crystal.position.z >= 0 &&
+            Math.abs(playerData.runner.position.x - crystal.position.x) < 0.76;
+          if (!crystal.userData.collected && (magnetContact || normalContact)) {
             crystal.userData.collected = true;
             awardDuelCrystal(playerData);
           }
@@ -15337,6 +15491,7 @@ void main() {
       }
       function updateCyberDuelHUD() {
         for (const playerData of cyberDuelPlayers) {
+          syncDuelPowerFlags(playerData);
           const suffix = playerData.index === 0 ? "P1" : "P2";
           const label = playerData.alive ? `${Math.floor(playerData.distance)}m / ${CYBER_DUEL_FINISH_DISTANCE}m` : "OUT";
           el(`duelDistance${suffix}`).textContent = label;
@@ -15349,10 +15504,12 @@ void main() {
           colorChip.style.color = `#${CYBER_DUEL_PALETTE[playerData.colorIndex].toString(16).padStart(6, "0")}`;
           colorChip.style.textShadow = "0 0 8px currentColor";
           el(`duelProgress${suffix}`).style.width = `${Math.min(100, playerData.distance / CYBER_DUEL_FINISH_DISTANCE * 100)}%`;
-          const active = playerData.phaseTimer > 0 ? `PHASE ${Math.ceil(playerData.phaseTimer)}s`
-            : playerData.hyperTimer > 0 ? `HYPER ${Math.ceil(playerData.hyperTimer)}s`
-            : playerData.vortexTimer > 0 ? `VORTEX ${Math.ceil(playerData.vortexTimer)}s`
-            : playerData.empTimer > 0 ? "GLITCHED" : playerData.alive ? "READY" : "ELIMINATED";
+          const active = playerData.isInvulnerable ? `SHIELD ${Math.ceil(playerData.invulnerabilityTimer)}s`
+            : playerData.hasShield ? "SHIELD READY"
+            : playerData.isQuantum ? `PHASE ${Math.ceil(playerData.phaseTimer)}s`
+            : playerData.isBoosted ? `HYPER ${Math.ceil(playerData.hyperTimer)}s`
+            : playerData.isMagnetActive ? `VORTEX ${Math.ceil(playerData.vortexTimer)}s`
+            : playerData.isEmpSlowed ? "GLITCHED · −30% SPEED" : playerData.alive ? "READY" : "ELIMINATED";
           el(`duelPower${suffix}`).textContent = active;
           const emp = el(`duelEmp${suffix}`);
           emp.classList.toggle("active", playerData.empTimer > 0);
@@ -15382,6 +15539,9 @@ void main() {
             hyperTimer: playerData.hyperTimer,
             vortexTimer: playerData.vortexTimer,
             empTimer: playerData.empTimer,
+            shieldCharges: playerData.shieldCharges,
+            invulnerabilityTimer: playerData.invulnerabilityTimer,
+            speedMultiplier: playerData.speedMultiplier,
             powerLabel: playerData.powerLabel,
             world: {
               gates: playerData.gates.filter(object => !object.userData.collected).map(object => ({
@@ -15462,9 +15622,12 @@ void main() {
           playerData.finished = Boolean(incoming.finished);
           playerData.finishTime = Number.isFinite(incoming.finishTime) ? incoming.finishTime : Infinity;
           playerData.speed = Math.max(0, Math.min(30, Number(incoming.speed) || 8.8));
-          for (const key of ["phaseTimer", "hyperTimer", "vortexTimer", "empTimer"]) {
+          for (const key of ["phaseTimer", "hyperTimer", "vortexTimer", "empTimer", "invulnerabilityTimer"]) {
             playerData[key] = Math.max(0, Math.min(10, Number(incoming[key]) || 0));
           }
+          playerData.shieldCharges = Math.max(0, Math.min(1, Math.floor(Number(incoming.shieldCharges) || 0)));
+          playerData.speedMultiplier = Math.max(0.65, Math.min(2, Number(incoming.speedMultiplier) || 1));
+          syncDuelPowerFlags(playerData);
           playerData.powerLabel = typeof incoming.powerLabel === "string" ? incoming.powerLabel.slice(0, 24) : "";
           const colorIndex = Math.max(0, Math.min(CYBER_DUEL_PALETTE.length - 1, Math.round(Number(incoming.colorIndex) || 0)));
           playerData.colorIndex = colorIndex;
@@ -15510,6 +15673,8 @@ void main() {
         cyberDuelState = "over";
         cyberDuelWinnerIndex = winnerIndex;
         cyberDuelFinishReason = reason;
+        for (const playerData of cyberDuelPlayers) resetDuelPowerState(playerData);
+        document.querySelectorAll(".duel-glitch-layer").forEach(layer => layer.classList.remove("active"));
         if (cyberDuelRoomSession) el("cyberDuelRematch").disabled = true;
         el("cyber-duel-screen").hidden = false;
         el("cyber-duel-victory").hidden = false;
@@ -15702,8 +15867,7 @@ void main() {
           playerData.finished = false;
           playerData.finishTime = Infinity;
           playerData.speed = 8.8;
-          playerData.phaseTimer = playerData.hyperTimer = playerData.vortexTimer = playerData.empTimer = 0;
-          playerData.powerLabel = "";
+          resetDuelPowerState(playerData);
           playerData.colorTimer = 4.2;
           playerData.gateTimer = 1.05 + playerData.index * 0.3;
           playerData.crystalTimer = 2.2 + playerData.index;
@@ -16752,12 +16916,12 @@ void main() {
         orbLight.intensity = blackoutModeActive ? 0 : (state === "ready" ? 14 + menuPulse * 8 : 16) * getGlowScale();
         orb.rotation.y += dt * (state === "running" ? 1.2 : 0.44);
         orb.rotation.x += dt * (state === "running" ? 0.7 : 0.24);
-        shieldBubble.visible = shieldCharges > 0 || activeShieldTimer > 0 || quantumPhaseTimer > 0 || graceTimer > 0;
+        shieldBubble.visible = activeRunPowerFlags.hasShield || activeRunPowerFlags.isQuantum || graceTimer > 0;
         if (graceTimer > 0) shieldBubble.material.color.setHex(0x68f2df);
-        else if (quantumPhaseTimer > 0) shieldBubble.material.color.setHex(0xb184ff);
-        else if (activeShieldTimer > 0) shieldBubble.material.color.setHex(0x70fff0);
+        else if (activeRunPowerFlags.isQuantum) shieldBubble.material.color.setHex(0xb184ff);
+        else if (activeRunPowerFlags.isInvulnerable) shieldBubble.material.color.setHex(0x70fff0);
         else shieldBubble.material.color.setHSL((t * 0.18) % 1, 0.9, 0.62);
-        shieldBubble.material.opacity = activeShieldTimer > 0
+        shieldBubble.material.opacity = activeRunPowerFlags.isInvulnerable
           ? 0.24 + (0.12 * (0.5 + Math.sin(t * 10) * 0.5))
           : shieldCharges > 0
           ? 0.16 + (0.1 * (0.5 + Math.sin(t * 7) * 0.5))
@@ -16782,18 +16946,10 @@ void main() {
           }
           elapsed += dt;
           const runScoreMultiplier = getScoreMultiplier();
-          const obstacleTimeScale = timeWarpTimer > 0 ? 0.5 : 1;
           graceTimer = Math.max(0, graceTimer - dt);
-          if (activeShieldTimer > 0) {
-            activeShieldTimer = Math.max(0, activeShieldTimer - dt);
-            if (activeShieldTimer === 0) shieldPursuitRepelled = false;
-          }
-          crystalMagnetTimer = Math.max(0, crystalMagnetTimer - dt);
-          quantumPhaseTimer = Math.max(0, quantumPhaseTimer - dt);
-          timeWarpTimer = Math.max(0, timeWarpTimer - dt);
-          scoreBoosterTimer = Math.max(0, scoreBoosterTimer - dt);
+          updateActiveRunPowerTimers(dt);
+          const obstacleTimeScale = timeWarpTimer > 0 ? 0.5 : 1;
           feverTimer = Math.max(0, feverTimer - dt);
-          speedBoostTimer = Math.max(0, speedBoostTimer - dt);
           updateActivePowerToolbar();
           obstacleElapsed += dt * obstacleTimeScale;
           const timeRamp = 1 - Math.exp(-elapsed / 140);
@@ -16805,7 +16961,7 @@ void main() {
           const speedCap = BASE_FORWARD_SPEED * (zeroGravityModeActive ? 2.35 : laserChaosModeActive ? 2.1 : 1.85);
           speed = Math.min(
             speedCap,
-            normalSpeed * weekendModeSpeed * (speedBoostTimer > 0 ? 1.25 : 1)
+            normalSpeed * weekendModeSpeed * speedBoostScale
           );
           const obstacleDt = dt * obstacleTimeScale;
           const obstacleSpeed = speed * obstacleTimeScale;
@@ -16853,26 +17009,30 @@ void main() {
             if (coin.userData.collected) continue;
             const previousZ = coin.position.z;
             const pickupPlane = -(PLAYER_RADIUS + 0.34);
-            let magnetSpeedScale = 1;
-            const distanceToPlayer = pickupPlane - previousZ;
-            const magnetizing = crystalMagnetTimer > 0 && previousZ < pickupPlane && distanceToPlayer <= 18;
+            const dx = player.position.x - coin.position.x;
+            const dy = player.position.y - coin.position.y;
+            const dz = player.position.z - coin.position.z;
+            const distanceToPlayer = Math.hypot(dx, dy, dz);
+            const magnetizing = activeRunPowerFlags.isMagnetActive && distanceToPlayer <= 6;
             if (!magnetizing) {
               coin.position.y = coin.userData.baseY + Math.sin(t * 3 + coin.userData.phase) * 0.13;
             }
             if (magnetizing) {
-              const pull = Math.min(1, dt * (4 + (18 - distanceToPlayer) * 0.9));
-              coin.position.x += (player.position.x - coin.position.x) * pull;
-              coin.position.y += (player.position.y - coin.position.y) * pull;
-              magnetSpeedScale = 1 + Math.min(0.25, (18 - distanceToPlayer) * 0.014);
+              const pull = 1 - Math.exp(-8 * dt);
+              coin.position.x += dx * pull;
+              coin.position.y += dy * pull;
             }
-            coin.position.z += speed * magnetSpeedScale * dt;
+            coin.position.z += speed * dt;
             if (blackoutModeActive) coin.visible = coin.position.z >= BLACKOUT_GATE_REVEAL_Z;
             coin.rotation.y += dt * 2.4;
             coin.rotation.x += dt * 0.75;
             coin.userData.crystal.scale.setScalar(1 + Math.sin(t * 6 + coin.userData.phase) * 0.09);
-            if (previousZ < pickupPlane && coin.position.z >= pickupPlane &&
-                Math.abs(player.position.x - coin.position.x) <= PLAYER_RADIUS + 0.34 &&
-                (!zeroGravityModeActive || Math.abs(player.position.y - coin.position.y) <= 1.45)) {
+            const closeEnoughToCollect = magnetizing &&
+              Math.hypot(player.position.x - coin.position.x, player.position.y - coin.position.y, player.position.z - coin.position.z) <= PLAYER_RADIUS + 0.38;
+            const crossedPlayer = previousZ < pickupPlane && coin.position.z >= pickupPlane &&
+              Math.abs(player.position.x - coin.position.x) <= PLAYER_RADIUS + 0.34 &&
+              (!zeroGravityModeActive || Math.abs(player.position.y - coin.position.y) <= 1.45);
+            if (closeEnoughToCollect || crossedPlayer) {
               collectCrystalCoin(coin);
             }
           }
