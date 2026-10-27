@@ -3840,6 +3840,7 @@
     @media (prefers-reduced-motion: reduce) {
       button.has-unclaimed, button.has-unclaimed::after { animation: none; }
       #rewards-screen .reward-claim-card.claim-ready { animation: none; }
+      #rewards-screen .active-claim-row { animation: none; }
     }
     @media (max-width: 650px) {
       #rewards-screen { padding: max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left)); }
@@ -4707,6 +4708,71 @@
     #rewards-screen .minimal-unclaimed-section {
       padding-top: 4px;
     }
+    #rewards-screen .weekend-bonus-summary {
+      margin: 0 0 18px;
+      padding: clamp(14px, 2.5vw, 20px);
+      border: 1px solid rgba(255, 204, 91, .28);
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 92% 8%, rgba(0, 255, 255, .08), transparent 42%),
+        rgba(255, 255, 255, .04);
+      box-shadow: inset 0 0 22px rgba(255, 198, 83, .035);
+    }
+    #rewards-screen .weekend-bonus-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    #rewards-screen .weekend-bonus-kicker {
+      color: #ffd87f;
+      font: 800 10px/1.3 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .08em;
+    }
+    #rewards-screen .weekend-bonus-heading h4 {
+      margin: 5px 0;
+      color: #f2fbff;
+      font: 700 clamp(15px, 2.8vw, 19px)/1.3 "Orbitron", system-ui, sans-serif;
+    }
+    #rewards-screen .weekend-bonus-heading p,
+    #rewards-screen .weekend-bonus-latest {
+      margin: 0;
+      color: rgba(222, 233, 239, .72);
+      font: 500 15px/1.35 "Rajdhani", system-ui, sans-serif;
+    }
+    #rewards-screen .weekend-bonus-heading > strong {
+      flex: 0 0 auto;
+      color: #ffe69b;
+      font: 900 clamp(20px, 4vw, 28px)/1 "Orbitron", system-ui, sans-serif;
+      text-shadow: 0 0 16px rgba(255, 205, 86, .34);
+    }
+    #rewards-screen .weekend-bonus-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin: 13px 0 8px;
+      color: rgba(221, 235, 239, .72);
+      font: 600 13px/1.35 "Rajdhani", system-ui, sans-serif;
+    }
+    #rewards-screen .weekend-bonus-stats strong { color: #d5fffa; }
+    #rewards-screen .weekend-bonus-action {
+      min-height: 48px;
+      margin-top: 12px;
+      padding: 0 14px;
+      border: 1px solid rgba(255, 210, 109, .34);
+      border-radius: 10px;
+      background: rgba(255, 210, 109, .08);
+      color: #fff1c6;
+      cursor: pointer;
+      font: 800 10px "Orbitron", system-ui, sans-serif;
+      touch-action: manipulation;
+    }
+    #rewards-screen .weekend-bonus-action:disabled { opacity: .58; cursor: default; }
+    #rewards-screen .active-claim-row.claimed {
+      opacity: .62;
+      filter: saturate(.65);
+      animation: none;
+    }
     #rewards-screen .active-unclaimed-list {
       display: grid;
       gap: 8px;
@@ -4718,9 +4784,11 @@
       gap: 14px;
       min-width: 0;
       padding: 12px 14px;
-      border: 1px solid rgba(119, 230, 220, .2);
+      border: 1px solid rgba(255, 215, 98, .32);
       border-radius: 12px;
       background: rgba(255, 255, 255, .04);
+      box-shadow: 0 0 18px rgba(0, 255, 255, .08), inset 0 0 14px rgba(255, 211, 92, .035);
+      animation: pulse-glow 1.55s ease-in-out infinite;
     }
     #rewards-screen .active-claim-copy {
       display: grid;
@@ -4743,7 +4811,7 @@
     #rewards-screen .active-claim-button {
       flex: 0 0 auto;
       min-width: 92px;
-      min-height: 46px;
+      min-height: 48px;
       padding: 8px 12px;
       border: 1px solid rgba(119, 230, 220, .34);
       border-radius: 9px;
@@ -4752,6 +4820,11 @@
       cursor: pointer;
       font: 800 10px "Orbitron", system-ui, sans-serif;
       touch-action: manipulation;
+    }
+    #rewards-screen .active-claim-button:hover:not(:disabled) {
+      border-color: rgba(0, 255, 255, .72);
+      background: linear-gradient(110deg, rgba(0, 255, 255, .2), rgba(255, 215, 98, .15));
+      box-shadow: 0 0 18px rgba(0, 255, 255, .18);
     }
     #rewards-screen .active-claim-button:active { transform: scale(.97); }
     #rewards-screen .active-unclaimed-empty {
@@ -5331,6 +5404,23 @@
               <span class="minimal-section-number">02</span>
               <div><h3 id="coreMilestonesTitle">Core Milestones</h3><p>Track progress and claim ready rewards below.</p></div>
             </header>
+            <section class="weekend-bonus-summary" id="weekendBonusSummary" aria-labelledby="weekendBonusTitle" aria-live="polite">
+              <div class="weekend-bonus-heading">
+                <div>
+                  <span class="weekend-bonus-kicker">EVENT BONUS · AUTOMATIC PAYOUT</span>
+                  <h4 id="weekendBonusTitle">⚡ Weekend Neon Storm</h4>
+                  <p id="weekendBonusDescription">Checking event status…</p>
+                </div>
+                <strong id="weekendBonusMultiplier">2×</strong>
+              </div>
+              <div class="weekend-bonus-stats">
+                <span><strong id="weekendBonusRuns">0</strong> runs</span>
+                <span><strong id="weekendBonusCompleted">0</strong> completed</span>
+                <span id="weekendBonusCountdown">EVENT STATUS</span>
+              </div>
+              <p class="weekend-bonus-latest" id="weekendBonusLatest">Event payouts are added automatically after each eligible run.</p>
+              <button class="weekend-bonus-action" id="weekendBonusAction" type="button">VIEW EVENT</button>
+            </section>
             <div class="badge-grid" id="achievementBadgeList" aria-label="Individual achievement badges" aria-live="polite"></div>
             <p class="reward-filter-empty" data-reward-empty="achievements" hidden>No badges match this filter yet.</p>
           </div>
@@ -12691,6 +12781,7 @@ void main() {
         } catch (error) {
           // The weekend event continues in memory if local storage is unavailable.
         }
+        window.dispatchEvent(new Event("colorShiftProgressionChanged"));
       }
       function loadWeekendStormState(eventId) {
         try {
@@ -12766,6 +12857,39 @@ void main() {
           el("weekendStormParticipation").textContent = weekendStormState.participated
             ? "2× event active · " + weekendStormState.completedRuns + " completed run" + (weekendStormState.completedRuns === 1 ? "" : "s") + " this weekend"
             : "Event bonus: 2× · No purchases required";
+        }
+        const bonusDescription = el("weekendBonusDescription");
+        const bonusMultiplier = el("weekendBonusMultiplier");
+        const bonusRuns = el("weekendBonusRuns");
+        const bonusCompleted = el("weekendBonusCompleted");
+        const bonusCountdown = el("weekendBonusCountdown");
+        const bonusLatest = el("weekendBonusLatest");
+        const bonusAction = el("weekendBonusAction");
+        if (bonusDescription) {
+          bonusDescription.textContent = weekendStormActive
+            ? weekendStormState.participated
+              ? "Storm active. Eligible Zero-Gravity and Laser Chaos runs earn 2× score and crystals."
+              : "The 2× score and crystal bonus is ready. Start a storm mode while the event is live."
+            : "The storm is offline. Check back Saturday or Sunday for 2× score and crystal payouts.";
+        }
+        if (bonusMultiplier) bonusMultiplier.textContent = weekendStormActive ? "2× LIVE" : "2× WEEKEND";
+        if (bonusRuns) bonusRuns.textContent = String(safeStoredCount(weekendStormState.runsStarted));
+        if (bonusCompleted) bonusCompleted.textContent = String(safeStoredCount(weekendStormState.completedRuns));
+        if (bonusCountdown) {
+          bonusCountdown.textContent = weekendStormActive
+            ? "ENDS IN " + formatWeekendCountdown(weekendStormEndsAt - now.getTime())
+            : rewardsCountdown?.textContent || "NEXT WEEKEND";
+        }
+        if (bonusLatest) {
+          bonusLatest.textContent = weekendStormState.completedRuns > 0
+            ? "Latest 2× run: " + safeStoredCount(weekendStormState.lastCompletedScore).toLocaleString("en-US") +
+              " points · +" + safeStoredCount(weekendStormState.lastCompletedCrystals).toLocaleString("en-US") +
+              " crystals credited automatically."
+            : "Event payouts are added to your wallet automatically after each eligible run.";
+        }
+        if (bonusAction) {
+          bonusAction.disabled = !weekendStormActive;
+          bonusAction.textContent = weekendStormActive ? "VIEW STORM MODES" : "EVENT OFFLINE";
         }
       }
       function closeWeekendStormModal() {
@@ -13031,6 +13155,7 @@ void main() {
           // Progress remains usable for this visit if browser storage is blocked or full.
         }
         writeLocalIntegritySnapshot();
+        window.dispatchEvent(new Event("colorShiftProgressionChanged"));
         return saved;
       }
       updateModeHighScoreDisplay();
@@ -13767,7 +13892,29 @@ void main() {
         const count = el("activeUnclaimedCount");
         if (!list || !empty || !count) return;
 
+        const now = Date.now();
+        for (const [key, reward] of recentClaimedRewardRows) {
+          if (reward.expiresAt <= now) recentClaimedRewardRows.delete(key);
+        }
+        refreshLoginStreakDate();
         const rewards = [];
+        if (!loginStreakClaimedToday) {
+          const day = Math.min(7, Math.max(1, safeStoredCount(loginStreakCount) || 1));
+          const streakReward = DAILY_STREAK_REWARDS[day - 1];
+          const extra = streakReward.shield
+            ? " · 1 free Shield"
+            : streakReward.aura
+              ? " · Legendary Aura"
+              : "";
+          rewards.push({
+            type: "streak",
+            id: String(day),
+            title: "Daily Streak Check-in",
+            detail: "Day " + day + " of 7 · today's login reward",
+            reward: "💎 +" + streakReward.crystals + extra,
+            action: "CLAIM"
+          });
+        }
         const addRows = (selector, readItem) => {
           document.querySelectorAll(selector).forEach(card => {
             const reward = readItem(card);
@@ -13808,6 +13955,12 @@ void main() {
             action: "CLAIM"
           };
         });
+        for (const reward of recentClaimedRewardRows.values()) {
+          if (!rewards.some(item => item.type === reward.type && item.id === reward.id)) {
+            rewards.push(reward);
+          }
+        }
+        rewards.sort((a, b) => Number(Boolean(a.claimed)) - Number(Boolean(b.claimed)));
 
         document.querySelectorAll("#achievementList .achievement-category").forEach(category => {
           const tiers = Array.from(category.querySelectorAll(".achievement-tier"));
@@ -13817,6 +13970,7 @@ void main() {
         rewards.forEach(reward => {
           const row = document.createElement("article");
           row.className = "active-claim-row";
+          row.classList.toggle("claimed", Boolean(reward.claimed));
           const copy = document.createElement("div");
           copy.className = "active-claim-copy";
           const title = document.createElement("strong");
@@ -13831,15 +13985,44 @@ void main() {
           button.type = "button";
           button.dataset.quickClaimType = reward.type;
           button.dataset.quickClaimId = reward.id;
-          button.textContent = "CLAIM";
-          button.setAttribute("aria-label", "Claim " + reward.title + " " + reward.reward);
+          button.disabled = Boolean(reward.claimed);
+          button.textContent = reward.claimed ? "CLAIMED ✓" : reward.action || "CLAIM";
+          button.setAttribute("aria-label", reward.claimed
+            ? reward.title + " already claimed"
+            : "Claim " + reward.title + " " + reward.reward);
           row.append(copy, button);
           list.append(row);
         });
-        count.textContent = rewards.length
-          ? rewards.length + (rewards.length === 1 ? " reward ready" : " rewards ready")
-          : "All caught up";
+        const readyCount = rewards.filter(reward => !reward.claimed).length;
+        count.textContent = readyCount
+          ? readyCount + (readyCount === 1 ? " reward ready" : " rewards ready")
+          : rewards.length
+            ? "Reward claimed"
+            : "All caught up";
         empty.hidden = rewards.length > 0;
+      }
+      const recentClaimedRewardRows = new Map();
+      let recentClaimClearTimer = 0;
+      function rememberClaimedReward(button) {
+        const row = button.closest(".active-claim-row");
+        const copy = row?.querySelector(".active-claim-copy");
+        const type = button.dataset.quickClaimType;
+        const id = button.dataset.quickClaimId;
+        if (!row || !copy || !type || !id) return;
+        recentClaimedRewardRows.set(type + ":" + id, {
+          type,
+          id,
+          title: copy.querySelector("strong")?.textContent || "Reward",
+          detail: copy.querySelector("span")?.textContent || "Claimed just now",
+          reward: copy.querySelector("small")?.textContent || "",
+          claimed: true,
+          expiresAt: Date.now() + 1800
+        });
+        window.clearTimeout(recentClaimClearTimer);
+        recentClaimClearTimer = window.setTimeout(() => {
+          recentClaimClearTimer = 0;
+          renderActiveUnclaimedRewards();
+        }, 1850);
       }
       function setRewardFilter(filter) {
         if (!["all", "claimed", "unclaimed"].includes(filter)) return;
@@ -13987,15 +14170,92 @@ void main() {
                (ready && !claimed ? 'data-attention-label="CLAIM!" ' : "") + (!ready || claimed ? "disabled" : "") + '>' +
               (claimed ? "CLAIMED ✓" : ready ? "CLAIM 💎 +" + item.reward : "LOCKED 🔒") + '</button></article>';
         }).join("");
-        renderActiveUnclaimedRewards();
         updateShopPreview();
         updateDailyQuestClock();
         updateUnclaimedRewardBadges();
         renderDailyStreakCalendar();
         updateWeekendStormUI();
+        renderActiveUnclaimedRewards();
         applyRewardFilter();
         if (milestonesChanged || previousDailyDate !== progression.daily.date) saveProgression();
       }
+      let progressionRefreshFrame = 0;
+      function integritySnapshotMatchesStorageValue(key, value) {
+        try {
+          const marker = JSON.parse(localStorage.getItem(LOCAL_INTEGRITY_KEY) || "null");
+          if (marker?.version !== 3 || !marker.snapshot || marker.snapshot.storage?.[key] !== value) return false;
+          return checksumText(
+            LOCAL_INTEGRITY_SEED + "|" + JSON.stringify(marker.snapshot)
+          ) === marker.checksum;
+        } catch {
+          return false;
+        }
+      }
+      function syncExternalProgressionRecord(raw) {
+        try {
+          if (!integritySnapshotMatchesStorageValue(PROGRESSION_KEY, raw)) return;
+          const saved = JSON.parse(raw || "null");
+          if (!saved || ![1, 2, 3, 4, 5, 6, 7].includes(saved.version)) return;
+          progression.crystals = safeStoredCount(saved.crystals);
+          progression.lifetimeCrystals = Math.max(
+            progression.crystals,
+            safeStoredCount(saved.lifetimeCrystals)
+          );
+          progression.daily = normalizeDailyProgress(saved.daily);
+          progression.stats = {
+            bestDistance: safeStoredCount(saved.stats?.bestDistance),
+            lifetimeGates: safeStoredCount(saved.stats?.lifetimeGates),
+            laserGates: safeStoredCount(saved.stats?.laserGates)
+          };
+          for (const item of ACHIEVEMENTS) {
+            if (saved.achievements && item.id in saved.achievements) {
+              progression.achievements[item.id] = saved.achievements[item.id] === true;
+            }
+            if (saved.claimedAchievements && item.id in saved.claimedAchievements) {
+              progression.claimedAchievements[item.id] = saved.claimedAchievements[item.id] === true;
+            }
+          }
+          for (const category of ACHIEVEMENT_CATEGORIES) {
+            for (const tier of category.tiers) {
+              if (saved.unlockedAchievementTiers && tier.id in saved.unlockedAchievementTiers) {
+                progression.unlockedAchievementTiers[tier.id] = saved.unlockedAchievementTiers[tier.id] === true;
+              }
+              if (saved.claimedAchievementRewards && tier.id in saved.claimedAchievementRewards) {
+                progression.claimedAchievementRewards[tier.id] = saved.claimedAchievementRewards[tier.id] === true;
+              }
+            }
+          }
+          if (saved.powerTokens) {
+            for (const type of ["prism", "warp", "booster"]) {
+              progression.powerTokens[type] = Math.min(99, safeStoredCount(saved.powerTokens[type]));
+            }
+          }
+        } catch (error) {
+          // Ignore malformed updates from another tab; keep the current session state.
+        }
+      }
+      window.addEventListener("colorShiftProgressionChanged", () => {
+        if (el("rewards-screen").hidden || progressionRefreshFrame) return;
+        progressionRefreshFrame = requestAnimationFrame(() => {
+          progressionRefreshFrame = 0;
+          if (!el("rewards-screen").hidden) renderProgressionUI();
+        });
+      });
+      const rewardsStorageKeys = new Set([
+        PROGRESSION_KEY,
+        DAILY_STREAK_DATE_KEY,
+        DAILY_STREAK_COUNT_KEY,
+        WEEKEND_STORM_STORAGE_KEY
+      ]);
+      window.addEventListener("storage", event => {
+        if (!rewardsStorageKeys.has(event.key)) return;
+        if (event.key === PROGRESSION_KEY) syncExternalProgressionRecord(event.newValue);
+        if (event.key === DAILY_STREAK_DATE_KEY || event.key === DAILY_STREAK_COUNT_KEY) {
+          if (integritySnapshotMatchesStorageValue(event.key, event.newValue)) initializeLoginStreak();
+        }
+        if (event.key === WEEKEND_STORM_STORAGE_KEY) refreshWeekendStormEvent();
+        if (!el("rewards-screen").hidden) renderProgressionUI();
+      });
       applyPlayerSkin(progression.activeSkin);
       applyPlayerAura(progression.activeAura);
       verifyLocalIntegritySnapshot();
@@ -14122,6 +14382,13 @@ void main() {
       function updateDailyQuestClock() {
         const timer = el("dailyResetTimer");
         if (!timer) return;
+        const previousStreakDay = loginStreakLaunchDay;
+        refreshLoginStreakDate();
+        if (previousStreakDay !== loginStreakLaunchDay && !el("rewards-screen").hidden) {
+          renderDailyStreakCalendar();
+          renderActiveUnclaimedRewards();
+          updateUnclaimedRewardBadges();
+        }
         const today = localDayKey();
         if (progression.daily?.date !== today) {
           progression.daily = createDailyProgress();
@@ -18772,6 +19039,7 @@ void main() {
       el("zeroGravityModeButton").addEventListener("click", () => setGameMode("zeroGravity"));
       el("laserChaosModeButton").addEventListener("click", () => setGameMode("laserChaos"));
       el("weekend-storm-banner").addEventListener("click", openWeekendStormModal);
+       el("weekendBonusAction").addEventListener("click", openWeekendStormModal);
       el("closeWeekendStormModal").addEventListener("click", closeWeekendStormModal);
       el("stormModeZeroGravity").addEventListener("click", () => chooseWeekendStormMode("zeroGravity"));
       el("stormModeLaserChaos").addEventListener("click", () => chooseWeekendStormMode("laserChaos"));
@@ -18887,10 +19155,12 @@ void main() {
         el("activeUnclaimedList").addEventListener("click", event => {
           const button = event.target.closest("[data-quick-claim-type]");
           if (!button || button.disabled) return;
+          rememberClaimedReward(button);
           const { quickClaimType, quickClaimId } = button.dataset;
           if (quickClaimType === "daily") claimDailyBounty(quickClaimId);
           else if (quickClaimType === "badge") claimAchievementBadge(quickClaimId);
           else if (quickClaimType === "tier") claimAchievementReward(quickClaimId);
+           else if (quickClaimType === "streak") claimDailyStreakReward();
         });
       el("settingsButton").addEventListener("click", openSettings);
         el("settingsBack").addEventListener("click", () => {
