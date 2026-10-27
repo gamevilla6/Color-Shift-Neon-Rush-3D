@@ -134,11 +134,14 @@ export function createCyberDuelRoom(): CyberDuelRoomSession {
   removeExpiredRooms(now);
   if (rooms.size >= MAX_ROOMS) throw new CyberDuelRoomError(503, "Room capacity is temporarily full.");
 
+  const firstCode = randomInt(1000, 10_000);
   let roomCode = "";
-  for (let attempt = 0; attempt < 100; attempt += 1) {
-    roomCode = `CYBER-${String(randomInt(1000, 10_000))}`;
-    if (!rooms.has(roomCode)) break;
-    roomCode = "";
+  for (let offset = 0; offset < 9000; offset += 1) {
+    const candidate = `CYBER-${String(1000 + ((firstCode - 1000 + offset) % 9000))}`;
+    if (!rooms.has(candidate)) {
+      roomCode = candidate;
+      break;
+    }
   }
   if (!roomCode) throw new CyberDuelRoomError(503, "Could not reserve a room code. Please try again.");
 
@@ -171,6 +174,7 @@ export function joinCyberDuelRoom(roomCode: string, token?: string): CyberDuelRo
       refreshWaitingStatus(room, now);
       return session(room, token, existingIndex);
     }
+    throw new CyberDuelRoomError(403, "This room session has expired. Open the invite again to join.");
   }
 
   if (room.status === "running" || room.status === "over") {

@@ -1607,6 +1607,19 @@
       background:linear-gradient(to bottom,rgba(4,10,20,.28) 0 50%,rgba(8,4,19,.3) 50% 100%);
       touch-action:none; user-select:none; -webkit-user-select:none;
     }
+    .cyber-duel-countdown {
+      position:fixed; z-index:120; inset:0; display:grid; place-items:center; pointer-events:auto;
+      background:rgba(3,5,18,.46); backdrop-filter:blur(5px);
+      color:#efffff; font:900 clamp(5rem,22vw,11rem)/1 system-ui,sans-serif; letter-spacing:.08em;
+      text-shadow:0 0 18px #38eaff,0 0 54px #ff4cc8,0 8px 30px rgba(0,0,0,.8);
+    }
+    .cyber-duel-countdown[hidden] { display:none !important; }
+    .cyber-duel-countdown.is-ticking { animation:cyberDuelTick .72s cubic-bezier(.2,.8,.2,1) both; }
+    @keyframes cyberDuelTick {
+      0% { opacity:0; transform:scale(1.55); filter:blur(8px); }
+      30% { opacity:1; filter:blur(0); }
+      100% { opacity:.92; transform:scale(1); }
+    }
     #game.cyber-duel-active .topbar, #game.cyber-duel-active #hud,
     #game.cyber-duel-active #activePowerToolbar, #game.cyber-duel-active #pauseButton,
     #game.cyber-duel-active #gameSoundToggle, #game.cyber-duel-active #pursuitWarning {
@@ -4510,6 +4523,7 @@
       </div>
       <div class="duel-wallet-chip" id="duelWallet">💎 0</div>
     </section>
+    <div class="cyber-duel-countdown" id="cyberDuelCountdown" role="status" aria-live="assertive" hidden></div>
     <section class="cyber-duel-victory" id="cyber-duel-victory" role="dialog" aria-modal="true" aria-labelledby="cyberDuelWinnerTitle" aria-describedby="cyberDuelWinnerSummary" hidden>
       <div class="cyber-duel-victory-card">
         <div class="cyber-duel-kicker">MATCH RESULT · NEON RUMBLE</div>
@@ -8454,18 +8468,27 @@ void main() {
       const CYBER_DUEL_ROOM_STORAGE_PREFIX = "neonCyberDuelRoomToken:";
       const CYBER_DUEL_ROOM_POLL_MS = 220;
       const CYBER_DUEL_SNAPSHOT_MS = 160;
+      const CYBER_DUEL_ACTIVE_ROOM_KEY = "neonCyberDuelActiveRoomV1";
       function normalizeCyberDuelRoomCode(value) {
         if (typeof value !== "string" || value.length > 16) return "";
         const normalized = value.trim().toUpperCase();
         return /^CYBER-[0-9]{4}$/.test(normalized) ? normalized : "";
       }
-      const CYBER_DUEL_ROOM_QUERY = (() => {
+      const CYBER_DUEL_ROOM_PARAM = (() => {
         try {
-          const raw = new URLSearchParams(window.location.search).get("room") || "";
-          return normalizeCyberDuelRoomCode(raw);
-        } catch { return ""; }
+          const params = new URLSearchParams(window.location.search);
+          const raw = params.get("room");
+          return {
+            present: raw !== null,
+            raw: raw || "",
+            roomCode: raw === null ? "" : normalizeCyberDuelRoomCode(raw)
+          };
+        } catch { return { present: false, raw: "", roomCode: "" }; }
       })();
+      const CYBER_DUEL_ROOM_QUERY = CYBER_DUEL_ROOM_PARAM.roomCode;
       let cyberDuelState = "idle";
+      let cyberDuelCountdownActive = false;
+      let cyberDuelCountdownTimer = 0;
       let cyberDuelPlayers = [];
       let cyberDuelCanvasSize = { width: 1, height: 1 };
       let cyberDuelBadgeUnlocked = false;
@@ -15698,6 +15721,28 @@ void main() {
       function cyberDuelSessionStorageKey(roomCode) {
         return `${CYBER_DUEL_ROOM_STORAGE_PREFIX}${roomCode}`;
       }
+      function readActiveCyberDuelRoom() {
+        try {
+          const saved = JSON.parse(window.sessionStorage.getItem(CYBER_DUEL_ACTIVE_ROOM_KEY) || "null");
+          const roomCode = normalizeCyberDuelRoomCode(saved?.roomCode);
+          if (!roomCode || ![0, 1].includes(saved?.playerIndex)) return null;
+          return { roomCode, playerIndex: saved.playerIndex };
+        } catch { return null; }
+      }
+      function saveActiveCyberDuelRoom(session) {
+        if (!isValidCyberDuelRoomSession(session)) return;
+        try {
+          window.sessionStorage.setItem(CYBER_DUEL_ACTIVE_ROOM_KEY, JSON.stringify({
+            roomCode: session.roomCode,
+            playerIndex: session.playerIndex
+          }));
+        } catch {}
+      }
+      function clearActiveCyberDuelRoom(roomCode = "") {
+        const active = readActiveCyberDuelRoom();
+        if (roomCode && active?.roomCode !== normalizeCyberDuelRoomCode(roomCode)) return;
+        try { window.sessionStorage.removeItem(CYBER_DUEL_ACTIVE_ROOM_KEY); } catch {}
+      }
       function readCyberDuelRoomToken(roomCode) {
         try { return window.sessionStorage.getItem(cyberDuelSessionStorageKey(roomCode)) || ""; } catch { return ""; }
       }
@@ -15784,7 +15829,9 @@ void main() {
         } else if (roomState.status === "over") {
           setCyberDuelRoomStatus(guestConnected ? "Match complete · both players can run it back." : "Match complete · invite your friend again to rematch.");
         } else if (guestConnected) {
-          setCyberDuelRoomStatus(isHost ? "Friend connected as Player 2 · you can start the duel." : "You joined as Player 2 · waiting for the host to start.");
+          setCyberDuelRoomStatus(isHost
+            ? "Friend connected as Player 2 · you can start the duel."
+            : `⚡ Connected to Room ${cyberDuelRoomSession.roomCode} as Player 2! Waiting for Host to start...`);
         } else {
           setCyberDuelRoomStatus(isHost ? `Room ${cyberDuelRoomSession.roomCode} is ready · waiting for Player 2.` : "Waiting for the room host to come online…");
         }
@@ -15794,6 +15841,7 @@ void main() {
         cyberDuelEventCursor = session.eventCursor || 0;
         cyberDuelSnapshotAccumulator = 0;
         saveCyberDuelRoomToken(session.roomCode, session.token);
+        saveActiveCyberDuelRoom(session);
         el("cyberDuelRoomCode").textContent = session.roomCode;
         updateCyberDuelLobbyRoomState(session);
         scheduleCyberDuelRoomPoll(150);
@@ -15841,9 +15889,13 @@ void main() {
             if (error.status === 404 || error.status === 403) {
               cyberDuelRoomSession = null;
               clearCyberDuelRoomToken(session.roomCode);
+              clearActiveCyberDuelRoom(session.roomCode);
+              stopCyberDuelCountdown();
               stopCyberDuelRoomPolling();
               if (cyberDuelState === "running") finishCyberDuel(null, "draw");
               else {
+                el("cyber-duel-screen").hidden = true;
+                el("cyber-duel-lobby").hidden = false;
                 el("cyberDuelStartButton").disabled = true;
                 el("cyberDuelStartButton").textContent = "ROOM UNAVAILABLE";
                 el("cyberDuelInviteButton").hidden = true;
@@ -15932,15 +15984,25 @@ void main() {
           if (session.playerIndex === 0) {
             setCyberDuelRoomStatus("This device created the room · open the invite on your friend's device for Player 2.");
           } else {
-            setCyberDuelRoomStatus(`Connected to ${session.roomCode} as Player 2 · waiting for the host.`);
+            setCyberDuelRoomStatus(`⚡ Connected to Room ${session.roomCode} as Player 2! Waiting for Host to start...`);
           }
         } catch (error) {
           if (generation !== cyberDuelRoomGeneration) return;
+          const roomRejected = [400, 403, 404, 409].includes(error.status) ||
+            error.message === "The room service returned an invalid session.";
+          if (roomRejected) {
+            clearCyberDuelRoomToken(roomCode);
+            clearActiveCyberDuelRoom(roomCode);
+          }
+          if (error.status === 400 || error.status === 404) clearCyberDuelRoomQuery(roomCode);
           el("cyberDuelRoomCode").textContent = roomCode;
           el("cyberDuelInviteButton").hidden = true;
           el("cyberDuelStartButton").disabled = true;
           el("cyberDuelStartButton").textContent = "ROOM UNAVAILABLE";
-          setCyberDuelRoomStatus(error.message || "This room is full, expired, or unavailable.");
+          setCyberDuelRoomStatus(
+            "⚠️ " + (error.message || "This room is full, expired, or unavailable.") +
+            " Ask the host for a fresh invite or return to the menu."
+          );
         }
       }
       function cyberDuelInviteUrl() {
@@ -15949,20 +16011,20 @@ void main() {
         url.searchParams.set("room", cyberDuelRoomSession.roomCode);
         return url.toString();
       }
+      function clearCyberDuelRoomQuery(expectedCode = "") {
+        try {
+          const url = new URL(window.location.href);
+          const currentCode = url.searchParams.get("room") || "";
+          if (expectedCode && normalizeCyberDuelRoomCode(currentCode) !== expectedCode) return;
+          url.searchParams.delete("room");
+          window.history.replaceState({}, "", url);
+        } catch {}
+      }
       async function inviteCyberDuelFriend() {
         const session = cyberDuelRoomSession;
         if (!session || session.playerIndex !== 0) return;
         const inviteUrl = cyberDuelInviteUrl();
-        const message = `⚔️ Join my Cyber Duel: Neon Rumble! Open room ${session.roomCode} and race me. ${inviteUrl}`;
-        if (typeof navigator.share === "function") {
-          try {
-            await navigator.share({ title: "Cyber Duel: Neon Rumble", text: message, url: inviteUrl });
-            setCyberDuelRoomStatus("Share sheet opened · send the invite from your chosen app.");
-            return;
-          } catch (error) {
-            if (error?.name === "AbortError") return;
-          }
-        }
+        const message = `⚡ Let's Duel! Join my Cyber Room in Color Shift: Neon Rush 3D: ${inviteUrl}`;
         const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
         const link = document.createElement("a");
         link.href = whatsappUrl;
@@ -15974,12 +16036,29 @@ void main() {
         setCyberDuelRoomStatus("WhatsApp invite opened · finish sharing in WhatsApp.");
       }
       function openCyberDuelLobby(roomCode = "") {
-        const validatedRoomCode = roomCode ? normalizeCyberDuelRoomCode(roomCode) : "";
-        if (roomCode && !validatedRoomCode) {
-          setCyberDuelRoomStatus("Invalid room code. Use the CYBER-1234 format.");
+        const hasExplicitRoomCode = roomCode !== "";
+        const requestedRoomCode = hasExplicitRoomCode ? normalizeCyberDuelRoomCode(roomCode) : "";
+        if (state !== "ready" || cyberDuelState === "running" || cyberDuelState === "lobby") return false;
+        if (hasExplicitRoomCode && !requestedRoomCode) {
+          cyberDuelRoomGeneration += 1;
+          stopCyberDuelRoomPolling();
+          cyberDuelRoomSession = null;
+          cyberDuelState = "lobby";
+          setBannerAdPlacement("hidden");
+          clearCyberDuelRoomQuery();
+          el("overlay").classList.add("hidden");
+          el("cyber-duel-lobby").hidden = false;
+          el("cyberDuelRoomCode").textContent = "INVALID LINK";
+          el("cyberDuelInviteButton").hidden = true;
+          el("cyberDuelInviteButton").disabled = true;
+          el("cyberDuelStartButton").disabled = true;
+          el("cyberDuelStartButton").textContent = "ROOM LINK INVALID";
+          setCyberDuelRoomStatus("⚠️ This invite link is invalid. Room codes use the CYBER-1234 format.");
           return false;
         }
-        if (state !== "ready" || cyberDuelState === "running" || cyberDuelState === "lobby") return;
+        const savedRoom = hasExplicitRoomCode ? null : readActiveCyberDuelRoom();
+        const validatedRoomCode = requestedRoomCode || savedRoom?.roomCode || "";
+        stopCyberDuelRoomPolling();
         cyberDuelRoomGeneration += 1;
         const generation = cyberDuelRoomGeneration;
         cyberDuelRoomSession = null;
@@ -15994,7 +16073,9 @@ void main() {
         el("cyberDuelInviteButton").disabled = true;
         el("cyberDuelStartButton").disabled = true;
         el("cyberDuelStartButton").textContent = validatedRoomCode ? "JOINING ROOM…" : "CREATING ROOM…";
-        setCyberDuelRoomStatus(validatedRoomCode ? `Joining ${validatedRoomCode} as Player 2…` : "Creating a secure room…");
+        setCyberDuelRoomStatus(validatedRoomCode
+          ? `Joining or reconnecting to ${validatedRoomCode}…`
+          : "Creating a secure room…");
         el("cyberDuelStartButton").focus({ preventScroll: true });
         if (validatedRoomCode) void joinCyberDuelRoomForLobby(validatedRoomCode, generation);
         else void createCyberDuelRoomForLobby(generation);
@@ -16013,20 +16094,16 @@ void main() {
         cyberDuelSnapshotAccumulator = 0;
         if (!session) return;
         clearCyberDuelRoomToken(session.roomCode);
+        clearActiveCyberDuelRoom(session.roomCode);
         void cyberDuelRoomRequest("leave", {
           roomCode: session.roomCode,
           token: session.token
         }, { keepalive: true }).catch(() => {});
-        try {
-          const url = new URL(window.location.href);
-          if (url.searchParams.get("room") === session.roomCode) {
-            url.searchParams.delete("room");
-            window.history.replaceState({}, "", url);
-          }
-        } catch {}
+        clearCyberDuelRoomQuery(session.roomCode);
       }
       function returnFromCyberDuel() {
         cyberDuelRoomGeneration += 1;
+        stopCyberDuelCountdown();
         leaveCyberDuelRoom();
         cyberDuelState = "idle";
         el("game").classList.remove("cyber-duel-active", "cyber-duel-online-host", "cyber-duel-online-guest");
@@ -16036,7 +16113,51 @@ void main() {
         disposeCyberDuelWorld();
         returnToHome();
       }
+      function stopCyberDuelCountdown() {
+        window.clearTimeout(cyberDuelCountdownTimer);
+        cyberDuelCountdownTimer = 0;
+        cyberDuelCountdownActive = false;
+        const countdown = el("cyberDuelCountdown");
+        if (countdown) {
+          countdown.hidden = true;
+          countdown.textContent = "";
+          countdown.classList.remove("is-ticking");
+        }
+      }
+      function startCyberDuelCountdown() {
+        if (cyberDuelCountdownActive) return;
+        cyberDuelCountdownActive = true;
+        el("cyber-duel-lobby").hidden = true;
+        el("cyber-duel-victory").hidden = true;
+        el("cyber-duel-screen").hidden = false;
+        const countdown = el("cyberDuelCountdown");
+        countdown.hidden = false;
+        let remaining = 3;
+        const tick = () => {
+          if (!cyberDuelCountdownActive) return;
+          if (remaining > 0) {
+            countdown.textContent = String(remaining);
+            remaining -= 1;
+            countdown.classList.remove("is-ticking");
+            void countdown.offsetWidth;
+            countdown.classList.add("is-ticking");
+            cyberDuelCountdownTimer = window.setTimeout(tick, 850);
+            return;
+          }
+          countdown.textContent = "GO!";
+          countdown.classList.remove("is-ticking");
+          void countdown.offsetWidth;
+          countdown.classList.add("is-ticking");
+          cyberDuelCountdownTimer = window.setTimeout(() => {
+            if (!cyberDuelCountdownActive) return;
+            stopCyberDuelCountdown();
+            beginCyberDuelRound();
+          }, 450);
+        };
+        tick();
+      }
       function beginCyberDuelRound() {
+        stopCyberDuelCountdown();
         resetCyberDuelRound();
         cyberDuelWinnerIndex = null;
         cyberDuelFinishReason = "finish";
@@ -16068,7 +16189,7 @@ void main() {
             .then(roomState => {
               if (cyberDuelRoomSession !== session) return;
               session.status = roomState.status;
-              beginCyberDuelRound();
+              startCyberDuelCountdown();
             })
             .catch(error => {
               el("cyberDuelStartButton").disabled = false;
@@ -16076,7 +16197,8 @@ void main() {
             });
           return;
         }
-        beginCyberDuelRound();
+        if (fromRoomSignal && cyberDuelRoomSession?.playerIndex !== 1) return;
+        startCyberDuelCountdown();
       }
       const fallbackGateOrder = [];
       function compareGateDepth(a, b) {
@@ -17477,12 +17599,19 @@ void main() {
           el("sessionConnectionStatus").textContent = "LOCAL SESSION PRESERVED · READY TO RESUME";
         }
       });
-      if (CYBER_DUEL_ROOM_QUERY) {
-        window.setTimeout(() => {
-          if (state === "ready" && cyberDuelState === "idle") {
-            openCyberDuelLobby(CYBER_DUEL_ROOM_QUERY);
+      if (CYBER_DUEL_ROOM_PARAM.present) {
+        const requestedRoom = CYBER_DUEL_ROOM_QUERY || CYBER_DUEL_ROOM_PARAM.raw || "INVALID";
+        const autoJoinRoom = (attempt = 0) => {
+          if (cyberDuelState !== "idle") return;
+          if (state === "ready") {
+            openCyberDuelLobby(requestedRoom);
+          } else if (attempt < 40) {
+            window.setTimeout(() => autoJoinRoom(attempt + 1), 100);
+          } else {
+            window.alert("The Cyber Duel room could not open. Please reload the invite link.");
           }
-        }, 900);
+        };
+        autoJoinRoom();
       }
       setSplashProgress(94, "Warming up the first frame");
     })();
