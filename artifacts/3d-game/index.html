@@ -22,7 +22,7 @@
     Short description (80 chars max): Match neon gates in a fast 3D cyberpunk arcade run.
     Long description: Switch colors, steer across three lanes, and survive an endless neon tunnel.
     Build streak multipliers, collect crystals, unlock original skins, and challenge Laser Pursuit,
-    Time Attack, Anti-Gravity, Blackout, and Mirror Matrix modes.
+    Time Attack, Blackout, and Laser Pursuit modes, plus limited-time weekend events.
     Feature tags: Neon Arcade · 3D Color Match · Endless Cyberpunk Game · Offline Arcade
     Prepare a real 512x512 Play icon, feature graphic, screenshots, privacy policy, data-safety
     answers, and age rating in Play Console before submitting.
@@ -36,9 +36,6 @@
     complete Google UMP consent configuration and Play data-safety disclosures, and never reward
     a user until the native SDK confirms its earned-reward callback.
   -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='24' fill='%2338eaff'/%3E%3C/svg%3E" />
   <title>Color Shift: Neon Rush 3D</title>
   <style>
@@ -55,12 +52,26 @@
       --lime: #c5ff4a;
       --accent: #68f2df;
     }
+    /* Local-only aliases keep the arcade typography on installed system fonts.
+       No web font files or external font requests are used. */
+    @font-face {
+      font-family: "Orbitron";
+      src: local("Roboto Mono"), local("SFMono-Regular"), local("Menlo"), local("Consolas"), local("Liberation Mono"), local("DejaVu Sans Mono");
+      font-style: normal;
+      font-weight: 100 900;
+    }
+    @font-face {
+      font-family: "Rajdhani";
+      src: local("Roboto"), local("SF Pro Text"), local("Segoe UI"), local("Arial"), local("Liberation Sans");
+      font-style: normal;
+      font-weight: 100 900;
+    }
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
     html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; touch-action: pan-y; background: #090c13; }
-    body { color: var(--ink); font-family: ui-monospace, monospace; -webkit-font-smoothing: antialiased; }
+    body { color: var(--ink); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; -webkit-font-smoothing: antialiased; }
     button { font: inherit; }
     [hidden] { display: none !important; }
-    #game { position: relative; width: 100%; height: 100vh; height: 100dvh; min-height: 100vh; min-height: 100svh; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; background: radial-gradient(ellipse at 50% 34%, #18202b 0%, #0b1018 55%, #080b11 100%); }
+    #game { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; min-height: 100svh; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; background: radial-gradient(ellipse at 50% 34%, #18202b 0%, #0b1018 55%, #080b11 100%); }
     #game.is-running:not(.is-paused) { touch-action: none; }
     .orientation-warning {
       position: fixed;
@@ -278,11 +289,11 @@
     .auto-color-indicator[hidden] { display: none !important; }
     .auto-color-dot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: var(--auto-color); box-shadow: 0 0 10px var(--auto-color); }
     .auto-color-indicator strong { color: rgba(225,232,240,.58); font-size: 6px; }
-    #game.quantum-mode .auto-color-indicator { top: max(96px, calc(env(safe-area-inset-top) + 86px)); }
+    #game.weekend-zero-gravity-mode .auto-color-indicator { top: max(96px, calc(env(safe-area-inset-top) + 86px)); }
     .ghost-status { position: absolute; z-index: 6; top: max(108px, calc(env(safe-area-inset-top) + 96px)); left: 50%; transform: translate(-50%, -5px); padding: 6px 10px; border: 1px solid rgba(191, 229, 255, .28); border-radius: 999px; background: rgba(9, 13, 24, .64); color: rgba(227, 243, 255, .8); font: 700 7px/1 ui-monospace, monospace; letter-spacing: .14em; text-shadow: 0 0 10px rgba(151, 213, 255, .4); white-space: nowrap; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .24s ease, transform .24s ease, visibility .24s ease; backdrop-filter: blur(6px); }
     .ghost-status.visible { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
-    #game.quantum-mode .ghost-status { top: max(137px, calc(env(safe-area-inset-top) + 124px)); }
-    #game.quantum-mode .pause-button { border-color: rgba(176,139,255,.4); }
+    #game.weekend-zero-gravity-mode .ghost-status { top: max(137px, calc(env(safe-area-inset-top) + 124px)); }
+    #game.weekend-zero-gravity-mode .pause-button { border-color: rgba(176,139,255,.4); }
     .boost-banner { position: absolute; z-index: 6; top: 184px; left: 50%; transform: translateX(-50%); color: var(--lime); font-family: system-ui, sans-serif; font-size: 19px; font-weight: 900; letter-spacing: .2em; text-shadow: 0 0 18px rgba(197,255,74,.8); pointer-events: none; animation: boostPulse .5s ease-in-out infinite alternate; white-space: nowrap; }
     .boost-banner span { font: 9px ui-monospace, monospace; letter-spacing: .12em; }
     @keyframes boostPulse { from { opacity: .68; filter: brightness(.9); } to { opacity: 1; filter: brightness(1.4); } }
@@ -1245,6 +1256,40 @@
     }
     #overlay.game-over-screen .home-actions .primary-btn:hover { transform: scale(1.035); filter: brightness(1.08); }
     #overlay.game-over-screen .home-actions .primary-btn:active { transform: scale(.97); }
+    .gameover-primary-action[hidden] { display: none !important; }
+    #overlay.game-over-screen .gameover-primary-action {
+      display: block;
+      position: relative;
+      z-index: 2;
+      width: min(100%, 530px);
+      margin: 12px auto 16px;
+    }
+    #overlay.game-over-screen #gameOverPrimaryAction .primary-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-width: 0;
+      min-height: 66px;
+      padding: 15px 22px;
+      border: 2px solid rgba(120, 250, 255, .94);
+      border-radius: 16px;
+      clip-path: none;
+      background: linear-gradient(105deg, #38d9e8, #8af9f4 52%, #9ebaff);
+      color: #06151b;
+      font: 900 clamp(14px, 3.5vw, 18px)/1.2 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .16em;
+      text-shadow: 0 1px rgba(255,255,255,.45);
+      box-shadow: 0 0 26px rgba(56,234,255,.42), 0 0 44px rgba(56,234,255,.18), inset 0 1px rgba(255,255,255,.7);
+      animation: summaryPlayPulse 1.8s ease-in-out infinite;
+      transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+    }
+    #overlay.game-over-screen #gameOverPrimaryAction .primary-btn:hover {
+      transform: scale(1.05);
+      filter: brightness(1.08);
+      box-shadow: 0 0 32px rgba(56,234,255,.52), 0 0 50px rgba(56,234,255,.24), inset 0 1px rgba(255,255,255,.8);
+    }
+    #overlay.game-over-screen #gameOverPrimaryAction .primary-btn:active { transform: scale(.97); }
     #overlay.game-over-screen .home-return-btn {
       min-height: 52px;
       border: 1px solid rgba(201, 222, 238, .26);
@@ -1276,6 +1321,7 @@
       #overlay.game-over-screen .mystery-reward { margin: 7px auto 8px; }
       #overlay.game-over-screen .home-actions { gap: 8px; margin-top: 10px; }
       #overlay.game-over-screen .home-actions .primary-btn { min-height: 54px; }
+      #overlay.game-over-screen #gameOverPrimaryAction .primary-btn { min-height: 64px; }
       #overlay.game-over-screen .home-return-btn { min-height: 50px; }
     }
     @media (max-height: 730px) {
@@ -1291,7 +1337,8 @@
       .new-record-badge,
       .new-record-badge::before,
       .record-spark,
-      #overlay.game-over-screen .home-actions .primary-btn { animation: none !important; }
+      #overlay.game-over-screen .home-actions .primary-btn,
+      #overlay.game-over-screen #gameOverPrimaryAction .primary-btn { animation: none !important; }
     }
     @keyframes gameOverVignette { 0%, 100% { opacity: .58; } 50% { opacity: .95; } }
     @keyframes sessionGlitch {
@@ -1332,10 +1379,7 @@
     .mode-btn:hover { border-color: rgba(56, 234, 255, .68); background: rgba(16, 33, 46, .92); color: #fff; transform: translateY(-1px); }
     .mode-btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
     .mode-btn[aria-pressed="true"] { border-color: rgba(56,230,211,.88); background: linear-gradient(145deg, rgba(56,234,255,.24), rgba(255,79,184,.16)); color: #f4ffff; box-shadow: inset 0 0 18px rgba(56,230,211,.13), 0 0 20px rgba(56,230,211,.23), 0 0 30px rgba(255,79,184,.09); text-shadow: 0 0 12px rgba(56,234,255,.42); }
-    #game.quantum-mode .mode-btn[aria-pressed="true"] { border-color: rgba(185,138,255,.78); background: rgba(143,92,255,.18); color: #eee4ff; box-shadow: 0 0 18px rgba(143,92,255,.22); }
     #game.blackout-mode .mode-btn[aria-pressed="true"] { border-color: rgba(255,79,184,.78); background: rgba(255,40,117,.14); color: #fff0fa; box-shadow: 0 0 18px rgba(255,40,117,.22); }
-    #game.mirror-matrix-mode .mode-btn[aria-pressed="true"] { border-color: rgba(111,224,255,.82); background: linear-gradient(140deg, rgba(111,224,255,.2), rgba(190,103,255,.17)); color: #f4eaff; box-shadow: 0 0 18px rgba(157,113,255,.25); }
-    #game.mirror-matrix-mode #overlay.home-screen .mode-btn[aria-pressed="true"] { border-color: rgba(157,113,255,.92); background: linear-gradient(145deg, rgba(111,224,255,.22), rgba(190,103,255,.22)); color: #f4eaff; box-shadow: inset 0 0 16px rgba(157,113,255,.12), 0 0 18px rgba(157,113,255,.25); }
     #game.laser-pursuit-mode .mode-btn[aria-pressed="true"] { border-color: rgba(255,76,128,.9); background: linear-gradient(140deg, rgba(255,47,102,.22), rgba(190,59,255,.18)); color: #fff0f5; box-shadow: 0 0 20px rgba(255,44,99,.28); }
     .pursuit-vignette { position: absolute; z-index: 4; inset: 0; opacity: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 42%, rgba(255,20,65,.14) 68%, rgba(255,15,73,.92) 100%); mix-blend-mode: screen; transition: opacity .18s ease; }
     .pursuit-vignette.active { animation: pursuitPulse .44s ease-in-out infinite alternate; }
@@ -1343,7 +1387,7 @@
     .pursuit-warning { position: absolute; z-index: 6; top: max(96px, calc(env(safe-area-inset-top) + 84px)); left: 50%; transform: translateX(-50%); padding: 7px 12px; border: 1px solid rgba(255,73,122,.72); background: rgba(34,5,20,.82); color: #ffeaf0; font: 900 9px/1 ui-monospace, monospace; letter-spacing: .18em; text-shadow: 0 0 12px rgba(255,45,98,.85); box-shadow: 0 0 20px rgba(255,29,83,.22); white-space: nowrap; pointer-events: none; animation: pursuitPulse .44s ease-in-out infinite alternate; }
     #game.laser-pursuit-mode .ghost-status { top: max(132px, calc(env(safe-area-inset-top) + 120px)); }
     .pursuit-warning[hidden] { display: none !important; }
-    #game.quantum-mode .gravity-indicator { border-color: rgba(185,138,255,.72); background: rgba(17,9,42,.84); }
+    #game.weekend-zero-gravity-mode .gravity-indicator { border-color: rgba(185,138,255,.72); background: rgba(17,9,42,.84); }
     .daily-modal { position: absolute; z-index: 20; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: max(20px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom)); background: rgba(4,7,13,.82); backdrop-filter: blur(10px); touch-action: pan-y; }
     .daily-modal[hidden] { display: none !important; }
     .daily-card { position: relative; width: min(100%, 390px); max-height: min(92dvh, 780px); overflow-y: auto; overscroll-behavior: contain; padding: 22px 20px 18px; border: 1px solid rgba(255,205,74,.42); border-radius: 16px; background: radial-gradient(circle at 50% 0, rgba(255,205,74,.12), transparent 55%), rgba(8,12,19,.96); text-align: center; box-shadow: 0 0 38px rgba(255,205,74,.14); scrollbar-width: thin; scrollbar-color: rgba(255,205,74,.46) transparent; touch-action: pan-y; }
@@ -1542,6 +1586,20 @@
     .duel-player-brief.p1 strong { color:#66f8ff; text-shadow:0 0 12px rgba(56,237,255,.6); }
     .duel-player-brief.p2 strong { color:#ff73d3; text-shadow:0 0 12px rgba(255,63,199,.55); }
     .duel-lobby-badge { min-height:20px; color:#caff7b !important; font:800 12px/1.5 "Orbitron",system-ui,sans-serif !important; }
+    .duel-room-card {
+      display:grid; gap:7px; margin:14px 0 4px; padding:14px;
+      border:1px solid rgba(79,239,255,.34); border-radius:15px;
+      background:linear-gradient(135deg,rgba(16,42,57,.78),rgba(44,14,48,.68));
+      box-shadow:inset 0 0 22px rgba(76,225,255,.05);
+    }
+    .duel-room-label { color:#a5bdca; font:800 10px/1.4 "Orbitron",system-ui,sans-serif; letter-spacing:.18em; }
+    #cyberDuelRoomCode {
+      color:#75f7ff; font:900 clamp(21px,6vw,30px)/1.15 "Orbitron",system-ui,sans-serif;
+      letter-spacing:.12em; text-shadow:0 0 16px rgba(62,238,255,.52);
+    }
+    #cyberDuelRoomStatus { min-height:20px; margin:0; color:#cfdae5; font:700 14px/1.4 system-ui,sans-serif; }
+    #cyberDuelInviteButton { min-height:52px; margin-top:3px; }
+    #cyberDuelStartButton:disabled { opacity:.58; filter:saturate(.55); cursor:wait; transform:none; }
     .cyber-duel-lobby-actions, .cyber-duel-victory-actions { display:grid; gap:10px; margin-top:18px; }
     .cyber-duel-lobby-actions button, .cyber-duel-victory-actions button { width:100%; min-height:54px; }
     .cyber-duel-screen {
@@ -1554,6 +1612,10 @@
     #game.cyber-duel-active #gameSoundToggle, #game.cyber-duel-active #pursuitWarning {
       display:none !important;
     }
+    #game.cyber-duel-online-host .duel-player-panel.p2 .duel-touch-zone,
+    #game.cyber-duel-online-host .duel-player-panel.p2 .duel-touch-controls,
+    #game.cyber-duel-online-guest .duel-player-panel.p1 .duel-touch-zone,
+    #game.cyber-duel-online-guest .duel-player-panel.p1 .duel-touch-controls { display:none !important; }
     .duel-screen-divider { position:absolute; z-index:2; inset:calc(50% - 1px) 0 auto; height:2px; background:linear-gradient(90deg,transparent,#58f7ff 20%,#fff 50%,#ff58c6 80%,transparent); box-shadow:0 0 13px rgba(95,240,255,.8); }
     .duel-player-panel { position:absolute; inset-inline:0; height:50%; pointer-events:none; }
     .duel-player-panel.p1 { top:0; border-bottom:1px solid rgba(78,232,255,.28); }
@@ -1712,9 +1774,9 @@
       .stat-label { margin-top: 6px; font-size: 6px; letter-spacing: .1em; }
       .power-status { top: 117px; gap: 4px; }
       .auto-color-indicator { top: max(62px, calc(env(safe-area-inset-top) + 50px)); }
-      #game.quantum-mode .auto-color-indicator { top: max(94px, calc(env(safe-area-inset-top) + 82px)); }
+      #game.weekend-zero-gravity-mode .auto-color-indicator { top: max(94px, calc(env(safe-area-inset-top) + 82px)); }
       .ghost-status { top: max(104px, calc(env(safe-area-inset-top) + 92px)); }
-      #game.quantum-mode .ghost-status { top: max(133px, calc(env(safe-area-inset-top) + 120px)); }
+      #game.weekend-zero-gravity-mode .ghost-status { top: max(133px, calc(env(safe-area-inset-top) + 120px)); }
       .power-chip { padding: 5px 6px; font-size: 6.5px; letter-spacing: .09em; }
       .boost-banner { top: 154px; font-size: 16px; }
       .fever-banner { top: 188px; }
@@ -3957,6 +4019,7 @@
       <div class="card home-card" id="card">
         <div class="eyebrow" id="eyebrow">A color reaction test</div>
         <h1 aria-label="Color Shift: Neon Rush 3D"><span class="title-light" id="titleTop">COLOR SHIFT:</span><span class="title-accent" id="titleBottom">NEON RUSH 3D</span></h1>
+        <div class="gameover-primary-action" id="gameOverPrimaryAction" hidden></div>
         <p class="intro" id="intro">The ball cycles Red, Cyan, and Yellow automatically every 3.5 seconds. Tap, press Space, or use W / ↑ to switch early; the timer resets after each manual shift. Steer into the lane glowing with its current color.</p>
         <div class="color-key" id="colorKey">
           <span class="key-chip"><i style="color:var(--red);background:var(--red)"></i>Red</span>
@@ -3966,9 +4029,7 @@
         <div class="mode-selector" id="modeSelector" role="group" aria-label="Choose game mode">
           <button class="mode-btn" id="endlessModeButton" type="button" aria-pressed="true" aria-label="Classic Mode" title="Classic endless runner">Classic Mode</button>
           <button class="mode-btn" id="timeAttackModeButton" type="button" aria-pressed="false" aria-label="Time Attack Mode, sixty seconds" title="Time Attack Mode · 60 seconds">Time Attack</button>
-          <button class="mode-btn" id="antiGravityModeButton" type="button" aria-pressed="false" aria-label="Quantum Singularity: Anti-Gravity Mode" title="Quantum Singularity: Anti-Gravity Mode">Anti-Gravity</button>
           <button class="mode-btn" id="blackoutModeButton" type="button" aria-pressed="false" aria-label="Blackout Nightmare Mode" title="Blackout Nightmare Mode">Blackout</button>
-          <button class="mode-btn" id="mirrorMatrixModeButton" type="button" aria-pressed="false" aria-label="Mirror Matrix Mode" title="Mirror Matrix Mode">Mirror Matrix</button>
           <button class="mode-btn" id="laserPursuitModeButton" type="button" aria-pressed="false" aria-label="Laser Pursuit Mode" title="Laser Pursuit / Boss Rush Mode">Laser Pursuit</button>
           <button class="mode-btn" id="zeroGravityModeButton" type="button" aria-pressed="false" aria-label="Weekend Zero-Gravity Speed Run" title="Weekend event mode · floating crystal clusters" hidden>Zero-Gravity</button>
           <button class="mode-btn" id="laserChaosModeButton" type="button" aria-pressed="false" aria-label="Weekend Laser Chaos Mode" title="Weekend event mode · dense rotating laser gates" hidden>Laser Chaos</button>
@@ -4395,16 +4456,22 @@
     </section>
     <section class="cyber-duel-lobby" id="cyber-duel-lobby" role="dialog" aria-modal="true" aria-labelledby="cyberDuelLobbyTitle" aria-describedby="cyberDuelLobbyDescription" hidden>
       <div class="cyber-duel-lobby-card">
-        <div class="cyber-duel-kicker">LOCAL 2-PLAYER ARENA</div>
+        <div class="cyber-duel-kicker">ONLINE ROOM · TWO PLAYER ARENA</div>
         <h2 id="cyberDuelLobbyTitle">⚔️ CYBER DUEL<br>NEON RUMBLE</h2>
-        <p id="cyberDuelLobbyDescription">Race separate neon tracks. Match each gate's color and collect crystals. Mystery crates grant Phase (safe gates), EMP (glitch the rival), Hyper Speed, or a Crystal Vortex. First to 300m wins.</p>
+        <p id="cyberDuelLobbyDescription">Invite a friend into your room. Both runners race separate neon tracks; the room host keeps the match in sync and the first to 300m wins.</p>
         <div class="duel-player-briefs">
           <div class="duel-player-brief p1"><strong>PLAYER 1 · CYAN</strong><span>A / D steer<br>W shifts color<br>Touch the upper track</span></div>
           <div class="duel-player-brief p2"><strong>PLAYER 2 · MAGENTA</strong><span>← / → steer<br>↑ or Space shifts color<br>Touch the lower track</span></div>
         </div>
+        <div class="duel-room-card" aria-live="polite">
+          <span class="duel-room-label">FRIEND ROOM CODE</span>
+          <strong id="cyberDuelRoomCode">CYBER-••••</strong>
+          <p id="cyberDuelRoomStatus" role="status">Creating a secure room…</p>
+          <button class="secondary-btn" id="cyberDuelInviteButton" type="button" disabled>💬 INVITE FRIEND ON WHATSAPP</button>
+        </div>
         <p class="duel-lobby-badge" id="cyberDuelBadgeStatus" role="status" aria-live="polite"></p>
         <div class="cyber-duel-lobby-actions">
-          <button class="primary-btn" id="cyberDuelStartButton" type="button">START NEON RUMBLE</button>
+          <button class="primary-btn" id="cyberDuelStartButton" type="button" disabled>WAITING FOR FRIEND</button>
           <button class="secondary-btn" id="cyberDuelLobbyBack" type="button">🏠 MAIN MENU</button>
         </div>
       </div>
@@ -8351,18 +8418,9 @@ void main() {
         { name: "Deep Matrix", background: 0x020805, fog: 0x07130b, fogDensity: 0.037, grid: 0x187449, rail: 0x527020, key: 0x125c36, tunnel: 0x145e3e, far: 0x405b1b, ground: 0x050d08, groundGlow: 0x06190d },
         { name: "Dark Nebula", background: 0x08040e, fog: 0x180d22, fogDensity: 0.039, grid: 0x68418c, rail: 0x326e8a, key: 0x583775, tunnel: 0x65316e, far: 0x245368, ground: 0x0d0715, groundGlow: 0x1c0c27 }
       ];
-      const MIRROR_ENVIRONMENTS = [
-        { name: "Glass Grid", background: 0x06131f, fog: 0x0c2233, fogDensity: 0.010, grid: 0x68e9ff, rail: 0xf07bff, key: 0x4ccbe8, tunnel: 0x7559df, far: 0x54ffd8, ground: 0x102031, groundGlow: 0x102a3c },
-        { name: "Prism Alley", background: 0x19091d, fog: 0x291331, fogDensity: 0.011, grid: 0xff7be7, rail: 0x75eaff, key: 0xe45fd0, tunnel: 0x9f4fc2, far: 0x72ffd8, ground: 0x28142d, groundGlow: 0x3e1844 },
-        { name: "Holographic Void", background: 0x09071f, fog: 0x171338, fogDensity: 0.011, grid: 0x9e88ff, rail: 0x65f4ff, key: 0x8170e8, tunnel: 0x5a52c6, far: 0x69ffe3, ground: 0x17152e, groundGlow: 0x28235a },
-        { name: "Crystalline Matrix", background: 0x04171b, fog: 0x0a252c, fogDensity: 0.012, grid: 0x63ffd0, rail: 0x83aaff, key: 0x45dcb7, tunnel: 0x3696b0, far: 0xc7fffb, ground: 0x0d282a, groundGlow: 0x10453f },
-        { name: "Mirror Core", background: 0x16091e, fog: 0x261135, fogDensity: 0.013, grid: 0xff84c9, rail: 0xb6a0ff, key: 0xd574e8, tunnel: 0x8654bd, far: 0x72eaff, ground: 0x25132d, groundGlow: 0x38184c }
-      ];
       let environmentIndex = 0;
-      let antiGravityModeActive = false;
       let zeroGravityModeActive = false;
       let blackoutModeActive = false;
-      let mirrorMatrixModeActive = false;
       let laserPursuitModeActive = false;
       let laserChaosModeActive = false;
       let weekendStormActive = false;
@@ -8373,7 +8431,6 @@ void main() {
       let weekendStormState = { eventId: "", participated: false, multiplier: WEEKEND_STORM_MULTIPLIER, runsStarted: 0, completedRuns: 0 };
       function getEnvironmentSet() {
         if (blackoutModeActive) return BLACKOUT_ENVIRONMENTS;
-        if (mirrorMatrixModeActive) return MIRROR_ENVIRONMENTS;
         if (laserPursuitModeActive) return LASER_ENVIRONMENTS;
         return ENVIRONMENTS;
       }
@@ -8393,11 +8450,35 @@ void main() {
       const CYBER_DUEL_BADGE_KEY = "neonCyberDuelChampionBadge";
       const CYBER_DUEL_PALETTE = [0x48f3ff, 0xff4fc8, 0xffdf58];
       const CYBER_DUEL_POWERUPS = ["phase", "emp", "hyper", "vortex"];
+      const CYBER_DUEL_ROOM_API = "/api/cyber-duel/rooms";
+      const CYBER_DUEL_ROOM_STORAGE_PREFIX = "neonCyberDuelRoomToken:";
+      const CYBER_DUEL_ROOM_POLL_MS = 220;
+      const CYBER_DUEL_SNAPSHOT_MS = 160;
+      function normalizeCyberDuelRoomCode(value) {
+        if (typeof value !== "string" || value.length > 16) return "";
+        const normalized = value.trim().toUpperCase();
+        return /^CYBER-[0-9]{4}$/.test(normalized) ? normalized : "";
+      }
+      const CYBER_DUEL_ROOM_QUERY = (() => {
+        try {
+          const raw = new URLSearchParams(window.location.search).get("room") || "";
+          return normalizeCyberDuelRoomCode(raw);
+        } catch { return ""; }
+      })();
       let cyberDuelState = "idle";
       let cyberDuelPlayers = [];
       let cyberDuelCanvasSize = { width: 1, height: 1 };
       let cyberDuelBadgeUnlocked = false;
-      try { cyberDuelBadgeUnlocked = localStorage.getItem(CYBER_DUEL_BADGE_KEY) === "1"; } catch {}
+      let cyberDuelRoomSession = null;
+      let cyberDuelRoomPollTimer = 0;
+      let cyberDuelRoomPollInFlight = false;
+      let cyberDuelSnapshotInFlight = false;
+      let cyberDuelSnapshotAccumulator = 0;
+      let cyberDuelEventCursor = 0;
+      let cyberDuelRoomGeneration = 0;
+      let cyberDuelEntitySequence = 0;
+      let cyberDuelWinnerIndex = null;
+      let cyberDuelFinishReason = "finish";
       const BACKGROUND_SESSION_TIMEOUT_MS = 60 * 1000;
       const SESSION_RECONNECT_SECONDS = 5;
       const SESSION_RETRY_BONUS = 25;
@@ -8457,6 +8538,7 @@ void main() {
           get available() { return Boolean(storage); }
         });
       })();
+      try { cyberDuelBadgeUnlocked = localStorage.getItem(CYBER_DUEL_BADGE_KEY) === "1"; } catch {}
       const SETTINGS_STORAGE_KEY = "colorShiftGameSettings";
       const DEFAULT_SETTINGS = {
         masterVolume: 78,
@@ -9097,7 +9179,7 @@ void main() {
         group.visible = state !== "ready";
         const level = environmentIndex + 1;
         const difficultyLevel = Math.min(level, 10);
-        const gateGravitySide = antiGravityModeActive ? nextGravityHazardSide() : null;
+        const gateGravitySide = zeroGravityModeActive ? nextGravityHazardSide() : null;
         const narrowing = difficultyLevel < 7 ? 0 : difficultyLevel === 7 ? 0.18 : difficultyLevel === 8 ? 0.28 : difficultyLevel === 9 ? 0.4 : 0.5;
         group.userData = {
           colorIndex,
@@ -9123,7 +9205,6 @@ void main() {
               : 0,
           colorChanging: laserPursuitModeActive || difficultyLevel >= 3,
           flashPhase: Math.random() * 2,
-          prismPhase: Math.random() * Math.PI * 2,
           phantom: difficultyLevel >= 7,
           phantomActive: true,
           phantomPhase: Math.random() * Math.PI * 2,
@@ -9176,7 +9257,7 @@ void main() {
           const markerMat = new THREE.MeshBasicMaterial({ color: COLORS[lane].hex, transparent: true, opacity: lane === colorIndex ? 1 : 0.45 });
           const marker = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.08, 0.08), markerMat);
           group.userData.markerMaterials.push(markerMat);
-          marker.position.set(LANE_X[lane], antiGravityModeActive ? -1.32 : -1.48, 0.04);
+          marker.position.set(LANE_X[lane], zeroGravityModeActive ? -1.32 : -1.48, 0.04);
           group.add(marker);
         }
         if (gateGravitySide) {
@@ -9206,10 +9287,6 @@ void main() {
             material.opacity = lane === activeColorIndex ? 1 : 0.38;
           }
         }
-        if (mirrorMatrixModeActive) {
-          const prismHue = (obstacleElapsed * 0.12 + mechanics.prismPhase / (Math.PI * 2)) % 1;
-          mechanics.frameMaterial.color.setHSL(prismHue, 0.96, 0.66);
-        }
         const pulse = 0.5 + 0.5 * Math.sin(obstacleElapsed * (mechanics.colorChanging ? 11 : 4) + mechanics.flashPhase);
         const approach = THREE.MathUtils.clamp((gate.position.z - FIRST_GATE_SPAWN_Z) / 34, 0, 1);
         const telegraphPulse = 0.5 + 0.5 * Math.sin(obstacleElapsed * 7.5 + mechanics.flashPhase);
@@ -9227,7 +9304,7 @@ void main() {
             ? active ? (mechanics.colorChanging ? 2.4 + pulse * 0.55 : 2.7) : 1.55
             : active
               ? mechanics.colorChanging ? 2.0 + pulse * 0.65 : 2.35
-              : mirrorMatrixModeActive ? 1.05 : 0.72)
+              : 0.72)
             * (1 + approach * (active ? 0.24 + telegraphPulse * 0.2 : 0.08))
             * getGlowScale();
         }
@@ -9342,8 +9419,8 @@ void main() {
         group.position.set(LANE_X[lane], 0.12, z);
         group.visible = state === "running";
         group.userData = { lane, phase: Math.random() * Math.PI * 2, baseY: 0.12, collected: false };
-        const crystalBase = antiGravityModeActive ? 0xb98aff : 0xffd25e;
-        const crystalGlow = antiGravityModeActive ? 0x7d5bff : 0xffa91f;
+        const crystalBase = zeroGravityModeActive ? 0xb98aff : 0xffd25e;
+        const crystalGlow = zeroGravityModeActive ? 0x7d5bff : 0xffa91f;
         const gold = new THREE.MeshStandardMaterial({
           color: crystalBase,
           emissive: crystalGlow,
@@ -9355,13 +9432,13 @@ void main() {
         group.add(crystal);
         const ring = new THREE.Mesh(
           new THREE.TorusGeometry(0.47, 0.035, 7, 32),
-          new THREE.MeshBasicMaterial({ color: antiGravityModeActive ? 0xe2d4ff : 0xffdf83, transparent: true, opacity: 0.9 })
+          new THREE.MeshBasicMaterial({ color: zeroGravityModeActive ? 0xe2d4ff : 0xffdf83, transparent: true, opacity: 0.9 })
         );
         ring.rotation.x = Math.PI / 2;
         group.add(ring);
         const innerRing = new THREE.Mesh(
           new THREE.TorusGeometry(0.34, 0.018, 6, 28),
-          new THREE.MeshBasicMaterial({ color: antiGravityModeActive ? 0x7e5cff : 0xff9f2e, transparent: true, opacity: 0.8 })
+          new THREE.MeshBasicMaterial({ color: zeroGravityModeActive ? 0x7e5cff : 0xff9f2e, transparent: true, opacity: 0.8 })
         );
         innerRing.rotation.set(Math.PI / 2, Math.PI / 3, 0);
         group.add(innerRing);
@@ -9379,12 +9456,12 @@ void main() {
       function makeLaser(z) {
         const group = new THREE.Group();
         group.position.set(0, 0, z);
-        const gravitySide = antiGravityModeActive ? nextGravityHazardSide() : null;
+        const gravitySide = zeroGravityModeActive ? nextGravityHazardSide() : null;
         const surfaceY = gravitySide
           ? gravitySide === "ceiling" ? 1.68 : -1.68
           : 0.52;
-        const beamColor = antiGravityModeActive ? gravitySide === "ceiling" ? 0xc4a0ff : 0x63e6ff : 0xff8ec0;
-        const glowColor = antiGravityModeActive ? gravitySide === "ceiling" ? 0x9c68ff : 0x45cfff : 0xff397e;
+        const beamColor = zeroGravityModeActive ? gravitySide === "ceiling" ? 0xc4a0ff : 0x63e6ff : 0xff8ec0;
+        const glowColor = zeroGravityModeActive ? gravitySide === "ceiling" ? 0x9c68ff : 0x45cfff : 0xff397e;
         group.userData = {
           phase: Math.random() * Math.PI * 2,
           checked: false,
@@ -9689,6 +9766,7 @@ void main() {
       let runStartedAt = 0;
       let scoreAuditAt = 0;
       let scoreAuditValue = 0;
+      let scoreAuditDistance = 0;
       let runScoreIntegrityValid = true;
       let rewardedAdGrantedThisRun = false;
       let combo = 0;
@@ -9864,6 +9942,7 @@ void main() {
       let magnetUses = 0;
       let bombUses = 0;
       let phaseUses = 0;
+      let activePowerLastActivationAt = Object.create(null);
       function getActivePowerUseCount(type) {
         if (type === "shield") return shieldUses;
         if (type === "magnet") return magnetUses;
@@ -9895,6 +9974,7 @@ void main() {
         magnetUses = 0;
         bombUses = 0;
         phaseUses = 0;
+        activePowerLastActivationAt = Object.create(null);
       }
       let dailySpinTimer = 0;
       let spinInProgress = false;
@@ -10240,16 +10320,43 @@ void main() {
       const REFERRAL_SHARE_ACTIONS_KEY = "colorShiftReferralShareActions";
       const CHALLENGE_VICTORY_KEY = "neonChallengeVictories";
       const REFERRAL_WELCOME_CRYSTALS = 150;
-      const MAX_SCORE_RATE_PER_SECOND = 9000;
-      const MAX_SCORE_EVENT_BURST = 10000;
-      const SCORE_START_ALLOWANCE = 12000;
+      // Client-side limits deter casual score injection; competitive results
+      // still require server-owned validation.
+      const MAX_SCORE_RATE_PER_SECOND = 7000;
+      const MAX_SCORE_EVENT_BURST = 7000;
+      const SCORE_START_ALLOWANCE = 9000;
+      const MAX_DISTANCE_RATE_PER_SECOND = 120;
+      const MAX_VISIBLE_FRAME_GAP_SECONDS = 8;
       let localStorageIntegrityWarning = false;
+      const trustedButtonActionTimes = new WeakMap();
+      let lastTrustedButtonActionAt = -Infinity;
+      document.addEventListener("click", event => {
+        const button = event.target instanceof Element ? event.target.closest("button") : null;
+        if (!button) return;
+        if (event.isTrusted !== true) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
+        const now = performance.now();
+        const powerButton = button.matches(
+          "#activeShieldButton, #activeMagnetButton, #activeBombButton, #activePhaseButton"
+        );
+        const cooldown = powerButton ? 350 : 70;
+        const previous = trustedButtonActionTimes.get(button);
+        if ((previous !== undefined && now - previous < cooldown) ||
+            now - lastTrustedButtonActionAt < 45) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
+        trustedButtonActionTimes.set(button, now);
+        lastTrustedButtonActionAt = now;
+      }, true);
       const MODE_HIGH_SCORE_KEYS = Object.freeze({
         endless: "neonHighScore_classic",
         timeAttack: "neonHighScore_timeAttack",
-        antiGravity: "neonHighScore_antiGravity",
         blackout: "neonHighScore_blackout",
-        mirrorMatrix: "neonHighScore_mirrorMatrix",
         laserPursuit: "neonHighScore_laser",
         zeroGravity: "neonHighScore_zeroGravity",
         laserChaos: "neonHighScore_laserChaos"
@@ -10257,13 +10364,18 @@ void main() {
       const MODE_HIGH_SCORE_LABELS = Object.freeze({
         endless: "Classic high score",
         timeAttack: "Time Attack high score",
-        antiGravity: "Anti-Gravity high score",
         blackout: "Blackout high score",
-        mirrorMatrix: "Mirror Matrix high score",
         laserPursuit: "Laser Pursuit high score",
         zeroGravity: "Zero-Gravity high score",
         laserChaos: "Laser Chaos high score"
       });
+      const RETIRED_MODE_SCORE_KEYS = Object.freeze([
+        "neonHighScore_antiGravity",
+        "neonHighScore_mirrorMatrix"
+      ]);
+      for (const key of RETIRED_MODE_SCORE_KEYS) {
+        try { localStorage.removeItem(key); } catch {}
+      }
       const GHOST_RUN_KEY = "ghostRunData";
       const NEON_CRYSTALS_KEY = "neonCrystals";
       const PROGRESSION_KEY = "colorShiftProgressionV2";
@@ -10339,6 +10451,7 @@ void main() {
         claimedChallengeIds.add(challengeId);
         try {
           localStorage.setItem(CHALLENGE_VICTORY_KEY, JSON.stringify(Array.from(claimedChallengeIds).slice(-500)));
+          writeLocalIntegritySnapshot();
         } catch {
           // The in-memory set still prevents repeat rewards during this session.
         }
@@ -10667,19 +10780,33 @@ void main() {
         }
         return (hash >>> 0).toString(16).padStart(8, "0");
       }
+      function integrityStorageValue(key) {
+        try { return localStorage.getItem(key); } catch { return null; }
+      }
+      function getIntegrityTrackedKeys() {
+        return Array.from(new Set([
+          PROGRESSION_KEY, LEGACY_PROGRESSION_KEY, NEON_CRYSTALS_KEY, COINS_KEY,
+          HIGH_SCORE_KEY, BEST_KEY, "colorSwipeBest",
+          ...Object.values(MODE_HIGH_SCORE_KEYS),
+          "lastLoginDate", "loginStreakCount",
+          REFERRAL_WELCOME_KEY, REFERRAL_REDEEMED_KEY, DEVICE_REFERRAL_REDEEMED_KEY,
+          CHALLENGE_VICTORY_KEY
+        ]));
+      }
       function getLocalIntegritySnapshot() {
         const highScores = Object.fromEntries(
           Object.entries(MODE_HIGH_SCORE_KEYS).map(([mode, key]) => {
-            let value = 0;
-            try { value = safeStoredCount(localStorage.getItem(key)); } catch {}
-            return [mode, value];
+            return [mode, safeStoredCount(integrityStorageValue(key))];
           })
         );
         return {
-          version: 1,
+          version: 2,
           wallet: safeStoredCount(progression.crystals),
           referralWelcomeClaimed: progression.referralWelcomeClaimed === true,
-          highScores
+          highScores,
+          storage: Object.fromEntries(
+            getIntegrityTrackedKeys().map(key => [key, integrityStorageValue(key)])
+          )
         };
       }
       function writeLocalIntegritySnapshot() {
@@ -10687,12 +10814,47 @@ void main() {
           const snapshot = getLocalIntegritySnapshot();
           const canonical = JSON.stringify(snapshot);
           localStorage.setItem(LOCAL_INTEGRITY_KEY, JSON.stringify({
-            version: 2,
+            version: 3,
             snapshot,
             checksum: checksumText(LOCAL_INTEGRITY_SEED + "|" + canonical)
           }));
         } catch (error) {
           // Local integrity markers are optional when browser storage is unavailable.
+        }
+      }
+      function resetIntegrityProtectedDataToDefaults() {
+        localStorageIntegrityWarning = true;
+        progression = createFreshProgression();
+        best = 0;
+        loginStreakCount = 1;
+        loginStreakLastClaimDate = "";
+        loginStreakClaimedToday = false;
+        loginStreakLaunchDay = localDayKey();
+        try {
+          [PROGRESSION_KEY, LEGACY_PROGRESSION_KEY, "lastLoginDate", "loginStreakCount",
+            REFERRAL_WELCOME_KEY, REFERRAL_REDEEMED_KEY, DEVICE_REFERRAL_REDEEMED_KEY,
+            CHALLENGE_VICTORY_KEY, GHOST_RUN_KEY, "neonWeekendStorm"].forEach(key => {
+            try { localStorage.removeItem(key); } catch {}
+          });
+          [...Object.values(MODE_HIGH_SCORE_KEYS), HIGH_SCORE_KEY, BEST_KEY, "colorSwipeBest"]
+            .forEach(key => { try { localStorage.setItem(key, "0"); } catch {} });
+          [NEON_CRYSTALS_KEY, COINS_KEY].forEach(key => {
+            try { localStorage.setItem(key, "0"); } catch {}
+          });
+        } catch {}
+        saveProgression();
+        loadChallengeVictoryClaims();
+        ghostRunData = loadGhostRunData();
+      }
+      function preserveIntegrityBackedClaimFlags(trustedPayload) {
+        if (!trustedPayload || typeof trustedPayload !== "object") return;
+        progression.referralWelcomeClaimed = trustedPayload.referralWelcomeClaimed === true;
+        progression.shareRewardClaimed = trustedPayload.shareRewardClaimed === true;
+        for (const id of Object.keys(progression.claimedAchievements)) {
+          progression.claimedAchievements[id] = trustedPayload.claimedAchievements?.[id] === true;
+        }
+        for (const id of Object.keys(progression.claimedAchievementRewards)) {
+          progression.claimedAchievementRewards[id] = trustedPayload.claimedAchievementRewards?.[id] === true;
         }
       }
       function verifyLocalIntegritySnapshot() {
@@ -10704,46 +10866,112 @@ void main() {
             return true;
           }
           record = JSON.parse(raw);
-        } catch (error) {
-          localStorageIntegrityWarning = true;
+        } catch {
+          resetIntegrityProtectedDataToDefaults();
           return false;
         }
-        if (!record || record.version !== 2 || !record.snapshot || typeof record.checksum !== "string") {
-          localStorageIntegrityWarning = true;
+        if (!record || !record.snapshot || typeof record.checksum !== "string") {
+          resetIntegrityProtectedDataToDefaults();
           return false;
         }
+
         const canonical = JSON.stringify(record.snapshot);
         if (checksumText(LOCAL_INTEGRITY_SEED + "|" + canonical) !== record.checksum) {
-          localStorageIntegrityWarning = true;
+          resetIntegrityProtectedDataToDefaults();
           return false;
         }
+
+        // Migrate the previous wallet/high-score-only snapshot without discarding
+        // progress that predates the expanded integrity record.
+        if (record.version === 2 && record.snapshot.version === 1) {
+          const saved = record.snapshot;
+          const currentLegacy = {
+            version: 1,
+            wallet: safeStoredCount(progression.crystals),
+            referralWelcomeClaimed: progression.referralWelcomeClaimed === true,
+            highScores: Object.fromEntries(
+              Object.entries(MODE_HIGH_SCORE_KEYS).map(([mode, key]) => [
+                mode,
+                safeStoredCount(integrityStorageValue(key))
+              ])
+            )
+          };
+          if (JSON.stringify(currentLegacy) !== canonical) {
+            progression.crystals = safeStoredCount(saved.wallet);
+            progression.referralWelcomeClaimed = saved.referralWelcomeClaimed === true;
+            try {
+              for (const [mode, key] of Object.entries(MODE_HIGH_SCORE_KEYS)) {
+                localStorage.setItem(key, String(safeStoredCount(saved.highScores?.[mode])));
+              }
+              const overallBest = Math.max(
+                0,
+                ...Object.values(MODE_HIGH_SCORE_KEYS).map(key => safeStoredCount(localStorage.getItem(key)))
+              );
+              localStorage.setItem(HIGH_SCORE_KEY, String(overallBest));
+              localStorage.setItem(BEST_KEY, String(overallBest));
+              localStorage.setItem("colorSwipeBest", String(overallBest));
+            } catch {}
+            localStorageIntegrityWarning = true;
+            best = loadModeHighScore(selectedMode);
+            saveProgression();
+            return false;
+          }
+          writeLocalIntegritySnapshot();
+          return true;
+        }
+
         const saved = record.snapshot;
+        if (record.version !== 3 || saved.version !== 2 ||
+            !saved.storage || typeof saved.storage !== "object") {
+          resetIntegrityProtectedDataToDefaults();
+          return false;
+        }
         const current = getLocalIntegritySnapshot();
         if (JSON.stringify(current) === canonical) return true;
 
-        // Restore a previously checksummed wallet and mode scores if only the
-        // ordinary localStorage values were edited or corrupted.
-        progression.crystals = safeStoredCount(saved.wallet);
-        progression.referralWelcomeClaimed = saved.referralWelcomeClaimed === true;
-        try {
-          for (const [mode, key] of Object.entries(MODE_HIGH_SCORE_KEYS)) {
-            localStorage.setItem(key, String(safeStoredCount(saved.highScores?.[mode])));
-          }
-          const overallBest = Math.max(
-            0,
-            ...Object.values(MODE_HIGH_SCORE_KEYS).map(key => safeStoredCount(localStorage.getItem(key)))
-          );
-          localStorage.setItem(HIGH_SCORE_KEY, String(overallBest));
-          localStorage.setItem(BEST_KEY, String(overallBest));
-          localStorage.setItem("colorSwipeBest", String(overallBest));
-          localStorage.setItem(NEON_CRYSTALS_KEY, String(progression.crystals));
-          localStorage.setItem(COINS_KEY, String(progression.crystals));
-        } catch (error) {
-          // Keep the restored in-memory values if storage writes are blocked.
-        }
-        best = loadModeHighScore(selectedMode);
         localStorageIntegrityWarning = true;
-        writeLocalIntegritySnapshot();
+        const trackedKeys = getIntegrityTrackedKeys();
+        const progressionCorrupt =
+          current.storage[PROGRESSION_KEY] !== saved.storage[PROGRESSION_KEY] ||
+          current.storage[LEGACY_PROGRESSION_KEY] !== saved.storage[LEGACY_PROGRESSION_KEY];
+        for (const key of trackedKeys) {
+          if (key === PROGRESSION_KEY || key === LEGACY_PROGRESSION_KEY ||
+              key === NEON_CRYSTALS_KEY || key === COINS_KEY) continue;
+          const savedValue = saved.storage[key];
+          if (savedValue !== undefined && (savedValue === null || typeof savedValue === "string") &&
+              (savedValue === null || savedValue.length <= 250000)) {
+            try {
+              if (savedValue === null) localStorage.removeItem(key);
+              else localStorage.setItem(key, savedValue);
+            } catch {}
+          }
+        }
+
+        if (progressionCorrupt) {
+          let trustedPayload = null;
+          try { trustedPayload = JSON.parse(saved.storage[PROGRESSION_KEY] || "null"); } catch {}
+          progression = createFreshProgression();
+          preserveIntegrityBackedClaimFlags(trustedPayload);
+          progression.crystals = 0;
+          progression.lifetimeCrystals = 0;
+          try { localStorage.removeItem(LEGACY_PROGRESSION_KEY); } catch {}
+          try { localStorage.setItem(NEON_CRYSTALS_KEY, "0"); } catch {}
+          try { localStorage.setItem(COINS_KEY, "0"); } catch {}
+        } else {
+          progression.crystals = safeStoredCount(saved.wallet);
+          progression.referralWelcomeClaimed = saved.referralWelcomeClaimed === true;
+          try {
+            localStorage.setItem(NEON_CRYSTALS_KEY, String(progression.crystals));
+            localStorage.setItem(COINS_KEY, String(progression.crystals));
+          } catch {}
+        }
+
+        best = loadModeHighScore(selectedMode);
+        initializeLoginStreak();
+        saveProgression();
+        loadChallengeVictoryClaims();
+        ghostRunData = loadGhostRunData();
+        updateModeHighScoreDisplay();
         return false;
       }
       const ADMOB_UNIT_IDS = Object.freeze({
@@ -11858,9 +12086,7 @@ void main() {
         const height = canvas.height;
         const finalScore = Math.floor(score);
         const modeLabel = selectedMode === "timeAttack" ? "TIME ATTACK"
-          : selectedMode === "antiGravity" ? "ANTI-GRAVITY"
           : selectedMode === "blackout" ? "BLACKOUT"
-          : selectedMode === "mirrorMatrix" ? "MIRROR MATRIX"
           : selectedMode === "laserPursuit" ? "LASER PURSUIT"
           : "CLASSIC RUN";
         const challengeUrl = new URL(window.location.href);
@@ -12841,15 +13067,13 @@ void main() {
       }
       function setGameMode(mode) {
         if (state === "running" ||
-            !["endless", "timeAttack", "antiGravity", "blackout", "mirrorMatrix", "laserPursuit", "zeroGravity", "laserChaos"].includes(mode) ||
+            !["endless", "timeAttack", "blackout", "laserPursuit", "zeroGravity", "laserChaos"].includes(mode) ||
             isWeekendStormMode(mode) && !weekendStormActive) return;
         selectedMode = mode;
         best = loadModeHighScore(mode);
         updateModeHighScoreDisplay();
-        antiGravityModeActive = mode === "antiGravity" || mode === "zeroGravity";
         zeroGravityModeActive = mode === "zeroGravity";
         blackoutModeActive = mode === "blackout";
-        mirrorMatrixModeActive = mode === "mirrorMatrix";
         laserPursuitModeActive = mode === "laserPursuit" || mode === "laserChaos";
         laserChaosModeActive = mode === "laserChaos";
         applyModeLighting();
@@ -12857,27 +13081,23 @@ void main() {
         orbMat.emissiveIntensity = (blackoutModeActive ? Math.max(2.2, activeSkin.glow) : activeSkin.glow) * getGlowScale();
         gravityHazardSerial = 0;
         gravitySide = "floor";
-        player.userData.gravityTargetY = antiGravityModeActive ? GRAVITY_FLOOR_Y : RUNNER_Y;
+        player.userData.gravityTargetY = zeroGravityModeActive ? GRAVITY_FLOOR_Y : RUNNER_Y;
         player.position.y = player.userData.gravityTargetY;
-        shadow.position.y = antiGravityModeActive ? -0.82 : -2.4;
+        shadow.position.y = zeroGravityModeActive ? -0.82 : -2.4;
         shadow.rotation.x = -Math.PI / 2;
         colorBeacon.position.y = 0.9;
         player.rotation.z = 0;
-        setOrbColor(mirrorMatrixModeActive ? COLORS.length - 1 : 1);
-        el("game").classList.toggle("quantum-mode", antiGravityModeActive);
+        setOrbColor(1);
         el("game").classList.toggle("blackout-mode", blackoutModeActive);
-        el("game").classList.toggle("mirror-matrix-mode", mirrorMatrixModeActive);
         el("game").classList.toggle("laser-pursuit-mode", laserPursuitModeActive);
         el("game").classList.toggle("weekend-zero-gravity-mode", zeroGravityModeActive);
         el("game").classList.toggle("weekend-laser-chaos-mode", laserChaosModeActive);
         if (!laserPursuitModeActive) resetLaserPursuitWall();
-        setParticleTheme(antiGravityModeActive);
+        setParticleTheme(zeroGravityModeActive);
         setEnvironment(environmentIndex, { announce: false, instant: true });
         el("endlessModeButton").setAttribute("aria-pressed", String(mode === "endless"));
         el("timeAttackModeButton").setAttribute("aria-pressed", String(mode === "timeAttack"));
-        el("antiGravityModeButton").setAttribute("aria-pressed", String(mode === "antiGravity"));
         el("blackoutModeButton").setAttribute("aria-pressed", String(mode === "blackout"));
-        el("mirrorMatrixModeButton").setAttribute("aria-pressed", String(mode === "mirrorMatrix"));
         el("laserPursuitModeButton").setAttribute("aria-pressed", String(mode === "laserPursuit"));
         el("zeroGravityModeButton").setAttribute("aria-pressed", String(mode === "zeroGravity"));
         el("laserChaosModeButton").setAttribute("aria-pressed", String(mode === "laserChaos"));
@@ -12888,12 +13108,10 @@ void main() {
         updateHUD();
       }
       function updateModeCopy() {
-        const quantum = selectedMode === "antiGravity";
         const zeroGravity = selectedMode === "zeroGravity";
         const laserChaos = selectedMode === "laserChaos";
-        const gravityMode = quantum || zeroGravity;
+        const gravityMode = zeroGravity;
         const blackout = selectedMode === "blackout";
-        const mirror = selectedMode === "mirrorMatrix";
         const pursuit = selectedMode === "laserPursuit" || laserChaos;
         if (el("results").hidden) {
           el("eyebrow").textContent = blackout
@@ -12901,7 +13119,7 @@ void main() {
             : zeroGravity ? "WEEKEND STORM · ZERO-G"
             : laserChaos ? "WEEKEND STORM · LASER CHAOS"
             : pursuit ? "LASER PURSUIT · BOSS RUSH"
-            : mirror ? "MIRROR MATRIX · HARDCORE" : quantum ? "QUANTUM SINGULARITY" : "A color reaction test";
+            : "A color reaction test";
           el("intro").textContent = blackout
             ? "Neon hazards emerge from dense, tinted fog only when close. Match the ball's color and steer through five dark environments that shift as you score or clear gates."
             : zeroGravity
@@ -12910,10 +13128,6 @@ void main() {
             ? "A faster pursuit wall closes in as rotating color gates and sweeping lasers arrive at tighter intervals. Stay sharp: all weekend runs earn 2× score and crystal pickups."
             : pursuit
             ? "A red-magenta laser wall chases you through rotating gates. Every 300 points or 10 cleared gates, the uninterrupted pursuit shifts through Laser Core, Cyber Grid, Sunset Alley, Quantum Void, and Matrix Rain."
-            : mirror
-            ? "Left moves right; colors cycle Yellow → Cyan → Red. Prism gates shift through five reflective environments every 300 points or 10 clears. Tap or press Space to switch color early; earn 2× rewards."
-            : quantum
-            ? "Match each plasma gate, then flip between floor and ceiling to dodge vertical hazards. Tap or press Space to flip; use W / ↑ to change color. New tunnel themes arrive as your score and gate clears reach milestones."
             : selectedMode === "timeAttack"
               ? "Score as much as you can before the 60-second clock runs out. Every gate adds 2 seconds, every crystal adds 3, and the tunnel shifts through new neon environments."
               : "Match each neon gate, collect crystals, and build your best streak. Tap or press Space to switch color early.";
@@ -12923,37 +13137,29 @@ void main() {
             ? '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / tap</b> change color</span><span class="mobile-hint">Swipe lanes · match colors · dodge rotating lasers</span>'
             : pursuit
             ? '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / tap</b> change color</span><span class="mobile-hint">Swipe lanes · tap to change color · outrun the wall</span>'
-            : mirror
-            ? '<span class="desktop-hint"><b>A / ←</b> move right &nbsp;·&nbsp; <b>D / →</b> move left &nbsp;·&nbsp; <b>Space / tap</b> change color</span><span class="mobile-hint">Swipe to steer · tap to change color · 2× rewards</span>'
             : selectedMode === "timeAttack"
             ? '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / tap</b> change color · gates +2s · crystals +3s</span><span class="mobile-hint">Swipe to steer · tap to change color · gates +2s · crystals +3s</span>'
             : '<span class="desktop-hint"><b>A / ←</b> lane left &nbsp;·&nbsp; <b>D / →</b> lane right &nbsp;·&nbsp; <b>Space / tap</b> change color</span><span class="mobile-hint">Swipe to steer · tap to change color</span>';
           el("controlsHint").innerHTML = laserChaos
             ? "<strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Tap / Space / W to change color · dodge the wall and rotating lasers"
-            : pursuit
+          : pursuit
             ? "<strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Tap / Space / W to change color · stay ahead of the laser wall"
-            : mirror
-            ? "<strong>← / A</strong> move right&nbsp;&nbsp; <strong>D / →</strong> move left<br>Tap / Space / W to change color · reverse cycle · 2× rewards"
             : gravityMode
             ? "<strong>← / A</strong> steer&nbsp;&nbsp; <strong>Space / tap</strong> flip gravity<br>W / ↑ or color button changes color"
             : "<strong>← / A</strong> lane left&nbsp;&nbsp; <strong>D / →</strong> lane right<br>Tap / Space / W to change color · auto-cycle every 3.5s";
-          el("laneLeft").innerHTML = mirror ? "→<small>RIGHT</small>" : "←<small>LANE</small>";
-          el("laneRight").innerHTML = mirror ? "←<small>LEFT</small>" : "→<small>LANE</small>";
-          el("laneLeft").setAttribute("aria-label", mirror ? "Press left to move to the right lane in Mirror Matrix mode" : "Shift lane left");
-          el("laneRight").setAttribute("aria-label", mirror ? "Press right to move to the left lane in Mirror Matrix mode" : "Shift lane right");
+          el("laneLeft").innerHTML = "←<small>LANE</small>";
+          el("laneRight").innerHTML = "→<small>LANE</small>";
+          el("laneLeft").setAttribute("aria-label", "Shift lane left");
+          el("laneRight").setAttribute("aria-label", "Shift lane right");
         }
         if (selectedMode === "zeroGravity") {
           if (!el("results").hidden) el("resultLine").textContent = "Weekend Zero-Gravity · 2× Storm";
         } else if (selectedMode === "laserChaos") {
           if (!el("results").hidden) el("resultLine").textContent = "Weekend Laser Chaos · 2× Storm";
-        } else if (selectedMode === "antiGravity") {
-          if (!el("results").hidden) el("resultLine").textContent = "Quantum Singularity · Anti-Gravity";
         } else if (pursuit) {
           if (!el("results").hidden) el("resultLine").textContent = "Laser Pursuit · Boss Rush";
         } else if (blackout) {
           if (!el("results").hidden) el("resultLine").textContent = "Blackout Nightmare · Run summary";
-        } else if (mirror) {
-          if (!el("results").hidden) el("resultLine").textContent = "Mirror Matrix · 2× Score & Crystals";
         } else if (selectedMode === "timeAttack") {
           if (!el("results").hidden) el("resultLine").textContent = "Time Attack · Run summary";
         } else {
@@ -12966,7 +13172,7 @@ void main() {
       }
       function updateAutoColorControl() {
         const control = el("switchColor");
-        if (antiGravityModeActive) {
+        if (zeroGravityModeActive) {
           control.disabled = false;
           control.innerHTML = '↕<small>FLIP</small>';
           control.setAttribute("aria-label", "Flip gravity between tunnel floor and ceiling");
@@ -13313,7 +13519,7 @@ void main() {
         document.querySelectorAll(".swatch").forEach(s => s.classList.toggle("active", s.dataset.color === c.key));
       }
       function advanceAutomaticColor() {
-        setOrbColor(currentColor + (mirrorMatrixModeActive ? -1 : 1));
+        setOrbColor(currentColor + 1);
         colorPulse = 0.15;
         unlockAudio();
         playCue("color");
@@ -13335,7 +13541,6 @@ void main() {
       }
       function shiftLane(step) {
         if (state !== "running") return false;
-        if (mirrorMatrixModeActive) step = -step;
         const nextLane = THREE.MathUtils.clamp(currentLane + step, 0, LANE_X.length - 1);
         if (nextLane === currentLane || !acceptPlayerInput()) return false;
         currentLane = nextLane;
@@ -13347,7 +13552,7 @@ void main() {
         return true;
       }
       function updateGravityIndicator() {
-        const visible = antiGravityModeActive && state === "running";
+        const visible = zeroGravityModeActive && state === "running";
         el("gravityIndicator").hidden = !visible;
         el("gravityLabel").textContent = gravitySide === "ceiling" ? "Ceiling gravity" : "Floor gravity";
         el("gravityArrow").textContent = gravitySide === "ceiling" ? "↑" : "↓";
@@ -13364,25 +13569,25 @@ void main() {
       }
       function setGravitySide(side, instant = false) {
         gravitySide = side === "ceiling" ? "ceiling" : "floor";
-        const targetY = antiGravityModeActive
+        const targetY = zeroGravityModeActive
           ? gravitySide === "ceiling" ? GRAVITY_CEILING_Y : GRAVITY_FLOOR_Y
           : RUNNER_Y;
         player.userData.gravityTargetY = targetY;
         if (instant) player.position.y = targetY;
-        shadow.position.y = antiGravityModeActive
+        shadow.position.y = zeroGravityModeActive
           ? gravitySide === "ceiling" ? 0.82 : -0.82
           : -2.4;
         shadow.rotation.x = gravitySide === "ceiling" ? Math.PI / 2 : -Math.PI / 2;
-        colorBeacon.position.y = antiGravityModeActive && gravitySide === "ceiling" ? -0.9 : 0.9;
+        colorBeacon.position.y = zeroGravityModeActive && gravitySide === "ceiling" ? -0.9 : 0.9;
         updateGravityIndicator();
       }
       function isPlayerOnGravitySide(side) {
-        if (!antiGravityModeActive) return true;
+        if (!zeroGravityModeActive) return true;
         const targetY = side === "ceiling" ? GRAVITY_CEILING_Y : GRAVITY_FLOOR_Y;
         return gravitySide === side && Math.abs(player.position.y - targetY) <= 0.42;
       }
       function flipGravity() {
-        if (state !== "running" || !antiGravityModeActive || !acceptPlayerInput()) return false;
+        if (state !== "running" || !zeroGravityModeActive || !acceptPlayerInput()) return false;
         const nextSide = gravitySide === "floor" ? "ceiling" : "floor";
         setGravitySide(nextSide);
         colorPulse = 0.12;
@@ -13477,7 +13682,6 @@ void main() {
           scoreBoosterTimer > 0 ? 2 : 1
         );
         return activeMultiplier *
-          (mirrorMatrixModeActive ? 2 : 1) *
           getWeekendRewardMultiplier();
       }
       // Client-side pace guard only deters casual score injection. Because this
@@ -13485,16 +13689,23 @@ void main() {
       // before trusting leaderboard or competitive rewards.
       function auditRunScore(now = performance.now()) {
         const candidate = Number(score);
+        const candidateDistance = Number(distance);
         const elapsedSeconds = Math.max(0, (now - runStartedAt) / 1000);
         const deltaSeconds = Math.max(0.001, (now - scoreAuditAt) / 1000);
         const deltaScore = candidate - scoreAuditValue;
+        const deltaDistance = candidateDistance - scoreAuditDistance;
         const cumulativeLimit = SCORE_START_ALLOWANCE + elapsedSeconds * MAX_SCORE_RATE_PER_SECOND;
         const stepLimit = MAX_SCORE_EVENT_BURST + deltaSeconds * MAX_SCORE_RATE_PER_SECOND;
+        const distanceStepLimit = 4 + deltaSeconds * MAX_DISTANCE_RATE_PER_SECOND;
+        const cumulativeDistanceLimit = 8 + elapsedSeconds * MAX_DISTANCE_RATE_PER_SECOND;
         if (!Number.isFinite(candidate) || candidate < 0 || deltaScore < -0.5 ||
-            candidate > cumulativeLimit || deltaScore > stepLimit) {
+            candidate > cumulativeLimit || deltaScore > stepLimit ||
+            !Number.isFinite(candidateDistance) || candidateDistance < 0 || deltaDistance < -0.5 ||
+            candidateDistance > cumulativeDistanceLimit || deltaDistance > distanceStepLimit) {
           runScoreIntegrityValid = false;
         }
         scoreAuditValue = Number.isFinite(candidate) ? candidate : scoreAuditValue;
+        scoreAuditDistance = Number.isFinite(candidateDistance) ? candidateDistance : scoreAuditDistance;
         scoreAuditAt = now;
         return runScoreIntegrityValid;
       }
@@ -13648,6 +13859,10 @@ void main() {
       }
       function buyActivePower(type) {
         if (state !== "running" || !Object.prototype.hasOwnProperty.call(ACTIVE_POWER_COSTS, type)) return false;
+        const activationNow = performance.now();
+        const previousActivation = activePowerLastActivationAt[type];
+        if (previousActivation !== undefined && activationNow - previousActivation < 350) return false;
+        activePowerLastActivationAt[type] = activationNow;
         const cost = getActivePowerCost(type);
         const activeTimer = type === "shield" ? activeShieldTimer
           : type === "magnet" ? crystalMagnetTimer
@@ -13756,7 +13971,7 @@ void main() {
       function collectCrystalCoin(coin) {
         coin.userData.collected = true;
         triggerHapticFeedback("crystal");
-        const crystalReward = (mirrorMatrixModeActive ? 2 : 1) * getWeekendRewardMultiplier();
+        const crystalReward = getWeekendRewardMultiplier();
         const timeBonus = addTimeAttackBonus(TIME_ATTACK_CRYSTAL_BONUS_SECONDS);
         runCoins += crystalReward;
         progression.crystals = safeStoredCount(progression.crystals + crystalReward);
@@ -13800,6 +14015,12 @@ void main() {
         closeShop();
         closeSettings();
         clearArcadeFloat();
+        const startButton = el("startButton");
+        const homeActions = document.querySelector("#overlay .home-actions");
+        if (homeActions && startButton.parentElement !== homeActions) {
+          homeActions.insertBefore(startButton, homeActions.firstElementChild);
+        }
+        el("gameOverPrimaryAction").hidden = true;
         resultTickerToken++;
         if (resultTickerFrame) cancelAnimationFrame(resultTickerFrame);
         resultTickerFrame = 0;
@@ -13853,7 +14074,7 @@ void main() {
             !el("dailyModal").hidden || !el("daily-streak-modal").hidden ||
             !el("weekend-storm-modal").hidden || !el("challenge-modal").hidden ||
             !el("challenge-victory-modal").hidden || !el("settings-screen").hidden) return;
-        if (!restartPaused && (!loginStreakClaimedToday || dailySpinReady())) {
+        if (!restartPaused && !challengeAccepted && (!loginStreakClaimedToday || dailySpinReady())) {
           maybeShowDailyReward();
           return;
         }
@@ -13914,6 +14135,7 @@ void main() {
         runStartedAt = performance.now();
         scoreAuditAt = runStartedAt;
         scoreAuditValue = 0;
+        scoreAuditDistance = 0;
         runScoreIntegrityValid = true;
         rewardedAdGrantedThisRun = false;
         timeRemaining = TIME_ATTACK_START_SECONDS;
@@ -13960,10 +14182,10 @@ void main() {
         if (laserPursuitModeActive) laserPursuitWall = makeLaserPursuitWall();
         currentLane = 1;
         laneVelocityX = 0;
-        setOrbColor(mirrorMatrixModeActive ? COLORS.length - 1 : 1);
+        setOrbColor(1);
         player.userData.targetX = LANE_X[currentLane];
         updateLaneIndicator();
-        player.position.set(LANE_X[currentLane], antiGravityModeActive ? GRAVITY_FLOOR_Y : RUNNER_Y, 0);
+        player.position.set(LANE_X[currentLane], zeroGravityModeActive ? GRAVITY_FLOOR_Y : RUNNER_Y, 0);
         player.rotation.set(0, 0, 0);
         orb.rotation.set(0, 0, 0);
         ghostBall.position.set(LANE_X[currentLane] + 0.38, player.position.y, -2.4);
@@ -13991,12 +14213,8 @@ void main() {
               ? "WEEKEND LASER CHAOS · 2X CRYSTALS & SCORE"
               : weekendStormActive
                 ? "WEEKEND NEON STORM · 2X CRYSTALS & SCORE"
-          : antiGravityModeActive
-            ? "Grace 1s · Space / tap flips gravity · W / ↑ switches color"
-            : blackoutModeActive
+          : blackoutModeActive
               ? "Grace 1s · Blackout · tap / Space switches color · 3.5s auto-cycle"
-            : mirrorMatrixModeActive
-              ? "Grace 1s · Mirror Matrix · controls reversed · 2× score and crystals"
             : laserPursuitModeActive
               ? "Grace 1s · Laser Pursuit · keep your pace up and clear rotating gates"
             : "Grace 1s · tap / Space / W to switch color · auto-cycle every 3.5s", 1600);
@@ -14319,7 +14537,7 @@ void main() {
       function resolveLaserCollision(laser) {
         laser.userData.checked = true;
         if (graceTimer > 0 || quantumPhaseTimer > 0 || !laser.userData.active) return;
-        if (antiGravityModeActive && !isPlayerOnGravitySide(laser.userData.gravitySide)) return;
+        if (zeroGravityModeActive && !isPlayerOnGravitySide(laser.userData.gravitySide)) return;
         const laserX = laser.position.x + laser.userData.beam.position.x;
         if (Math.abs(player.position.x - laserX) <= LASER_HALF_WIDTH + PLAYER_RADIUS) {
           handleObstacleImpact("Laser strike", 0xff397e);
@@ -14366,7 +14584,7 @@ void main() {
           handleObstacleImpact("Color mismatch", COLORS[currentColor].hex);
           return;
         }
-        if (antiGravityModeActive && !isPlayerOnGravitySide(gate.userData.gravitySide)) {
+        if (zeroGravityModeActive && !isPlayerOnGravitySide(gate.userData.gravitySide)) {
           handleObstacleImpact("Wrong gravity surface", 0x9b6dff);
           return;
         }
@@ -14486,6 +14704,7 @@ void main() {
         runStartedAt = 0;
         scoreAuditAt = 0;
         scoreAuditValue = 0;
+        scoreAuditDistance = 0;
         runScoreIntegrityValid = true;
         combo = 0;
         maxCombo = 0;
@@ -14525,7 +14744,7 @@ void main() {
         colorPulse = 0;
         setEnvironment(0, { announce: false, instant: true });
         setGravitySide("floor", true);
-        setOrbColor(mirrorMatrixModeActive ? COLORS.length - 1 : 1);
+        setOrbColor(1);
         player.userData.targetX = LANE_X[currentLane];
         player.position.set(LANE_X[currentLane], RUNNER_Y, 0);
         player.rotation.set(0, 0, 0);
@@ -14638,13 +14857,11 @@ void main() {
             ? "Zero-Gravity run complete"
             : laserChaosModeActive
               ? "Laser Chaos run complete"
-          : selectedMode === "antiGravity"
-            ? "Quantum run complete"
             : blackoutModeActive
               ? "Blackout run complete"
               : laserPursuitModeActive
                 ? "Pursuit wall caught you"
-                : mirrorMatrixModeActive ? "Mirror Matrix run complete" : "Run complete";
+                : "Run complete";
         el("titleTop").textContent = reason === "time" ? "TIME" : "SESSION";
         el("titleBottom").textContent = reason === "time" ? "EXPIRED" : "TERMINATED";
         el("intro").textContent = reason === "time"
@@ -14653,15 +14870,11 @@ void main() {
             ? "The zero-gravity storm has passed. Your crystals and score are saved—come back next weekend for another run."
             : laserChaosModeActive
               ? "The laser chaos run is over. Your score and collected crystals are saved—try the storm again next weekend."
-          : selectedMode === "antiGravity"
-            ? "The quantum tunnel keeps moving. Recalibrate your gravity flips and try again."
             : blackoutModeActive
               ? "The darkness hides each gate until it draws near. Track the active color and steer into its matching lane for another run."
               : laserPursuitModeActive
                 ? "The pursuit wall caught up. Clear the rotating gates and use every speed boost to stay ahead longer."
-              : mirrorMatrixModeActive
-                ? "The mirror reversed your steering and color cycle. Try again to earn double score and crystals."
-            : "The tunnel keeps moving. Find your rhythm and take another run.";
+                : "The tunnel keeps moving. Find your rhythm and take another run.";
         el("colorKey").hidden = true;
         el("startHint").hidden = true;
         el("modeSelector").hidden = true;
@@ -14680,14 +14893,10 @@ void main() {
           ? "Weekend Zero-Gravity · 2× Storm"
           : laserChaosModeActive
             ? "Weekend Laser Chaos · 2× Storm"
-          : selectedMode === "antiGravity"
-          ? "Quantum Singularity · Anti-Gravity"
           : blackoutModeActive
             ? "Blackout Nightmare · Run summary"
             : laserPursuitModeActive
               ? "Laser Pursuit · Boss Rush"
-            : mirrorMatrixModeActive
-              ? "Mirror Matrix · 2× Score & Crystals"
             : (selectedMode === "timeAttack" ? "Time Attack" : "Endless") + " · Run summary";
         el("bestMessage").textContent = isBest
           ? "PREVIOUS BEST · " + previousBest.toLocaleString("en-US")
@@ -14721,6 +14930,8 @@ void main() {
         updatePowerHUD();
         saveProgression();
         el("startButton").innerHTML = 'Play Again <span class="button-arrow">↗</span>';
+        el("gameOverPrimaryAction").appendChild(el("startButton"));
+        el("gameOverPrimaryAction").hidden = false;
         el("shopButton").hidden = true;
         el("settingsButton").hidden = true;
         el("hud").classList.remove("visible");
@@ -14813,7 +15024,7 @@ void main() {
           index, name: index === 0 ? "PLAYER 1" : "PLAYER 2", scene, camera: laneCamera,
           runner, orb, halo, runnerLight, lane: 1, targetX: 0,
           colorIndex: index === 0 ? 0 : 1, distance: 0, survivalTime: 0, gatesPassed: 0,
-          score: 0, alive: true, finished: false, finishTime: Infinity, speed: 8.8,
+          score: 0, crystalsCollected: 0, alive: true, finished: false, finishTime: Infinity, speed: 8.8,
           phaseTimer: 0, hyperTimer: 0, vortexTimer: 0, empTimer: 0, powerLabel: "",
           colorTimer: 4.2, gateTimer: 1.1 + index * 0.35, crystalTimer: 2.3 + index,
           crateTimer: 5.2 + index * 1.1, gates: [], crystals: [], crates: [],
@@ -14870,9 +15081,9 @@ void main() {
         }
         cyberDuelPlayers = [];
       }
-      function makeDuelGate(playerData, z) {
+      function makeDuelGate(playerData, z, syncData = null) {
         const root = new THREE.Group();
-        const laneColors = [
+        const laneColors = syncData?.laneColors || [
           Math.floor(Math.random() * CYBER_DUEL_PALETTE.length),
           Math.floor(Math.random() * CYBER_DUEL_PALETTE.length),
           Math.floor(Math.random() * CYBER_DUEL_PALETTE.length)
@@ -14892,14 +15103,16 @@ void main() {
           const edgeMaterial = new THREE.LineBasicMaterial({ color: 0xf5fdff, transparent: true, opacity: 0.82 });
           root.add(new THREE.LineSegments(new THREE.EdgesGeometry(panel.geometry), edgeMaterial));
         });
-        root.position.z = z;
+        root.position.z = syncData?.z ?? z;
         root.userData.laneColors = laneColors;
-        root.userData.checked = false;
-        root.userData.phase = Math.random() * Math.PI * 2;
+        root.userData.checked = Boolean(syncData?.checked);
+        root.userData.phase = syncData?.phase ?? Math.random() * Math.PI * 2;
+        root.userData.netId = syncData?.id || `duel-${playerData.index}-${++cyberDuelEntitySequence}`;
+        root.userData.targetZ = root.position.z;
         playerData.scene.add(root);
         return root;
       }
-      function makeDuelCrystal(playerData, z) {
+      function makeDuelCrystal(playerData, z, syncData = null) {
         const root = new THREE.Group();
         const crystal = new THREE.Mesh(
           new THREE.OctahedronGeometry(0.27, 0),
@@ -14912,14 +15125,18 @@ void main() {
         );
         halo.rotation.x = Math.PI / 2;
         root.add(halo);
-        root.position.set(duelLaneX(Math.floor(Math.random() * 3)), 0.16, z);
+        const lane = syncData?.lane ?? Math.floor(Math.random() * 3);
+        root.position.set(syncData?.x ?? duelLaneX(lane), 0.16, syncData?.z ?? z);
         root.userData.kind = "crystal";
+        root.userData.netId = syncData?.id || `duel-${playerData.index}-${++cyberDuelEntitySequence}`;
+        root.userData.lane = lane;
+        root.userData.targetZ = root.position.z;
         playerData.scene.add(root);
         return root;
       }
-      function makeDuelCrate(playerData, z) {
+      function makeDuelCrate(playerData, z, syncData = null) {
         const root = new THREE.Group();
-        const type = CYBER_DUEL_POWERUPS[Math.floor(Math.random() * CYBER_DUEL_POWERUPS.length)];
+        const type = syncData?.type || CYBER_DUEL_POWERUPS[Math.floor(Math.random() * CYBER_DUEL_POWERUPS.length)];
         const colorMap = { phase: 0xa76bff, emp: 0xc5ff45, hyper: 0xff9b38, vortex: 0x43eaff };
         const color = colorMap[type];
         const box = new THREE.Mesh(
@@ -14931,9 +15148,13 @@ void main() {
           new THREE.EdgesGeometry(box.geometry),
           new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.88 })
         ));
-        root.position.set(duelLaneX(Math.floor(Math.random() * 3)), 0.16, z);
+        const lane = syncData?.lane ?? Math.floor(Math.random() * 3);
+        root.position.set(syncData?.x ?? duelLaneX(lane), 0.16, syncData?.z ?? z);
         root.userData.type = type;
-        root.userData.phase = Math.random() * Math.PI * 2;
+        root.userData.phase = syncData?.phase ?? Math.random() * Math.PI * 2;
+        root.userData.netId = syncData?.id || `duel-${playerData.index}-${++cyberDuelEntitySequence}`;
+        root.userData.lane = lane;
+        root.userData.targetZ = root.position.z;
         playerData.scene.add(root);
         return root;
       }
@@ -14947,7 +15168,7 @@ void main() {
         playCue("color");
         if (manual) triggerHapticFeedback("power");
       }
-      function cyberDuelControl(playerIndex, action) {
+      function applyCyberDuelControl(playerIndex, action) {
         if (cyberDuelState !== "running") return;
         const playerData = cyberDuelPlayers[playerIndex];
         if (!playerData?.alive) return;
@@ -14960,6 +15181,24 @@ void main() {
           playerData.colorTimer = 4.2;
         }
       }
+      function cyberDuelControl(playerIndex, action) {
+        if (cyberDuelState !== "running") return;
+        if (cyberDuelRoomSession && playerIndex !== cyberDuelRoomSession.playerIndex) return;
+        applyCyberDuelControl(playerIndex, action);
+        if (cyberDuelRoomSession?.playerIndex === 1 &&
+            (action === "left" || action === "right" || action === "color")) {
+          void sendCyberDuelRoomInput(action);
+        }
+      }
+      function updateCyberDuelVisuals(playerData, dt, t) {
+        playerData.runner.position.x = THREE.MathUtils.damp(playerData.runner.position.x, playerData.targetX, 13, dt);
+        playerData.runner.position.y = 0.06 + Math.sin(t * 4.2 + playerData.bobPhase) * 0.075;
+        playerData.orb.rotation.y += dt * 1.1;
+        playerData.halo.rotation.z += dt * 0.75;
+        playerData.runnerLight.intensity = 4.4 + Math.sin(t * 5 + playerData.bobPhase) * 0.8;
+        playerData.camera.position.x = THREE.MathUtils.damp(playerData.camera.position.x, playerData.runner.position.x * 0.14, 3.5, dt);
+        playerData.camera.lookAt(playerData.runner.position.x * 0.07, 0.1, -18);
+      }
       function applyDuelPowerup(playerData, type) {
         const opponent = cyberDuelPlayers[1 - playerData.index];
         if (type === "phase") { playerData.phaseTimer = 5; playerData.powerLabel = "PHASE"; }
@@ -14970,6 +15209,8 @@ void main() {
         triggerHapticFeedback("power");
       }
       function awardDuelCrystal(playerData) {
+        playerData.crystalsCollected = (playerData.crystalsCollected || 0) + 1;
+        if (cyberDuelRoomSession && cyberDuelRoomSession.playerIndex !== playerData.index) return;
         progression.crystals = safeStoredCount(progression.crystals + 5);
         progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + 5);
         saveProgression();
@@ -14993,13 +15234,7 @@ void main() {
           playerData.finished = true;
           playerData.finishTime = playerData.survivalTime - dt + Math.max(0, CYBER_DUEL_FINISH_DISTANCE - oldDistance) / speed;
         }
-        playerData.runner.position.x = THREE.MathUtils.damp(playerData.runner.position.x, playerData.targetX, 13, dt);
-        playerData.runner.position.y = 0.06 + Math.sin(t * 4.2 + playerData.bobPhase) * 0.075;
-        playerData.orb.rotation.y += dt * 1.1;
-        playerData.halo.rotation.z += dt * 0.75;
-        playerData.runnerLight.intensity = 4.4 + Math.sin(t * 5 + playerData.bobPhase) * 0.8;
-        playerData.camera.position.x = THREE.MathUtils.damp(playerData.camera.position.x, playerData.runner.position.x * 0.14, 3.5, dt);
-        playerData.camera.lookAt(playerData.runner.position.x * 0.07, 0.1, -18);
+        updateCyberDuelVisuals(playerData, dt, t);
         playerData.colorTimer -= dt;
         if (playerData.colorTimer <= 0) {
           setDuelColor(playerData);
@@ -15102,9 +15337,157 @@ void main() {
         }
         el("duelWallet").textContent = `💎 ${safeStoredCount(progression.crystals)}`;
       }
+      function serializeCyberDuelSnapshot() {
+        return {
+          matchOver: cyberDuelState === "over",
+          winnerIndex: cyberDuelWinnerIndex,
+          reason: cyberDuelFinishReason,
+          players: cyberDuelPlayers.map(playerData => ({
+            index: playerData.index,
+            lane: playerData.lane,
+            colorIndex: playerData.colorIndex,
+            distance: playerData.distance,
+            survivalTime: playerData.survivalTime,
+            gatesPassed: playerData.gatesPassed,
+            score: playerData.score,
+            crystalsCollected: playerData.crystalsCollected || 0,
+            alive: playerData.alive,
+            finished: playerData.finished,
+            finishTime: Number.isFinite(playerData.finishTime) ? playerData.finishTime : null,
+            speed: playerData.speed,
+            phaseTimer: playerData.phaseTimer,
+            hyperTimer: playerData.hyperTimer,
+            vortexTimer: playerData.vortexTimer,
+            empTimer: playerData.empTimer,
+            powerLabel: playerData.powerLabel,
+            world: {
+              gates: playerData.gates.filter(object => !object.userData.collected).map(object => ({
+                id: object.userData.netId,
+                z: object.position.z,
+                laneColors: object.userData.laneColors,
+                checked: object.userData.checked,
+                phase: object.userData.phase,
+                rotationZ: object.rotation.z
+              })),
+              crystals: playerData.crystals.filter(object => !object.userData.collected).map(object => ({
+                id: object.userData.netId,
+                z: object.position.z,
+                x: object.position.x,
+                lane: object.userData.lane
+              })),
+              crates: playerData.crates.filter(object => !object.userData.collected).map(object => ({
+                id: object.userData.netId,
+                z: object.position.z,
+                x: object.position.x,
+                lane: object.userData.lane,
+                type: object.userData.type,
+                phase: object.userData.phase
+              }))
+            }
+          }))
+        };
+      }
+      function reconcileCyberDuelEntities(playerData, listKey, records, factory) {
+        if (!Array.isArray(records)) return;
+        const list = playerData[listKey];
+        const byId = new Map(list.map(object => [object.userData.netId, object]));
+        const keep = new Set();
+        for (const record of records) {
+          if (!record || typeof record.id !== "string" || record.id.length > 80) continue;
+          const id = record.id;
+          let object = byId.get(id);
+          if (!object) {
+            object = factory(playerData, record.z, { ...record, id });
+            list.push(object);
+          }
+          keep.add(id);
+          object.userData.targetZ = Math.max(-60, Math.min(6, Number(record.z) || 0));
+          if (Number.isFinite(record.x)) object.userData.targetX = Math.max(-2.2, Math.min(2.2, record.x));
+          if (listKey === "gates") {
+            object.userData.checked = Boolean(record.checked);
+            object.rotation.z = Number(record.rotationZ) || 0;
+          }
+        }
+        for (let index = list.length - 1; index >= 0; index -= 1) {
+          if (keep.has(list[index].userData.netId)) continue;
+          disposeCyberDuelObject(list[index]);
+          list.splice(index, 1);
+        }
+      }
+      function applyCyberDuelSnapshot(snapshot) {
+        if (!snapshot || !Array.isArray(snapshot.players) || cyberDuelPlayers.length !== 2) return;
+        for (const incoming of snapshot.players) {
+          if (!incoming || ![0, 1].includes(incoming.index)) continue;
+          const playerData = cyberDuelPlayers[incoming.index];
+          const previousCrystals = playerData.crystalsCollected || 0;
+          playerData.lane = Math.max(0, Math.min(2, Math.round(Number(incoming.lane) || 0)));
+          playerData.targetX = duelLaneX(playerData.lane);
+          playerData.distance = Math.max(0, Math.min(CYBER_DUEL_FINISH_DISTANCE, Number(incoming.distance) || 0));
+          playerData.survivalTime = Math.max(0, Number(incoming.survivalTime) || 0);
+          playerData.gatesPassed = Math.max(0, Math.floor(Number(incoming.gatesPassed) || 0));
+          playerData.score = Math.max(0, Math.floor(Number(incoming.score) || 0));
+          playerData.crystalsCollected = Math.max(0, Math.floor(Number(incoming.crystalsCollected) || 0));
+          if (cyberDuelRoomSession && playerData.index === cyberDuelRoomSession.playerIndex &&
+              playerData.crystalsCollected > previousCrystals) {
+            const gained = playerData.crystalsCollected - previousCrystals;
+            progression.crystals = safeStoredCount(progression.crystals + gained * 5);
+            progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + gained * 5);
+            saveProgression();
+            updateCoinDisplay();
+          }
+          playerData.alive = Boolean(incoming.alive);
+          playerData.finished = Boolean(incoming.finished);
+          playerData.finishTime = Number.isFinite(incoming.finishTime) ? incoming.finishTime : Infinity;
+          playerData.speed = Math.max(0, Math.min(30, Number(incoming.speed) || 8.8));
+          for (const key of ["phaseTimer", "hyperTimer", "vortexTimer", "empTimer"]) {
+            playerData[key] = Math.max(0, Math.min(10, Number(incoming[key]) || 0));
+          }
+          playerData.powerLabel = typeof incoming.powerLabel === "string" ? incoming.powerLabel.slice(0, 24) : "";
+          const colorIndex = Math.max(0, Math.min(CYBER_DUEL_PALETTE.length - 1, Math.round(Number(incoming.colorIndex) || 0)));
+          playerData.colorIndex = colorIndex;
+          const color = CYBER_DUEL_PALETTE[colorIndex];
+          playerData.orb.material.color.setHex(color);
+          playerData.orb.material.emissive.setHex(color);
+          playerData.halo.material.color.setHex(color);
+          playerData.runnerLight.color.setHex(color);
+          const world = incoming.world;
+          if (world && typeof world === "object") {
+            reconcileCyberDuelEntities(playerData, "gates", world.gates, makeDuelGate);
+            reconcileCyberDuelEntities(playerData, "crystals", world.crystals, makeDuelCrystal);
+            reconcileCyberDuelEntities(playerData, "crates", world.crates, makeDuelCrate);
+          }
+        }
+        updateCyberDuelHUD();
+        if (snapshot.matchOver === true && cyberDuelState === "running") {
+          const winnerIndex = snapshot.winnerIndex === 0 || snapshot.winnerIndex === 1 ? snapshot.winnerIndex : null;
+          finishCyberDuel(winnerIndex, snapshot.reason === "survivor" ? "survivor" : "finish");
+        }
+      }
+      function animateSyncedCyberDuelWorld(playerData, dt, t) {
+        for (const gate of playerData.gates) {
+          gate.position.z = THREE.MathUtils.damp(gate.position.z, gate.userData.targetZ ?? gate.position.z, 18, dt);
+          gate.rotation.z = Math.sin(t * 0.65 + gate.userData.phase) * 0.045;
+        }
+        for (const crystal of playerData.crystals) {
+          crystal.position.z = THREE.MathUtils.damp(crystal.position.z, crystal.userData.targetZ ?? crystal.position.z, 18, dt);
+          if (Number.isFinite(crystal.userData.targetX)) crystal.position.x = THREE.MathUtils.damp(crystal.position.x, crystal.userData.targetX, 12, dt);
+          crystal.rotation.y += dt * 2.4;
+          crystal.rotation.x += dt * 1.2;
+        }
+        for (const crate of playerData.crates) {
+          crate.position.z = THREE.MathUtils.damp(crate.position.z, crate.userData.targetZ ?? crate.position.z, 18, dt);
+          if (Number.isFinite(crate.userData.targetX)) crate.position.x = THREE.MathUtils.damp(crate.position.x, crate.userData.targetX, 12, dt);
+          crate.rotation.x += dt * 1.15;
+          crate.rotation.y += dt * 1.7;
+          crate.scale.setScalar(1 + Math.sin(t * 5 + crate.userData.phase) * 0.07);
+        }
+      }
       function finishCyberDuel(winnerIndex, reason = "finish") {
         if (cyberDuelState !== "running") return;
         cyberDuelState = "over";
+        cyberDuelWinnerIndex = winnerIndex;
+        cyberDuelFinishReason = reason;
+        if (cyberDuelRoomSession) el("cyberDuelRematch").disabled = true;
         el("cyber-duel-screen").hidden = false;
         el("cyber-duel-victory").hidden = false;
         const winner = winnerIndex === null ? null : cyberDuelPlayers[winnerIndex];
@@ -15112,24 +15495,30 @@ void main() {
         const summary = el("cyberDuelWinnerSummary");
         const reward = el("cyberDuelReward");
         const badge = el("cyberDuelBadgeReward");
+        const localWinner = winner && (!cyberDuelRoomSession || winnerIndex === cyberDuelRoomSession.playerIndex);
         if (winner) {
           title.textContent = `${winner.name} WINS!`;
           const resultReason = reason === "finish" ? "crossed the finish line first" : "was the last runner standing";
           const p1 = cyberDuelPlayers[0];
           const p2 = cyberDuelPlayers[1];
           summary.textContent = `${resultReason} · P1 ${Math.floor(p1.distance)}m / ${Math.floor(p1.survivalTime)}s · P2 ${Math.floor(p2.distance)}m / ${Math.floor(p2.survivalTime)}s`;
-          progression.crystals = safeStoredCount(progression.crystals + CYBER_DUEL_WIN_CRYSTALS);
-          progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + CYBER_DUEL_WIN_CRYSTALS);
-          saveProgression();
-          updateCoinDisplay();
-          updateHUD();
-          reward.textContent = `+${CYBER_DUEL_WIN_CRYSTALS} NEON CRYSTALS`;
-          const wasUnlocked = cyberDuelBadgeUnlocked;
-          cyberDuelBadgeUnlocked = true;
-          try { localStorage.setItem(CYBER_DUEL_BADGE_KEY, "1"); } catch {}
-          badge.textContent = wasUnlocked ? "🏆 CYBER DUEL CHAMPION BADGE · OWNED" : "🏆 CYBER DUEL CHAMPION BADGE UNLOCKED";
-          playCue("power");
-          triggerHapticFeedback("crystal");
+          if (localWinner) {
+            progression.crystals = safeStoredCount(progression.crystals + CYBER_DUEL_WIN_CRYSTALS);
+            progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + CYBER_DUEL_WIN_CRYSTALS);
+            saveProgression();
+            updateCoinDisplay();
+            updateHUD();
+            reward.textContent = `+${CYBER_DUEL_WIN_CRYSTALS} NEON CRYSTALS`;
+            const wasUnlocked = cyberDuelBadgeUnlocked;
+            cyberDuelBadgeUnlocked = true;
+            try { localStorage.setItem(CYBER_DUEL_BADGE_KEY, "1"); } catch {}
+            badge.textContent = wasUnlocked ? "🏆 CYBER DUEL CHAMPION BADGE · OWNED" : "🏆 CYBER DUEL CHAMPION BADGE UNLOCKED";
+            playCue("power");
+            triggerHapticFeedback("crystal");
+          } else {
+            reward.textContent = "NO CRYSTALS · YOUR FRIEND WON";
+            badge.textContent = cyberDuelBadgeUnlocked ? "🏆 CYBER DUEL CHAMPION BADGE · OWNED" : "RUN IT BACK FOR THE CHAMPION BADGE";
+          }
         } else {
           title.textContent = "DUEL DRAW";
           const p1 = cyberDuelPlayers[0];
@@ -15140,17 +15529,32 @@ void main() {
         }
         updateCyberDuelHUD();
         el("cyberDuelRematch").focus({ preventScroll: true });
+        if (cyberDuelRoomSession?.playerIndex === 0) void publishCyberDuelRoomSnapshot();
       }
       function updateCyberDuel(dt, t) {
-        for (const playerData of cyberDuelPlayers) updateDuelPlayer(playerData, Math.min(dt, 0.05), t);
-        const finishers = cyberDuelPlayers.filter(playerData => playerData.finished && playerData.alive).sort((a, b) => a.finishTime - b.finishTime);
-        if (finishers.length) {
-          const tie = finishers.length > 1 && Math.abs(finishers[0].finishTime - finishers[1].finishTime) < 0.025;
-          finishCyberDuel(tie ? null : finishers[0].index, "finish");
+        if (cyberDuelRoomSession?.playerIndex === 1) {
+          for (const playerData of cyberDuelPlayers) {
+            updateCyberDuelVisuals(playerData, Math.min(dt, 0.05), t);
+            animateSyncedCyberDuelWorld(playerData, Math.min(dt, 0.05), t);
+          }
         } else {
-          const alive = cyberDuelPlayers.filter(playerData => playerData.alive);
-          if (alive.length === 1) finishCyberDuel(alive[0].index, "survivor");
-          else if (alive.length === 0) finishCyberDuel(null, "draw");
+          for (const playerData of cyberDuelPlayers) updateDuelPlayer(playerData, Math.min(dt, 0.05), t);
+          const finishers = cyberDuelPlayers.filter(playerData => playerData.finished && playerData.alive).sort((a, b) => a.finishTime - b.finishTime);
+          if (finishers.length) {
+            const tie = finishers.length > 1 && Math.abs(finishers[0].finishTime - finishers[1].finishTime) < 0.025;
+            finishCyberDuel(tie ? null : finishers[0].index, "finish");
+          } else {
+            const alive = cyberDuelPlayers.filter(playerData => playerData.alive);
+            if (alive.length === 1) finishCyberDuel(alive[0].index, "survivor");
+            else if (alive.length === 0) finishCyberDuel(null, "draw");
+          }
+          if (cyberDuelRoomSession?.playerIndex === 0 && cyberDuelState === "running") {
+            cyberDuelSnapshotAccumulator += dt;
+            if (cyberDuelSnapshotAccumulator >= CYBER_DUEL_SNAPSHOT_MS / 1000) {
+              cyberDuelSnapshotAccumulator = 0;
+              void publishCyberDuelRoomSnapshot();
+            }
+          }
         }
         let refreshHUD = false;
         for (const playerData of cyberDuelPlayers) {
@@ -15260,6 +15664,7 @@ void main() {
       }
       function resetCyberDuelRound() {
         ensureCyberDuelWorld();
+        cyberDuelEntitySequence = 0;
         for (const playerData of cyberDuelPlayers) {
           clearDuelEntities(playerData);
           playerData.lane = 1;
@@ -15269,6 +15674,7 @@ void main() {
           playerData.survivalTime = 0;
           playerData.gatesPassed = 0;
           playerData.score = 0;
+          playerData.crystalsCollected = 0;
           playerData.alive = true;
           playerData.finished = false;
           playerData.finishTime = Infinity;
@@ -15289,33 +15695,388 @@ void main() {
         }
         updateCyberDuelHUD();
       }
-      function openCyberDuelLobby() {
-        if (state !== "ready" || cyberDuelState === "running") return;
+      function cyberDuelSessionStorageKey(roomCode) {
+        return `${CYBER_DUEL_ROOM_STORAGE_PREFIX}${roomCode}`;
+      }
+      function readCyberDuelRoomToken(roomCode) {
+        try { return window.sessionStorage.getItem(cyberDuelSessionStorageKey(roomCode)) || ""; } catch { return ""; }
+      }
+      function saveCyberDuelRoomToken(roomCode, token) {
+        try { window.sessionStorage.setItem(cyberDuelSessionStorageKey(roomCode), token); } catch {}
+      }
+      function clearCyberDuelRoomToken(roomCode) {
+        try { window.sessionStorage.removeItem(cyberDuelSessionStorageKey(roomCode)); } catch {}
+      }
+      async function cyberDuelRoomRequest(action, body = null, options = {}) {
+        const allowedActions = new Set(["", "join", "poll", "input", "snapshot", "start", "leave"]);
+        if (typeof action !== "string" || !allowedActions.has(action)) {
+          throw new TypeError("Invalid duel room action.");
+        }
+        if (body && typeof body === "object") {
+          body = { ...body };
+          if (body.roomCode !== undefined) {
+            const roomCode = normalizeCyberDuelRoomCode(body.roomCode);
+            if (!roomCode) throw new TypeError("Invalid duel room code.");
+            body.roomCode = roomCode;
+          }
+          if (body.token !== undefined &&
+              (typeof body.token !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(body.token))) {
+            throw new TypeError("Invalid duel room session token.");
+          }
+        }
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 6000);
+        try {
+          const response = await fetch(`${CYBER_DUEL_ROOM_API}${action ? `/${action}` : ""}`, {
+            method: "POST",
+            cache: "no-store",
+            keepalive: Boolean(options.keepalive),
+            headers: { "Content-Type": "application/json" },
+            body: body ? JSON.stringify(body) : undefined,
+            signal: controller.signal
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            const error = new Error(typeof data.error === "string" ? data.error : "The duel room service is unavailable.");
+            error.status = response.status;
+            throw error;
+          }
+          return data;
+        } finally {
+          window.clearTimeout(timeout);
+        }
+      }
+      function setCyberDuelRoomStatus(message) {
+        const status = el("cyberDuelRoomStatus");
+        if (status) status.textContent = message;
+      }
+      function isValidCyberDuelRoomSession(session, expectedRoomCode = "") {
+        const roomCode = normalizeCyberDuelRoomCode(session?.roomCode);
+        return Boolean(
+          session && typeof session === "object" && roomCode &&
+          (!expectedRoomCode || roomCode === expectedRoomCode) &&
+          /^[A-Za-z0-9_-]{43}$/.test(String(session.token || "")) &&
+          (session.playerIndex === 0 || session.playerIndex === 1)
+        );
+      }
+      function updateCyberDuelLobbyRoomState(roomState) {
+        if (!cyberDuelRoomSession) return;
+        const isHost = cyberDuelRoomSession.playerIndex === 0;
+        const guestConnected = Boolean(roomState.players?.some(player => player.playerIndex === 1 && player.connected));
+        const canStart = isHost && guestConnected && (roomState.status === "ready" || roomState.status === "over");
+        const startButton = el("cyberDuelStartButton");
+        startButton.disabled = !canStart;
+        startButton.textContent = canStart
+          ? (roomState.status === "over" ? "REMATCH" : "START NEON RUMBLE")
+          : isHost ? "WAITING FOR FRIEND" : "WAITING FOR HOST";
+        const rematchButton = el("cyberDuelRematch");
+        if (rematchButton) {
+          rematchButton.disabled = !cyberDuelRoomSession
+            ? false
+            : !isHost || !guestConnected || roomState.status !== "over";
+          rematchButton.textContent = cyberDuelRoomSession && !isHost ? "WAIT FOR HOST" : "REMATCH";
+        }
+        const inviteButton = el("cyberDuelInviteButton");
+        inviteButton.hidden = !isHost;
+        inviteButton.disabled = !isHost;
+        if (roomState.status === "running") {
+          setCyberDuelRoomStatus(isHost ? "Your room is live. Your friend is racing on the second track." : "Connected as Player 2 · syncing the live race…");
+        } else if (roomState.status === "over") {
+          setCyberDuelRoomStatus(guestConnected ? "Match complete · both players can run it back." : "Match complete · invite your friend again to rematch.");
+        } else if (guestConnected) {
+          setCyberDuelRoomStatus(isHost ? "Friend connected as Player 2 · you can start the duel." : "You joined as Player 2 · waiting for the host to start.");
+        } else {
+          setCyberDuelRoomStatus(isHost ? `Room ${cyberDuelRoomSession.roomCode} is ready · waiting for Player 2.` : "Waiting for the room host to come online…");
+        }
+      }
+      function saveCyberDuelRoomSession(session) {
+        cyberDuelRoomSession = session;
+        cyberDuelEventCursor = session.eventCursor || 0;
+        cyberDuelSnapshotAccumulator = 0;
+        saveCyberDuelRoomToken(session.roomCode, session.token);
+        el("cyberDuelRoomCode").textContent = session.roomCode;
+        updateCyberDuelLobbyRoomState(session);
+        scheduleCyberDuelRoomPoll(150);
+      }
+      function scheduleCyberDuelRoomPoll(delay = CYBER_DUEL_ROOM_POLL_MS) {
+        window.clearTimeout(cyberDuelRoomPollTimer);
+        if (!cyberDuelRoomSession || cyberDuelState === "idle") return;
+        cyberDuelRoomPollTimer = window.setTimeout(pollCyberDuelRoom, delay);
+      }
+      async function pollCyberDuelRoom() {
+        if (!cyberDuelRoomSession || cyberDuelRoomPollInFlight || cyberDuelState === "idle") return;
+        cyberDuelRoomPollInFlight = true;
+        const session = cyberDuelRoomSession;
+        try {
+          const roomState = await cyberDuelRoomRequest("poll", {
+            roomCode: session.roomCode,
+            token: session.token,
+            after: cyberDuelEventCursor
+          });
+          if (session !== cyberDuelRoomSession) return;
+          cyberDuelRoomSession.status = roomState.status;
+          if (Number.isFinite(roomState.eventCursor)) cyberDuelEventCursor = Math.max(cyberDuelEventCursor, roomState.eventCursor);
+          if (roomState.status === "running" && session.playerIndex === 0) {
+            for (const event of roomState.events || []) {
+              if (event.playerIndex === 1) applyCyberDuelControl(1, event.action);
+            }
+          }
+          if (session.playerIndex === 1 && roomState.snapshot) applyCyberDuelSnapshot(roomState.snapshot);
+          updateCyberDuelLobbyRoomState(roomState);
+          if (roomState.status === "running" && session.playerIndex === 1 &&
+              (cyberDuelState === "lobby" || cyberDuelState === "over")) {
+            startCyberDuel(true);
+          }
+          if (roomState.status === "over" && session.playerIndex === 1 && roomState.snapshot) {
+            applyCyberDuelSnapshot(roomState.snapshot);
+          }
+          if (cyberDuelState === "running" && !roomState.players?.some(player => player.playerIndex !== session.playerIndex && player.connected)) {
+            setCyberDuelRoomStatus("Friend connection lost · the room will stay open briefly for reconnection.");
+          }
+        } catch (error) {
+          if (session === cyberDuelRoomSession) {
+            setCyberDuelRoomStatus(error.status === 404
+              ? "This room expired or was closed by the host."
+              : "Connection interrupted · reconnecting to the duel room…");
+            if (error.status === 404 || error.status === 403) {
+              cyberDuelRoomSession = null;
+              clearCyberDuelRoomToken(session.roomCode);
+              stopCyberDuelRoomPolling();
+              if (cyberDuelState === "running") finishCyberDuel(null, "draw");
+              else {
+                el("cyberDuelStartButton").disabled = true;
+                el("cyberDuelStartButton").textContent = "ROOM UNAVAILABLE";
+                el("cyberDuelInviteButton").hidden = true;
+              }
+            }
+          }
+        } finally {
+          cyberDuelRoomPollInFlight = false;
+          if (cyberDuelRoomSession) {
+            const delay = cyberDuelState === "running" ? CYBER_DUEL_ROOM_POLL_MS : 700;
+            scheduleCyberDuelRoomPoll(delay);
+          }
+        }
+      }
+      async function sendCyberDuelRoomInput(action) {
+        if (!["left", "right", "color"].includes(action)) return;
+        const session = cyberDuelRoomSession;
+        if (!session || session.playerIndex !== 1) return;
+        try {
+          await cyberDuelRoomRequest("input", {
+            roomCode: session.roomCode,
+            token: session.token,
+            action
+          });
+        } catch {
+          setCyberDuelRoomStatus("Input connection interrupted · trying to reconnect…");
+        }
+      }
+      async function publishCyberDuelRoomSnapshot() {
+        const session = cyberDuelRoomSession;
+        if (!session || session.playerIndex !== 0 || cyberDuelSnapshotInFlight ||
+            (cyberDuelState !== "running" && cyberDuelState !== "over")) return;
+        cyberDuelSnapshotInFlight = true;
+        try {
+          await cyberDuelRoomRequest("snapshot", {
+            roomCode: session.roomCode,
+            token: session.token,
+            snapshot: serializeCyberDuelSnapshot()
+          });
+        } catch {
+          setCyberDuelRoomStatus("Match connection interrupted · syncing will resume automatically.");
+        } finally {
+          cyberDuelSnapshotInFlight = false;
+        }
+      }
+      async function createCyberDuelRoomForLobby(generation) {
+        try {
+          const session = await cyberDuelRoomRequest("", null);
+          if (!isValidCyberDuelRoomSession(session)) throw new Error("The room service returned an invalid session.");
+          if (generation !== cyberDuelRoomGeneration || cyberDuelState !== "lobby") {
+            void cyberDuelRoomRequest("leave", { roomCode: session.roomCode, token: session.token }, { keepalive: true }).catch(() => {});
+            return;
+          }
+          saveCyberDuelRoomSession(session);
+          setCyberDuelRoomStatus(`Room ${session.roomCode} created · invite a friend to join as Player 2.`);
+        } catch {
+          if (generation !== cyberDuelRoomGeneration) return;
+          el("cyberDuelRoomCode").textContent = "OFFLINE";
+          el("cyberDuelInviteButton").disabled = true;
+          el("cyberDuelInviteButton").hidden = true;
+          setCyberDuelRoomStatus("Live rooms are unavailable right now. You can still play local split-screen.");
+          el("cyberDuelStartButton").disabled = false;
+          el("cyberDuelStartButton").textContent = "START LOCAL DUEL";
+        }
+      }
+      async function joinCyberDuelRoomForLobby(roomCode, generation) {
+        roomCode = normalizeCyberDuelRoomCode(roomCode);
+        if (!roomCode) {
+          setCyberDuelRoomStatus("Invalid room code. Use the CYBER-1234 format.");
+          el("cyberDuelStartButton").disabled = true;
+          return;
+        }
+        try {
+          const session = await cyberDuelRoomRequest("join", {
+            roomCode,
+            token: readCyberDuelRoomToken(roomCode) || undefined
+          });
+          if (!isValidCyberDuelRoomSession(session, roomCode)) {
+            throw new Error("The room service returned an invalid session.");
+          }
+          if (generation !== cyberDuelRoomGeneration || cyberDuelState !== "lobby") {
+            void cyberDuelRoomRequest("leave", { roomCode: session.roomCode, token: session.token }, { keepalive: true }).catch(() => {});
+            return;
+          }
+          saveCyberDuelRoomSession(session);
+          if (session.playerIndex === 0) {
+            setCyberDuelRoomStatus("This device created the room · open the invite on your friend's device for Player 2.");
+          } else {
+            setCyberDuelRoomStatus(`Connected to ${session.roomCode} as Player 2 · waiting for the host.`);
+          }
+        } catch (error) {
+          if (generation !== cyberDuelRoomGeneration) return;
+          el("cyberDuelRoomCode").textContent = roomCode;
+          el("cyberDuelInviteButton").hidden = true;
+          el("cyberDuelStartButton").disabled = true;
+          el("cyberDuelStartButton").textContent = "ROOM UNAVAILABLE";
+          setCyberDuelRoomStatus(error.message || "This room is full, expired, or unavailable.");
+        }
+      }
+      function cyberDuelInviteUrl() {
+        if (!cyberDuelRoomSession) return "";
+        const url = new URL(window.location.pathname, window.location.origin);
+        url.searchParams.set("room", cyberDuelRoomSession.roomCode);
+        return url.toString();
+      }
+      async function inviteCyberDuelFriend() {
+        const session = cyberDuelRoomSession;
+        if (!session || session.playerIndex !== 0) return;
+        const inviteUrl = cyberDuelInviteUrl();
+        const message = `⚔️ Join my Cyber Duel: Neon Rumble! Open room ${session.roomCode} and race me. ${inviteUrl}`;
+        if (typeof navigator.share === "function") {
+          try {
+            await navigator.share({ title: "Cyber Duel: Neon Rumble", text: message, url: inviteUrl });
+            setCyberDuelRoomStatus("Share sheet opened · send the invite from your chosen app.");
+            return;
+          } catch (error) {
+            if (error?.name === "AbortError") return;
+          }
+        }
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+        const link = document.createElement("a");
+        link.href = whatsappUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setCyberDuelRoomStatus("WhatsApp invite opened · finish sharing in WhatsApp.");
+      }
+      function openCyberDuelLobby(roomCode = "") {
+        const validatedRoomCode = roomCode ? normalizeCyberDuelRoomCode(roomCode) : "";
+        if (roomCode && !validatedRoomCode) {
+          setCyberDuelRoomStatus("Invalid room code. Use the CYBER-1234 format.");
+          return false;
+        }
+        if (state !== "ready" || cyberDuelState === "running" || cyberDuelState === "lobby") return;
+        cyberDuelRoomGeneration += 1;
+        const generation = cyberDuelRoomGeneration;
+        cyberDuelRoomSession = null;
         cyberDuelState = "lobby";
+        cyberDuelWinnerIndex = null;
         setBannerAdPlacement("hidden");
         el("overlay").classList.add("hidden");
         el("cyber-duel-lobby").hidden = false;
-        el("cyberDuelBadgeStatus").textContent = cyberDuelBadgeUnlocked ? "🏆 CYBER DUEL CHAMPION BADGE · UNLOCKED" : "WIN A DUEL TO UNLOCK THE CHAMPION BADGE + 100 💎";
+        el("cyberDuelBadgeStatus").textContent = cyberDuelBadgeUnlocked ? "🏆 CYBER DUEL CHAMPION BADGE · UNLOCKED" : "WIN YOUR ONLINE DUEL TO UNLOCK THE CHAMPION BADGE + 100 💎";
+        el("cyberDuelRoomCode").textContent = validatedRoomCode || "CREATING…";
+        el("cyberDuelInviteButton").hidden = Boolean(validatedRoomCode);
+        el("cyberDuelInviteButton").disabled = true;
+        el("cyberDuelStartButton").disabled = true;
+        el("cyberDuelStartButton").textContent = validatedRoomCode ? "JOINING ROOM…" : "CREATING ROOM…";
+        setCyberDuelRoomStatus(validatedRoomCode ? `Joining ${validatedRoomCode} as Player 2…` : "Creating a secure room…");
         el("cyberDuelStartButton").focus({ preventScroll: true });
+        if (validatedRoomCode) void joinCyberDuelRoomForLobby(validatedRoomCode, generation);
+        else void createCyberDuelRoomForLobby(generation);
+        return true;
+      }
+      function stopCyberDuelRoomPolling() {
+        window.clearTimeout(cyberDuelRoomPollTimer);
+        cyberDuelRoomPollTimer = 0;
+        cyberDuelRoomPollInFlight = false;
+      }
+      function leaveCyberDuelRoom() {
+        const session = cyberDuelRoomSession;
+        stopCyberDuelRoomPolling();
+        cyberDuelRoomSession = null;
+        cyberDuelSnapshotInFlight = false;
+        cyberDuelSnapshotAccumulator = 0;
+        if (!session) return;
+        clearCyberDuelRoomToken(session.roomCode);
+        void cyberDuelRoomRequest("leave", {
+          roomCode: session.roomCode,
+          token: session.token
+        }, { keepalive: true }).catch(() => {});
+        try {
+          const url = new URL(window.location.href);
+          if (url.searchParams.get("room") === session.roomCode) {
+            url.searchParams.delete("room");
+            window.history.replaceState({}, "", url);
+          }
+        } catch {}
       }
       function returnFromCyberDuel() {
+        cyberDuelRoomGeneration += 1;
+        leaveCyberDuelRoom();
         cyberDuelState = "idle";
+        el("game").classList.remove("cyber-duel-active", "cyber-duel-online-host", "cyber-duel-online-guest");
         el("cyber-duel-screen").hidden = true;
         el("cyber-duel-lobby").hidden = true;
         el("cyber-duel-victory").hidden = true;
         disposeCyberDuelWorld();
         returnToHome();
       }
-      function startCyberDuel() {
+      function beginCyberDuelRound() {
         resetCyberDuelRound();
+        cyberDuelWinnerIndex = null;
+        cyberDuelFinishReason = "finish";
         cyberDuelState = "running";
         el("game").classList.add("cyber-duel-active");
+        el("game").classList.toggle("cyber-duel-online-host", cyberDuelRoomSession?.playerIndex === 0);
+        el("game").classList.toggle("cyber-duel-online-guest", cyberDuelRoomSession?.playerIndex === 1);
         el("cyber-duel-lobby").hidden = true;
         el("cyber-duel-victory").hidden = true;
         el("cyber-duel-screen").hidden = false;
         resizeCyberDuelCameras();
         unlockAudio().then(unlocked => { if (unlocked) playCue("button"); });
         updateCyberDuelHUD();
+      }
+      function startCyberDuel(fromRoomSignal = false) {
+        if (cyberDuelRoomSession && !fromRoomSignal) {
+          if (cyberDuelRoomSession.playerIndex !== 0) {
+            setCyberDuelRoomStatus("The room host will start the match when ready.");
+            return;
+          }
+          if (cyberDuelRoomSession.status !== "ready" && cyberDuelRoomSession.status !== "over") {
+            setCyberDuelRoomStatus("Wait for Player 2 to connect before starting.");
+            return;
+          }
+          const session = cyberDuelRoomSession;
+          el("cyberDuelStartButton").disabled = true;
+          setCyberDuelRoomStatus("Starting the synchronized match…");
+          void cyberDuelRoomRequest("start", { roomCode: session.roomCode, token: session.token })
+            .then(roomState => {
+              if (cyberDuelRoomSession !== session) return;
+              session.status = roomState.status;
+              beginCyberDuelRound();
+            })
+            .catch(error => {
+              el("cyberDuelStartButton").disabled = false;
+              setCyberDuelRoomStatus(error.message || "The match could not start. Try again.");
+            });
+          return;
+        }
+        beginCyberDuelRound();
       }
       const fallbackGateOrder = [];
       function compareGateDepth(a, b) {
@@ -15442,7 +16203,7 @@ void main() {
           ctx.lineWidth = Math.max(1.5, progress * 4);
           ctx.strokeRect(x, y - halfHeight, halfWidth * 2, halfHeight * 2);
           ctx.shadowBlur = 0;
-          if (antiGravityModeActive) {
+        if (zeroGravityModeActive) {
             const gravityY = y + (gate.userData.gravitySide === "ceiling" ? -halfHeight * 0.78 : halfHeight * 0.78);
             const gravityColor = gate.userData.gravitySide === "ceiling" ? "#b992ff" : "#69e8ff";
             ctx.beginPath();
@@ -15463,12 +16224,12 @@ void main() {
           if (progress <= 0 || progress > 1) continue;
           const gateY = horizon + (floor - horizon) * progress;
           const halfWidth = width * (0.035 + 0.37 * progress);
-          const y = antiGravityModeActive
+          const y = zeroGravityModeActive
             ? gateY + (laser.userData.gravitySide === "ceiling" ? -height * 0.035 : height * 0.035)
             : gateY;
           const laserX = center + (laser.userData.beam.position.x / 4.5) * nearHalf;
           const beamWidth = Math.max(8, (LASER_HALF_WIDTH * 2 / 4.5) * halfWidth);
-          const laserTint = antiGravityModeActive
+          const laserTint = zeroGravityModeActive
             ? laser.userData.gravitySide === "ceiling" ? "#c4a0ff" : "#63e6ff"
             : "#ff397e";
           ctx.beginPath();
@@ -15585,10 +16346,10 @@ void main() {
           ctx.lineTo(0, radius);
           ctx.lineTo(-radius * 0.66, 0);
           ctx.closePath();
-          ctx.fillStyle = antiGravityModeActive ? "#b98aff" : "#ffd25e";
-          ctx.strokeStyle = antiGravityModeActive ? "#dfd0ff" : "#fff0b2";
+          ctx.fillStyle = zeroGravityModeActive ? "#b98aff" : "#ffd25e";
+          ctx.strokeStyle = zeroGravityModeActive ? "#dfd0ff" : "#fff0b2";
           ctx.lineWidth = Math.max(1.5, progress * 2.5);
-          ctx.shadowColor = antiGravityModeActive ? "#7d5bff" : "#ffb52d";
+          ctx.shadowColor = zeroGravityModeActive ? "#7d5bff" : "#ffb52d";
           ctx.shadowBlur = 18 * progress;
           ctx.fill();
           ctx.stroke();
@@ -15734,7 +16495,12 @@ void main() {
 
       function animate(time) {
         requestAnimationFrame(animate);
-        const dt = Math.min((time - (lastTime || time)) / 1000, 0.045);
+        const rawDt = lastTime ? (time - lastTime) / 1000 : 0;
+        if (state === "running" && document.visibilityState === "visible" &&
+            (!Number.isFinite(rawDt) || rawDt < 0 || rawDt > MAX_VISIBLE_FRAME_GAP_SECONDS)) {
+          runScoreIntegrityValid = false;
+        }
+        const dt = THREE.MathUtils.clamp(Number.isFinite(rawDt) ? rawDt : 0, 0, 0.045);
         lastTime = time;
         const t = time * 0.001;
         if (state === "running" || cyberDuelState === "running") updateAmbientAudio();
@@ -15774,7 +16540,7 @@ void main() {
         orbLight.color.lerp(selectedOrbColor, colorLerp);
         skinAccent.rotation.z += dt * 0.38;
         animatePlayerAura(dt, t);
-        const beaconDirection = antiGravityModeActive && gravitySide === "ceiling" ? -1 : 1;
+        const beaconDirection = zeroGravityModeActive && gravitySide === "ceiling" ? -1 : 1;
         colorBeacon.position.y = beaconDirection * (0.9 + Math.sin(t * 3.2) * 0.045);
         colorBeacon.rotation.y += dt * 1.5;
         const laneTargetX = LANE_X[currentLane];
@@ -15799,7 +16565,7 @@ void main() {
         }
         if (state === "ready") {
           player.position.y = RUNNER_Y + Math.sin(t * 1.45) * 0.16;
-        } else if (state === "running" && antiGravityModeActive) {
+        } else if (state === "running" && zeroGravityModeActive) {
           player.position.y = THREE.MathUtils.damp(player.position.y, player.userData.gravityTargetY, 14, dt);
         } else if (state === "running") {
           player.position.y = RUNNER_Y + Math.sin(t * 5) * 0.055;
@@ -15825,7 +16591,7 @@ void main() {
           const lateralLean = THREE.MathUtils.clamp(laneVelocityX * 0.035, -0.34, 0.34);
           cameraFollowPosition.set(
             player.position.x + lateralLean,
-            CAMERA_BASE_Y + (antiGravityModeActive ? (player.position.y - RUNNER_Y) * 0.32 : 0),
+            CAMERA_BASE_Y + (zeroGravityModeActive ? (player.position.y - RUNNER_Y) * 0.32 : 0),
             CAMERA_BASE_Z
           );
           cameraFollowTarget.set(player.position.x + lateralLean * 0.28, player.position.y, -18);
@@ -15984,7 +16750,7 @@ void main() {
             coin.userData.crystal.scale.setScalar(1 + Math.sin(t * 6 + coin.userData.phase) * 0.09);
             if (previousZ < pickupPlane && coin.position.z >= pickupPlane &&
                 Math.abs(player.position.x - coin.position.x) <= PLAYER_RADIUS + 0.34 &&
-                (!antiGravityModeActive || Math.abs(player.position.y - coin.position.y) <= 1.45)) {
+                (!zeroGravityModeActive || Math.abs(player.position.y - coin.position.y) <= 1.45)) {
               collectCrystalCoin(coin);
             }
           }
@@ -16044,7 +16810,7 @@ void main() {
             auditRunScore(performance.now());
           }
         } else {
-          if (antiGravityModeActive) {
+          if (zeroGravityModeActive) {
             player.position.y = THREE.MathUtils.damp(player.position.y, player.userData.gravityTargetY, 10, dt);
           } else {
             player.position.y = RUNNER_Y + Math.sin(t * 1.15) * 0.09;
@@ -16123,11 +16889,12 @@ void main() {
          setBannerAdPlacement(activeBannerPlacement);
         if (el("bannerAdStatus")) el("bannerAdStatus").textContent = "Offline · ads unavailable; game remains playable";
       }, { passive: true });
-       el("startButton").addEventListener("click", startGame);
-       el("cyberDuelMenuButton").addEventListener("click", openCyberDuelLobby);
-       el("cyberDuelStartButton").addEventListener("click", startCyberDuel);
+       el("startButton").addEventListener("click", () => startGame(true));
+        el("cyberDuelMenuButton").addEventListener("click", () => openCyberDuelLobby());
+        el("cyberDuelStartButton").addEventListener("click", () => startCyberDuel());
+        el("cyberDuelInviteButton").addEventListener("click", inviteCyberDuelFriend);
        el("cyberDuelLobbyBack").addEventListener("click", returnFromCyberDuel);
-       el("cyberDuelRematch").addEventListener("click", startCyberDuel);
+        el("cyberDuelRematch").addEventListener("click", () => startCyberDuel());
        el("cyberDuelVictoryHome").addEventListener("click", returnFromCyberDuel);
        document.querySelectorAll("[data-duel-player][data-duel-action]").forEach(button => {
          button.addEventListener("click", () => cyberDuelControl(Number(button.dataset.duelPlayer), button.dataset.duelAction));
@@ -16167,9 +16934,7 @@ void main() {
        });
       el("endlessModeButton").addEventListener("click", () => setGameMode("endless"));
       el("timeAttackModeButton").addEventListener("click", () => setGameMode("timeAttack"));
-      el("antiGravityModeButton").addEventListener("click", () => setGameMode("antiGravity"));
       el("blackoutModeButton").addEventListener("click", () => setGameMode("blackout"));
-      el("mirrorMatrixModeButton").addEventListener("click", () => setGameMode("mirrorMatrix"));
       el("laserPursuitModeButton").addEventListener("click", () => setGameMode("laserPursuit"));
       el("zeroGravityModeButton").addEventListener("click", () => setGameMode("zeroGravity"));
       el("laserChaosModeButton").addEventListener("click", () => setGameMode("laserChaos"));
@@ -16371,10 +17136,11 @@ void main() {
       el("laneLeft").addEventListener("click", () => shiftLane(-1));
       el("laneRight").addEventListener("click", () => shiftLane(1));
       el("switchColor").addEventListener("click", () => {
-        if (antiGravityModeActive) flipGravity();
+        if (zeroGravityModeActive) flipGravity();
         else manuallyCycleColor();
       });
       window.addEventListener("keydown", event => {
+        if (event.isTrusted !== true) return;
         if (event.repeat && ["ArrowLeft", "ArrowRight", "ArrowUp", "KeyA", "KeyD", "KeyW", "Space", "Escape", "KeyP"].includes(event.code)) return;
         if (!el("challenge-modal").hidden) {
           if (event.key === "Tab") {
@@ -16566,7 +17332,7 @@ void main() {
           if (event.code === "ArrowLeft" || event.code === "KeyA") shiftLane(-1);
           if (event.code === "ArrowRight" || event.code === "KeyD") shiftLane(1);
           if (event.code === "Space") {
-            if (antiGravityModeActive) flipGravity();
+        if (zeroGravityModeActive) flipGravity();
             else manuallyCycleColor();
           }
           if (event.code === "KeyW" || event.code === "ArrowUp") manuallyCycleColor();
@@ -16589,7 +17355,7 @@ void main() {
         if (Math.abs(dx) >= 20 || Math.abs(dy) >= 20) return;
         if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
           if (state === "running") {
-            if (antiGravityModeActive) flipGravity();
+            if (zeroGravityModeActive) flipGravity();
             else manuallyCycleColor();
             return;
           }
@@ -16598,11 +17364,13 @@ void main() {
             el("weekend-storm-modal").hidden && el("rewards-screen").hidden && el("settings-screen").hidden) startGame();
       };
       game.addEventListener("pointerdown", event => {
+        if (event.isTrusted !== true) return;
         if (event.pointerType === "touch" || event.button !== 0 || (event.target instanceof Element && event.target.closest("button, #overlay .card, #pause-screen, #session-terminated-screen, #rewards-screen, #settings-screen, #dailyModal, #daily-streak-modal, #weekend-storm-modal, #challenge-modal, #challenge-victory-modal, #cyber-duel-lobby, #cyber-duel-screen, #cyber-duel-victory"))) return;
         gestureStart = { id: event.pointerId, source: "pointer", x: event.clientX, y: event.clientY, swiped: false };
         try { game.setPointerCapture(event.pointerId); } catch {}
       }, { passive: true });
       game.addEventListener("pointerup", event => {
+        if (event.isTrusted !== true) { gestureStart = null; return; }
         if (!gestureStart || gestureStart.source !== "pointer" || gestureStart.id !== event.pointerId) return;
         const start = gestureStart;
         gestureStart = null;
@@ -16612,6 +17380,7 @@ void main() {
         if (gestureStart?.source === "pointer" && gestureStart.id === event.pointerId) gestureStart = null;
       }, { passive: true });
       game.addEventListener("touchstart", event => {
+         if (event.isTrusted !== true) { gestureStart = null; return; }
          if (event.target instanceof Element && event.target.closest("button, #overlay .card, #pause-screen, #session-terminated-screen, #rewards-screen, #settings-screen, #dailyModal, #daily-streak-modal, #weekend-storm-modal, #challenge-modal, #challenge-victory-modal, #cyber-duel-lobby, #cyber-duel-screen, #cyber-duel-victory")) {
           gestureStart = null;
           return;
@@ -16626,6 +17395,7 @@ void main() {
         gestureStart = { id: touch.identifier, source: "touch", x: touch.clientX, y: touch.clientY, swiped: false };
       }, { passive: false });
       game.addEventListener("touchmove", event => {
+        if (event.isTrusted !== true) { gestureStart = null; return; }
         if (gestureStart?.source !== "touch") return;
         const touch = Array.from(event.changedTouches).find(item => item.identifier === gestureStart.id);
         if (!touch) return;
@@ -16639,6 +17409,7 @@ void main() {
         }
       }, { passive: false });
       game.addEventListener("touchend", event => {
+        if (event.isTrusted !== true) { gestureStart = null; return; }
         if (gestureStart?.source !== "touch") return;
         const touch = Array.from(event.changedTouches).find(item => item.identifier === gestureStart.id);
         if (!touch) return;
@@ -16706,6 +17477,13 @@ void main() {
           el("sessionConnectionStatus").textContent = "LOCAL SESSION PRESERVED · READY TO RESUME";
         }
       });
+      if (CYBER_DUEL_ROOM_QUERY) {
+        window.setTimeout(() => {
+          if (state === "ready" && cyberDuelState === "idle") {
+            openCyberDuelLobby(CYBER_DUEL_ROOM_QUERY);
+          }
+        }, 900);
+      }
       setSplashProgress(94, "Warming up the first frame");
     })();
   </script>

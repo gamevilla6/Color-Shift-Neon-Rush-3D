@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: cyber-duel
+    description: Temporary room coordination for Cyber Duel matches
 paths:
   /healthz:
     get:
@@ -24,6 +26,198 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /cyber-duel/rooms:
+    post:
+      operationId: createCyberDuelRoom
+      tags: [cyber-duel]
+      summary: Create a Cyber Duel room
+      responses:
+        "201":
+          description: Room created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CyberDuelRoomSession"
+        "503":
+          description: Room capacity reached
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /cyber-duel/rooms/join:
+    post:
+      operationId: joinCyberDuelRoom
+      tags: [cyber-duel]
+      summary: Join a Cyber Duel room as the second player
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CyberDuelJoinInput"
+      responses:
+        "200":
+          description: Room joined
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CyberDuelRoomSession"
+        "404":
+          description: Room not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Room is full or the match cannot be joined
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /cyber-duel/rooms/poll:
+    post:
+      operationId: pollCyberDuelRoom
+      tags: [cyber-duel]
+      summary: Poll room presence, controls, and authoritative match state
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CyberDuelRoomPollInput"
+      responses:
+        "200":
+          description: Current room state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CyberDuelRoomState"
+        "403":
+          description: Invalid room token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Room not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /cyber-duel/rooms/start:
+    post:
+      operationId: startCyberDuelRoom
+      tags: [cyber-duel]
+      summary: Start or restart a room match
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CyberDuelRoomTokenInput"
+      responses:
+        "200":
+          description: Match started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CyberDuelRoomState"
+        "403":
+          description: Only the room host can start the match
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: A second player must join before the match can start
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /cyber-duel/rooms/input:
+    post:
+      operationId: sendCyberDuelInput
+      tags: [cyber-duel]
+      summary: Send steering or color input to the room host
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CyberDuelRoomActionInput"
+      responses:
+        "202":
+          description: Input queued for the authoritative host
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CyberDuelActionAccepted"
+        "403":
+          description: Invalid token or match is not active
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Room not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /cyber-duel/rooms/snapshot:
+    post:
+      operationId: publishCyberDuelSnapshot
+      tags: [cyber-duel]
+      summary: Publish an authoritative match snapshot from the room host
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CyberDuelSnapshotInput"
+      responses:
+        "202":
+          description: Snapshot accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CyberDuelActionAccepted"
+        "403":
+          description: Only the room host can publish snapshots
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Room not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /cyber-duel/rooms/leave:
+    post:
+      operationId: leaveCyberDuelRoom
+      tags: [cyber-duel]
+      summary: Leave a Cyber Duel room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CyberDuelRoomTokenInput"
+      responses:
+        "200":
+          description: Player left the room
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CyberDuelLeaveResponse"
+        "404":
+          description: Room not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -31,6 +225,173 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
-
+      required: [status]
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    CyberDuelRoomPlayer:
+      type: object
+      properties:
+        playerIndex:
+          type: integer
+          enum: [0, 1]
+        connected:
+          type: boolean
+        ready:
+          type: boolean
+      required: [playerIndex, connected, ready]
+    CyberDuelRoomEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        playerIndex:
+          type: integer
+          enum: [0, 1]
+        action:
+          type: string
+          enum: [left, right, color]
+      required: [id, playerIndex, action]
+    CyberDuelRoomState:
+      type: object
+      properties:
+        roomCode:
+          type: string
+          pattern: "^CYBER-[0-9]{4}$"
+        status:
+          type: string
+          enum: [waiting, ready, running, over]
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/CyberDuelRoomPlayer"
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/CyberDuelRoomEvent"
+        eventCursor:
+          type: integer
+          minimum: 0
+        snapshot:
+          type: [object, "null"]
+          additionalProperties: true
+        winnerIndex:
+          type: [integer, "null"]
+          enum: [0, 1, null]
+      required: [roomCode, status, players, events, eventCursor, snapshot, winnerIndex]
+    CyberDuelRoomSession:
+      type: object
+      properties:
+        roomCode:
+          type: string
+          pattern: "^CYBER-[0-9]{4}$"
+        status:
+          type: string
+          enum: [waiting, ready, running, over]
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/CyberDuelRoomPlayer"
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/CyberDuelRoomEvent"
+        eventCursor:
+          type: integer
+          minimum: 0
+        snapshot:
+          type: [object, "null"]
+          additionalProperties: true
+        winnerIndex:
+          type: [integer, "null"]
+          enum: [0, 1, null]
+        token:
+          type: string
+          minLength: 32
+        playerIndex:
+          type: integer
+          enum: [0, 1]
+      required: [roomCode, status, players, events, eventCursor, snapshot, winnerIndex, token, playerIndex]
+    CyberDuelJoinInput:
+      type: object
+      properties:
+        roomCode:
+          type: string
+          pattern: "^CYBER-[0-9]{4}$"
+        token:
+          type: string
+          minLength: 32
+      required: [roomCode]
+      additionalProperties: false
+    CyberDuelRoomPollInput:
+      type: object
+      properties:
+        roomCode:
+          type: string
+          pattern: "^CYBER-[0-9]{4}$"
+        token:
+          type: string
+          minLength: 32
+        after:
+          type: integer
+          minimum: 0
+      required: [roomCode, token, after]
+      additionalProperties: false
+    CyberDuelRoomTokenInput:
+      type: object
+      properties:
+        roomCode:
+          type: string
+          pattern: "^CYBER-[0-9]{4}$"
+        token:
+          type: string
+          minLength: 32
+      required: [roomCode, token]
+      additionalProperties: false
+    CyberDuelRoomActionInput:
+      type: object
+      properties:
+        roomCode:
+          type: string
+          pattern: "^CYBER-[0-9]{4}$"
+        token:
+          type: string
+          minLength: 32
+        action:
+          type: string
+          enum: [left, right, color]
+      required: [roomCode, token, action]
+      additionalProperties: false
+    CyberDuelSnapshotInput:
+      type: object
+      properties:
+        roomCode:
+          type: string
+          pattern: "^CYBER-[0-9]{4}$"
+        token:
+          type: string
+          minLength: 32
+        snapshot:
+          type: object
+          additionalProperties: true
+      required: [roomCode, token, snapshot]
+      additionalProperties: false
+    CyberDuelActionAccepted:
+      type: object
+      properties:
+        accepted:
+          type: boolean
+        eventCursor:
+          type: integer
+          minimum: 0
+      required: [accepted, eventCursor]
+    CyberDuelLeaveResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+      required: [ok]

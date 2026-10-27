@@ -4,3 +4,4 @@
 - [Startup splash progress](startup-splash-progress.md) — tie loading progress to actual procedural setup and keep the splash until the first rendered frame.
 - [Share reward verification](share-reward-verification.md) — native shares can be confirmed by API resolution; social-app intent launches cannot confirm a completed send.
 - [Audio mix controls](audio-mix-controls.md) — master mute stays independent from the saved SFX and ambient-synth preferences.
+- [Android build prerequisites](android-build-prerequisites.md) — Capacitor sync can pass while Gradle still needs an installed Android SDK and configured `ANDROID_HOME`.
