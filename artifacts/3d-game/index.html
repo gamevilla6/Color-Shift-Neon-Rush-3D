@@ -10020,6 +10020,10 @@ void main() {
         shieldPursuitRepelled = false;
         syncActiveRunPowerFlags();
         orbMat.opacity = 1;
+        window.clearTimeout(flashTimer);
+        flashTimer = 0;
+        el("flash").classList.remove("on");
+        el("flash").style.background = "";
       }
       let graceTimer = 0;
       let statusTimer = 0;
@@ -15167,6 +15171,7 @@ void main() {
       }
       function disposeCyberDuelWorld() {
         for (const playerData of cyberDuelPlayers) {
+          resetDuelPowerState(playerData);
           clearDuelEntities(playerData);
           const geometries = new Set();
           const materials = new Set();
@@ -15235,7 +15240,10 @@ void main() {
       }
       function makeDuelCrate(playerData, z, syncData = null) {
         const root = new THREE.Group();
-        const type = syncData?.type || CYBER_DUEL_POWERUPS[Math.floor(Math.random() * CYBER_DUEL_POWERUPS.length)];
+        const requestedType = syncData?.type;
+        const type = CYBER_DUEL_POWERUPS.includes(requestedType)
+          ? requestedType
+          : CYBER_DUEL_POWERUPS[Math.floor(Math.random() * CYBER_DUEL_POWERUPS.length)];
         const colorMap = { phase: 0xa76bff, emp: 0xc5ff45, hyper: 0xff9b38, vortex: 0x43eaff, shield: 0x70fff0 };
         const color = colorMap[type];
         const box = new THREE.Mesh(
@@ -15349,6 +15357,7 @@ void main() {
         );
       }
       function applyDuelPowerup(playerData, type) {
+        if (!CYBER_DUEL_POWERUPS.includes(type)) return false;
         const opponent = cyberDuelPlayers[1 - playerData.index];
         if (type === "phase") { playerData.phaseTimer = Math.max(playerData.phaseTimer, 5); playerData.powerLabel = "PHASE"; }
         if (type === "hyper") { playerData.hyperTimer = Math.max(playerData.hyperTimer, 4); playerData.powerLabel = "HYPER"; }
@@ -15357,14 +15366,17 @@ void main() {
           playerData.shieldCharges = Math.min(1, playerData.shieldCharges + 1);
           playerData.powerLabel = "SHIELD";
         }
-        if (type === "emp" && opponent) {
+        if (type === "emp" && opponent?.alive && !opponent.finished) {
           opponent.empTimer = Math.max(opponent.empTimer, 1);
           syncDuelPowerFlags(opponent);
           playerData.powerLabel = "EMP HIT";
+        } else if (type === "emp") {
+          playerData.powerLabel = "EMP MISS";
         }
         syncDuelPowerFlags(playerData);
         playCue("power");
         triggerHapticFeedback("power");
+        return true;
       }
       function awardDuelCrystal(playerData) {
         playerData.crystalsCollected = (playerData.crystalsCollected || 0) + 1;
@@ -15622,9 +15634,10 @@ void main() {
           playerData.finished = Boolean(incoming.finished);
           playerData.finishTime = Number.isFinite(incoming.finishTime) ? incoming.finishTime : Infinity;
           playerData.speed = Math.max(0, Math.min(30, Number(incoming.speed) || 8.8));
-          for (const key of ["phaseTimer", "hyperTimer", "vortexTimer", "empTimer", "invulnerabilityTimer"]) {
+          for (const key of ["phaseTimer", "hyperTimer", "vortexTimer", "empTimer"]) {
             playerData[key] = Math.max(0, Math.min(10, Number(incoming[key]) || 0));
           }
+          playerData.invulnerabilityTimer = Math.max(0, Math.min(1.2, Number(incoming.invulnerabilityTimer) || 0));
           playerData.shieldCharges = Math.max(0, Math.min(1, Math.floor(Number(incoming.shieldCharges) || 0)));
           playerData.speedMultiplier = Math.max(0.65, Math.min(2, Number(incoming.speedMultiplier) || 1));
           syncDuelPowerFlags(playerData);
@@ -16676,10 +16689,12 @@ void main() {
         ctx.shadowBlur = 19 + menuPulse * 16;
         ctx.stroke();
         ctx.shadowBlur = 0;
-        if (shieldCharges > 0 || graceTimer > 0) {
+        if (activeRunPowerFlags.hasShield || activeRunPowerFlags.isQuantum || graceTimer > 0) {
           const shieldCount = shieldCharges > 0 ? fallbackShieldColors.length : 1;
           for (let index = 0; index < shieldCount; index++) {
-            const shieldColor = shieldCharges > 0 ? fallbackShieldColors[index] : "#68f2df";
+            const shieldColor = activeRunPowerFlags.isQuantum ? "#b184ff"
+              : activeRunPowerFlags.isInvulnerable ? "#70fff0"
+              : shieldCharges > 0 ? fallbackShieldColors[index] : "#68f2df";
             ctx.beginPath();
             ctx.arc(
               orbX,
