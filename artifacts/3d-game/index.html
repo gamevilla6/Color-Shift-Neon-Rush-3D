@@ -1602,6 +1602,20 @@
     #cyberDuelStartButton:disabled { opacity:.58; filter:saturate(.55); cursor:wait; transform:none; }
     .cyber-duel-lobby-actions, .cyber-duel-victory-actions { display:grid; gap:10px; margin-top:18px; }
     .cyber-duel-lobby-actions button, .cyber-duel-victory-actions button { width:100%; min-height:54px; }
+    .cyber-duel-mode-picker { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin:16px 0 8px; }
+    .cyber-duel-mode-choice {
+      min-width:0; min-height:54px; padding:10px 11px; border:1px solid rgba(99,226,244,.38); border-radius:13px;
+      background:rgba(8,18,32,.76); color:#d9eaf1; font:800 clamp(11px,2.8vw,14px)/1.25 "Orbitron",system-ui,sans-serif;
+      letter-spacing:.025em; cursor:pointer; touch-action:manipulation; transition:transform .16s ease,background .2s ease,border-color .2s ease,box-shadow .2s ease;
+    }
+    .cyber-duel-mode-choice:hover { transform:translateY(-1px); }
+    .cyber-duel-mode-choice:active { transform:scale(.97); }
+    .cyber-duel-mode-choice[aria-pressed="true"] {
+      border-color:rgba(84,246,255,.9); color:#fff; background:linear-gradient(125deg,rgba(0,198,222,.24),rgba(189,48,169,.22));
+      box-shadow:0 0 18px rgba(62,236,255,.2),inset 0 0 18px rgba(255,255,255,.06); text-shadow:0 0 10px rgba(83,244,255,.6);
+    }
+    .cyber-duel-mode-choice:disabled { opacity:.68; cursor:default; transform:none; }
+    #cyberDuelModeDescription { min-height:38px; margin:7px auto 13px; color:#aebfce; font:600 14px/1.4 "Rajdhani",system-ui,sans-serif; }
     .cyber-duel-screen {
       position:fixed; z-index:36; inset:0; overflow:hidden; pointer-events:none; color:#f5fbff;
       background:linear-gradient(to bottom,rgba(4,10,20,.28) 0 50%,rgba(8,4,19,.3) 50% 100%);
@@ -1644,6 +1658,15 @@
     .duel-finish-progress { position:absolute; z-index:3; top:36px; left:12px; right:12px; height:4px; overflow:hidden; border-radius:5px; background:rgba(210,244,255,.17); pointer-events:none; }
     .duel-finish-progress i { display:block; width:0; height:100%; border-radius:inherit; background:linear-gradient(90deg,#4ceaff,#fff); box-shadow:0 0 10px #4ceaff; }
     .duel-player-panel.p2 .duel-finish-progress { top:34px; }
+    .duel-ghost-delta {
+      position:absolute; z-index:4; top:45px; left:50%; transform:translateX(-50%); max-width:calc(100% - 24px);
+      padding:4px 10px; border:1px solid rgba(96,239,255,.4); border-radius:999px;
+      background:rgba(4,10,22,.78); color:#d6fbff; font:900 clamp(9px,2.5vw,12px)/1.25 "Orbitron",system-ui,sans-serif;
+      letter-spacing:.035em; text-align:center; white-space:nowrap; text-shadow:0 0 10px currentColor;
+      box-shadow:0 0 14px rgba(68,231,255,.15); pointer-events:none;
+    }
+    .duel-player-panel.p2 .duel-ghost-delta { border-color:rgba(255,113,213,.42); color:#ffe0f4; box-shadow:0 0 14px rgba(255,79,200,.14); }
+    .duel-ghost-delta[hidden] { display:none !important; }
     .duel-touch-controls { position:absolute; z-index:5; left:12px; right:12px; bottom:max(8px,env(safe-area-inset-bottom)); display:grid; grid-template-columns:1fr 1.15fr 1fr; gap:8px; pointer-events:auto; }
     .duel-touch-controls button { min-width:48px; min-height:48px; border:1px solid rgba(142,239,255,.58); border-radius:13px; background:rgba(4,11,25,.74); color:#f4fbff; font:900 14px/1 "Orbitron",system-ui,sans-serif; text-shadow:0 0 8px currentColor; box-shadow:0 0 13px rgba(73,230,255,.14); touch-action:manipulation; }
     .duel-player-panel.p2 .duel-touch-controls button { border-color:rgba(255,122,222,.5); }
@@ -1658,6 +1681,9 @@
       .duel-touch-controls { left:8px; right:8px; gap:5px; }
       .duel-touch-controls button { min-height:48px; font-size:12px; }
       .duel-stats { gap:3px 6px; }
+      .cyber-duel-mode-picker { gap:7px; }
+      .cyber-duel-mode-choice { min-height:52px; padding:9px 7px; }
+      .duel-ghost-delta { top:42px; padding:3px 8px; }
     }
     @media (max-width:520px) {
       .weekend-storm-banner { grid-template-columns:auto minmax(0,1fr); gap:8px; }
@@ -3520,25 +3546,61 @@
       box-shadow: 0 28px 100px rgba(0,0,0,.66), 0 0 54px rgba(56,230,211,.12);
     }
     #rewards-screen .shop-scroll {
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      height: 0;
       min-height: 0;
       overflow-x: hidden;
       overflow-y: auto;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y;
-      padding: clamp(18px, 3vw, 38px);
+      padding: 0;
     }
+    #rewards-screen .shop-panel { display: flex; flex-direction: column; overflow: hidden; padding: 0; }
+    #rewards-screen .shop-sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      flex: 0 0 auto;
+      padding: 14px clamp(14px, 3vw, 38px) 12px;
+      border-bottom: 1px solid rgba(0,255,255,.2);
+      background: rgba(10,10,20,.88);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.24);
+    }
+    #rewards-screen .shop-content { flex: 0 0 auto; padding: clamp(18px, 3vw, 38px); }
+    #rewards-screen .shop-footer { flex: 0 0 auto; }
     #rewards-screen .shop-header { margin-bottom: 22px; }
     #rewards-screen .eyebrow, #rewards-screen .panel-kicker {
       color: #72f4e4; font: 700 11px/1.4 "Orbitron", sans-serif; letter-spacing: .16em;
     }
-    #rewards-screen .shop-title { font-size: clamp(25px, 3.7vw, 44px); letter-spacing: -.045em; }
+    #rewards-screen .shop-title { font-size: clamp(22px, 3.1vw, 38px); letter-spacing: -.045em; }
     #rewards-screen .shop-intro { color: #b4c2d0; font-size: 16px; }
-    #rewards-screen .shop-balance { border-color: rgba(255,211,106,.38); background: rgba(255,211,106,.07); }
+    #rewards-screen .shop-intro { margin-top: 6px; }
+    #rewards-screen .shop-summary-card { display: flex; align-items: stretch; justify-content: flex-end; gap: 9px; }
+    #rewards-screen .shop-balance, #rewards-screen .shop-streak-summary {
+      display: grid;
+      min-width: 142px;
+      align-content: center;
+      padding: 9px 12px;
+      border: 1px solid rgba(255,211,106,.38);
+      background: rgba(255,211,106,.07);
+      text-align: left;
+    }
+    #rewards-screen .shop-balance { color: #ffdf85; }
+    #rewards-screen .shop-balance strong { font-size: clamp(18px, 2vw, 24px); }
+    #rewards-screen .shop-streak-summary { border-color: rgba(68,236,223,.3); background: rgba(68,236,223,.065); }
+    #rewards-screen .shop-streak-summary > span,
+    #rewards-screen .shop-streak-summary small { color: #8ca5b2; font: 700 9px "Orbitron", sans-serif; letter-spacing: .09em; }
+    #rewards-screen .shop-streak-summary strong { margin: 4px 0 2px; color: #a8fff2; font: 800 clamp(13px, 1.35vw, 17px) "Orbitron", sans-serif; }
+    #rewards-screen .shop-streak-summary small { color: #ffdf85; font-size: 8px; }
     #rewards-screen .reward-tabs {
-      position: sticky; top: -1px; z-index: 5;
+      position: relative; top: auto; z-index: auto;
       grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px;
-      padding: 7px; margin: 0 -1px 22px; border-color: rgba(99,230,224,.19);
+      padding: 5px; margin: 0 0 10px; border-color: rgba(99,230,224,.19);
       background: rgba(6,11,19,.96); backdrop-filter: blur(14px);
     }
     #rewards-screen .reward-tab {
@@ -3552,6 +3614,36 @@
       background: linear-gradient(110deg, rgba(51,219,216,.15), rgba(206,75,176,.10));
       color: #e9fffb; box-shadow: inset 0 -2px #58eadc;
     }
+    #rewards-screen .reward-filterbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-width: 0;
+    }
+    #rewards-screen .reward-filter-copy { display: grid; gap: 3px; min-width: 0; }
+    #rewards-screen .reward-filter-copy > span { color: #82f5e8; font: 800 9px "Orbitron", sans-serif; letter-spacing: .12em; }
+    #rewards-screen .reward-filter-copy small { color: #99a8b7; font: 600 12px "Rajdhani", sans-serif; }
+    #rewards-screen .reward-filter-options { display: flex; flex: 0 0 auto; gap: 5px; padding: 4px; border: 1px solid rgba(117,197,209,.18); background: rgba(4,9,17,.7); }
+    #rewards-screen .reward-filter {
+      display: inline-flex;
+      min-width: 76px;
+      min-height: 40px;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 9px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #9cabb9;
+      cursor: pointer;
+      font: 800 9px "Orbitron", sans-serif;
+      letter-spacing: .05em;
+      touch-action: manipulation;
+    }
+    #rewards-screen .reward-filter b { color: #758898; font-size: 9px; }
+    #rewards-screen .reward-filter.active { border-color: rgba(75,239,220,.38); background: rgba(62,222,214,.1); color: #d5fff9; }
+    #rewards-screen .reward-filter.active b { color: #ffe28b; }
     #rewards-screen .shop-live-preview { margin-bottom: 22px; }
     #rewards-screen .progress-hero {
       position: relative; display: flex; min-height: 150px; justify-content: space-between; align-items: center; gap: 18px;
@@ -3661,17 +3753,107 @@
     }
     #dailyModal:not([hidden]) { z-index: 1100; }
     #rewards-screen .claim-celebrate { animation: rewardClaimBurst .48s ease-out; }
+    #rewards-screen [data-reward-card][hidden] { display: none !important; }
+    #rewards-screen .achievement-category[hidden],
+    #rewards-screen .reward-filter-empty[hidden] { display: none !important; }
+    #rewards-screen .reward-filter-empty {
+      margin: 12px 0 18px;
+      padding: 16px;
+      border: 1px dashed rgba(105,216,225,.24);
+      background: rgba(8,17,28,.54);
+      color: #aab8c5;
+      font: 600 15px/1.4 "Rajdhani", system-ui, sans-serif;
+      text-align: center;
+    }
+    #rewards-screen .reward-claim-card.claim-ready {
+      border-color: rgba(255,215,100,.58);
+      box-shadow: inset 0 0 22px rgba(61,238,220,.055), 0 0 16px rgba(255,205,74,.12);
+      animation: rewardReadyPulse 1.8s ease-in-out infinite;
+    }
+    #rewards-screen .reward-claim-card.claimed { opacity: .66; filter: saturate(.68); }
+    #rewards-screen .reward-card-title { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+    #rewards-screen .reward-claimed-badge {
+      display: inline-flex;
+      min-height: 20px;
+      align-items: center;
+      padding: 3px 7px;
+      border: 1px solid rgba(94,233,199,.3);
+      background: rgba(94,233,199,.08);
+      color: #8bead2;
+      font: 800 8px/1 "Orbitron", sans-serif;
+      letter-spacing: .06em;
+      white-space: nowrap;
+    }
+    @keyframes rewardReadyPulse {
+      0%, 100% { box-shadow: inset 0 0 14px rgba(61,238,220,.035), 0 0 8px rgba(255,205,74,.07); }
+      50% { box-shadow: inset 0 0 24px rgba(61,238,220,.09), 0 0 22px rgba(255,205,74,.2), 0 0 30px rgba(61,238,220,.1); }
+    }
     @keyframes rewardClaimBurst {
       0% { box-shadow: 0 0 0 rgba(78,241,220,0); transform: scale(1); }
       42% { box-shadow: 0 0 35px rgba(78,241,220,.44), 0 0 52px rgba(235,91,192,.18); transform: scale(1.015); }
       100% { box-shadow: 0 0 0 rgba(78,241,220,0); transform: scale(1); }
     }
+    button.has-unclaimed {
+      position: relative;
+      z-index: 2;
+      overflow: visible;
+      animation: pulse-glow 1.55s ease-in-out infinite;
+    }
+    #weekend-storm-banner.has-unclaimed { animation: weekendStormGlow 1.7s ease-in-out infinite alternate; }
+    button.has-unclaimed::after {
+      content: attr(data-attention-label);
+      position: absolute;
+      z-index: 8;
+      top: -9px;
+      right: -7px;
+      display: inline-flex;
+      min-height: 19px;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 7px;
+      border: 1px solid rgba(255,239,164,.92);
+      border-radius: 999px;
+      background: linear-gradient(110deg, #ffe783, #a9fff3 70%, #fff);
+      color: #08131a;
+      box-shadow: 0 0 9px rgba(255,221,105,.8), 0 0 19px rgba(77,246,236,.46);
+      font: 900 8px/1 "Orbitron", system-ui, sans-serif;
+      letter-spacing: .045em;
+      white-space: nowrap;
+      pointer-events: none;
+      animation: pulse-badge 1.15s ease-in-out infinite;
+    }
+    #overlay.home-screen .secondary-actions .has-unclaimed { z-index: 4; }
+    #rewards-screen .reward-tab.has-unclaimed { z-index: 7; }
+    #rewards-screen .badge-claim.has-unclaimed,
+    #rewards-screen .tier-claim.has-unclaimed,
+    #rewards-screen .quest-action.has-unclaimed { border-color: rgba(255,224,119,.72); }
+    #daily-streak-modal .has-unclaimed { z-index: 2; }
+    @keyframes pulse-glow {
+      0%, 100% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.035); filter: brightness(1.12); }
+    }
+    @keyframes pulse-badge {
+      0%, 100% { transform: scale(1); filter: brightness(1); }
+      50% { transform: scale(1.08); filter: brightness(1.2); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      button.has-unclaimed, button.has-unclaimed::after { animation: none; }
+      #rewards-screen .reward-claim-card.claim-ready { animation: none; }
+    }
     @media (max-width: 650px) {
       #rewards-screen { padding: max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left)); }
       #rewards-screen .shop-panel { width: 100%; border-radius: 12px; }
-      #rewards-screen .shop-scroll { padding: 15px; }
+      #rewards-screen .shop-sticky-header { padding: 10px 12px 9px; }
+      #rewards-screen .shop-content { padding: 15px; }
+      #rewards-screen .shop-header { display: grid; grid-template-columns: 1fr; gap: 9px; margin-bottom: 10px; }
+      #rewards-screen .shop-summary-card { justify-content: stretch; }
+      #rewards-screen .shop-summary-card > * { flex: 1 1 0; min-width: 0; }
+      #rewards-screen .shop-intro { display: none; }
       #rewards-screen .reward-tabs { grid-template-columns: repeat(2,minmax(0,1fr)); margin-bottom: 16px; }
       #rewards-screen .reward-tab { min-height: 52px; font-size: 11px; }
+      #rewards-screen .reward-filterbar { align-items: flex-start; flex-direction: column; gap: 7px; }
+      #rewards-screen .reward-filter-options { width: 100%; }
+      #rewards-screen .reward-filter { flex: 1 1 0; min-width: 0; min-height: 42px; padding: 0 5px; font-size: 8px; }
       #rewards-screen .progress-hero { min-height: 132px; padding: 18px; }
       #rewards-screen .reset-clock { min-width: 116px; padding-left: 10px; }
       #rewards-screen .reset-clock strong { font-size: 18px; }
@@ -3680,6 +3862,7 @@
       #rewards-screen .spin-wheel-mark { width: 52px; height: 52px; }
       #rewards-screen .rewards-spin-cta { grid-column: 1 / -1; width: 100%; }
       #rewards-screen .shop-balance { min-width: 112px; padding: 9px; font-size: 9px; }
+      #rewards-screen .shop-summary-card .shop-balance { min-width: 0; flex: 1 1 0; }
     }
     @media (max-width: 390px) {
       #rewards-screen .shop-header { align-items: flex-start; }
@@ -3692,10 +3875,24 @@
       #rewards-screen { align-items: stretch; padding: max(6px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left)); }
       #rewards-achievements-screen { align-items: flex-start; }
       #rewards-screen .shop-panel { height: min(920px, calc(100dvh - 12px - env(safe-area-inset-top) - env(safe-area-inset-bottom))); max-height: none; }
-      #rewards-screen .shop-scroll { padding: 14px 20px; }
-      #rewards-screen .shop-header { margin-bottom: 12px; }
+      #rewards-screen .shop-sticky-header { padding: 6px 14px 7px; }
+      #rewards-screen .shop-content { padding: 14px 20px; }
+      #rewards-screen .shop-header { grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px; margin-bottom: 6px; }
+      #rewards-screen .shop-title { font-size: clamp(18px, 3vw, 25px); }
+      #rewards-screen .shop-intro { display: none; }
+      #rewards-screen .shop-summary-card { flex-direction: row; gap: 4px; }
+      #rewards-screen .shop-balance, #rewards-screen .shop-streak-summary { min-width: 106px; padding: 5px 7px; }
+      #rewards-screen .shop-summary-card .shop-balance strong { font-size: 17px; }
+      #rewards-screen .shop-streak-summary strong { margin: 2px 0; font-size: 11px; }
+      #rewards-screen .reward-tabs { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 4px; padding: 3px; margin-bottom: 5px; }
+      #rewards-screen .reward-tab { min-height: 40px; padding: 5px 3px; font-size: 8px; }
+      #rewards-screen .reward-filterbar { flex-direction: row; align-items: center; gap: 8px; }
+      #rewards-screen .reward-filter-copy small { display: none; }
+      #rewards-screen .reward-filter-options { width: auto; }
+      #rewards-screen .reward-filter { min-height: 35px; min-width: 66px; font-size: 7px; }
+      #rewards-screen .shop-header { margin-bottom: 6px; }
       #rewards-screen .progress-hero { min-height: 108px; margin-bottom: 14px; }
-      #rewards-screen .reward-tabs { margin-bottom: 12px; }
+      #rewards-screen .reward-tabs { margin-bottom: 5px; }
     }
     @media (max-height: 520px) {
       #rewards-achievements-screen { align-items: flex-start; }
@@ -4272,16 +4469,32 @@
       <div id="rewards-achievements-screen" class="rewards-dashboard-surface">
       <div class="shop-panel" id="shop-screen">
         <div class="shop-scroll" id="shopScroll">
-          <div class="shop-header">
-            <div><div class="eyebrow">PLAYER PROGRESSION</div><h2 class="shop-title" id="rewardsTitle">Rewards &amp; Achievements</h2><p class="shop-intro">Earn milestones, collect crystals, and customize your next run.</p></div>
-            <div class="shop-balance"><span>💎 NEON CRYSTALS</span><strong id="shopBalance">00000</strong></div>
+          <div class="shop-sticky-header" id="shopStickyHeader">
+            <div class="shop-header">
+              <div><div class="eyebrow">PLAYER PROGRESSION</div><h2 class="shop-title" id="rewardsTitle">Rewards &amp; Achievements</h2><p class="shop-intro">Earn milestones, collect crystals, and customize your next run.</p></div>
+              <div class="shop-summary-card">
+                <div class="shop-balance"><span>💎 NEON CRYSTALS</span><strong id="shopBalance">00000</strong></div>
+                <div class="shop-streak-summary" aria-live="polite">
+                  <span>LOGIN STREAK</span><strong id="shopStreakValue">DAY 1 / 7</strong><small id="shopStreakStatus">READY TO CLAIM</small>
+                </div>
+              </div>
+            </div>
+            <nav class="reward-tabs" role="tablist" aria-label="Player progression" aria-orientation="horizontal">
+              <button class="reward-tab active" id="rewardTabAchievements" type="button" role="tab" aria-selected="true" aria-controls="rewardPanelAchievements" tabindex="0" data-reward-tab="daily"><span aria-hidden="true">◷</span> Daily Quests</button>
+              <button class="reward-tab" id="rewardTabReferral" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelReferral" tabindex="-1" data-reward-tab="achievements"><span aria-hidden="true">✧</span> Achievements &amp; Badges</button>
+              <button class="reward-tab" id="rewardTabSkins" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelSkins" tabindex="-1" data-reward-tab="milestones"><span aria-hidden="true">◆</span> Milestone Rewards</button>
+              <button class="reward-tab" id="rewardTabBoosters" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelBoosters" tabindex="-1" data-reward-tab="lucky"><span aria-hidden="true">◎</span> Lucky Spin</button>
+            </nav>
+            <div class="reward-filterbar">
+              <div class="reward-filter-copy"><span>REWARD STATUS</span><small id="rewardFilterSummary" aria-live="polite">Showing all reward cards</small></div>
+              <div class="reward-filter-options" role="group" aria-label="Filter rewards by claim status">
+                <button class="reward-filter active" type="button" data-reward-filter="all" aria-pressed="true"><span>ALL</span><b data-filter-count="all">0</b></button>
+                <button class="reward-filter" type="button" data-reward-filter="claimed" aria-pressed="false"><span>CLAIMED</span><b data-filter-count="claimed">0</b></button>
+                <button class="reward-filter" type="button" data-reward-filter="unclaimed" aria-pressed="false"><span>UNCLAIMED</span><b data-filter-count="unclaimed">0</b></button>
+              </div>
+            </div>
           </div>
-          <nav class="reward-tabs" role="tablist" aria-label="Player progression" aria-orientation="horizontal">
-            <button class="reward-tab active" id="rewardTabAchievements" type="button" role="tab" aria-selected="true" aria-controls="rewardPanelAchievements" tabindex="0" data-reward-tab="daily"><span aria-hidden="true">◷</span> Daily Quests</button>
-            <button class="reward-tab" id="rewardTabReferral" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelReferral" tabindex="-1" data-reward-tab="achievements"><span aria-hidden="true">✧</span> Achievements &amp; Badges</button>
-            <button class="reward-tab" id="rewardTabSkins" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelSkins" tabindex="-1" data-reward-tab="milestones"><span aria-hidden="true">◆</span> Milestone Rewards</button>
-            <button class="reward-tab" id="rewardTabBoosters" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelBoosters" tabindex="-1" data-reward-tab="lucky"><span aria-hidden="true">◎</span> Lucky Spin</button>
-          </nav>
+          <div class="shop-content" id="shopContent">
           <aside class="shop-live-preview" id="shopPreview" aria-live="polite" aria-atomic="true">
             <div class="shop-live-swatch" id="shopPreviewSwatch" aria-hidden="true">✦</div>
             <div class="shop-live-copy">
@@ -4307,11 +4520,13 @@
             </section>
             <div class="shop-section-heading"><div><h3>Current bounties</h3><p>Complete objectives on the track to claim 💎 Neon Crystals.</p></div><span class="achievement-tier-key">DAILY CONTRACTS</span></div>
             <div class="achievement-list daily-list" id="dailyBountyList"></div>
+            <p class="reward-filter-empty" data-reward-empty="daily" hidden>No daily rewards match this filter yet.</p>
             <section class="quest-note"><span aria-hidden="true">✦</span><p>Keep your streak alive. New quests arrive with the next daily reset.</p></section>
           </div>
           <div class="reward-tab-panel" id="rewardPanelReferral" data-reward-panel="achievements" role="tabpanel" aria-labelledby="rewardTabReferral" tabindex="0" hidden>
             <section class="progress-hero badge-hero"><div><span class="panel-kicker">YOUR LEGEND / COLLECTION</span><h3>Achievements &amp; Badges</h3><p>Every badge marks a run worth remembering.</p></div><div class="badge-emblem" aria-hidden="true">✧</div></section>
             <div class="badge-grid" id="achievementBadgeList" aria-label="Individual achievement badges" aria-live="polite"></div>
+            <p class="reward-filter-empty" data-reward-empty="achievements" hidden>No badges match this filter yet.</p>
           </div>
           <div class="reward-tab-panel" id="rewardPanelSkins" data-reward-panel="milestones" role="tabpanel" aria-labelledby="rewardTabSkins" tabindex="0" hidden>
             <section class="progress-hero milestone-hero"><div><span class="panel-kicker">LONG GAME / REWARD TRACK</span><h3>Milestone Rewards</h3><p>Build your run record, unlock tiers, and claim your crystal haul.</p></div><span class="hero-crystal" aria-hidden="true">💎</span></section>
@@ -4324,6 +4539,7 @@
             <section class="milestone-content milestone-run-panel" id="milestoneRunPanel" role="tabpanel" aria-label="Run milestones" hidden>
               <div class="shop-section-heading"><div><h3>Achievement tracks</h3><p>Claim crystal rewards as your skills level up.</p></div><span class="achievement-tier-key">BRONZE · SILVER · GOLD · DIAMOND</span></div>
               <div class="achievement-list" id="achievementList"></div>
+              <p class="reward-filter-empty" data-reward-empty="milestones" hidden>No milestone rewards match this filter yet.</p>
             </section>
             <section class="milestone-content milestone-cosmetics-panel" id="milestoneCosmeticsPanel" role="tabpanel" aria-label="Cosmetic rewards" hidden>
               <div class="shop-section-label">Sphere skins · make the stream yours</div><div class="skin-grid" id="skinGrid"></div>
@@ -4353,6 +4569,7 @@
           <div class="save-reset">
             <p>Progress, claimed rewards, owned cosmetics, and equipped styles are saved on this device.</p>
             <button class="secondary-btn reset-save-btn" id="resetLocalData" type="button">Reset local save</button>
+          </div>
           </div>
         </div>
         <div class="shop-footer">
@@ -4471,7 +4688,12 @@
       <div class="cyber-duel-lobby-card">
         <div class="cyber-duel-kicker">ONLINE ROOM · TWO PLAYER ARENA</div>
         <h2 id="cyberDuelLobbyTitle">⚔️ CYBER DUEL<br>NEON RUMBLE</h2>
-        <p id="cyberDuelLobbyDescription">Invite a friend into your room. Both runners race separate neon tracks; the room host keeps the match in sync and the first to 300m wins.</p>
+        <p id="cyberDuelLobbyDescription">Invite a friend into your room. Pick a duel style before the room fills; the host keeps both tracks in sync.</p>
+        <div class="cyber-duel-mode-picker" role="group" aria-label="Cyber Duel sub-mode">
+          <button class="cyber-duel-mode-choice" type="button" data-cyber-duel-mode="rumble" aria-pressed="true">⚔️ 1v1 RUMBLE</button>
+          <button class="cyber-duel-mode-choice" type="button" data-cyber-duel-mode="ghost" aria-pressed="false">👻 GHOST RACE<br>(SHADOW MIRROR)</button>
+        </div>
+        <p id="cyberDuelModeDescription">Race separate tracks. First to 300m wins.</p>
         <div class="duel-player-briefs">
           <div class="duel-player-brief p1"><strong>PLAYER 1 · CYAN</strong><span>A / D steer<br>W shifts color<br>Touch the upper track</span></div>
           <div class="duel-player-brief p2"><strong>PLAYER 2 · MAGENTA</strong><span>← / → steer<br>↑ or Space shifts color<br>Touch the lower track</span></div>
@@ -4498,6 +4720,7 @@
           <span class="duel-power-status" id="duelPowerP1">READY</span>
         </div>
         <div class="duel-finish-progress"><i id="duelProgressP1"></i></div>
+        <div class="duel-ghost-delta" id="duelDeltaP1" aria-live="off" hidden></div>
         <div class="duel-glitch-layer" id="duelEmpP1" aria-hidden="true"></div>
         <div class="duel-touch-controls" role="group" aria-label="Player 1 touch controls">
           <button type="button" data-duel-player="0" data-duel-action="left" aria-label="Player 1 steer left">◀</button>
@@ -4514,6 +4737,7 @@
           <span class="duel-power-status" id="duelPowerP2">READY</span>
         </div>
         <div class="duel-finish-progress"><i id="duelProgressP2"></i></div>
+        <div class="duel-ghost-delta" id="duelDeltaP2" aria-live="off" hidden></div>
         <div class="duel-glitch-layer" id="duelEmpP2" aria-hidden="true"></div>
         <div class="duel-touch-controls" role="group" aria-label="Player 2 touch controls">
           <button type="button" data-duel-player="1" data-duel-action="left" aria-label="Player 2 steer left">◀</button>
@@ -4526,13 +4750,14 @@
     <div class="cyber-duel-countdown" id="cyberDuelCountdown" role="status" aria-live="assertive" hidden></div>
     <section class="cyber-duel-victory" id="cyber-duel-victory" role="dialog" aria-modal="true" aria-labelledby="cyberDuelWinnerTitle" aria-describedby="cyberDuelWinnerSummary" hidden>
       <div class="cyber-duel-victory-card">
-        <div class="cyber-duel-kicker">MATCH RESULT · NEON RUMBLE</div>
+        <div class="cyber-duel-kicker" id="cyberDuelWinnerKicker">MATCH RESULT · NEON RUMBLE</div>
         <h2 id="cyberDuelWinnerTitle">CYBER DUEL COMPLETE</h2>
         <p id="cyberDuelWinnerSummary">The duel is over.</p>
         <div class="challenge-victory-bonus" id="cyberDuelReward">+100 NEON CRYSTALS</div>
         <p class="duel-lobby-badge" id="cyberDuelBadgeReward">🏆 CYBER DUEL CHAMPION BADGE UNLOCKED</p>
         <div class="cyber-duel-victory-actions">
           <button class="primary-btn" id="cyberDuelRematch" type="button">REMATCH</button>
+          <button class="secondary-btn" id="cyberDuelReturnLobby" type="button">↩ RETURN TO LOBBY</button>
           <button class="secondary-btn" id="cyberDuelVictoryHome" type="button">🏠 MAIN MENU</button>
         </div>
       </div>
@@ -8478,10 +8703,12 @@ void main() {
         try {
           const params = new URLSearchParams(window.location.search);
           const raw = params.get("room");
+          const requestedDuelMode = params.get("duel");
           return {
             present: raw !== null,
             raw: raw || "",
-            roomCode: raw === null ? "" : normalizeCyberDuelRoomCode(raw)
+            roomCode: raw === null ? "" : normalizeCyberDuelRoomCode(raw),
+            duelMode: requestedDuelMode === "ghost" || requestedDuelMode === "rumble" ? requestedDuelMode : ""
           };
         } catch { return { present: false, raw: "", roomCode: "" }; }
       })();
@@ -8502,6 +8729,8 @@ void main() {
       let cyberDuelEntitySequence = 0;
       let cyberDuelWinnerIndex = null;
       let cyberDuelFinishReason = "finish";
+      let cyberDuelMode = "rumble";
+      let cyberDuelModeLockedByInvite = false;
       const BACKGROUND_SESSION_TIMEOUT_MS = 60 * 1000;
       const SESSION_RECONNECT_SECONDS = 5;
       const SESSION_RETRY_BONUS = 25;
@@ -9943,6 +10172,7 @@ void main() {
       }
       let progression = createFreshProgression();
       let activeRewardsTab = "daily";
+      let activeRewardFilter = "all";
       let activeMilestoneTab = "run";
       let dailyQuestClockTimer = 0;
       let runCoins = 0;
@@ -11740,6 +11970,7 @@ void main() {
           weekendStormEndsAt = 0;
         }
         updateWeekendStormUI(now);
+        updateUnclaimedRewardBadges();
         if (!active && isWeekendStormMode(selectedMode) && state === "ready") setGameMode("endless");
         if (!active && !el("weekend-storm-modal").hidden) closeWeekendStormModal();
         if (wasActive !== active) updateModeCopy();
@@ -11752,6 +11983,7 @@ void main() {
         weekendStormState.lastMode = isWeekendStormMode(mode) ? mode : "";
         saveWeekendStormState();
         updateWeekendStormUI();
+        updateUnclaimedRewardBadges();
       }
       function recordWeekendStormRunCompletion(finalScore, earnedCrystals) {
         if (!weekendStormActive || !weekendStormState.eventId) return;
@@ -12546,6 +12778,127 @@ void main() {
         if (item.id === "gates") return safeStoredCount(progression.daily.gatesCleared);
         return safeStoredCount(progression.daily.crystalsCollected);
       }
+      function setUnclaimedRewardBadge(button, ready, label = "🎁 READY", accessibleLabel = "") {
+        if (!button) return;
+        button.classList.toggle("has-unclaimed", Boolean(ready));
+        if (ready) {
+          button.dataset.attentionLabel = label;
+          if (accessibleLabel) button.setAttribute("aria-label", accessibleLabel);
+        } else {
+          delete button.dataset.attentionLabel;
+          button.removeAttribute("aria-label");
+        }
+      }
+      function updateUnclaimedRewardBadges() {
+        if (!progression || !progression.daily) return;
+        progression.daily = normalizeDailyProgress(progression.daily);
+        refreshLoginStreakDate();
+        const dailyReady = DAILY_BOUNTIES.filter(item =>
+          progression.daily[item.id + "Claimed"] !== true && dailyBountyValue(item) >= item.target
+        ).length;
+        const badgeReady = ACHIEVEMENTS.filter(item =>
+          progression.claimedAchievements[item.id] !== true &&
+          (progression.achievements[item.id] === true || achievementBadgeValue(item) >= item.target)
+        ).length;
+        const tierReady = ACHIEVEMENT_CATEGORIES.reduce((total, category) => {
+          const value = safeStoredCount(achievementMetric(category));
+          return total + category.tiers.filter(tier =>
+            progression.claimedAchievementRewards[tier.id] !== true &&
+            (progression.unlockedAchievementTiers[tier.id] === true || value >= tier.target)
+          ).length;
+        }, 0);
+        const streakReady = loginStreakClaimedToday !== true;
+        const spinReady = hasFreeLuckySpinToday() || safeStoredCount(progression.bonusSpins) > 0;
+        const totalReady = dailyReady + badgeReady + tierReady + Number(streakReady) + Number(spinReady);
+
+        setUnclaimedRewardBadge(
+          el("shopButton"),
+          totalReady > 0,
+          "🎁 READY",
+          "Rewards and Skins · " + totalReady + " reward" + (totalReady === 1 ? "" : "s") + " ready to claim"
+        );
+        setUnclaimedRewardBadge(
+          el("luckySpinHomeButton"),
+          spinReady,
+          "🎁 SPIN READY",
+          "Daily Lucky Spin · reward ready"
+        );
+        setUnclaimedRewardBadge(
+          el("luckySpinGameOverButton"),
+          spinReady,
+          "🎁 SPIN READY",
+          "Daily Lucky Spin · reward ready"
+        );
+        setUnclaimedRewardBadge(
+          el("claimDailyStreakButton"),
+          streakReady,
+          "🎁 READY",
+          "Claim today's daily login streak reward"
+        );
+        setUnclaimedRewardBadge(el("rewardTabAchievements"), dailyReady > 0, "CLAIM!", "Daily Quests · " + dailyReady + " rewards ready");
+        setUnclaimedRewardBadge(el("rewardTabReferral"), badgeReady > 0, "CLAIM!", "Achievements and Badges · " + badgeReady + " rewards ready");
+        setUnclaimedRewardBadge(el("rewardTabSkins"), tierReady > 0, "CLAIM!", "Milestone Rewards · " + tierReady + " rewards ready");
+        setUnclaimedRewardBadge(el("rewardTabBoosters"), spinReady, "FREE SPIN", "Lucky Spin · daily reward ready");
+        setUnclaimedRewardBadge(el("dailySpinButton"), spinReady, "🎁 READY", "Spin for a daily reward");
+        setUnclaimedRewardBadge(el("rewardsLuckySpinButton"), spinReady, "🎁 READY", "Spin for a daily reward");
+
+        const weekendBonusReady = weekendStormActive && weekendStormState?.participated !== true;
+        setUnclaimedRewardBadge(el("weekend-storm-banner"), weekendBonusReady, "2× BONUS READY", "Weekend Neon Storm · double rewards ready");
+        updateShopStreakSummary();
+      }
+      function updateShopStreakSummary() {
+        const dayValue = Math.min(7, Math.max(1, safeStoredCount(loginStreakCount) || 1));
+        const value = el("shopStreakValue");
+        const status = el("shopStreakStatus");
+        if (value) value.textContent = "DAY " + dayValue + " / 7";
+        if (status) status.textContent = loginStreakClaimedToday ? "CLAIMED TODAY" : "READY TO CLAIM";
+      }
+      function applyRewardFilter() {
+        const root = el("shopScroll");
+        if (!root) return;
+        const cards = Array.from(root.querySelectorAll("[data-reward-card]"));
+        const counts = { all: cards.length, claimed: 0, unclaimed: 0 };
+        cards.forEach(card => {
+          const isClaimed = card.dataset.rewardClaimState === "claimed";
+          if (isClaimed) counts.claimed++;
+          else counts.unclaimed++;
+          card.hidden = activeRewardFilter !== "all" &&
+            (activeRewardFilter === "claimed" ? !isClaimed : isClaimed);
+        });
+        root.querySelectorAll(".achievement-category").forEach(category => {
+          category.hidden = !category.querySelector(".achievement-tier[data-reward-card]:not([hidden])");
+        });
+        [
+          ["dailyBountyList", "daily"],
+          ["achievementBadgeList", "achievements"],
+          ["achievementList", "milestones"]
+        ].forEach(([listId, panelId]) => {
+          const list = el(listId);
+          const empty = root.querySelector('[data-reward-empty="' + panelId + '"]');
+          if (!list || !empty) return;
+          const visibleCount = list.querySelectorAll("[data-reward-card]:not([hidden])").length;
+          empty.hidden = activeRewardFilter === "all" || visibleCount > 0;
+        });
+        document.querySelectorAll("[data-reward-filter]").forEach(button => {
+          const selected = button.dataset.rewardFilter === activeRewardFilter;
+          button.classList.toggle("active", selected);
+          button.setAttribute("aria-pressed", String(selected));
+        });
+        document.querySelectorAll("[data-filter-count]").forEach(counter => {
+          counter.textContent = String(counts[counter.dataset.filterCount] || 0);
+        });
+        const summary = el("rewardFilterSummary");
+        if (summary) {
+          const shown = activeRewardFilter === "all" ? counts.all : counts[activeRewardFilter];
+          const label = activeRewardFilter === "all" ? "all" : activeRewardFilter;
+          summary.textContent = "Showing " + shown + " " + label + " reward card" + (shown === 1 ? "" : "s");
+        }
+      }
+      function setRewardFilter(filter) {
+        if (!["all", "claimed", "unclaimed"].includes(filter)) return;
+        activeRewardFilter = filter;
+        applyRewardFilter();
+      }
       function renderProgressionUI() {
         const previousDailyDate = progression.daily?.date;
         progression.daily = normalizeDailyProgress(progression.daily);
@@ -12633,13 +12986,17 @@ void main() {
           const claimed = progression.claimedAchievements[item.id] === true;
           const percent = Math.min(100, Math.round((value / item.target) * 100));
           const stateLabel = claimed ? "CLAIMED ✓" : unlocked ? "READY TO CLAIM" : "IN PROGRESS";
-          return '<article class="badge-card' + (unlocked ? " unlocked" : "") + (claimed ? " claimed" : "") + '" data-badge-card="' + item.id + '">' +
+          return '<article class="badge-card reward-claim-card' + (unlocked ? " unlocked" : "") + (claimed ? " claimed" : "") +
+            (unlocked && !claimed ? " claim-ready" : "") + '" data-reward-card data-reward-claim-state="' + (claimed ? "claimed" : "unclaimed") + '" data-badge-card="' + item.id + '">' +
             '<span class="badge-symbol" aria-hidden="true">' + item.icon + '</span>' +
-            '<div class="badge-copy"><strong>' + item.title + '</strong><p>' + item.description + '</p>' +
+            '<div class="badge-copy"><div class="reward-card-title"><strong>' + item.title + '</strong>' +
+              (claimed ? '<span class="reward-claimed-badge">CLAIMED ✓</span>' : '') + '</div><p>' + item.description + '</p>' +
               '<div class="badge-progress-track" role="progressbar" aria-label="' + item.title + ' progress" aria-valuemin="0" aria-valuemax="' + item.target + '" aria-valuenow="' + value + '"><span style="width:' + percent + '%"></span></div>' +
-              '<div class="badge-progress-meta"><span>' + value.toLocaleString() + ' / ' + item.target.toLocaleString() + '</span><span>' + stateLabel + '</span></div></div>' +
+              '<div class="badge-progress-meta"><span>' + value.toLocaleString() + ' / ' + item.target.toLocaleString() + '</span>' +
+                '<span>' + (claimed ? "COMPLETE" : stateLabel) + '</span></div></div>' +
             '<div class="badge-actions"><span class="badge-reward">REWARD · 💎 +' + item.reward + '</span>' +
-              '<button class="badge-claim" type="button" data-claim-badge="' + item.id + '" ' + (!unlocked || claimed ? "disabled" : "") + '>' +
+              '<button class="badge-claim' + (unlocked && !claimed ? " has-unclaimed" : "") + '" type="button" data-claim-badge="' + item.id + '" ' +
+                (unlocked && !claimed ? 'data-attention-label="CLAIM!" ' : "") + (!unlocked || claimed ? "disabled" : "") + '>' +
                 (claimed ? "CLAIMED ✓" : unlocked ? "CLAIM 💎 +" + item.reward : "LOCKED 🔒") + '</button></div>' +
             '</article>';
         }).join("");
@@ -12654,11 +13011,14 @@ void main() {
               const claimed = progression.claimedAchievementRewards[tier.id] === true;
               const percent = Math.min(100, Math.round((safeValue / tier.target) * 100));
               const label = claimed ? "CLAIMED ✓" : unlocked ? "CLAIM 💎 +" + tier.reward : "LOCKED 🔒";
-              return '<div class="achievement-tier ' + (unlocked ? "unlocked" : "") + (claimed ? " claimed" : "") + '">' +
-                '<div class="tier-heading"><strong>' + tier.name + '</strong><span>' + (unlocked ? "COMPLETE" : tier.target.toLocaleString() + " " + category.unit) + '</span></div>' +
+              return '<div class="achievement-tier reward-claim-card' + (unlocked ? " unlocked" : "") + (claimed ? " claimed" : "") +
+                (unlocked && !claimed ? " claim-ready" : "") + '" data-reward-card data-reward-claim-state="' + (claimed ? "claimed" : "unclaimed") + '">' +
+                '<div class="tier-heading"><strong>' + tier.name + '</strong>' +
+                  (claimed ? '<span class="reward-claimed-badge">CLAIMED ✓</span>' : '<span>' + (unlocked ? "COMPLETE" : tier.target.toLocaleString() + " " + category.unit) + '</span>') + '</div>' +
                 '<div class="tier-progress" role="progressbar" aria-label="' + category.title + " " + tier.name + ' progress" aria-valuemin="0" aria-valuemax="' + tier.target + '" aria-valuenow="' + Math.min(safeValue, tier.target) + '"><span style="width:' + percent + '%"></span></div>' +
                 '<div class="tier-footer"><span class="tier-reward"><span class="crystal-mark" aria-hidden="true"></span>+' + tier.reward + '</span>' +
-                '<button class="secondary-btn tier-claim" type="button" data-tier="' + tier.id + '" ' + (!unlocked || claimed ? "disabled" : "") + '>' + label + '</button></div>' +
+                '<button class="secondary-btn tier-claim' + (unlocked && !claimed ? " has-unclaimed" : "") + '" type="button" data-tier="' + tier.id + '" ' +
+                  (unlocked && !claimed ? 'data-attention-label="CLAIM!" ' : "") + (!unlocked || claimed ? "disabled" : "") + '>' + label + '</button></div>' +
                 '</div>';
             }).join("") + '</div></article>';
         }).join("");
@@ -12668,17 +13028,22 @@ void main() {
           const ready = progress >= item.target;
           const unit = item.id === "distance" ? "M" : item.id === "gates" ? "GATES" : "CRYSTALS";
           const percent = Math.min(100, Math.round((progress / item.target) * 100));
-          return '<article class="quest-card' + (ready ? " ready" : "") + (claimed ? " claimed" : "") + '" data-daily-card="' + item.id + '">' +
+          return '<article class="quest-card reward-claim-card' + (ready ? " ready" : "") + (claimed ? " claimed" : "") +
+            (ready && !claimed ? " claim-ready" : "") + '" data-reward-card data-reward-claim-state="' + (claimed ? "claimed" : "unclaimed") + '" data-daily-card="' + item.id + '">' +
             '<span class="quest-symbol" aria-hidden="true">' + item.icon + '</span>' +
             '<div class="quest-copy"><div class="quest-topline"><h3>' + item.title + '</h3><span class="quest-reward">💎 +' + item.reward + '</span></div>' +
               '<p>' + item.description + '</p>' +
               '<div class="quest-progress-track" role="progressbar" aria-label="' + item.title + ' progress" aria-valuemin="0" aria-valuemax="' + item.target + '" aria-valuenow="' + progress + '"><span style="width:' + percent + '%"></span></div>' +
-              '<div class="quest-progress-meta"><span>' + progress.toLocaleString() + ' / ' + item.target.toLocaleString() + ' ' + unit + '</span><span>' + (claimed ? "CLAIMED" : ready ? "COMPLETE" : "IN PROGRESS") + '</span></div></div>' +
-            '<button class="quest-action" type="button" data-claim-daily="' + item.id + '" ' + (!ready || claimed ? "disabled" : "") + '>' +
+              '<div class="quest-progress-meta"><span>' + progress.toLocaleString() + ' / ' + item.target.toLocaleString() + ' ' + unit + '</span>' +
+                (claimed ? '<span class="reward-claimed-badge">CLAIMED ✓</span>' : '<span>' + (ready ? "COMPLETE" : "IN PROGRESS") + '</span>') + '</div></div>' +
+             '<button class="quest-action' + (ready && !claimed ? " has-unclaimed" : "") + '" type="button" data-claim-daily="' + item.id + '" ' +
+               (ready && !claimed ? 'data-attention-label="CLAIM!" ' : "") + (!ready || claimed ? "disabled" : "") + '>' +
               (claimed ? "CLAIMED ✓" : ready ? "CLAIM 💎 +" + item.reward : "LOCKED 🔒") + '</button></article>';
         }).join("");
         updateShopPreview();
         updateDailyQuestClock();
+        updateUnclaimedRewardBadges();
+        applyRewardFilter();
         if (milestonesChanged || previousDailyDate !== progression.daily.date) saveProgression();
       }
       applyPlayerSkin(progression.activeSkin);
@@ -12869,6 +13234,13 @@ void main() {
           : summary;
         el("claimDailyStreakButton").disabled = loginStreakClaimedToday;
         el("claimDailyStreakButton").textContent = loginStreakClaimedToday ? "CLAIMED ✓" : "CLAIM REWARD";
+        setUnclaimedRewardBadge(
+          el("claimDailyStreakButton"),
+          !loginStreakClaimedToday,
+          "🎁 READY",
+          "Claim today's daily login streak reward"
+        );
+        updateShopStreakSummary();
       }
       function openDailyStreakModal() {
         if (state !== "ready" || loginStreakClaimedToday) return;
@@ -12972,6 +13344,7 @@ void main() {
               ? "You used today's free spin. " + bonusCount + " bonus spin" + (bonusCount === 1 ? " is" : "s are") + " ready."
               : "Today's free spin is used. Share from the wheel to unlock one extra spin.";
         }
+        updateUnclaimedRewardBadges();
       }
       function openLuckySpin() {
         if (state === "running" || spinInProgress || !el("daily-streak-modal").hidden) return;
@@ -15120,9 +15493,30 @@ void main() {
         runner.add(runnerLight);
         runner.position.set(0, 0.08, 0);
         scene.add(runner);
+        const ghostRunner = new THREE.Group();
+        ghostRunner.name = `cyber-duel-ghost-${index}`;
+        const ghostColor = CYBER_DUEL_PALETTE[index === 0 ? 1 : 0];
+        const ghostOrb = new THREE.Mesh(
+          new THREE.SphereGeometry(0.39, 18, 12),
+          new THREE.MeshStandardMaterial({
+            color: ghostColor, emissive: ghostColor, emissiveIntensity: 1.8,
+            transparent: true, opacity: 0.35, depthWrite: false, metalness: 0.08, roughness: 0.22, toneMapped: false
+          })
+        );
+        ghostRunner.add(ghostOrb);
+        const ghostHalo = new THREE.Mesh(
+          new THREE.TorusGeometry(0.61, 0.035, 7, 28),
+          new THREE.MeshBasicMaterial({ color: ghostColor, transparent: true, opacity: 0.46, depthWrite: false, toneMapped: false })
+        );
+        ghostHalo.rotation.x = Math.PI / 2;
+        ghostHalo.position.y = -0.27;
+        ghostRunner.add(ghostHalo);
+        ghostRunner.position.set(0, 0.08, -10);
+        ghostRunner.visible = false;
+        scene.add(ghostRunner);
         return {
           index, name: index === 0 ? "PLAYER 1" : "PLAYER 2", scene, camera: laneCamera,
-          runner, orb, halo, shieldShell, runnerLight, lane: 1, targetX: 0,
+          runner, orb, halo, shieldShell, runnerLight, ghostRunner, ghostOrb, ghostHalo, lane: 1, targetX: 0,
           colorIndex: index === 0 ? 0 : 1, distance: 0, survivalTime: 0, gatesPassed: 0,
           score: 0, crystalsCollected: 0, alive: true, finished: false, finishTime: Infinity, speed: 8.8,
           phaseTimer: 0, hyperTimer: 0, vortexTimer: 0, empTimer: 0,
@@ -15501,6 +15895,59 @@ void main() {
           }
         }
       }
+      function updateCyberDuelModeUI() {
+        const session = cyberDuelRoomSession;
+        const locked = cyberDuelState !== "lobby" || cyberDuelCountdownActive || cyberDuelModeLockedByInvite ||
+          Boolean(session && (session.playerIndex !== 0 || session.status !== "waiting"));
+        el("cyberDuelLobbyTitle").textContent = cyberDuelMode === "ghost"
+          ? "👻 SHADOW MIRROR · GHOST RACE"
+          : "⚔️ CYBER DUEL · NEON RUMBLE";
+        document.querySelectorAll("[data-cyber-duel-mode]").forEach(button => {
+          const selected = button.dataset.cyberDuelMode === cyberDuelMode;
+          button.setAttribute("aria-pressed", selected ? "true" : "false");
+          button.disabled = locked;
+        });
+        const description = el("cyberDuelModeDescription");
+        if (description) {
+          description.textContent = cyberDuelMode === "ghost"
+            ? (session?.playerIndex === 1
+              ? "Shadow Mirror selected by the host · your rival appears as a live neon ghost on your track."
+              : "Shadow Mirror: both tracks show the rival as a translucent live ghost. First to 300m wins.")
+            : "1v1 Rumble: race separate neon tracks, use power-ups, and reach 300m first.";
+        }
+      }
+      function selectCyberDuelMode(mode) {
+        if (mode !== "rumble" && mode !== "ghost") return;
+        if (cyberDuelState !== "lobby" || cyberDuelCountdownActive || cyberDuelModeLockedByInvite) return;
+        const session = cyberDuelRoomSession;
+        if (session && (session.playerIndex !== 0 || session.status !== "waiting")) return;
+        cyberDuelMode = mode;
+        updateCyberDuelModeUI();
+        playCue("button");
+      }
+      function updateCyberDuelGhostRunners(time = 0, dt = 1 / 60) {
+        const visible = cyberDuelMode === "ghost" && (cyberDuelState === "running" || cyberDuelState === "over");
+        for (const playerData of cyberDuelPlayers) {
+          const ghost = playerData.ghostRunner;
+          const rival = cyberDuelPlayers[1 - playerData.index];
+          if (!ghost || !rival) continue;
+          ghost.visible = visible;
+          if (!visible) continue;
+          const distanceDelta = rival.distance - playerData.distance;
+          const sameLaneOffset = rival.lane === playerData.lane ? (playerData.index === 0 ? 0.3 : -0.3) : 0;
+          const targetX = rival.runner.position.x + sameLaneOffset;
+          const targetZ = Math.abs(distanceDelta) < 1.25
+            ? -1.1
+            : THREE.MathUtils.clamp(-distanceDelta * 0.34, -26, 4.5);
+          const frameDelta = THREE.MathUtils.clamp(dt, 0, 0.05);
+          ghost.position.x = THREE.MathUtils.damp(ghost.position.x, targetX, 18, frameDelta);
+          ghost.position.y = rival.runner.position.y;
+          ghost.position.z = THREE.MathUtils.damp(ghost.position.z, targetZ, 10, frameDelta);
+          ghost.rotation.y = time * 0.42;
+          playerData.ghostHalo.material.opacity = 0.38 + (Math.sin(time * 4.2 + playerData.index) + 1) * 0.07;
+          playerData.ghostOrb.material.opacity = 0.35;
+        }
+      }
       function updateCyberDuelHUD() {
         for (const playerData of cyberDuelPlayers) {
           syncDuelPowerFlags(playerData);
@@ -15526,11 +15973,22 @@ void main() {
           const emp = el(`duelEmp${suffix}`);
           emp.classList.toggle("active", playerData.empTimer > 0);
           emp.setAttribute("aria-hidden", playerData.empTimer > 0 ? "false" : "true");
+          const delta = el(`duelDelta${suffix}`);
+          const rival = cyberDuelPlayers[1 - playerData.index];
+          const ghostRaceActive = cyberDuelMode === "ghost" && (cyberDuelState === "running" || cyberDuelState === "over");
+          delta.hidden = !ghostRaceActive;
+          if (ghostRaceActive && rival) {
+            const advantage = playerData.distance - rival.distance;
+            delta.textContent = Math.abs(advantage) < 1.5
+              ? "⚡ NECK AND NECK!"
+              : `${advantage > 0 ? "+" : "−"}${Math.abs(advantage).toFixed(1)}m ${advantage > 0 ? "AHEAD" : "BEHIND"}`;
+          }
         }
         el("duelWallet").textContent = `💎 ${safeStoredCount(progression.crystals)}`;
       }
       function serializeCyberDuelSnapshot() {
         return {
+          duelMode: cyberDuelMode,
           matchOver: cyberDuelState === "over",
           winnerIndex: cyberDuelWinnerIndex,
           reason: cyberDuelFinishReason,
@@ -15611,6 +16069,10 @@ void main() {
       }
       function applyCyberDuelSnapshot(snapshot) {
         if (!snapshot || !Array.isArray(snapshot.players) || cyberDuelPlayers.length !== 2) return;
+        if (snapshot.duelMode === "ghost" || snapshot.duelMode === "rumble") {
+          cyberDuelMode = snapshot.duelMode;
+          updateCyberDuelModeUI();
+        }
         for (const incoming of snapshot.players) {
           if (!incoming || ![0, 1].includes(incoming.index)) continue;
           const playerData = cyberDuelPlayers[incoming.index];
@@ -15686,6 +16148,9 @@ void main() {
         cyberDuelState = "over";
         cyberDuelWinnerIndex = winnerIndex;
         cyberDuelFinishReason = reason;
+        el("cyberDuelWinnerKicker").textContent = cyberDuelMode === "ghost"
+          ? "MATCH RESULT · SHADOW MIRROR GHOST RACE"
+          : "MATCH RESULT · NEON RUMBLE";
         for (const playerData of cyberDuelPlayers) resetDuelPowerState(playerData);
         document.querySelectorAll(".duel-glitch-layer").forEach(layer => layer.classList.remove("active"));
         if (cyberDuelRoomSession) el("cyberDuelRematch").disabled = true;
@@ -15699,7 +16164,9 @@ void main() {
         const localWinner = winner && (!cyberDuelRoomSession || winnerIndex === cyberDuelRoomSession.playerIndex);
         if (winner) {
           title.textContent = `${winner.name} WINS!`;
-          const resultReason = reason === "finish" ? "crossed the finish line first" : "was the last runner standing";
+          const resultReason = reason === "finish"
+            ? cyberDuelMode === "ghost" ? "won the Shadow Mirror race to 300m" : "crossed the finish line first"
+            : "was the last runner standing";
           const p1 = cyberDuelPlayers[0];
           const p2 = cyberDuelPlayers[1];
           summary.textContent = `${resultReason} · P1 ${Math.floor(p1.distance)}m / ${Math.floor(p1.survivalTime)}s · P2 ${Math.floor(p2.distance)}m / ${Math.floor(p2.survivalTime)}s`;
@@ -15728,6 +16195,7 @@ void main() {
           reward.textContent = "NO CRYSTALS AWARDED";
           badge.textContent = cyberDuelBadgeUnlocked ? "🏆 CYBER DUEL CHAMPION BADGE · OWNED" : "RUN IT BACK FOR THE CHAMPION BADGE";
         }
+        updateCyberDuelGhostRunners(0, 0.016);
         updateCyberDuelHUD();
         el("cyberDuelRematch").focus({ preventScroll: true });
         if (cyberDuelRoomSession?.playerIndex === 0) void publishCyberDuelRoomSnapshot();
@@ -15765,6 +16233,7 @@ void main() {
             refreshHUD = true;
           }
         }
+        updateCyberDuelGhostRunners(t, Math.min(dt, 0.05));
         if (refreshHUD) updateCyberDuelHUD();
       }
       function renderCyberDuel() {
@@ -15854,6 +16323,18 @@ void main() {
             const x = center + crate.position.x / 2.7 * near * 0.65 * depth;
             const y = horizon + (floorY - horizon) * depth;
             ctx.fillStyle = "#ffe36e"; ctx.fillText("⬡", x, y);
+          }
+          if (cyberDuelMode === "ghost") {
+            const rival = cyberDuelPlayers[1 - playerData.index];
+            const distanceDelta = rival.distance - playerData.distance;
+            const relativeZ = Math.abs(distanceDelta) < 1.25 ? -1.1 : THREE.MathUtils.clamp(-distanceDelta * 0.34, -26, 4.5);
+            const depth = project(relativeZ);
+            const sameLaneOffset = rival.lane === playerData.lane ? (playerData.index === 0 ? 0.3 : -0.3) : 0;
+            const x = center + (rival.runner.position.x + sameLaneOffset) / 2.7 * near * 0.65 * depth;
+            const y = horizon + (floorY - horizon) * depth;
+            const ghostColor = playerData.index === 0 ? "#ff64d1" : "#63f4ff";
+            ctx.globalAlpha = 0.35; ctx.shadowColor = ghostColor; ctx.shadowBlur = 20; ctx.fillStyle = ghostColor;
+            ctx.beginPath(); ctx.arc(x, y, 12 + depth * 4, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
           }
           const playerX = center + (playerData.lane - 1) * near * 0.65;
           ctx.shadowColor = color; ctx.shadowBlur = 18; ctx.fillStyle = color;
@@ -15989,8 +16470,11 @@ void main() {
         const startButton = el("cyberDuelStartButton");
         startButton.disabled = !canStart;
         startButton.textContent = canStart
-          ? (roomState.status === "over" ? "REMATCH" : "START NEON RUMBLE")
-          : isHost ? "WAITING FOR FRIEND" : "WAITING FOR HOST";
+          ? (roomState.status === "over"
+            ? `REMATCH ${cyberDuelMode === "ghost" ? "GHOST RACE" : "RUMBLE"}`
+            : `START ${cyberDuelMode === "ghost" ? "GHOST RACE" : "NEON RUMBLE"}`)
+          : roomState.status === "running" ? "SYNCING ROOM…"
+            : isHost ? "WAITING FOR FRIEND" : "WAITING FOR HOST";
         const rematchButton = el("cyberDuelRematch");
         if (rematchButton) {
           rematchButton.disabled = !cyberDuelRoomSession
@@ -16002,16 +16486,19 @@ void main() {
         inviteButton.hidden = !isHost;
         inviteButton.disabled = !isHost;
         if (roomState.status === "running") {
-          setCyberDuelRoomStatus(isHost ? "Your room is live. Your friend is racing on the second track." : "Connected as Player 2 · syncing the live race…");
+          setCyberDuelRoomStatus(isHost
+            ? `Your room is live · ${cyberDuelMode === "ghost" ? "Shadow Mirror Ghost Race" : "Neon Rumble"} is in progress.`
+            : `Connected as Player 2 · syncing the ${cyberDuelMode === "ghost" ? "ghost race" : "duel"}…`);
         } else if (roomState.status === "over") {
           setCyberDuelRoomStatus(guestConnected ? "Match complete · both players can run it back." : "Match complete · invite your friend again to rematch.");
         } else if (guestConnected) {
           setCyberDuelRoomStatus(isHost
-            ? "Friend connected as Player 2 · you can start the duel."
+            ? `Friend connected · ${cyberDuelMode === "ghost" ? "Shadow Mirror Ghost Race" : "1v1 Rumble"} is ready.`
             : `⚡ Connected to Room ${cyberDuelRoomSession.roomCode} as Player 2! Waiting for Host to start...`);
         } else {
           setCyberDuelRoomStatus(isHost ? `Room ${cyberDuelRoomSession.roomCode} is ready · waiting for Player 2.` : "Waiting for the room host to come online…");
         }
+        updateCyberDuelModeUI();
       }
       function saveCyberDuelRoomSession(session) {
         cyberDuelRoomSession = session;
@@ -16020,6 +16507,7 @@ void main() {
         saveCyberDuelRoomToken(session.roomCode, session.token);
         saveActiveCyberDuelRoom(session);
         el("cyberDuelRoomCode").textContent = session.roomCode;
+        updateCyberDuelModeUI();
         updateCyberDuelLobbyRoomState(session);
         scheduleCyberDuelRoomPoll(150);
       }
@@ -16127,15 +16615,15 @@ void main() {
             return;
           }
           saveCyberDuelRoomSession(session);
-          setCyberDuelRoomStatus(`Room ${session.roomCode} created · invite a friend to join as Player 2.`);
+          setCyberDuelRoomStatus(`Room ${session.roomCode} created · invite a friend to join ${cyberDuelMode === "ghost" ? "Shadow Mirror Ghost Race" : "Neon Rumble"}.`);
         } catch {
           if (generation !== cyberDuelRoomGeneration) return;
           el("cyberDuelRoomCode").textContent = "OFFLINE";
           el("cyberDuelInviteButton").disabled = true;
           el("cyberDuelInviteButton").hidden = true;
-          setCyberDuelRoomStatus("Live rooms are unavailable right now. You can still play local split-screen.");
+          setCyberDuelRoomStatus("Live rooms are unavailable right now. You can still play a local split-screen duel.");
           el("cyberDuelStartButton").disabled = false;
-          el("cyberDuelStartButton").textContent = "START LOCAL DUEL";
+          el("cyberDuelStartButton").textContent = `START LOCAL ${cyberDuelMode === "ghost" ? "GHOST RACE" : "DUEL"}`;
         }
       }
       async function joinCyberDuelRoomForLobby(roomCode, generation) {
@@ -16186,6 +16674,7 @@ void main() {
         if (!cyberDuelRoomSession) return "";
         const url = new URL(window.location.pathname, window.location.origin);
         url.searchParams.set("room", cyberDuelRoomSession.roomCode);
+        url.searchParams.set("duel", cyberDuelMode);
         return url.toString();
       }
       function clearCyberDuelRoomQuery(expectedCode = "") {
@@ -16194,6 +16683,7 @@ void main() {
           const currentCode = url.searchParams.get("room") || "";
           if (expectedCode && normalizeCyberDuelRoomCode(currentCode) !== expectedCode) return;
           url.searchParams.delete("room");
+          url.searchParams.delete("duel");
           window.history.replaceState({}, "", url);
         } catch {}
       }
@@ -16235,6 +16725,9 @@ void main() {
         }
         const savedRoom = hasExplicitRoomCode ? null : readActiveCyberDuelRoom();
         const validatedRoomCode = requestedRoomCode || savedRoom?.roomCode || "";
+        const modeMatchesInvite = Boolean(requestedRoomCode && CYBER_DUEL_ROOM_PARAM.roomCode === requestedRoomCode);
+        cyberDuelMode = modeMatchesInvite && CYBER_DUEL_ROOM_PARAM.duelMode === "ghost" ? "ghost" : "rumble";
+        cyberDuelModeLockedByInvite = Boolean(requestedRoomCode);
         stopCyberDuelRoomPolling();
         cyberDuelRoomGeneration += 1;
         const generation = cyberDuelRoomGeneration;
@@ -16244,6 +16737,7 @@ void main() {
         setBannerAdPlacement("hidden");
         el("overlay").classList.add("hidden");
         el("cyber-duel-lobby").hidden = false;
+        updateCyberDuelModeUI();
         el("cyberDuelBadgeStatus").textContent = cyberDuelBadgeUnlocked ? "🏆 CYBER DUEL CHAMPION BADGE · UNLOCKED" : "WIN YOUR ONLINE DUEL TO UNLOCK THE CHAMPION BADGE + 100 💎";
         el("cyberDuelRoomCode").textContent = validatedRoomCode || "CREATING…";
         el("cyberDuelInviteButton").hidden = Boolean(validatedRoomCode);
@@ -16290,6 +16784,32 @@ void main() {
         disposeCyberDuelWorld();
         returnToHome();
       }
+      function returnCyberDuelToLobby() {
+        if (cyberDuelState !== "over") return;
+        stopCyberDuelCountdown();
+        cyberDuelState = "lobby";
+        el("game").classList.remove("cyber-duel-active", "cyber-duel-online-host", "cyber-duel-online-guest");
+        el("cyber-duel-screen").hidden = true;
+        el("cyber-duel-victory").hidden = true;
+        el("cyber-duel-lobby").hidden = false;
+        updateCyberDuelModeUI();
+        if (cyberDuelRoomSession) {
+          const startButton = el("cyberDuelStartButton");
+          startButton.disabled = true;
+          startButton.textContent = "SYNCING ROOM…";
+          updateCyberDuelLobbyRoomState(cyberDuelRoomSession);
+          scheduleCyberDuelRoomPoll(80);
+        } else {
+          el("cyberDuelRoomCode").textContent = "LOCAL DUEL";
+          el("cyberDuelInviteButton").hidden = true;
+          el("cyberDuelInviteButton").disabled = true;
+          const startButton = el("cyberDuelStartButton");
+          startButton.disabled = false;
+          startButton.textContent = `START LOCAL ${cyberDuelMode === "ghost" ? "GHOST RACE" : "DUEL"}`;
+          setCyberDuelRoomStatus(`Local lobby ready · ${cyberDuelMode === "ghost" ? "Shadow Mirror Ghost Race" : "1v1 Rumble"}.`);
+        }
+        el("cyberDuelStartButton").focus({ preventScroll: true });
+      }
       function stopCyberDuelCountdown() {
         window.clearTimeout(cyberDuelCountdownTimer);
         cyberDuelCountdownTimer = 0;
@@ -16304,6 +16824,7 @@ void main() {
       function startCyberDuelCountdown() {
         if (cyberDuelCountdownActive) return;
         cyberDuelCountdownActive = true;
+        updateCyberDuelModeUI();
         el("cyber-duel-lobby").hidden = true;
         el("cyber-duel-victory").hidden = true;
         el("cyber-duel-screen").hidden = false;
@@ -16346,6 +16867,8 @@ void main() {
         el("cyber-duel-victory").hidden = true;
         el("cyber-duel-screen").hidden = false;
         resizeCyberDuelCameras();
+        updateCyberDuelModeUI();
+        updateCyberDuelGhostRunners(0, 0.016);
         unlockAudio().then(unlocked => { if (unlocked) playCue("button"); });
         updateCyberDuelHUD();
       }
@@ -17188,10 +17711,14 @@ void main() {
       }, { passive: true });
        el("startButton").addEventListener("click", () => startGame(true));
         el("cyberDuelMenuButton").addEventListener("click", () => openCyberDuelLobby());
+        document.querySelectorAll("[data-cyber-duel-mode]").forEach(button => {
+          button.addEventListener("click", () => selectCyberDuelMode(button.dataset.cyberDuelMode));
+        });
         el("cyberDuelStartButton").addEventListener("click", () => startCyberDuel());
         el("cyberDuelInviteButton").addEventListener("click", inviteCyberDuelFriend);
        el("cyberDuelLobbyBack").addEventListener("click", returnFromCyberDuel);
         el("cyberDuelRematch").addEventListener("click", () => startCyberDuel());
+        el("cyberDuelReturnLobby").addEventListener("click", returnCyberDuelToLobby);
        el("cyberDuelVictoryHome").addEventListener("click", returnFromCyberDuel);
        document.querySelectorAll("[data-duel-player][data-duel-action]").forEach(button => {
          button.addEventListener("click", () => cyberDuelControl(Number(button.dataset.duelPlayer), button.dataset.duelAction));
@@ -17261,6 +17788,9 @@ void main() {
        document.querySelectorAll("[data-reward-tab]").forEach(button => {
          button.addEventListener("click", () => setRewardsTab(button.dataset.rewardTab));
        });
+        document.querySelectorAll("[data-reward-filter]").forEach(button => {
+          button.addEventListener("click", () => setRewardFilter(button.dataset.rewardFilter));
+        });
        document.querySelectorAll('input[name="milestoneCategory"]').forEach(radio => {
          radio.addEventListener("change", () => {
            if (radio.checked) setMilestoneCategory(radio.id.replace(/^milestone/, "").toLowerCase());
