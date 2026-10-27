@@ -2401,6 +2401,7 @@
       pointer-events: auto;
     }
     #rewards-screen {
+      --rewards-top-safe-gap: calc(env(safe-area-inset-top, 20px) + 60px);
       position: fixed;
       z-index: 70;
       inset: 0;
@@ -4114,6 +4115,426 @@
       .arcade-float.visible { animation-duration: .01ms; }
     }
     #rewards-screen { display: block; padding: 0; }
+    /* Standalone, full-viewport rewards dashboard */
+    #rewards-screen {
+      position: fixed;
+      z-index: 2000;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      padding: 0;
+      background: radial-gradient(circle at center, #0f0c29, #302b63, #24243e);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    #rewards-achievements-screen {
+      position: fixed;
+      z-index: 2001;
+      inset: 0;
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      min-width: 0;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 0;
+      background:
+        radial-gradient(ellipse at 10% 0%, rgba(0,255,255,.08), transparent 37%),
+        radial-gradient(ellipse at 95% 90%, rgba(255,0,255,.10), transparent 40%),
+        radial-gradient(circle at center, #0f0c29, #302b63, #24243e);
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-gutter: stable;
+      pointer-events: auto;
+      touch-action: pan-y;
+    }
+    #rewards-screen .shop-panel {
+      display: flex;
+      flex: 1 0 auto;
+      flex-direction: column;
+      width: 100%;
+      min-height: 100%;
+      height: auto;
+      max-height: none;
+      overflow: visible;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    #rewards-screen .shop-scroll {
+      display: flex;
+      flex: 1 0 auto;
+      flex-direction: column;
+      height: auto;
+      min-height: 0;
+      overflow: visible;
+      padding: 0;
+    }
+    #rewards-screen .shop-sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding:
+        max(12px, env(safe-area-inset-top))
+        max(16px, env(safe-area-inset-right))
+        12px
+        max(16px, env(safe-area-inset-left));
+      border-bottom: 1px solid rgba(0,255,255,.2);
+      background: rgba(15,12,41,.88);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 34px rgba(0,0,0,.28);
+    }
+    #rewards-screen .shop-header {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+    #rewards-screen .shop-title {
+      color: #dfffff;
+      font-size: clamp(20px, 3.2vw, 36px);
+      letter-spacing: -.035em;
+      text-shadow: 0 0 10px rgba(0,255,255,.58), 0 0 28px rgba(0,255,255,.22);
+    }
+    #rewards-screen .shop-header .eyebrow { color: #8ffff5; }
+    #rewards-screen .shop-summary-card {
+      display: flex;
+      align-items: stretch;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    #rewards-screen .shop-balance,
+    #rewards-screen .shop-streak-summary,
+    #rewards-screen .rewards-close-top {
+      min-height: 54px;
+    }
+    #rewards-screen .rewards-close-top {
+      min-width: 104px;
+      padding: 0 15px;
+      border: 1px solid rgba(255,111,207,.48);
+      background: rgba(255,75,188,.09);
+      color: #ffe7fa;
+      cursor: pointer;
+      font: 800 11px "Orbitron", sans-serif;
+      letter-spacing: .06em;
+      touch-action: manipulation;
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+    #rewards-screen .rewards-close-top:hover,
+    #rewards-screen .rewards-close-top:active {
+      transform: scale(1.035);
+      background: rgba(255,75,188,.17);
+      box-shadow: 0 0 22px rgba(255,75,188,.2);
+    }
+    #rewards-screen .reward-tabs {
+      display: grid;
+      grid-template-columns: repeat(4,minmax(0,1fr));
+      gap: 7px;
+      margin: 0 0 11px;
+      padding: 5px;
+      border: 1px solid rgba(0,255,255,.18);
+      border-radius: 12px;
+      background: rgba(6,11,26,.76);
+    }
+    #rewards-screen .reward-tab {
+      min-width: 0;
+      min-height: 52px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: clamp(10px, 1.1vw, 13px);
+      line-height: 1.2;
+      touch-action: manipulation;
+    }
+    #rewards-screen .reward-filterbar {
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px;
+      background: rgba(255,255,255,.035);
+    }
+    #rewards-screen .shop-content {
+      flex: 0 0 auto;
+      width: min(100%, 1440px);
+      margin: 0 auto;
+      padding: clamp(16px, 3vw, 38px);
+    }
+    #rewards-screen .shop-footer {
+      width: min(100%, 1440px);
+      margin: 0 auto;
+      padding: 0 clamp(16px, 3vw, 38px) max(18px, env(safe-area-inset-bottom));
+    }
+    #rewards-screen .reward-tab-panel:not([hidden]) { animation: rewardsPanelReveal .18s ease-out both; }
+    #rewards-screen .reward-claim-card {
+      transition: opacity .2s ease, transform .2s ease, filter .2s ease;
+    }
+    #rewards-screen .reward-claim-card.claimed {
+      order: 2;
+      opacity: .6;
+      filter: saturate(.62);
+    }
+    #rewards-screen .reward-claim-card:not(.claimed) { order: 1; }
+    #rewards-screen .reward-claim-card.claim-ready {
+      border-color: rgba(0,255,255,.48);
+      box-shadow: 0 0 20px rgba(0,255,255,.10), 0 0 25px rgba(255,215,100,.08);
+    }
+    #rewards-screen .rewards-streak-card,
+    #rewards-screen .rewards-weekend-card {
+      margin: 0 0 22px;
+      padding: clamp(15px, 2vw, 24px);
+      border: 1px solid rgba(0,255,255,.22);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(13,27,48,.88), rgba(20,17,48,.82));
+      box-shadow: inset 0 1px rgba(255,255,255,.04), 0 12px 32px rgba(0,0,0,.18);
+    }
+    #rewards-screen .rewards-streak-head,
+    #rewards-screen .rewards-weekend-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    #rewards-screen .rewards-streak-head h3,
+    #rewards-screen .rewards-weekend-head h3 {
+      margin: 0;
+      color: #efffff;
+      font: 800 clamp(17px,2vw,24px) "Orbitron", sans-serif;
+    }
+    #rewards-screen .rewards-streak-head p,
+    #rewards-screen .rewards-weekend-copy {
+      margin: 6px 0 0;
+      color: #b6c5d4;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+    #rewards-screen .rewards-streak-day {
+      flex: 0 0 auto;
+      padding: 9px 12px;
+      border: 1px solid rgba(255,220,117,.34);
+      border-radius: 999px;
+      background: rgba(255,214,102,.08);
+      color: #ffe393;
+      font: 800 11px "Orbitron", sans-serif;
+      white-space: nowrap;
+    }
+    #rewards-screen .rewards-streak-grid {
+      grid-template-columns: repeat(7,minmax(0,1fr));
+      margin-bottom: 14px;
+    }
+    #rewards-screen .rewards-streak-grid .daily-streak-day {
+      min-width: 0;
+      min-height: 112px;
+      padding: 10px 8px;
+      border-radius: 12px;
+    }
+    #rewards-screen .rewards-streak-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #d7e2ee;
+      font-size: 16px;
+    }
+    #rewards-screen .rewards-streak-summary p { margin: 0; }
+    #rewards-screen .rewards-streak-claim {
+      flex: 0 0 auto;
+      min-width: 160px;
+      min-height: 50px;
+      padding: 10px 16px;
+      border: 1px solid rgba(0,255,255,.5);
+      border-radius: 999px;
+      background: linear-gradient(110deg, rgba(0,255,255,.2), rgba(255,0,255,.16));
+      color: #edffff;
+      cursor: pointer;
+      font: 800 11px "Orbitron", sans-serif;
+      letter-spacing: .05em;
+    }
+    #rewards-screen .rewards-streak-claim:disabled {
+      border-color: rgba(150,164,177,.2);
+      background: rgba(130,145,160,.08);
+      color: #97a2ad;
+      cursor: default;
+    }
+    #rewards-screen .rewards-streak-card.claim-ready {
+      animation: rewardReadyPulse 1.8s ease-in-out infinite;
+    }
+    #rewards-screen .rewards-streak-card.claimed {
+      opacity: .6;
+      filter: saturate(.62);
+    }
+    #rewards-screen .rewards-weekend-card.active {
+      border-color: rgba(255,204,86,.42);
+      box-shadow: 0 0 28px rgba(255,190,55,.10), inset 0 0 25px rgba(255,190,55,.035);
+    }
+    #rewards-screen .rewards-weekend-countdown {
+      color: #ffe28e;
+      font: 800 clamp(18px,2.5vw,28px) "Orbitron", sans-serif;
+      white-space: nowrap;
+    }
+    #rewards-screen .rewards-weekend-stats {
+      display: grid;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+    #rewards-screen .rewards-weekend-stats > div {
+      display: grid;
+      gap: 5px;
+      padding: 13px;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 10px;
+      background: rgba(3,8,20,.42);
+    }
+    #rewards-screen .rewards-weekend-stats span {
+      color: #8fa3b5;
+      font: 700 9px "Orbitron", sans-serif;
+      letter-spacing: .08em;
+    }
+    #rewards-screen .rewards-weekend-stats strong {
+      color: #f0ffff;
+      font: 800 clamp(15px,1.7vw,20px) "Orbitron", sans-serif;
+      overflow-wrap: anywhere;
+    }
+    @media (max-width: 680px) {
+      #rewards-screen .shop-sticky-header {
+        padding: max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 9px max(10px,env(safe-area-inset-left));
+      }
+      #rewards-screen .shop-header { grid-template-columns: minmax(0,1fr); gap: 10px; margin-bottom: 10px; }
+      #rewards-screen .shop-header > div:first-child { padding-right: 0; }
+      #rewards-screen .shop-title { font-size: clamp(18px,5vw,25px); }
+      #rewards-screen .shop-intro { display: none; }
+      #rewards-screen .shop-summary-card { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto; gap: 6px; }
+      #rewards-screen .shop-balance,
+      #rewards-screen .shop-streak-summary,
+      #rewards-screen .rewards-close-top { min-width: 0; min-height: 48px; padding: 7px 8px; }
+      #rewards-screen .rewards-close-top { min-width: 78px; font-size: 9px; }
+      #rewards-screen .shop-summary-card .shop-balance strong { font-size: clamp(15px,4vw,20px); }
+      #rewards-screen .reward-tabs { gap: 4px; margin-bottom: 7px; padding: 3px; }
+      #rewards-screen .reward-tab { min-height: 48px; padding: 6px 4px; gap: 4px; font-size: clamp(9px,2.45vw,11px); }
+      #rewards-screen .reward-tab > span { font-size: 14px; }
+      #rewards-screen .reward-filterbar { flex-direction: column; align-items: stretch; gap: 7px; padding: 8px; }
+      #rewards-screen .reward-filter-options { width: 100%; }
+      #rewards-screen .reward-filter { flex: 1 1 0; min-width: 0; min-height: 48px; padding: 0 3px; font-size: 8px; }
+      #rewards-screen .shop-content { padding: 15px 12px; }
+      #rewards-screen .shop-footer { padding: 0 12px max(14px,env(safe-area-inset-bottom)); }
+      #rewards-screen .rewards-streak-grid { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 7px; }
+      #rewards-screen .rewards-streak-grid .daily-streak-day { min-height: 98px; padding: 8px 6px; }
+      #rewards-screen .rewards-streak-summary { align-items: stretch; flex-direction: column; }
+      #rewards-screen .rewards-streak-claim { width: 100%; }
+      #rewards-screen .rewards-weekend-head { align-items: flex-start; flex-direction: column; }
+      #rewards-screen .rewards-weekend-stats { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 380px) {
+      #rewards-screen .reward-tab { letter-spacing: 0; }
+      #rewards-screen .shop-summary-card { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+      #rewards-screen .rewards-close-top { grid-column: 1 / -1; width: 100%; }
+      #rewards-screen .rewards-streak-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #rewards-screen .reward-tab-panel:not([hidden]),
+      #rewards-screen .reward-claim-card.claim-ready { animation: none; }
+    }
+    /* Rewards uses one scroll owner so sticky navigation and the final action
+       stay reachable even when the dashboard grows beyond a short viewport. */
+    #rewards-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      padding:
+        var(--rewards-top-safe-gap)
+        max(16px, env(safe-area-inset-right, 16px))
+        calc(env(safe-area-inset-bottom, 20px) + 40px)
+        max(16px, env(safe-area-inset-left, 16px));
+      scrollbar-gutter: stable;
+    }
+    #rewards-achievements-screen {
+      position: relative;
+      inset: auto;
+      z-index: auto;
+      display: flex;
+      flex: 1 0 auto;
+      width: min(100%, 1600px);
+      height: auto;
+      min-height: 100%;
+      min-width: 0;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      margin: 0 auto;
+      margin-top: calc(0px - var(--rewards-top-safe-gap));
+      box-sizing: border-box;
+      overflow: visible;
+      padding: 0;
+      touch-action: pan-y;
+    }
+    #rewards-screen .shop-panel {
+      flex: 1 0 auto;
+      width: 100%;
+      height: auto;
+      min-height: 100%;
+      max-height: none;
+      box-sizing: border-box;
+      overflow: visible;
+    }
+    #rewards-screen .shop-scroll {
+      flex: 1 0 auto;
+      min-height: 0;
+      overflow: visible;
+      -webkit-overflow-scrolling: auto;
+    }
+    #rewards-screen .shop-sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-sizing: border-box;
+    }
+    #rewards-screen .shop-footer {
+      box-sizing: border-box;
+      padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
+    }
+    #rewards-screen .achievement-list,
+    #rewards-screen .skin-grid,
+    #rewards-screen .trail-grid,
+    #rewards-screen .aura-grid,
+    #rewards-screen .booster-grid,
+    #rewards-screen .achievement-tier-grid {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+      align-items: stretch;
+    }
+    @media (orientation: landscape) and (max-height: 620px) {
+      #rewards-screen {
+        --rewards-top-safe-gap: calc(env(safe-area-inset-top, 8px) + 16px);
+        padding-top: var(--rewards-top-safe-gap);
+        padding-bottom: calc(env(safe-area-inset-bottom, 8px) + 20px);
+      }
+      #rewards-screen .shop-sticky-header {
+        padding-top: max(8px, env(safe-area-inset-top, 8px));
+        padding-bottom: 8px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -4471,19 +4892,20 @@
         <div class="shop-scroll" id="shopScroll">
           <div class="shop-sticky-header" id="shopStickyHeader">
             <div class="shop-header">
-              <div><div class="eyebrow">PLAYER PROGRESSION</div><h2 class="shop-title" id="rewardsTitle">Rewards &amp; Achievements</h2><p class="shop-intro">Earn milestones, collect crystals, and customize your next run.</p></div>
+              <div><div class="eyebrow">PLAYER PROGRESSION</div><h2 class="shop-title" id="rewardsTitle">🎁 REWARDS &amp; ACHIEVEMENTS</h2><p class="shop-intro">Earn milestones, collect crystals, and customize your next run.</p></div>
               <div class="shop-summary-card">
                 <div class="shop-balance"><span>💎 NEON CRYSTALS</span><strong id="shopBalance">00000</strong></div>
                 <div class="shop-streak-summary" aria-live="polite">
                   <span>LOGIN STREAK</span><strong id="shopStreakValue">DAY 1 / 7</strong><small id="shopStreakStatus">READY TO CLAIM</small>
                 </div>
+                <button class="rewards-close-top" id="shopCloseTop" type="button" aria-label="Close rewards and return to the main menu">✕ CLOSE</button>
               </div>
             </div>
             <nav class="reward-tabs" role="tablist" aria-label="Player progression" aria-orientation="horizontal">
-              <button class="reward-tab active" id="rewardTabAchievements" type="button" role="tab" aria-selected="true" aria-controls="rewardPanelAchievements" tabindex="0" data-reward-tab="daily"><span aria-hidden="true">◷</span> Daily Quests</button>
-              <button class="reward-tab" id="rewardTabReferral" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelReferral" tabindex="-1" data-reward-tab="achievements"><span aria-hidden="true">✧</span> Achievements &amp; Badges</button>
-              <button class="reward-tab" id="rewardTabSkins" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelSkins" tabindex="-1" data-reward-tab="milestones"><span aria-hidden="true">◆</span> Milestone Rewards</button>
-              <button class="reward-tab" id="rewardTabBoosters" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelBoosters" tabindex="-1" data-reward-tab="lucky"><span aria-hidden="true">◎</span> Lucky Spin</button>
+              <button class="reward-tab active" id="rewardTabAll" type="button" role="tab" aria-selected="true" aria-controls="rewardPanelAll" tabindex="0" data-reward-tab="all"><span aria-hidden="true">✦</span> All</button>
+              <button class="reward-tab" id="rewardTabDaily" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelDaily" tabindex="-1" data-reward-tab="daily"><span aria-hidden="true">◷</span> Daily Streak</button>
+              <button class="reward-tab" id="rewardTabWeekend" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelWeekend" tabindex="-1" data-reward-tab="weekend"><span aria-hidden="true">⚡</span> Weekend Storm</button>
+              <button class="reward-tab" id="rewardTabMilestones" type="button" role="tab" aria-selected="false" aria-controls="rewardPanelAchievements" tabindex="-1" data-reward-tab="milestones"><span aria-hidden="true">◆</span> Milestones</button>
             </nav>
             <div class="reward-filterbar">
               <div class="reward-filter-copy"><span>REWARD STATUS</span><small id="rewardFilterSummary" aria-live="polite">Showing all reward cards</small></div>
@@ -4494,7 +4916,7 @@
               </div>
             </div>
           </div>
-          <div class="shop-content" id="shopContent">
+          <div class="shop-content" id="rewardPanelAll" role="tabpanel" aria-labelledby="rewardTabAll" tabindex="0">
           <aside class="shop-live-preview" id="shopPreview" aria-live="polite" aria-atomic="true">
             <div class="shop-live-swatch" id="shopPreviewSwatch" aria-hidden="true">✦</div>
             <div class="shop-live-copy">
@@ -4513,22 +4935,51 @@
             <button class="rewarded-ad-button" id="shopRewardedAdButton" type="button">▶ WATCH VIDEO · EARN +250 💎</button>
             <p class="shop-ad-reward-status" id="shopAdRewardStatus" role="status" aria-live="polite" aria-atomic="true"></p>
           </section>
-          <div class="reward-tab-panel" id="rewardPanelAchievements" data-reward-panel="daily" role="tabpanel" aria-labelledby="rewardTabAchievements" tabindex="0">
+          <div class="reward-tab-panel" id="rewardPanelDaily" data-reward-panel="daily" role="tabpanel" aria-labelledby="rewardTabDaily" tabindex="0">
             <section class="progress-hero quest-hero">
               <div><span class="panel-kicker">TODAY’S RUN / ACTIVE CONTRACTS</span><h3>Daily Quests</h3><p>Every clean run brings you closer to your next crystal cache.</p></div>
               <div class="reset-clock"><span>QUEST RESET</span><strong id="dailyResetTimer" aria-live="polite">23:59:59</strong><small>LOCAL TIME · MIDNIGHT</small></div>
+            </section>
+            <section class="rewards-streak-card claim-ready" id="rewardsStreakCard" data-reward-card data-reward-claim-state="unclaimed" aria-labelledby="rewardsStreakTitle">
+              <div class="rewards-streak-head">
+                <div><h3 id="rewardsStreakTitle">7-Day Login Streak</h3><p>Check in daily to build your streak and claim the reward for today.</p></div>
+                <span class="rewards-streak-day" id="rewardsStreakDay">DAY 1 / 7</span>
+              </div>
+              <div class="daily-streak-grid rewards-streak-grid" id="rewardsStreakGrid" aria-label="Seven-day login rewards"></div>
+              <div class="rewards-streak-summary">
+                <p id="rewardsStreakSummary">Today's reward is ready to claim.</p>
+                <button class="rewards-streak-claim" id="claimRewardsStreakButton" type="button">CLAIM TODAY’S REWARD</button>
+              </div>
             </section>
             <div class="shop-section-heading"><div><h3>Current bounties</h3><p>Complete objectives on the track to claim 💎 Neon Crystals.</p></div><span class="achievement-tier-key">DAILY CONTRACTS</span></div>
             <div class="achievement-list daily-list" id="dailyBountyList"></div>
             <p class="reward-filter-empty" data-reward-empty="daily" hidden>No daily rewards match this filter yet.</p>
             <section class="quest-note"><span aria-hidden="true">✦</span><p>Keep your streak alive. New quests arrive with the next daily reset.</p></section>
           </div>
-          <div class="reward-tab-panel" id="rewardPanelReferral" data-reward-panel="achievements" role="tabpanel" aria-labelledby="rewardTabReferral" tabindex="0" hidden>
+          <div class="reward-tab-panel" id="rewardPanelWeekend" data-reward-panel="weekend" role="tabpanel" aria-labelledby="rewardTabWeekend" tabindex="0" hidden>
+            <section class="rewards-weekend-card" id="rewardsWeekendCard" aria-labelledby="rewardsWeekendTitle">
+              <div class="rewards-weekend-head">
+                <div>
+                  <span class="panel-kicker">LIMITED-TIME EVENT · DOUBLE REWARDS</span>
+                  <h3 id="rewardsWeekendTitle">⚡ Weekend Neon Storm</h3>
+                  <p class="rewards-weekend-copy" id="rewardsWeekendStatus">Check back during the weekend event for special modes and 2× score and crystal rewards.</p>
+                </div>
+                <strong class="rewards-weekend-countdown" id="rewardsWeekendCountdown">NEXT EVENT</strong>
+              </div>
+              <div class="rewards-weekend-stats">
+                <div><span>EVENT RUNS</span><strong id="rewardsWeekendRuns">0</strong></div>
+                <div><span>COMPLETED</span><strong id="rewardsWeekendCompleted">0</strong></div>
+                <div><span>LATEST MODE</span><strong id="rewardsWeekendMode">—</strong></div>
+              </div>
+            </section>
+            <section class="progress-hero"><div><span class="panel-kicker">EVENT PLAYLIST</span><h3>Zero-Gravity &amp; Laser Chaos</h3><p>Choose a storm mode from the main menu while the event is active. Runs completed during the event receive the active 2× bonus.</p></div><span class="hero-crystal" aria-hidden="true">⚡</span></section>
+          </div>
+          <div class="reward-tab-panel" id="rewardPanelAchievements" data-reward-panel="milestones" role="tabpanel" aria-labelledby="rewardTabMilestones" tabindex="0" hidden>
             <section class="progress-hero badge-hero"><div><span class="panel-kicker">YOUR LEGEND / COLLECTION</span><h3>Achievements &amp; Badges</h3><p>Every badge marks a run worth remembering.</p></div><div class="badge-emblem" aria-hidden="true">✧</div></section>
             <div class="badge-grid" id="achievementBadgeList" aria-label="Individual achievement badges" aria-live="polite"></div>
             <p class="reward-filter-empty" data-reward-empty="achievements" hidden>No badges match this filter yet.</p>
           </div>
-          <div class="reward-tab-panel" id="rewardPanelSkins" data-reward-panel="milestones" role="tabpanel" aria-labelledby="rewardTabSkins" tabindex="0" hidden>
+          <div class="reward-tab-panel" id="rewardPanelSkins" data-reward-panel="milestones" role="tabpanel" aria-labelledby="rewardTabMilestones" tabindex="0" hidden>
             <section class="progress-hero milestone-hero"><div><span class="panel-kicker">LONG GAME / REWARD TRACK</span><h3>Milestone Rewards</h3><p>Build your run record, unlock tiers, and claim your crystal haul.</p></div><span class="hero-crystal" aria-hidden="true">💎</span></section>
             <div class="milestone-subnav" role="tablist" aria-label="Milestone reward categories">
               <input class="milestone-radio" type="radio" name="milestoneCategory" id="milestoneRun" checked><label class="milestone-subtab" for="milestoneRun" role="tab" aria-controls="milestoneRunPanel">Run milestones</label>
@@ -4560,7 +5011,7 @@
               </div>
             </section>
           </div>
-          <div class="reward-tab-panel" id="rewardPanelBoosters" data-reward-panel="lucky" role="tabpanel" aria-labelledby="rewardTabBoosters" tabindex="0" hidden>
+          <div class="reward-tab-panel" id="rewardPanelBoosters" data-reward-panel="lucky" role="tabpanel" aria-label="Lucky Spin" tabindex="0" hidden>
             <section class="progress-hero spin-hero"><div><span class="panel-kicker">LUCK FAVORS THE BOLD</span><h3>Lucky Spin</h3><p>One spin can change your next run. Give the wheel a turn.</p></div><div class="spin-orb" aria-hidden="true">◎</div></section>
             <div class="spin-feature"><div class="spin-wheel-mark" aria-hidden="true">✦</div><div><span class="panel-kicker">DAILY FREE SPIN</span><h4>Fortune is in motion</h4><p id="rewardsSpinStatus">Spin for 💎 crystals, boosters, and rare drops.</p></div><button class="primary-btn rewards-spin-cta" id="rewardsLuckySpinButton" type="button">SPIN THE WHEEL <span aria-hidden="true">↗</span></button></div>
             <div class="spin-prizes" aria-label="Example spin rewards"><span>💎 CRYSTAL CACHE</span><span>✦ RARE SKIN</span><span>⚡ BOOSTER</span><span>◈ BONUS SPIN</span></div>
@@ -10171,7 +10622,7 @@ void main() {
         };
       }
       let progression = createFreshProgression();
-      let activeRewardsTab = "daily";
+      let activeRewardsTab = "all";
       let activeRewardFilter = "all";
       let activeMilestoneTab = "run";
       let dailyQuestClockTimer = 0;
@@ -11919,6 +12370,32 @@ void main() {
         banner.hidden = !weekendStormActive || !el("results").hidden;
         zeroGravityButton.hidden = !weekendStormActive;
         laserChaosButton.hidden = !weekendStormActive;
+        const rewardsCard = el("rewardsWeekendCard");
+        const rewardsStatus = el("rewardsWeekendStatus");
+        const rewardsCountdown = el("rewardsWeekendCountdown");
+        if (rewardsCard) rewardsCard.classList.toggle("active", weekendStormActive);
+        if (rewardsStatus) {
+          rewardsStatus.textContent = weekendStormActive
+            ? weekendStormState.participated
+              ? "Storm active · " + weekendStormState.completedRuns + " run" + (weekendStormState.completedRuns === 1 ? "" : "s") + " completed. Eligible event runs earn 2× score and crystals."
+              : "Storm active · choose Zero-Gravity or Laser Chaos from the main menu to start a 2× score and crystal run."
+            : "The weekend event is offline. Return on Saturday or Sunday for special modes and 2× score and crystal rewards.";
+        }
+        if (rewardsCountdown) {
+          if (weekendStormActive) {
+            rewardsCountdown.textContent = "ENDS IN " + formatWeekendCountdown(weekendStormEndsAt - now.getTime());
+          } else {
+            const nextStart = new Date(now);
+            const daysUntilSaturday = (6 - now.getDay() + 7) % 7 || 7;
+            nextStart.setDate(nextStart.getDate() + daysUntilSaturday);
+            nextStart.setHours(0, 0, 0, 0);
+            rewardsCountdown.textContent = "IN " + formatWeekendCountdown(nextStart.getTime() - now.getTime());
+          }
+        }
+        if (el("rewardsWeekendRuns")) el("rewardsWeekendRuns").textContent = String(safeStoredCount(weekendStormState.runsStarted));
+        if (el("rewardsWeekendCompleted")) el("rewardsWeekendCompleted").textContent = String(safeStoredCount(weekendStormState.completedRuns));
+        const eventModeLabels = { zeroGravity: "ZERO-G", laserChaos: "LASER CHAOS" };
+        if (el("rewardsWeekendMode")) el("rewardsWeekendMode").textContent = eventModeLabels[weekendStormState.lastMode] || "—";
         if (weekendStormActive) {
           const countdown = formatWeekendCountdown(weekendStormEndsAt - now.getTime());
           el("weekendStormCountdown").textContent = "ENDS IN " + countdown;
@@ -12835,10 +13312,30 @@ void main() {
           "🎁 READY",
           "Claim today's daily login streak reward"
         );
-        setUnclaimedRewardBadge(el("rewardTabAchievements"), dailyReady > 0, "CLAIM!", "Daily Quests · " + dailyReady + " rewards ready");
-        setUnclaimedRewardBadge(el("rewardTabReferral"), badgeReady > 0, "CLAIM!", "Achievements and Badges · " + badgeReady + " rewards ready");
-        setUnclaimedRewardBadge(el("rewardTabSkins"), tierReady > 0, "CLAIM!", "Milestone Rewards · " + tierReady + " rewards ready");
-        setUnclaimedRewardBadge(el("rewardTabBoosters"), spinReady, "FREE SPIN", "Lucky Spin · daily reward ready");
+        setUnclaimedRewardBadge(
+          el("rewardTabAll"),
+          totalReady > 0,
+          "🎁 READY",
+          "All rewards · " + totalReady + " available reward" + (totalReady === 1 ? "" : "s")
+        );
+        setUnclaimedRewardBadge(
+          el("rewardTabDaily"),
+          dailyReady > 0 || streakReady,
+          "CLAIM!",
+          "Daily Streak · " + (dailyReady + Number(streakReady)) + " rewards ready"
+        );
+        setUnclaimedRewardBadge(
+          el("rewardTabWeekend"),
+          weekendStormActive && weekendStormState?.participated !== true,
+          "2× LIVE",
+          "Weekend Storm · double rewards event active"
+        );
+        setUnclaimedRewardBadge(
+          el("rewardTabMilestones"),
+          badgeReady + tierReady > 0,
+          "CLAIM!",
+          "Milestones · " + (badgeReady + tierReady) + " rewards ready"
+        );
         setUnclaimedRewardBadge(el("dailySpinButton"), spinReady, "🎁 READY", "Spin for a daily reward");
         setUnclaimedRewardBadge(el("rewardsLuckySpinButton"), spinReady, "🎁 READY", "Spin for a daily reward");
 
@@ -12858,6 +13355,13 @@ void main() {
         if (!root) return;
         const cards = Array.from(root.querySelectorAll("[data-reward-card]"));
         const counts = { all: cards.length, claimed: 0, unclaimed: 0 };
+        const cardParents = new Set(cards.map(card => card.parentElement).filter(Boolean));
+        cardParents.forEach(parent => {
+          Array.from(parent.children)
+            .filter(child => child.matches?.("[data-reward-card]"))
+            .sort((a, b) => Number(a.dataset.rewardClaimState === "claimed") - Number(b.dataset.rewardClaimState === "claimed"))
+            .forEach(card => parent.appendChild(card));
+        });
         cards.forEach(card => {
           const isClaimed = card.dataset.rewardClaimState === "claimed";
           if (isClaimed) counts.claimed++;
@@ -13043,6 +13547,8 @@ void main() {
         updateShopPreview();
         updateDailyQuestClock();
         updateUnclaimedRewardBadges();
+        renderDailyStreakCalendar();
+        updateWeekendStormUI();
         applyRewardFilter();
         if (milestonesChanged || previousDailyDate !== progression.daily.date) saveProgression();
       }
@@ -13205,7 +13711,7 @@ void main() {
         const dayCount = Math.min(7, Math.max(1, loginStreakCount));
         el("dailyStreakDayCount").textContent = "DAY " + dayCount + (loginStreakClaimedToday ? " ✓" : "");
         el("dailyStreakWallet").textContent = progression.crystals.toLocaleString("en-US");
-        el("dailyStreakGrid").innerHTML = DAILY_STREAK_REWARDS.map((reward, index) => {
+        const calendarMarkup = DAILY_STREAK_REWARDS.map((reward, index) => {
           const day = index + 1;
           const claimed = day < dayCount || (loginStreakClaimedToday && day === dayCount);
           const current = !loginStreakClaimedToday && day === dayCount;
@@ -13223,6 +13729,8 @@ void main() {
             '<div class="daily-streak-state">' + statusText + '</div>' +
             '</article>';
         }).join("");
+        el("dailyStreakGrid").innerHTML = calendarMarkup;
+        if (el("rewardsStreakGrid")) el("rewardsStreakGrid").innerHTML = calendarMarkup;
         const reward = DAILY_STREAK_REWARDS[dayCount - 1];
         const summary = reward.shield
           ? "Claim 💎 +" + reward.crystals + " crystals and 1 free Neon Shield."
@@ -13232,6 +13740,28 @@ void main() {
         el("dailyStreakRewardSummary").textContent = loginStreakClaimedToday
           ? "Day " + dayCount + " is claimed. Your streak is saved."
           : summary;
+        if (el("rewardsStreakDay")) el("rewardsStreakDay").textContent = "DAY " + dayCount + " / 7";
+        if (el("rewardsStreakSummary")) {
+          el("rewardsStreakSummary").textContent = loginStreakClaimedToday
+            ? "Day " + dayCount + " claimed. Your streak is saved on this device."
+            : summary;
+        }
+        if (el("claimRewardsStreakButton")) {
+          el("claimRewardsStreakButton").disabled = loginStreakClaimedToday;
+          el("claimRewardsStreakButton").textContent = loginStreakClaimedToday ? "CLAIMED ✓" : "CLAIM TODAY’S REWARD";
+        }
+        const dashboardStreakCard = el("rewardsStreakCard");
+        if (dashboardStreakCard) {
+          dashboardStreakCard.dataset.rewardClaimState = loginStreakClaimedToday ? "claimed" : "unclaimed";
+          dashboardStreakCard.classList.toggle("claimed", loginStreakClaimedToday);
+          dashboardStreakCard.classList.toggle("claim-ready", !loginStreakClaimedToday);
+        }
+        setUnclaimedRewardBadge(
+          el("claimRewardsStreakButton"),
+          !loginStreakClaimedToday,
+          "CLAIM!",
+          "Claim today's seven-day login streak reward"
+        );
         el("claimDailyStreakButton").disabled = loginStreakClaimedToday;
         el("claimDailyStreakButton").textContent = loginStreakClaimedToday ? "CLAIMED ✓" : "CLAIM REWARD";
         setUnclaimedRewardBadge(
@@ -13307,9 +13837,11 @@ void main() {
         unlockAudio().then(unlocked => { if (unlocked) playCue("crystal"); });
         triggerHapticFeedback("crystal");
         if (achievementQueue.length && !achievementNoticeTimer) displayNextAchievement();
-        const returnFocus = dailyStreakReturnFocus;
+        const returnFocus = dailyStreakReturnFocus ||
+          (!el("rewards-screen").hidden ? el("claimRewardsStreakButton") : null);
         dailyStreakReturnFocus = null;
         if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
+        else if (!el("rewards-screen").hidden) el("shopCloseTop").focus({ preventScroll: true });
         else el("startButton").focus({ preventScroll: true });
         window.clearTimeout(dailySpinTimer);
         dailySpinTimer = window.setTimeout(() => {
@@ -13654,6 +14186,10 @@ void main() {
         if (initialTab === "referral") {
           initialTab = "milestones";
           milestoneTab = "invite";
+        } else if (initialTab === "achievements") {
+          initialTab = "milestones";
+        } else if (initialTab === "lucky") {
+          initialTab = "all";
         } else if (hasOwn(legacyMilestoneTab, initialTab)) {
           milestoneTab = legacyMilestoneTab[initialTab];
           initialTab = "milestones";
@@ -13679,7 +14215,7 @@ void main() {
         setBannerAdPlacement(state === "ready" ? "menu" : "hidden");
       }
       function setRewardsTab(tab) {
-        const validTabs = ["daily", "achievements", "milestones", "lucky"];
+        const validTabs = ["all", "daily", "weekend", "milestones"];
         if (!validTabs.includes(tab)) return;
         activeRewardsTab = tab;
         el("shop-screen").querySelectorAll("[data-reward-tab]").forEach(button => {
@@ -13689,13 +14225,33 @@ void main() {
           button.tabIndex = selected ? 0 : -1;
         });
         el("shop-screen").querySelectorAll("[data-reward-panel]").forEach(panel => {
-          const selected = panel.dataset.rewardPanel === tab;
+          const panelTab = panel.dataset.rewardPanel;
+          const selected = tab === "all" ||
+            (tab === "daily" && panelTab === "daily") ||
+            (tab === "weekend" && panelTab === "weekend") ||
+            (tab === "milestones" && panelTab === "milestones");
           panel.hidden = !selected;
           panel.setAttribute("aria-hidden", String(!selected));
         });
-        if (tab === "milestones") setMilestoneCategory(activeMilestoneTab);
-        else el("shopPreview").hidden = true;
+        if (tab === "milestones") {
+          setMilestoneCategory(activeMilestoneTab);
+        } else if (tab === "all") {
+          el("shop-screen").querySelectorAll(".milestone-content").forEach(panel => {
+            panel.hidden = false;
+            panel.setAttribute("aria-hidden", "false");
+          });
+          el("shopPreview").hidden = true;
+        } else {
+          el("shopPreview").hidden = true;
+          el("shop-screen").querySelectorAll(".milestone-content").forEach(panel => {
+            panel.hidden = true;
+            panel.setAttribute("aria-hidden", "true");
+          });
+        }
+        const rewardedVideo = el("shop-screen").querySelector(".shop-ad-reward-card");
+        if (rewardedVideo) rewardedVideo.hidden = tab !== "all";
         el("shopScroll").scrollTop = 0;
+        el("rewards-achievements-screen").scrollTop = 0;
       }
       function setMilestoneCategory(tab) {
         if (!["run", "cosmetics", "power", "invite"].includes(tab)) return;
@@ -17784,7 +18340,12 @@ void main() {
        el("inviteButton").addEventListener("click", () => openShop("milestones", "invite"));
        el("copyReferralButton").addEventListener("click", copyReferralInviteLink);
        el("whatsappReferralButton").addEventListener("click", shareReferralViaWhatsApp);
-       el("shopBack").addEventListener("click", returnToHome);
+        el("shopBack").addEventListener("click", returnToHome);
+        el("shopCloseTop").addEventListener("click", () => {
+          closeShop();
+          el("shopButton").focus({ preventScroll: true });
+        });
+        el("claimRewardsStreakButton").addEventListener("click", claimDailyStreakReward);
        document.querySelectorAll("[data-reward-tab]").forEach(button => {
          button.addEventListener("click", () => setRewardsTab(button.dataset.rewardTab));
        });
