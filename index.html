@@ -816,62 +816,6 @@
     .aura-card p, .booster-card p { min-height: 44px; margin: 6px 0 10px; color: #a4b1c0; font-size: 16px; line-height: 1.35; }
     .booster-inventory { margin: 6px 0 10px; color: #9caebe; font-size: 15px; }
     .booster-inventory strong { color: #d9fff5; font-family: "Orbitron", system-ui, sans-serif; }
-    .referral-panel {
-      display: grid;
-      gap: clamp(15px, 2.4vw, 24px);
-      max-width: 850px;
-      margin: 0 auto;
-      padding: clamp(18px, 3.4vw, 34px);
-      border: 1px solid rgba(84, 242, 223, .27);
-      border-radius: 14px;
-      background:
-        radial-gradient(ellipse at 92% 4%, rgba(255, 79, 184, .12), transparent 42%),
-        radial-gradient(ellipse at 8% 95%, rgba(56, 234, 255, .1), transparent 45%),
-        linear-gradient(145deg, rgba(14, 23, 37, .9), rgba(7, 11, 20, .94));
-      box-shadow: inset 0 1px rgba(255,255,255,.05), 0 0 28px rgba(56,234,255,.06);
-    }
-    .referral-kicker { color: #91fff0; font: 700 11px "Orbitron", system-ui, sans-serif; letter-spacing: .18em; }
-    .referral-heading { margin: 8px 0 0; color: #f2f6fb; font: 800 clamp(22px, 3vw, 32px)/1.2 "Orbitron", system-ui, sans-serif; }
-    .referral-copy { max-width: 680px; margin: 9px 0 0; color: #b5c1cf; font-size: clamp(16px, 1.7vw, 18px); line-height: 1.5; }
-    .referral-field-label { display: block; margin: 0 0 8px; color: #9aabba; font: 700 11px "Orbitron", system-ui, sans-serif; letter-spacing: .12em; }
-    .referral-link-row { display: flex; gap: 10px; min-width: 0; }
-    .referral-link-input {
-      flex: 1 1 auto;
-      min-width: 0;
-      min-height: 52px;
-      padding: 12px 14px;
-      border: 1px solid rgba(91,225,234,.32);
-      border-radius: 7px;
-      outline: none;
-      background: rgba(3,7,14,.78);
-      color: #d5ffff;
-      font: 600 14px/1.35 "Rajdhani", system-ui, sans-serif;
-      letter-spacing: .02em;
-      user-select: text;
-    }
-    .referral-link-input:focus-visible { border-color: #5af5e3; box-shadow: 0 0 0 2px rgba(90,245,227,.2); }
-    .referral-action-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .referral-action {
-      min-width: 0;
-      min-height: 52px;
-      border: 1px solid rgba(84,242,223,.42);
-      border-radius: 7px;
-      background: linear-gradient(110deg, rgba(56,234,255,.13), rgba(155,111,255,.1) 56%, rgba(255,79,184,.1));
-      color: #eaffff;
-      cursor: pointer;
-      font: 750 clamp(11px, 1.5vw, 14px) "Orbitron", system-ui, sans-serif;
-      letter-spacing: .055em;
-      text-align: center;
-      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
-      touch-action: manipulation;
-    }
-    .referral-action:hover { transform: translateY(-1px); border-color: rgba(255,79,184,.7); box-shadow: 0 0 20px rgba(56,234,255,.13); }
-    .referral-action:active { transform: scale(.97); }
-    .referral-action:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-    .referral-share-count { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid rgba(255,255,255,.1); background: rgba(4,8,15,.48); color: #aab8c7; font-size: 16px; }
-    .referral-share-count strong { color: #ffe68c; font: 700 18px "Orbitron", system-ui, sans-serif; }
-    .referral-status { min-height: 26px; margin: -8px 0 0; color: #8fffee; font-size: 16px; line-height: 1.45; text-align: center; }
-    .referral-disclaimer { margin: 0; color: #8795a5; font-size: 14px; line-height: 1.55; }
     .shop-section-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; margin: 4px 0 14px; }
     .shop-section-heading h3 { margin: 0; color: #f4f7ff; font: 700 clamp(20px, 2.2vw, 27px)/1.15 "Orbitron", system-ui, sans-serif; }
     .shop-section-heading p { margin: 6px 0 0; color: #a6b1c0; font-size: 16px; line-height: 1.4; }
@@ -2514,10 +2458,6 @@
       #overlay.home-screen .mode-selector { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       #overlay.home-screen .home-actions .primary-btn { min-height: 58px; font-size: 13px; }
       #overlay.home-screen .secondary-actions .secondary-btn { min-height: 44px; font-size: 8px; }
-      #rewards-screen .referral-link-row { flex-direction: column; }
-      #rewards-screen .referral-link-input { width: 100%; min-height: 50px; }
-      #rewards-screen .referral-action-row { grid-template-columns: 1fr; }
-      #rewards-screen .referral-action { min-height: 52px; }
       #overlay.home-screen .universal-menu-back,
       #overlay:not(.home-screen) .universal-menu-back,
       #dailyModal .universal-menu-back { min-height: 56px; font-size: 9px; }
@@ -4479,7 +4419,6 @@
     #rewards-screen #rewardPanelSkins .milestone-subnav,
     #rewards-screen #rewardPanelSkins .milestone-cosmetics-panel,
     #rewards-screen #rewardPanelSkins .milestone-power-panel,
-    #rewards-screen #rewardPanelSkins .milestone-invite-panel,
     #rewards-screen .shop-notice,
     #rewards-screen .save-reset,
     #rewards-screen .shop-footer {
@@ -4950,12 +4889,6 @@
     #rewards-screen .shop-content {
       margin-top: 0;
     }
-    #rewards-screen[data-view="invite"] #rewardPanelAll > :not(#rewardPanelSkins) {
-      display: none !important;
-    }
-    #rewards-screen[data-view="invite"] #rewardPanelSkins .milestone-invite-panel {
-      display: block !important;
-    }
   </style>
 </head>
 <body>
@@ -5168,7 +5101,6 @@
           <div class="secondary-actions">
             <button class="secondary-btn" id="shopButton" type="button">Rewards</button>
             <button class="secondary-btn" id="settingsButton" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settings-screen">Settings</button>
-            <button class="secondary-btn" id="inviteButton" type="button">Invite &amp; Earn 💎</button>
             <button class="secondary-btn lucky-spin-entry" id="luckySpinHomeButton" type="button" aria-haspopup="dialog" aria-controls="dailyModal">🎡 Daily Lucky Spin</button>
           </div>
         </div>
@@ -5430,7 +5362,6 @@
               <input class="milestone-radio" type="radio" name="milestoneCategory" id="milestoneRun" checked><label class="milestone-subtab" for="milestoneRun" role="tab" aria-controls="milestoneRunPanel">Run milestones</label>
               <input class="milestone-radio" type="radio" name="milestoneCategory" id="milestoneCosmetics"><label class="milestone-subtab" for="milestoneCosmetics" role="tab" aria-controls="milestoneCosmeticsPanel">Cosmetics</label>
               <input class="milestone-radio" type="radio" name="milestoneCategory" id="milestonePower"><label class="milestone-subtab" for="milestonePower" role="tab" aria-controls="milestonePowerPanel">Power-ups</label>
-              <input class="milestone-radio" type="radio" name="milestoneCategory" id="milestoneInvite"><label class="milestone-subtab" for="milestoneInvite" role="tab" aria-controls="milestoneInvitePanel">Invite &amp; Earn</label>
             </div>
             <section class="milestone-content milestone-run-panel" id="milestoneRunPanel" role="tabpanel" aria-label="Run milestones" hidden>
                 <div class="minimal-subheading"><h3>Milestone tiers</h3><p>Progress across distance, crystals, gates, and modes.</p></div>
@@ -5444,16 +5375,6 @@
             </section>
             <section class="milestone-content milestone-power-panel" id="milestonePowerPanel" role="tabpanel" aria-label="Power-up rewards" hidden>
               <div class="shop-section-label">Run boosters · single-use tokens</div><div class="booster-grid" id="boosterGrid"></div>
-            </section>
-            <section class="milestone-content milestone-invite-panel" id="milestoneInvitePanel" role="tabpanel" aria-label="Invite friends" hidden>
-              <div class="shop-section-label">Invite your crew</div>
-              <div class="referral-panel">
-                <header><div class="referral-kicker">NEON RUSH · FRIEND INVITES</div><h3 class="referral-heading">Bring a friend into the stream</h3><p class="referral-copy">Share your personal link. The first browser to open an invite from a different player receives a one-time welcome bonus of <strong>💎 150 Neon Crystals</strong>.</p></header>
-                <div><label class="referral-field-label" for="referralLink">YOUR PERSONAL INVITE LINK</label><div class="referral-link-row"><input class="referral-link-input" id="referralLink" type="url" readonly aria-label="Your unique referral link" /><button class="referral-action" id="copyReferralButton" type="button">📋 COPY INVITE LINK</button></div></div>
-                <div class="referral-action-row"><button class="referral-action" id="whatsappReferralButton" type="button">🔗 SHARE VIA WHATSAPP</button><div class="referral-share-count"><span>Share actions on this device</span><strong id="referralShareCount">0</strong></div></div>
-                <p class="referral-status" id="referralStatus" role="status" aria-live="polite" aria-atomic="true"></p>
-                <p class="referral-disclaimer">Share actions are counted on this device; they do not confirm that a message was sent or an install occurred. This browser-only build cannot verify or pay inviter rewards across devices.</p>
-              </div>
             </section>
           </div>
           <div class="reward-tab-panel" id="rewardPanelBoosters" data-reward-panel="lucky" role="tabpanel" aria-label="Lucky Spin" tabindex="0" hidden>
@@ -11053,7 +10974,6 @@ void main() {
           ownedSkins: ["sphere"],
           activeSkin: "sphere",
           shareRewardClaimed: false,
-          referralWelcomeClaimed: false,
           ownedTrails: ["none"],
           activeTrail: "none",
           ownedAuras: ["none"],
@@ -11538,13 +11458,15 @@ void main() {
       const HIGH_SCORE_KEY = "highScore";
       const LOCAL_INTEGRITY_KEY = "colorShiftLocalIntegrityV2";
       const LOCAL_INTEGRITY_SEED = "ColorShift-NeonRush3D-client-check-v1";
-      const REFERRAL_PLAYER_ID_KEY = "colorShiftPlayerId";
-      const DEVICE_UUID_KEY = "device_uuid";
-      const REFERRAL_WELCOME_KEY = "colorShiftReferralWelcomeClaimed";
-      const REFERRAL_REDEEMED_KEY = "hasRedeemedReferral";
-      const REFERRAL_SHARE_ACTIONS_KEY = "colorShiftReferralShareActions";
+      const PLAYER_ID_KEY = "colorShiftPlayerIdentity";
+      const LEGACY_PLAYER_ID_KEY = "colorShiftPlayerId";
+      const LEGACY_REFERRAL_STORAGE_KEYS = Object.freeze([
+        "device_uuid",
+        "colorShiftReferralWelcomeClaimed",
+        "hasRedeemedReferral",
+        "colorShiftReferralShareActions"
+      ]);
       const CHALLENGE_VICTORY_KEY = "neonChallengeVictories";
-      const REFERRAL_WELCOME_CRYSTALS = 150;
       // Client-side limits deter casual score injection; competitive results
       // still require server-owned validation.
       const MAX_SCORE_RATE_PER_SECOND = 7000;
@@ -11610,7 +11532,7 @@ void main() {
         const parsed = Number(value);
         return Number.isFinite(parsed) && parsed >= 0 ? Math.min(1000000000, Math.floor(parsed)) : 0;
       }
-      function createReferralPlayerId() {
+      function createPlayerId() {
         const bytes = new Uint8Array(16);
         try {
           if (window.crypto?.getRandomValues) window.crypto.getRandomValues(bytes);
@@ -11620,48 +11542,33 @@ void main() {
         }
         return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
       }
-      function createDeviceUuid() {
+      function getOrCreatePlayerId() {
         try {
-          if (typeof window.crypto?.randomUUID === "function") {
-            return window.crypto.randomUUID().toLowerCase();
-          }
-        } catch {}
-        const hex = createReferralPlayerId();
-        return [
-          hex.slice(0, 8),
-          hex.slice(8, 12),
-          "4" + hex.slice(13, 16),
-          ((parseInt(hex[16], 16) & 3) | 8).toString(16) + hex.slice(17, 20),
-          hex.slice(20, 32)
-        ].join("-");
-      }
-      function getOrCreateDeviceUuid() {
-        try {
-          const storedId = localStorage.getItem(DEVICE_UUID_KEY) || "";
-          if (/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(storedId)) {
-            return storedId.toLowerCase();
-          }
-          const newId = createDeviceUuid();
-          localStorage.setItem(DEVICE_UUID_KEY, newId);
-          return newId;
-        } catch {
-          return createDeviceUuid();
-        }
-      }
-      function getOrCreateReferralPlayerId() {
-        try {
-          const storedId = localStorage.getItem(REFERRAL_PLAYER_ID_KEY) || "";
+          const storedId = localStorage.getItem(PLAYER_ID_KEY) || "";
           if (/^[a-f0-9]{32}$/i.test(storedId)) return storedId.toLowerCase();
-          const newId = createReferralPlayerId();
-          localStorage.setItem(REFERRAL_PLAYER_ID_KEY, newId);
-          return newId;
+          const legacyId = localStorage.getItem(LEGACY_PLAYER_ID_KEY) || "";
+          const playerId = /^[a-f0-9]{32}$/i.test(legacyId) ? legacyId.toLowerCase() : createPlayerId();
+          localStorage.setItem(PLAYER_ID_KEY, playerId);
+          localStorage.removeItem(LEGACY_PLAYER_ID_KEY);
+          return playerId;
         } catch {
-          return createReferralPlayerId();
+          return createPlayerId();
         }
       }
-      const deviceUuid = getOrCreateDeviceUuid();
-      const DEVICE_REFERRAL_REDEEMED_KEY = "colorShiftReferralRedeemed:" + deviceUuid;
-      const referralPlayerId = getOrCreateReferralPlayerId();
+      function clearLegacyReferralStorage() {
+        try {
+          LEGACY_REFERRAL_STORAGE_KEYS.forEach(key => localStorage.removeItem(key));
+          localStorage.removeItem(LEGACY_PLAYER_ID_KEY);
+          for (let index = localStorage.length - 1; index >= 0; index--) {
+            const key = localStorage.key(index);
+            if (key && key.startsWith("colorShiftReferralRedeemed:")) localStorage.removeItem(key);
+          }
+        } catch {
+          // Legacy invite data is nonessential; storage may be unavailable.
+        }
+      }
+      const playerId = getOrCreatePlayerId();
+      clearLegacyReferralStorage();
       function loadChallengeVictoryClaims() {
         try {
           const saved = JSON.parse(localStorage.getItem(CHALLENGE_VICTORY_KEY) || "[]");
@@ -11682,101 +11589,6 @@ void main() {
         }
       }
       loadChallengeVictoryClaims();
-      function makeReferralLink() {
-        const inviteUrl = new URL(window.location.pathname, window.location.origin);
-        inviteUrl.searchParams.set("ref", referralPlayerId);
-        return inviteUrl.toString();
-      }
-      function recordReferralShareAction() {
-        let actions = 0;
-        try {
-          actions = safeStoredCount(localStorage.getItem(REFERRAL_SHARE_ACTIONS_KEY)) + 1;
-          localStorage.setItem(REFERRAL_SHARE_ACTIONS_KEY, String(actions));
-        } catch {
-          actions++;
-        }
-        if (el("referralShareCount")) el("referralShareCount").textContent = String(actions);
-        return actions;
-      }
-      function updateReferralUI() {
-        const input = el("referralLink");
-        if (input) input.value = makeReferralLink();
-        const count = el("referralShareCount");
-        if (count) {
-          let actions = 0;
-          try { actions = safeStoredCount(localStorage.getItem(REFERRAL_SHARE_ACTIONS_KEY)); } catch {}
-          count.textContent = actions.toLocaleString("en-US");
-        }
-      }
-      function clearReferralQueryParameter() {
-        try {
-          const url = new URL(window.location.href);
-          if (!url.searchParams.has("ref")) return;
-          url.searchParams.delete("ref");
-          history.replaceState(history.state, "", url.pathname + url.search + url.hash);
-        } catch {
-          // Keep the app running if URL history updates are restricted.
-        }
-      }
-      function referralAlreadyRedeemed() {
-        if (progression.referralWelcomeClaimed === true) return true;
-        try {
-          return ["1", "true"].includes(String(localStorage.getItem(DEVICE_REFERRAL_REDEEMED_KEY) || "").toLowerCase()) ||
-            ["1", "true"].includes(String(localStorage.getItem(REFERRAL_REDEEMED_KEY) || "").toLowerCase()) ||
-            ["1", "true"].includes(String(localStorage.getItem(REFERRAL_WELCOME_KEY) || "").toLowerCase());
-        } catch {
-          return false;
-        }
-      }
-      function persistReferralRedemption() {
-        progression.referralWelcomeClaimed = true;
-        try {
-          localStorage.setItem(DEVICE_REFERRAL_REDEEMED_KEY, "true");
-          localStorage.setItem(REFERRAL_REDEEMED_KEY, "true");
-          localStorage.setItem(REFERRAL_WELCOME_KEY, "1");
-        } catch {
-          // The in-memory progression flag still blocks another claim this session.
-        }
-      }
-      function processIncomingReferral() {
-        let referralId = "";
-        try { referralId = new URLSearchParams(window.location.search).get("ref") || ""; } catch {}
-        if (!referralId) {
-          updateReferralUI();
-          return false;
-        }
-        const normalizedReferralId = referralId.toLowerCase();
-        if (!/^[a-f0-9]{32}$/.test(normalizedReferralId)) {
-          el("referralStatus").textContent = "That invite link is invalid.";
-          clearReferralQueryParameter();
-          updateReferralUI();
-          return false;
-        }
-        if (normalizedReferralId === referralPlayerId) {
-          el("referralStatus").textContent = "Cannot redeem your own invite link on the same device! ⚠️";
-          clearReferralQueryParameter();
-          updateReferralUI();
-          return false;
-        }
-        if (referralAlreadyRedeemed()) {
-          persistReferralRedemption();
-          el("referralStatus").textContent = "Cannot redeem your own invite link on the same device! ⚠️";
-          clearReferralQueryParameter();
-          updateReferralUI();
-          return false;
-        }
-        // Mark redemption before crediting the wallet so a repeated startup cannot
-        // award the same welcome bonus twice if saving progression is interrupted.
-        persistReferralRedemption();
-        progression.crystals = safeStoredCount(progression.crystals + REFERRAL_WELCOME_CRYSTALS);
-        progression.lifetimeCrystals = safeStoredCount(progression.lifetimeCrystals + REFERRAL_WELCOME_CRYSTALS);
-        saveProgression();
-        el("referralStatus").textContent = "Welcome bonus claimed: +150 Neon Crystals.";
-        window.setTimeout(() => showShareRewardToast("🎉 Bonus! Invited by a friend: +150 Crystals added!", 5200), 1800);
-        clearReferralQueryParameter();
-        updateReferralUI();
-        return true;
-      }
       function encodeChallengeText(value) {
         const bytes = new TextEncoder().encode(value);
         let binary = "";
@@ -11804,9 +11616,9 @@ void main() {
         const core = {
           v: 1,
           score: safeStoredCount(finalScore),
-          challenger: "Runner " + referralPlayerId.slice(0, 4).toUpperCase(),
-          challengerId: referralPlayerId,
-          id: createReferralPlayerId()
+          challenger: "Runner " + playerId.slice(0, 4).toUpperCase(),
+          challengerId: playerId,
+          id: createPlayerId()
         };
         // The URL payload is encoded and checksummed to reject malformed links.
         // This client-only checksum is not a trusted signature; a server would be
@@ -11902,7 +11714,7 @@ void main() {
         if (!hasChallengeParams) return false;
         incomingChallenge = parseIncomingChallenge();
         clearChallengeQueryParameters();
-        if (!incomingChallenge || incomingChallenge.challengerId === referralPlayerId) {
+        if (!incomingChallenge || incomingChallenge.challengerId === playerId) {
           incomingChallenge = null;
           return false;
         }
@@ -11972,31 +11784,6 @@ void main() {
           button.disabled = false;
         }
       }
-      async function copyReferralInviteLink() {
-        const copied = await copyShareText(makeReferralLink());
-        el("referralStatus").textContent = copied
-          ? "Invite link copied. Share it with a friend to get them started."
-          : "Could not copy automatically. Select and copy the invite link above.";
-      }
-      async function shareReferralViaWhatsApp() {
-        const button = el("whatsappReferralButton");
-        if (button.disabled) return;
-        const inviteLink = makeReferralLink();
-        const message = "Hey! Play Color Shift: Neon Rush 3D with me and grab bonus Neon Crystals! 🚀 Play here: " + inviteLink;
-        button.disabled = true;
-        try {
-          openWhatsAppShareIntent(message);
-          recordReferralShareAction();
-          const copied = await copyShareText(message);
-          el("referralStatus").textContent = copied
-            ? "WhatsApp share opened and the message was copied. Sending and installs are not verified."
-            : "WhatsApp share opened. Sending and installs are not verified.";
-        } catch (error) {
-          el("referralStatus").textContent = "Could not open the WhatsApp share link. You can copy your invite link instead.";
-        } finally {
-          button.disabled = false;
-        }
-      }
       function checksumText(value) {
         let hash = 0x811c9dc5;
         for (let index = 0; index < value.length; index++) {
@@ -12014,7 +11801,6 @@ void main() {
           HIGH_SCORE_KEY, BEST_KEY, "colorSwipeBest",
           ...Object.values(MODE_HIGH_SCORE_KEYS),
           "lastLoginDate", "loginStreakCount",
-          REFERRAL_WELCOME_KEY, REFERRAL_REDEEMED_KEY, DEVICE_REFERRAL_REDEEMED_KEY,
           CHALLENGE_VICTORY_KEY
         ]));
       }
@@ -12025,9 +11811,8 @@ void main() {
           })
         );
         return {
-          version: 2,
+          version: 3,
           wallet: safeStoredCount(progression.crystals),
-          referralWelcomeClaimed: progression.referralWelcomeClaimed === true,
           highScores,
           storage: Object.fromEntries(
             getIntegrityTrackedKeys().map(key => [key, integrityStorageValue(key)])
@@ -12039,7 +11824,7 @@ void main() {
           const snapshot = getLocalIntegritySnapshot();
           const canonical = JSON.stringify(snapshot);
           localStorage.setItem(LOCAL_INTEGRITY_KEY, JSON.stringify({
-            version: 3,
+            version: 4,
             snapshot,
             checksum: checksumText(LOCAL_INTEGRITY_SEED + "|" + canonical)
           }));
@@ -12057,10 +11842,10 @@ void main() {
         loginStreakLaunchDay = localDayKey();
         try {
           [PROGRESSION_KEY, LEGACY_PROGRESSION_KEY, "lastLoginDate", "loginStreakCount",
-            REFERRAL_WELCOME_KEY, REFERRAL_REDEEMED_KEY, DEVICE_REFERRAL_REDEEMED_KEY,
             CHALLENGE_VICTORY_KEY, GHOST_RUN_KEY, "neonWeekendStorm"].forEach(key => {
             try { localStorage.removeItem(key); } catch {}
           });
+          clearLegacyReferralStorage();
           [...Object.values(MODE_HIGH_SCORE_KEYS), HIGH_SCORE_KEY, BEST_KEY, "colorSwipeBest"]
             .forEach(key => { try { localStorage.setItem(key, "0"); } catch {} });
           [NEON_CRYSTALS_KEY, COINS_KEY].forEach(key => {
@@ -12073,7 +11858,6 @@ void main() {
       }
       function preserveIntegrityBackedClaimFlags(trustedPayload) {
         if (!trustedPayload || typeof trustedPayload !== "object") return;
-        progression.referralWelcomeClaimed = trustedPayload.referralWelcomeClaimed === true;
         progression.shareRewardClaimed = trustedPayload.shareRewardClaimed === true;
         for (const id of Object.keys(progression.claimedAchievements)) {
           progression.claimedAchievements[id] = trustedPayload.claimedAchievements?.[id] === true;
@@ -12100,10 +11884,35 @@ void main() {
           return false;
         }
 
-        const canonical = JSON.stringify(record.snapshot);
+        let canonical = JSON.stringify(record.snapshot);
         if (checksumText(LOCAL_INTEGRITY_SEED + "|" + canonical) !== record.checksum) {
           resetIntegrityProtectedDataToDefaults();
           return false;
+        }
+
+        // Drop referral-only fields from older integrity snapshots while
+        // preserving the wallet, challenge data, and high scores they protect.
+        if (record.version === 3 && record.snapshot.version === 2 &&
+            record.snapshot.storage && typeof record.snapshot.storage === "object") {
+          const migratedSnapshot = {
+            ...record.snapshot,
+            version: 3,
+            storage: { ...record.snapshot.storage }
+          };
+          delete migratedSnapshot.referralWelcomeClaimed;
+          for (const key of Object.keys(migratedSnapshot.storage)) {
+            if (LEGACY_REFERRAL_STORAGE_KEYS.includes(key) ||
+                key.startsWith("colorShiftReferralRedeemed:")) {
+              delete migratedSnapshot.storage[key];
+            }
+          }
+          record = {
+            version: 4,
+            snapshot: migratedSnapshot,
+            checksum: checksumText(LOCAL_INTEGRITY_SEED + "|" + JSON.stringify(migratedSnapshot))
+          };
+          canonical = JSON.stringify(migratedSnapshot);
+          try { localStorage.setItem(LOCAL_INTEGRITY_KEY, JSON.stringify(record)); } catch {}
         }
 
         // Migrate the previous wallet/high-score-only snapshot without discarding
@@ -12113,7 +11922,6 @@ void main() {
           const currentLegacy = {
             version: 1,
             wallet: safeStoredCount(progression.crystals),
-            referralWelcomeClaimed: progression.referralWelcomeClaimed === true,
             highScores: Object.fromEntries(
               Object.entries(MODE_HIGH_SCORE_KEYS).map(([mode, key]) => [
                 mode,
@@ -12121,9 +11929,18 @@ void main() {
               ])
             )
           };
-          if (JSON.stringify(currentLegacy) !== canonical) {
+          const savedLegacy = {
+            version: 1,
+            wallet: safeStoredCount(saved.wallet),
+            highScores: Object.fromEntries(
+              Object.entries(MODE_HIGH_SCORE_KEYS).map(([mode]) => [
+                mode,
+                safeStoredCount(saved.highScores?.[mode])
+              ])
+            )
+          };
+          if (JSON.stringify(currentLegacy) !== JSON.stringify(savedLegacy)) {
             progression.crystals = safeStoredCount(saved.wallet);
-            progression.referralWelcomeClaimed = saved.referralWelcomeClaimed === true;
             try {
               for (const [mode, key] of Object.entries(MODE_HIGH_SCORE_KEYS)) {
                 localStorage.setItem(key, String(safeStoredCount(saved.highScores?.[mode])));
@@ -12146,7 +11963,7 @@ void main() {
         }
 
         const saved = record.snapshot;
-        if (record.version !== 3 || saved.version !== 2 ||
+        if (record.version !== 4 || saved.version !== 3 ||
             !saved.storage || typeof saved.storage !== "object") {
           resetIntegrityProtectedDataToDefaults();
           return false;
@@ -12184,7 +12001,6 @@ void main() {
           try { localStorage.setItem(COINS_KEY, "0"); } catch {}
         } else {
           progression.crystals = safeStoredCount(saved.wallet);
-          progression.referralWelcomeClaimed = saved.referralWelcomeClaimed === true;
           try {
             localStorage.setItem(NEON_CRYSTALS_KEY, String(progression.crystals));
             localStorage.setItem(COINS_KEY, String(progression.crystals));
@@ -13031,7 +12847,6 @@ void main() {
               : "sphere";
           progression.shareRewardClaimed =
             stored.shareRewardClaimed === true || progression.ownedSkins.includes(SHARE_REWARD_SKIN);
-          progression.referralWelcomeClaimed = stored.referralWelcomeClaimed === true;
           const validTrails = Array.isArray(stored.ownedTrails)
             ? stored.ownedTrails.filter(id => hasOwn(TRAIL_STYLES, id))
             : [];
@@ -13102,7 +12917,6 @@ void main() {
           ownedSkins: progression.ownedSkins.filter(id => hasOwn(PLAYER_SKINS, id)),
           activeSkin: hasOwn(PLAYER_SKINS, progression.activeSkin) ? progression.activeSkin : "sphere",
           shareRewardClaimed: progression.shareRewardClaimed === true,
-          referralWelcomeClaimed: progression.referralWelcomeClaimed === true,
           ownedTrails: progression.ownedTrails.filter(id => hasOwn(TRAIL_STYLES, id)),
           activeTrail: hasOwn(TRAIL_STYLES, progression.activeTrail) ? progression.activeTrail : "none",
           ownedAuras: progression.ownedAuras.filter(id => hasOwn(AURA_STYLES, id)),
@@ -14259,10 +14073,6 @@ void main() {
       applyPlayerSkin(progression.activeSkin);
       applyPlayerAura(progression.activeAura);
       verifyLocalIntegritySnapshot();
-      try {
-        if (localStorage.getItem(REFERRAL_WELCOME_KEY) === "1") progression.referralWelcomeClaimed = true;
-      } catch {}
-      processIncomingReferral();
       if (localStorageIntegrityWarning) {
         el("integrityNotice").textContent = "Local save integrity check detected edited or corrupted data. The latest verifiable wallet and mode scores were restored where possible.";
         el("integrityNotice").hidden = false;
@@ -14893,13 +14703,8 @@ void main() {
         if (state !== "ready") return;
         setBannerAdPlacement("shop");
         closeSettings();
-        const openInviteView = initialTab === "referral" ||
-          (initialTab === "milestones" && milestoneTab === "invite");
         const legacyMilestoneTab = { skins: "run", trails: "cosmetics", auras: "cosmetics", boosters: "power" };
-        if (initialTab === "referral") {
-          initialTab = "milestones";
-          milestoneTab = "invite";
-        } else if (initialTab === "achievements") {
+        if (initialTab === "achievements") {
           initialTab = "milestones";
         } else if (initialTab === "lucky") {
           initialTab = "all";
@@ -14908,11 +14713,11 @@ void main() {
           initialTab = "milestones";
         }
         // The default rewards view is intentionally a single, consolidated page.
-        initialTab = openInviteView ? "milestones" : "all";
-        milestoneTab = openInviteView ? "invite" : "run";
+        initialTab = "all";
+        milestoneTab = "run";
         el("rewards-screen").hidden = false;
-        el("rewards-screen").dataset.view = openInviteView ? "invite" : "rewards";
-        el("rewardsTitle").textContent = openInviteView ? "INVITE & EARN" : "🎁 REWARDS & ACHIEVEMENTS";
+        el("rewards-screen").dataset.view = "rewards";
+        el("rewardsTitle").textContent = "🎁 REWARDS & ACHIEVEMENTS";
         el("rewards-screen").scrollTop = 0;
         el("shopNotice").textContent = "";
         activeMilestoneTab = milestoneTab;
@@ -14921,7 +14726,6 @@ void main() {
         setRewardFilter("all");
         renderProgressionUI();
         refreshLuckySpinUI();
-        updateReferralUI();
         startDailyQuestClock();
         el("shopCloseTop").focus({ preventScroll: true });
       }
@@ -14974,15 +14778,14 @@ void main() {
         el("rewards-screen").scrollTop = 0;
       }
       function setMilestoneCategory(tab) {
-        if (!["run", "cosmetics", "power", "invite"].includes(tab)) return;
+        if (!["run", "cosmetics", "power"].includes(tab)) return;
         activeMilestoneTab = tab;
         const radio = el("milestone" + tab[0].toUpperCase() + tab.slice(1));
         if (radio) radio.checked = true;
         const panelClasses = {
           run: "milestone-run-panel",
           cosmetics: "milestone-cosmetics-panel",
-          power: "milestone-power-panel",
-          invite: "milestone-invite-panel"
+          power: "milestone-power-panel"
         };
         el("shop-screen").querySelectorAll(".milestone-content").forEach(panel => {
           const selected = panel.classList.contains(panelClasses[tab]);
@@ -15029,7 +14832,7 @@ void main() {
       }
       function resetLocalProgress() {
         const confirmed = window.confirm(
-          "Reset this device's game save? Scores, crystals, skins, achievements, daily rewards, duel badge, and share counts will clear. This browser's referral ID and one-time welcome claim will stay to prevent repeat invite bonuses."
+          "Reset this device's game save? Scores, crystals, skins, achievements, daily rewards, duel progress, and share rewards will clear. Audio and display preferences will remain."
         );
         if (!confirmed) return;
         dismissShareRewardToast();
@@ -15048,10 +14851,10 @@ void main() {
             WEEKEND_STORM_STORAGE_KEY,
             GHOST_RUN_KEY,
             LOCAL_INTEGRITY_KEY,
-            REFERRAL_SHARE_ACTIONS_KEY,
             CHALLENGE_VICTORY_KEY,
             CYBER_DUEL_BADGE_KEY
           ].forEach(key => localStorage.removeItem(key));
+          clearLegacyReferralStorage();
           localStorage.setItem(HIGH_SCORE_KEY, "0");
           localStorage.setItem(NEON_CRYSTALS_KEY, "0");
         } catch (error) {
@@ -15064,9 +14867,6 @@ void main() {
         weekendStormState = { eventId: weekendStormState.eventId, participated: false, multiplier: WEEKEND_STORM_MULTIPLIER, runsStarted: 0, completedRuns: 0, lastMode: "" };
         if (weekendStormActive && weekendStormState.eventId) saveWeekendStormState();
         updateWeekendStormUI();
-        try {
-          progression.referralWelcomeClaimed = localStorage.getItem(REFERRAL_WELCOME_KEY) === "1";
-        } catch {}
         localStorageIntegrityWarning = false;
         el("integrityNotice").hidden = true;
         el("integrityNotice").textContent = "";
@@ -19058,9 +18858,6 @@ void main() {
         el("dailySpinButton").focus({ preventScroll: true });
       });
        el("shopButton").addEventListener("click", () => openShop());
-       el("inviteButton").addEventListener("click", () => openShop("milestones", "invite"));
-       el("copyReferralButton").addEventListener("click", copyReferralInviteLink);
-       el("whatsappReferralButton").addEventListener("click", shareReferralViaWhatsApp);
         el("shopBack").addEventListener("click", returnToHome);
         el("shopCloseTop").addEventListener("click", () => {
           closeShop();
